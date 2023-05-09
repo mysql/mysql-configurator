@@ -1,0 +1,967 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MySql.Configurator</RootNamespace>
+    <AssemblyName>mysql_configurator</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <ApplicationIcon>mysql-server.ico</ApplicationIcon>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.11.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Interop.Shell32">
+      <HintPath>..\common\Interop.Shell32.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="MySql.Data, Version=8.0.30.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\common\MySql.Data.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controls\FlatButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\SelectablePictureBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Core\Classes\AppConfiguration.cs" />
+    <Compile Include="Core\Classes\AppConfigurationData.cs" />
+    <Compile Include="Core\Classes\Attributes\AlternateNameAttribute.cs" />
+    <Compile Include="Core\Classes\Attributes\ExcludeAttribute.cs" />
+    <Compile Include="Core\Classes\Attributes\NumericCodeAttribute.cs" />
+    <Compile Include="Core\Classes\Attributes\SupportedByAttribute.cs" />
+    <Compile Include="Core\Classes\BaseStartupParameters.cs" />
+    <Compile Include="Core\Classes\CommandAreaProperties.cs" />
+    <Compile Include="Core\Classes\Configuration\IniFile.cs" />
+    <Compile Include="Core\Classes\Configuration\IniFileLine.cs" />
+    <Compile Include="Core\Classes\Configuration\IniFileLineType.cs" />
+    <Compile Include="Core\Classes\Configuration\IniFileSection.cs" />
+    <Compile Include="Core\Classes\DeprecatedServerVariable.cs" />
+    <Compile Include="Core\Classes\DirectoryServicesWrapper.cs" />
+    <Compile Include="Core\Classes\DllImportConstants.cs" />
+    <Compile Include="Core\Classes\ErrorProviderProperties.cs" />
+    <Compile Include="Core\Classes\ExtensionMethods.cs" />
+    <Compile Include="Core\Classes\ImageComboBoxItem.cs" />
+    <Compile Include="Core\Classes\InfoDialogProperties.cs" />
+    <Compile Include="Core\Classes\InnoDbClusterAttribute.cs" />
+    <Compile Include="Core\Classes\LastFocusedControlFilter.cs" />
+    <Compile Include="Core\Classes\LinkActivationEventArgs.cs" />
+    <Compile Include="Core\Classes\ListViewHelper.cs" />
+    <Compile Include="Core\Classes\Logging\LogFile.cs" />
+    <Compile Include="Core\Classes\Logging\LogFileMonitor.cs" />
+    <Compile Include="Core\Classes\Logging\Logger.cs" />
+    <Compile Include="Core\Classes\Logging\LoggerListener.cs" />
+    <Compile Include="Core\Classes\Logging\LoggerPropertySetException.cs" />
+    <Compile Include="Core\Classes\Logging\LoggerUndefinedLogFileException.cs" />
+    <Compile Include="Core\Classes\MigrationResult.cs" />
+    <Compile Include="Core\Classes\MyListViewSubItem.cs" />
+    <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbench.cs" />
+    <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchConnection.cs" />
+    <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchConnectionCollection.cs" />
+    <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchConnectionExtraParameters.cs" />
+    <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchConnectionExtraParametersCollection.cs" />
+    <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchPasswordVault.cs" />
+    <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchServer.cs" />
+    <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchServerCollection.cs" />
+    <Compile Include="Core\Classes\MySQL\MySqlServerInstance.cs" />
+    <Compile Include="Core\Classes\MySQL\MySqlServerStartupParameters.cs" />
+    <Compile Include="Core\Classes\MySQL\MySqlServerUser.cs" />
+    <Compile Include="Core\Classes\NativeMethods.cs" />
+    <Compile Include="Core\Classes\Options\CommandLineOption.cs" />
+    <Compile Include="Core\Classes\Options\CommandLineOptions.cs" />
+    <Compile Include="Core\Classes\PasswordStrengthVerifier.cs" />
+    <Compile Include="Core\Classes\ProcessResult.cs" />
+    <Compile Include="Core\Classes\Security\SecureVault.cs" />
+    <Compile Include="Core\Classes\Service.cs" />
+    <Compile Include="Core\Classes\TwoKeyDictionary.cs" />
+    <Compile Include="Core\Classes\Utilities.cs" />
+    <Compile Include="Core\Classes\VisualStyles\CustomVisualStyleElements.cs" />
+    <Compile Include="Core\Classes\VisualStyles\StyleableHelper.cs" />
+    <Compile Include="Core\Classes\Win32.cs" />
+    <Compile Include="Core\Classes\XmlRepository.cs" />
+    <Compile Include="Core\Common\BaseStep.cs" />
+    <Compile Include="Core\Common\ConfiguratorException.cs" />
+    <Compile Include="Core\Common\GeneralSettings.cs" />
+    <Compile Include="Core\Controllers\BaseServerSettings.cs" />
+    <Compile Include="Core\Controllers\ConfigurationStep.cs" />
+    <Compile Include="Core\Controllers\ControllerSettingAttribute.cs" />
+    <Compile Include="Core\Controllers\ControllerSettings.cs" />
+    <Compile Include="Core\Controllers\ControllerType.cs" />
+    <Compile Include="Core\Controllers\ExtendedServerSettings.cs" />
+    <Compile Include="Core\Controllers\PluginManager.cs" />
+    <Compile Include="Core\Controllers\ProductConfigurationAttribute.cs" />
+    <Compile Include="Core\Controllers\ProductConfigurationController.cs" />
+    <Compile Include="Core\Controllers\RemoveStep.cs" />
+    <Compile Include="Core\Controllers\ServerProductConfigurationController.cs" />
+    <Compile Include="Core\Controllers\ValueList.cs" />
+    <Compile Include="Core\Controls\ConfigStepControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Core\Controls\ConfigStepControl.Designer.cs">
+      <DependentUpon>ConfigStepControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Controls\ImageComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Core\Controls\LocalIpAddressesComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Core\Controls\LocalIpAddressesComboBox.Designer.cs">
+      <DependentUpon>LocalIpAddressesComboBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Controls\MyListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Core\Controls\NewUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Core\Controls\NewUserControl.Designer.cs">
+      <DependentUpon>NewUserControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Controls\PasswordStrengthLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Core\Controls\PasswordStrengthLabel.Designer.cs">
+      <DependentUpon>PasswordStrengthLabel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Controls\RemoveStepControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Core\Controls\RemoveStepControl.Designer.cs">
+      <DependentUpon>RemoveStepControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Controls\RootCredentialsCheckControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Core\Controls\RootCredentialsCheckControl.Designer.cs">
+      <DependentUpon>RootCredentialsCheckControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Controls\StepFlowLayoutPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Core\Dialogs\BaseAdvancedOptionsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Core\Dialogs\BaseAdvancedOptionsDialog.Designer.cs">
+      <DependentUpon>BaseAdvancedOptionsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Dialogs\RootPasswordPromptDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Core\Dialogs\RootPasswordPromptDialog.Designer.cs">
+      <DependentUpon>RootPasswordPromptDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Enums\AuthenticationResponse.cs" />
+    <Compile Include="Core\Enums\ChainedInstallerAction.cs" />
+    <Compile Include="Core\Enums\ConfigState.cs" />
+    <Compile Include="Core\Enums\ConfigurationEventType.cs" />
+    <Compile Include="Core\Enums\ConfigurationKeyType.cs" />
+    <Compile Include="Core\Enums\ConfigurationStepStatus.cs" />
+    <Compile Include="Core\Enums\ConfigurationTimeoutReason.cs" />
+    <Compile Include="Core\Enums\ConfigurationType.cs" />
+    <Compile Include="Core\Enums\ConfiguratorError.cs" />
+    <Compile Include="Core\Enums\ConnectionResultType.cs" />
+    <Compile Include="Core\Enums\DeviceCap.cs" />
+    <Compile Include="Core\Enums\FormulaTokenType.cs" />
+    <Compile Include="Core\Enums\GroupReplicationMemberRoleType.cs" />
+    <Compile Include="Core\Enums\IniLineType.cs" />
+    <Compile Include="Core\Enums\InstallAction.cs" />
+    <Compile Include="Core\Enums\InstallLogMode.cs" />
+    <Compile Include="Core\Enums\InstallMessage.cs" />
+    <Compile Include="Core\Enums\InstallProgressState.cs" />
+    <Compile Include="Core\Enums\InstallState.cs" />
+    <Compile Include="Core\Enums\InstallUILevel.cs" />
+    <Compile Include="Core\Enums\LicenseType.cs" />
+    <Compile Include="Core\Enums\ListViewExtendedStyles.cs" />
+    <Compile Include="Core\Enums\ListViewMessages.cs" />
+    <Compile Include="Core\Enums\LowerCaseTableNameTypes.cs" />
+    <Compile Include="Core\Enums\MSICostTree.cs" />
+    <Compile Include="Core\Enums\MSIEnumError.cs" />
+    <Compile Include="Core\Enums\MsiInstallFeatureAttribute.cs" />
+    <Compile Include="Core\Enums\MySqlAuthenticationPluginType.cs" />
+    <Compile Include="Core\Enums\PackageAction.cs" />
+    <Compile Include="Core\Enums\PackageArchitecture.cs" />
+    <Compile Include="Core\Enums\PackageMaturity.cs" />
+    <Compile Include="Core\Enums\PackagePlatform.cs" />
+    <Compile Include="Core\Enums\PackageStatus.cs" />
+    <Compile Include="Core\Enums\PackageType.cs" />
+    <Compile Include="Core\Enums\PasswordStrengthType.cs" />
+    <Compile Include="Core\Enums\PathWarningType.cs" />
+    <Compile Include="Core\Enums\PluginActivationStateType.cs" />
+    <Compile Include="Core\Enums\ProductState.cs" />
+    <Compile Include="Core\Enums\ResultProcessingLogicType.cs" />
+    <Compile Include="Core\Enums\SchemaInformationType.cs" />
+    <Compile Include="Core\Enums\ServerConfigurationType.cs" />
+    <Compile Include="Core\Enums\ServerInstallationType.cs" />
+    <Compile Include="Core\Enums\ServerSeriesType.cs" />
+    <Compile Include="Core\Enums\ServiceAccountMissingRequirement.cs" />
+    <Compile Include="Core\Enums\StepType.cs" />
+    <Compile Include="Core\Enums\SystemTablesUpgradedType.cs" />
+    <Compile Include="Core\Enums\UpgradeType.cs" />
+    <Compile Include="Core\Enums\UserCrudOperationType.cs" />
+    <Compile Include="Core\Enums\UserRoleType.cs" />
+    <Compile Include="Core\Enums\ValidHostNameType.cs" />
+    <Compile Include="Core\Firewall\Action.cs" />
+    <Compile Include="Core\Firewall\Policy.cs" />
+    <Compile Include="Core\Firewall\ProfileType.cs" />
+    <Compile Include="Core\Firewall\Rule.cs" />
+    <Compile Include="Core\Firewall\RuleDirection.cs" />
+    <Compile Include="Core\Firewall\Rules.cs" />
+    <Compile Include="Core\Firewall\ServiceRestriction.cs" />
+    <Compile Include="Core\Forms\AutoStyleableBaseDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Core\Forms\AutoStyleableBaseDialog.Designer.cs">
+      <DependentUpon>AutoStyleableBaseDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Forms\AutoStyleableBaseForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Core\Forms\AutoStyleableBaseForm.Designer.cs">
+      <DependentUpon>AutoStyleableBaseForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Forms\InfoDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Core\Forms\InfoDialog.Designer.cs">
+      <DependentUpon>InfoDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Forms\PasswordDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Core\Forms\PasswordDialog.designer.cs">
+      <DependentUpon>PasswordDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Forms\ValidatingBaseDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Core\Forms\ValidatingBaseDialog.Designer.cs">
+      <DependentUpon>ValidatingBaseDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\IniFile\IniFile.cs" />
+    <Compile Include="Core\IniFile\IniFileEngine.cs" />
+    <Compile Include="Core\IniFile\IniLineFullDetail.cs" />
+    <Compile Include="Core\IniFile\IniSection.cs" />
+    <Compile Include="Core\IniFile\Template\Formula\FormulaEngine.cs" />
+    <Compile Include="Core\IniFile\Template\Formula\FormulaToken.cs" />
+    <Compile Include="Core\IniFile\Template\IniTemplate.cs" />
+    <Compile Include="Core\IniFile\Template\IniTemplateVariable.cs" />
+    <Compile Include="Core\IniFile\Template\InitTemplateStatic.cs" />
+    <Compile Include="Core\Interfaces\IPackage.cs" />
+    <Compile Include="Core\Interfaces\IProgressObserver.cs" />
+    <Compile Include="Core\Interfaces\IWizard.cs" />
+    <Compile Include="Core\MSI\ChainedInstallerEventArgs.cs" />
+    <Compile Include="Core\MSI\Installer.cs" />
+    <Compile Include="Core\MSI\MsiInterop.cs" />
+    <Compile Include="Core\MSI\MsiQuery.cs" />
+    <Compile Include="Core\MSI\PackageParameters.cs" />
+    <Compile Include="Core\MSI\Record.cs" />
+    <Compile Include="Core\Package\Package.cs" />
+    <Compile Include="Core\Package\PackageFeature.cs" />
+    <Compile Include="Core\Package\PackageManager.cs" />
+    <Compile Include="Core\Package\PackageOperation.cs" />
+    <Compile Include="Core\Package\PackageStatusEventArgs.cs" />
+    <Compile Include="Core\Product\Product.cs" />
+    <Compile Include="Core\Product\ProductManager.cs" />
+    <Compile Include="Core\Structs\InfoDialogResult.cs" />
+    <Compile Include="Core\Structs\PasswordDialogFlags.cs" />
+    <Compile Include="Core\Wizard\ConfigWizardPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Core\Wizard\ConfigWizardPage.Designer.cs">
+      <DependentUpon>ConfigWizardPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Wizard\WizardPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Core\Wizard\WizardPage.designer.cs">
+      <DependentUpon>WizardPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\UpgradeFromServerPreGaWarningDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\UpgradeFromServerPreGaWarningDialog.Designer.cs">
+      <DependentUpon>UpgradeFromServerPreGaWarningDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ResourcesLink.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ResourcesLink.Designer.cs">
+      <DependentUpon>ResourcesLink.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SideBarTab.cs" />
+    <Compile Include="Controls\InstallWizardSideBarControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\InstallWizardSideBarControl.Designer.cs">
+      <DependentUpon>InstallWizardSideBarControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Common\ConfigOverviewPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Common\ConfigOverviewPage.Designer.cs">
+      <DependentUpon>ConfigOverviewPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Common\PathsConflictPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Common\PathsConflictPage.Designer.cs">
+      <DependentUpon>PathsConflictPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Common\BaseConfigureRemoveApplyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Common\BaseConfigureRemoveApplyPage.Designer.cs">
+      <DependentUpon>BaseConfigureRemoveApplyPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Common\WelcomePage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Common\WelcomePage.Designer.cs">
+      <DependentUpon>WelcomePage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\ConfigWizard\ConfigWizard.Designer.cs">
+      <DependentUpon>ConfigWizard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\ConfigWizard\ConfigWizard.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\ConfigWizard\ConfigApplyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\ConfigWizard\ConfigApplyPage.Designer.cs">
+      <DependentUpon>ConfigApplyPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\ConfigWizard\ConfigCompletePage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\ConfigWizard\ConfigCompletePage.Designer.cs">
+      <DependentUpon>ConfigCompletePage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Examples\ExampleDatabaseInfo.cs" />
+    <Compile Include="Wizards\RemoveWizard\RemoveApplyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\RemoveWizard\RemoveApplyPage.Designer.cs">
+      <DependentUpon>RemoveApplyPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\RemoveWizard\RemoveCompletePage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\RemoveWizard\RemoveCompletePage.Designer.cs">
+      <DependentUpon>RemoveCompletePage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\RemoveWizard\RemoveProductsWizard.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\RemoveWizard\RemoveProductsWizard.Designer.cs">
+      <DependentUpon>RemoveProductsWizard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Server\ColumnSorter.cs" />
+    <Compile Include="Wizards\Server\DatabaseUserDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Wizards\Server\DatabaseUserDialog.Designer.cs">
+      <DependentUpon>DatabaseUserDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Server\ExpandedServiceController.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Wizards\Server\GrantedPrivilege.cs" />
+    <Compile Include="Wizards\Server\LocalServerInstance.cs" />
+    <Compile Include="Wizards\Server\MysqlSCM.cs" />
+    <Compile Include="Wizards\Server\MySqlServerSettings.cs" />
+    <Compile Include="Wizards\Server\Plugin.cs" />
+    <Compile Include="Wizards\Server\PluginsList.cs" />
+    <Compile Include="Wizards\Server\Privilege.cs" />
+    <Compile Include="Wizards\Server\Role.cs" />
+    <Compile Include="Wizards\Server\RoleDefinitions.cs" />
+    <Compile Include="Wizards\Server\RolePrivilege.cs" />
+    <Compile Include="Wizards\Server\ServerConfigAdvancedOptionsPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigAdvancedOptionsPage.Designer.cs">
+      <DependentUpon>ServerConfigAdvancedOptionsPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigDefaultAuthenticationPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigDefaultAuthenticationPage.Designer.cs">
+      <DependentUpon>ServerConfigDefaultAuthenticationPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigLocalMachinePage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigLocalMachinePage.Designer.cs">
+      <DependentUpon>ServerConfigLocalMachinePage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigLoggingOptionsPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigLoggingOptionsPage.Designer.cs">
+      <DependentUpon>ServerConfigLoggingOptionsPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigNamedPipesPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigNamedPipesPage.Designer.cs">
+      <DependentUpon>ServerConfigNamedPipesPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigSecurityPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigSecurityPage.Designer.cs">
+      <DependentUpon>ServerConfigSecurityPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigServicePage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigServicePage.Designer.cs">
+      <DependentUpon>ServerConfigServicePage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigUpgradePage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigUpgradePage.Designer.cs">
+      <DependentUpon>ServerConfigUpgradePage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigurationController.cs" />
+    <Compile Include="Wizards\Server\ServerConfigUserAccountsPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigUserAccountsPage.Designer.cs">
+      <DependentUpon>ServerConfigUserAccountsPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerErrorLog.cs" />
+    <Compile Include="Wizards\Server\ServerErrorLogLine.cs" />
+    <Compile Include="Wizards\Server\ServerExampleDatabasesPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerExampleDatabasesPage.Designer.cs">
+      <DependentUpon>ServerExampleDatabasesPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerRemovePage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerRemovePage.Designer.cs">
+      <DependentUpon>ServerRemovePage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerStartStatus.cs" />
+    <Compile Include="Wizards\Server\ServerUpgradeStatus.cs" />
+    <Compile Include="Wizards\Server\ServerUser.cs" />
+    <Compile Include="Wizards\Server\Service.cs" />
+    <Compile Include="Wizards\Utilities\UtilitiesConfigurationController.cs" />
+    <Compile Include="Wizards\Wizard.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Wizard.Designer.cs">
+      <DependentUpon>Wizard.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Core\Controls\ConfigStepControl.resx">
+      <DependentUpon>ConfigStepControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Core\Controls\NewUserControl.resx">
+      <DependentUpon>NewUserControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Core\Controls\PasswordStrengthLabel.resx">
+      <DependentUpon>PasswordStrengthLabel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Core\Controls\RemoveStepControl.resx">
+      <DependentUpon>RemoveStepControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Core\Controls\RootCredentialsCheckControl.resx">
+      <DependentUpon>RootCredentialsCheckControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Core\Dialogs\BaseAdvancedOptionsDialog.resx">
+      <DependentUpon>BaseAdvancedOptionsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Core\Dialogs\RootPasswordPromptDialog.resx">
+      <DependentUpon>RootPasswordPromptDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Core\Forms\AutoStyleableBaseDialog.resx">
+      <DependentUpon>AutoStyleableBaseDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Core\Forms\AutoStyleableBaseForm.resx">
+      <DependentUpon>AutoStyleableBaseForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Core\Forms\InfoDialog.resx">
+      <DependentUpon>InfoDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Core\Forms\PasswordDialog.resx">
+      <DependentUpon>PasswordDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Core\Forms\ValidatingBaseDialog.resx">
+      <DependentUpon>ValidatingBaseDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Core\Wizard\ConfigWizardPage.resx">
+      <DependentUpon>ConfigWizardPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Core\Wizard\WizardPage.resx">
+      <DependentUpon>WizardPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\UpgradeFromServerPreGaWarningDialog.resx">
+      <DependentUpon>UpgradeFromServerPreGaWarningDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ResourcesLink.resx">
+      <DependentUpon>ResourcesLink.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\InstallWizardSideBarControl.resx">
+      <DependentUpon>InstallWizardSideBarControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Common\ConfigOverviewPage.resx">
+      <DependentUpon>ConfigOverviewPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Common\PathsConflictPage.resx">
+      <DependentUpon>PathsConflictPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Common\BaseConfigureRemoveApplyPage.resx">
+      <DependentUpon>BaseConfigureRemoveApplyPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Common\WelcomePage.resx">
+      <DependentUpon>WelcomePage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\ConfigWizard\ConfigWizard.resx">
+      <DependentUpon>ConfigWizard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\ConfigWizard\ConfigApplyPage.resx">
+      <DependentUpon>ConfigApplyPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\ConfigWizard\ConfigCompletePage.resx">
+      <DependentUpon>ConfigCompletePage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\RemoveWizard\RemoveApplyPage.resx">
+      <DependentUpon>RemoveApplyPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\RemoveWizard\RemoveCompletePage.resx">
+      <DependentUpon>RemoveCompletePage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\RemoveWizard\RemoveProductsWizard.resx">
+      <DependentUpon>RemoveProductsWizard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Server\DatabaseUserDialog.resx">
+      <DependentUpon>DatabaseUserDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Server\ServerConfigAdvancedOptionsPage.resx">
+      <DependentUpon>ServerConfigAdvancedOptionsPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Server\ServerConfigDefaultAuthenticationPage.resx">
+      <DependentUpon>ServerConfigDefaultAuthenticationPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Server\ServerConfigLocalMachinePage.resx">
+      <DependentUpon>ServerConfigLocalMachinePage.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Server\ServerConfigLoggingOptionsPage.resx">
+      <DependentUpon>ServerConfigLoggingOptionsPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Server\ServerConfigNamedPipesPage.resx">
+      <DependentUpon>ServerConfigNamedPipesPage.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Server\ServerConfigSecurityPage.resx">
+      <DependentUpon>ServerConfigSecurityPage.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Server\ServerConfigServicePage.resx">
+      <DependentUpon>ServerConfigServicePage.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Server\ServerConfigUpgradePage.resx">
+      <DependentUpon>ServerConfigUpgradePage.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Server\ServerConfigUserAccountsPage.resx">
+      <DependentUpon>ServerConfigUserAccountsPage.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Server\ServerExampleDatabasesPage.resx">
+      <DependentUpon>ServerExampleDatabasesPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Server\ServerRemovePage.resx">
+      <DependentUpon>ServerRemovePage.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Wizard.resx">
+      <DependentUpon>Wizard.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="app.manifest">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\example_databases.zip" />
+    <EmbeddedResource Include="Core\Resources\my-template-5.6.ini" />
+    <EmbeddedResource Include="Core\Resources\my-template-5.7.ini" />
+    <EmbeddedResource Include="Core\Resources\my-template-8.0.ini" />
+    <EmbeddedResource Include="Core\Resources\my-template-8.x.ini" />
+    <None Include="Resources\my-template-5.6.ini" />
+    <None Include="Resources\my-template-5.7.ini" />
+    <None Include="Resources\my-template-8.0.ini" />
+    <None Include="Resources\my-template-8.x.ini" />
+    <None Include="Resources\WizardSelection.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Wizards\Scripts\UninstallEnterpriseFirewall.sql" />
+    <None Include="Wizards\Scripts\PreInstallEnterpriseFirewall.sql" />
+    <None Include="Wizards\Scripts\InstallEnterpriseFirewall.sql" />
+    <None Include="Resources\right_arrow.png" />
+    <None Include="Resources\left_arrow.png" />
+    <None Include="Resources\MySQLInstallerLogo.png" />
+    <None Include="Resources\MySQLInstallerAbout.png" />
+    <None Include="Resources\MySQLInstallerSettings.png" />
+    <None Include="Resources\MySQLInstallerUpdateAvailable.png" />
+    <None Include="Resources\Commercial.png" />
+    <None Include="Resources\upgrade_logo.png" />
+    <None Include="Resources\error_sign.png" />
+    <None Include="Resources\down_arrow.png" />
+    <None Include="Resources\about_mysql_light.png" />
+    <None Include="Core\Resources\ActionCurrent.png" />
+    <None Include="Core\Resources\ActionDone.png" />
+    <None Include="Core\Resources\ActionError.png" />
+    <None Include="Core\Resources\ActionOpen.png" />
+    <None Include="Core\Resources\AddOnsCategoryIcon.png" />
+    <None Include="Core\Resources\AddOnsCategoryIcon24.png" />
+    <None Include="Core\Resources\BottomDivider.png" />
+    <None Include="Core\Resources\ConnectorCategoryIcon.png" />
+    <None Include="Core\Resources\ConnectorCategoryIcon24.png" />
+    <None Include="Core\Resources\DocsCategoryIcon.png" />
+    <None Include="Core\Resources\DocsCategoryIcon24.png" />
+    <None Include="Core\Resources\linkpanel_divider.png" />
+    <None Include="Core\Resources\MainLogo.png" />
+    <None Include="Core\Resources\minus_sign.PNG" />
+    <None Include="Core\Resources\mos-logo.png" />
+    <None Include="Core\Resources\ok_sign.png" />
+    <None Include="Core\Resources\plus_sign.PNG" />
+    <None Include="Core\Resources\Revert.png" />
+    <None Include="Core\Resources\Server_Reflection.png" />
+    <None Include="Core\Resources\ServerCategoryIcon.png" />
+    <None Include="Core\Resources\ServerCategoryIcon24.png" />
+    <None Include="Core\Resources\TutorialsCategoryIcon.png" />
+    <None Include="Core\Resources\TutorialsCategoryIcon24.png" />
+    <EmbeddedResource Include="Core\Resources\user-roles.xml" />
+    <None Include="Core\Resources\warning_sign.png" />
+    <None Include="Core\Resources\WelcomeMaintenance.png" />
+    <Content Include="mysql-server.ico" />
+    <None Include="Resources\ActionAbout.png" />
+    <None Include="Resources\ActionCurrent1.png" />
+    <None Include="Resources\ActionDone1.png" />
+    <None Include="Resources\ActionError1.png" />
+    <None Include="Resources\ActionOpen1.png" />
+    <None Include="Resources\ActionWarning.png" />
+    <None Include="Resources\ActionCurrent2.png" />
+    <None Include="Resources\ActionDone2.png" />
+    <None Include="Resources\ActionError2.png" />
+    <None Include="Resources\ActionOpen2.png" />
+    <None Include="Resources\AddOnsCategoryIcon.png" />
+    <None Include="Resources\AddOnsCategoryIcon24.png" />
+    <Content Include="Resources\BigWarning.png" />
+    <None Include="Resources\BigWarning1.png" />
+    <None Include="Resources\config_logs.png" />
+    <None Include="Resources\config_tools.png" />
+    <None Include="Resources\config_win_integration.png" />
+    <None Include="Resources\ConfigUserMySQL.png" />
+    <None Include="Resources\ConfigUserMySQL24.png" />
+    <None Include="Resources\ConfigUserMySQLRoot.png" />
+    <None Include="Resources\ConfigUserWindows24.png" />
+    <None Include="Resources\dedicated_machine1.png" />
+    <None Include="Resources\developer_machine1.png" />
+    <None Include="Resources\fading_divider1.png" />
+    <None Include="Resources\BottomDivider1.png" />
+    <None Include="Resources\ConnectorCategoryIcon.png" />
+    <None Include="Resources\ConnectorCategoryIcon24.png" />
+    <None Include="Resources\DocsCategoryIcon.png" />
+    <None Include="Resources\DocsCategoryIcon24.png" />
+    <None Include="Resources\error_sign1.png" />
+    <Content Include="Resources\left_double_arrow.png" />
+    <None Include="Resources\Maintenance.png" />
+    <None Include="Resources\Remove.png" />
+    <None Include="Resources\UpdateProducts.png" />
+    <None Include="Resources\MainLogo.png" />
+    <None Include="Resources\InstallAvailableUpdatesIcon.png" />
+    <None Include="Resources\MainLogo-Error.png" />
+    <None Include="Resources\MainLogo-Input.png" />
+    <None Include="Resources\MainLogo-Success.png" />
+    <None Include="Resources\MainLogo-Warn.png" />
+    <None Include="Resources\MainLogo-Security.png" />
+    <None Include="Resources\up_arrow.png" />
+    <None Include="Resources\right_double_arrow.png" />
+    <None Include="Resources\resource_links_light.png" />
+    <None Include="Resources\selection_light.png" />
+    <None Include="Resources\license_light.png" />
+    <None Include="Resources\mysql-server.ico" />
+    <None Include="Resources\logo.png" />
+    <None Include="Resources\MySQLInstallerConfig_Done1.png" />
+    <None Include="Resources\MySQLInstallerConfig_Error1.png" />
+    <None Include="Resources\Revert1.png" />
+    <None Include="Resources\server_config_networking1.png" />
+    <None Include="Resources\server_config_security1.png" />
+    <None Include="Resources\server_config_windows1.png" />
+    <None Include="Resources\server-confirm1.png" />
+    <None Include="Resources\server_machine1.png" />
+    <None Include="Resources\Server_Reflection.png" />
+    <None Include="Resources\ServerCategoryIcon.png" />
+    <None Include="Resources\warning_sign1.png" />
+    <None Include="Resources\MySQLInstallerConfig_Done.ico" />
+    <None Include="Resources\MySQLInstallerConfig_Error.ico" />
+    <None Include="Resources\MySQLInstallerConfig_InProgress.ico" />
+    <None Include="Resources\warning_sign1.ico" />
+    <EmbeddedResource Include="Resources\UninstallEnterpriseFirewall.sql" />
+    <EmbeddedResource Include="Resources\user-roles.xml" />
+    <None Include="Resources\ServerCategoryIcon1.png" />
+    <None Include="Resources\ServerCategoryIcon24.png" />
+    <None Include="Resources\linkpanel_divider1.png" />
+    <None Include="Resources\MainLogo1.png" />
+    <None Include="Resources\minus_sign1.PNG" />
+    <None Include="Resources\mos-logo.png" />
+    <None Include="Resources\ok_sign.png" />
+    <None Include="Resources\plus_sign1.PNG" />
+    <None Include="Resources\Revert2.png" />
+    <None Include="Resources\ServerCategoryIcon2.png" />
+    <None Include="Resources\ServerCategoryIcon241.png" />
+    <None Include="Resources\Server_Reflection1.png" />
+    <None Include="Resources\TutorialsCategoryIcon.png" />
+    <None Include="Resources\TutorialsCategoryIcon24.png" />
+    <None Include="Resources\warning_sign2.png" />
+    <EmbeddedResource Include="Resources\MySql.Data.dll" />
+    <Content Include="Resources\WelcomeInstallation.png" />
+    <Content Include="Resources\WelcomeMaintenance.png" />
+    <None Include="Resources\WelcomeMaintenance1.png" />
+    <Content Include="Resources\WelcomePlanning.png" />
+    <Content Include="Resources\WelcomeResources.png" />
+    <Content Include="Resources\WelcomeRoundedButton.png" />
+    <None Include="Resources\wex_product_catalog.png" />
+    <None Include="Resources\AboutBanner.png" />
+    <None Include="Resources\Add.ico" />
+    <None Include="Resources\Abort.png" />
+    <None Include="Resources\dedicated_machine.png" />
+    <None Include="Resources\developer_machine.png" />
+    <None Include="Resources\fading_divider.png" />
+    <None Include="Resources\check_mark.png" />
+    <None Include="Resources\ActionCurrent.png" />
+    <None Include="Resources\ActionDone.png" />
+    <None Include="Resources\ActionError.png" />
+    <None Include="Resources\ActionItemAbout.png" />
+    <None Include="Resources\ActionItemAddModify.png" />
+    <None Include="Resources\ActionItemAddRemove.png" />
+    <None Include="Resources\ActionItemInstall.png" />
+    <None Include="Resources\ActionItemRemove.png" />
+    <None Include="Resources\ActionItemResources.png" />
+    <None Include="Resources\ActionOpen.png" />
+    <None Include="Resources\BottomDivider.png" />
+    <None Include="Resources\error_small.png" />
+    <None Include="Resources\home_bottom_line.png" />
+    <Content Include="Resources\Download.png" />
+    <Content Include="Resources\h_divider.png" />
+    <Content Include="Resources\linkpanel_divider.png" />
+    <Content Include="Resources\link_arrow.png" />
+    <None Include="Resources\mysql-installer.ico" />
+    <None Include="Resources\minus_sign.PNG" />
+    <Content Include="Resources\Modify.png" />
+    <Content Include="Resources\MySQLInstallerConfig_Current.png" />
+    <Content Include="Resources\MySQLInstallerConfig_Done.png" />
+    <Content Include="Resources\MySQLInstallerConfig_Error.png" />
+    <Content Include="Resources\OK.png" />
+    <Content Include="Resources\OverviewInstallation.png" />
+    <Content Include="Resources\OverviewMaintenance.png" />
+    <Content Include="Resources\OverviewOptions.png" />
+    <Content Include="Resources\OverviewPlanning.png" />
+    <Content Include="Resources\OverviewResources.png" />
+    <Content Include="Resources\OverviewSelection.png" />
+    <None Include="Resources\ResourcesBanner.png" />
+    <None Include="Resources\Remove.ico" />
+    <None Include="Resources\server_machine.png" />
+    <None Include="Resources\server_config_networking.png" />
+    <None Include="Resources\server_config_security.png" />
+    <None Include="Resources\server_config_windows.png" />
+    <None Include="Resources\server-confirm.png" />
+    <None Include="Resources\plus_sign.png" />
+    <None Include="Resources\Revert.png" />
+    <Content Include="Resources\Problem.png" />
+    <Content Include="Resources\SidebarBackground.png" />
+    <None Include="Resources\warning_sign.png" />
+    <None Include="Resources\VerticalMiddleDivider.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="NATUPNPLib">
+      <Guid>{1C565858-F302-471E-B409-F180AA4ABEC6}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="NETCONLib">
+      <Guid>{43E734CA-043D-4A70-9A2C-A8F254063D91}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="NetFwTypeLib">
+      <Guid>{58FBCF7C-E7A9-467C-80B3-FC65E8FCCA08}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(TargetPath)" "$(ProjectDir)\..\Configurator\bin\$(ConfigurationName)\$(TargetFileName)"
+
+copy /Y "$(TargetDir)\*.*"  "$(SolutionDir)\common\"</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

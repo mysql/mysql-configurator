@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RoleDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="1" format="1">
+  <Privileges>
+    <Privilege name="SELECT" column="Select_priv" description="The SELECT privilege enables you to select rows from tables in a database. SELECT statements require the SELECT privilege only if they actually retrieve rows from a table. Some SELECT statements do not access tables and can be executed without permission for any database" minVersion="5.1.0" maxVersion="" />
+    <Privilege name="INSERT" column="Insert_priv" description="The INSERT privilege enables rows to be inserted into tables in a database. INSERT is also required for the ANALYZE TABLE, OPTIMIZE TABLE, and REPAIR TABLE table-maintenance statements." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="UPDATE" column="Update_priv" description="The UPDATE privilege enables rows to be updated in tables in a database." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="DELETE" column="Delete_priv" description="The DELETE privilege enables rows to be deleted from tables in a database." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="CREATE" column="Create_priv" description="The CREATE privilege enables creation of new databases and tables." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="DROP" column="Drop_priv" description="The DROP privilege enables you to drop (remove) existing databases, tables, and views. Beginning with MySQL 5.1.10, the DROP privilege is also required in order to use the statement ALTER TABLE ... DROP PARTITION on a partitioned table. Beginning with MySQL 5.1.16, the DROP privilege is required for TRUNCATE TABLE (before that, TRUNCATE TABLE requires the DELETE privilege). If you grant the DROP privilege for the mysql database to a user, that user can drop the database in which the MySQL access privileges are stored." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="RELOAD" column="Reload_priv" description="The RELOAD privilege enables use of the FLUSH statement. It also enables mysqladmin commands that are equivalent to FLUSH operations: flush-hosts, flush-logs, flush-privileges, flush-status, flush-tables, flush-threads, refresh, and reload." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="EVENT" column="Event_priv" description="The EVENT privilege is required to create, alter, or drop events for the Event Scheduler. This privilege was added in MySQL 5.1.6." minVersion="5.1.6" maxVersion="" />
+    <Privilege name="SHUTDOWN" column="Shutdown_priv" description="The SHUTDOWN privilege enables use of the mysqladmin shutdown command. There is no corresponding SQL statement." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="PROCESS" column="Process_priv" description="The PROCESS privilege pertains to display of information about the threads executing within the server (that is, information about the statements being executed by sessions). The privilege enables use of SHOW PROCESSLIST or mysqladmin processlist to see threads belonging to other accounts; you can always see your own threads." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="FILE" column="File_priv" description="The FILE privilege gives you permission to read and write files on the server host using the LOAD DATA INFILE and SELECT ... INTO OUTFILE statements and the LOAD_FILE() function. A user who has the FILE privilege can read any file on the server host that is either world-readable or readable by the MySQL server. (This implies the user can read any file in any database directory, because the server can access any of those files.) The FILE privilege also enables the user to create new files in any directory where the MySQL server has write access. As a security measure, the server will not overwrite existing files." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="GRANT OPTION" column="Grant_priv" description="The GRANT OPTION privilege enables you to give to other users or remove from other users those privileges that you yourself possess." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="REFERENCES" column="References_priv" description="The REFERENCES privilege currently is unused." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="INDEX" column="Index_priv" description="The INDEX privilege enables you to create or drop (remove) indexes. INDEX applies to existing tables. If you have the CREATE privilege for a table, you can include index definitions in the CREATE TABLE statement." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="ALTER" column="Alter_priv" description="The ALTER privilege enables use of ALTER TABLE to change the structure of or rename tables. (ALTER TABLE also requires the INSERT and CREATE privileges.)" minVersion="5.1.0" maxVersion="" />
+    <Privilege name="SHOW DATABASES" column="Show_db_priv" description="The SHOW DATABASES privilege enables the account to see database names by issuing the SHOW DATABASE statement. Accounts that do not have this privilege see only databases for which they have some privileges, and cannot use the statement at all if the server was started with the --skip-show-database option. Note that any global privilege is a privilege for the database." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="TRIGGER" column="Trigger_priv" description="The TRIGGER privilege enables you to create and drop triggers. You must have this privilege for a table to create or drop triggers for that table. This privilege was added in MySQL 5.1.6. (Prior to MySQL 5.1.6, trigger operations required the SUPER privilege.)" minVersion="5.1.6" maxVersion="" />
+    <Privilege name="TRIGGER" column="Super_priv" description="The TRIGGER privilege enables you to create and drop triggers. You must have this privilege for a table to create or drop triggers for that table. This privilege was added in MySQL 5.1.6. (Prior to MySQL 5.1.6, trigger operations required the SUPER privilege.)" minVersion="5.1.0" maxVersion="5.1.5" />    
+    <Privilege name="SUPER" column="Super_priv" description="The SUPER privilege enables an account to use CHANGE MASTER TO, KILL or mysqladmin kill to kill threads belonging to other accounts (you can always kill your own threads), PURGE BINARY LOGS, configuration changes via SET GLOBAL to modify global system variables, the mysqladmin debug command, enabling or disabling logging, performing updates even if the read_only system variable is enabled, starting and stopping replication on slave servers, and allows you to connect (once) even if the connection limit controlled by the max_connections system variable is reached." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="CREATE TEMPORARY TABLES" column="Create_tmp_table_priv" description="The CREATE TEMPORARY TABLES privilege enables the use of the keyword TEMPORARY in CREATE TABLE statements." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="LOCK TABLES" column="Lock_tables_priv" description="The LOCK TABLES privilege enables the use of explicit LOCK TABLES statements to lock tables for which you have the SELECT privilege. This includes the use of write locks, which prevents other sessions from reading the locked table." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="EXECUTE" column="Execute_priv" description="The EXECUTE privilege is required to execute stored routines (procedures and functions)." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="REPLICATION SLAVE" column="Repl_slave_priv" description="The REPLICATION SLAVE privilege should be granted to accounts that are used by slave servers to connect to the current server as their master. Without this privilege, the slave cannot request updates that have been made to databases on the master server." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="REPLICATION CLIENT" column="Repl_client_priv" description="The REPLICATION CLIENT privilege enables the use of SHOW MASTER STATUS and SHOW SLAVE STATUS." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="CREATE VIEW" column="Create_view_priv" description="The CREATE VIEW privilege enables use of CREATE VIEW." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="SHOW VIEW" column="Show_view_priv" description="The SHOW VIEW privilege enables use of SHOW CREATE VIEW." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="CREATE ROUTINE" column="Create_routine_priv" description="The CREATE ROUTINE privilege is needed to create stored routines (procedures and functions)." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="ALTER ROUTINE" column="Alter_routine_priv" description="The ALTER ROUTINE privilege is needed to alter or drop stored routines (procedures and functions)." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="CREATE USER" column="Create_user_priv" description="The CREATE USER privilege enables use of CREATE USER, DROP USER, RENAME USER, and REVOKE ALL PRIVILEGES." minVersion="5.1.0" maxVersion="" />
+    <Privilege name="CREATE TABLESPACE" column="Create_tablespace_priv" description="The CREATE TABLESPACE privilege is needed to create, alter, or drop tablespaces and log file groups." minVersion="5.5.0" maxVersion="" />
+  </Privileges>
+  <Roles>
+    <Role id="BackupAdmin" display="Backup Admin" description="minimal rights needed to backup any database">
+      <RolePrivileges>
+        <RolePrivilege name="EVENT" />
+        <RolePrivilege name="SELECT" />
+        <RolePrivilege name="LOCK TABLES" />
+      </RolePrivileges>
+      <GrantedPrivileges></GrantedPrivileges>
+    </Role>
+    <Role id="DBA" display="DB Admin" description="grants the rights to perform all tasks">
+      <RolePrivileges>
+        <RolePrivilege name="SELECT" />
+        <RolePrivilege name="INSERT" />
+        <RolePrivilege name="UPDATE" />
+        <RolePrivilege name="DELETE" />
+        <RolePrivilege name="CREATE" />
+        <RolePrivilege name="DROP" />
+        <RolePrivilege name="RELOAD" />
+        <RolePrivilege name="EVENT" />
+        <RolePrivilege name="SHUTDOWN" />
+        <RolePrivilege name="PROCESS" />
+        <RolePrivilege name="FILE" />
+        <RolePrivilege name="GRANT OPTION" />
+        <RolePrivilege name="REFERENCES" />
+        <RolePrivilege name="INDEX" />
+        <RolePrivilege name="ALTER" />
+        <RolePrivilege name="SHOW DATABASES" />
+        <RolePrivilege name="TRIGGER" />
+        <RolePrivilege name="SUPER" />
+        <RolePrivilege name="CREATE TEMPORARY TABLES" />
+        <RolePrivilege name="LOCK TABLES" />
+        <RolePrivilege name="EXECUTE" />
+        <RolePrivilege name="REPLICATION SLAVE" />
+        <RolePrivilege name="REPLICATION CLIENT" />
+        <RolePrivilege name="CREATE VIEW" />
+        <RolePrivilege name="SHOW VIEW" />
+        <RolePrivilege name="CREATE ROUTINE" />
+        <RolePrivilege name="ALTER ROUTINE" />
+        <RolePrivilege name="CREATE USER" />
+        <RolePrivilege name="CREATE TABLESPACE" />
+      </RolePrivileges>
+      <GrantedPrivileges></GrantedPrivileges>
+    </Role>
+    <Role id="DBDesigner" display="DB Designer" description="rights to create and reverse engineer any database schema">
+      <RolePrivileges>
+        <RolePrivilege name="CREATE" />
+        <RolePrivilege name="ALTER" />
+        <RolePrivilege name="INDEX" />
+        <RolePrivilege name="INSERT" />
+        <RolePrivilege name="SELECT" />
+        <RolePrivilege name="TRIGGER" />
+        <RolePrivilege name="CREATE VIEW" />
+        <RolePrivilege name="SHOW VIEW" />
+        <RolePrivilege name="ALTER ROUTINE" />
+        <RolePrivilege name="CREATE ROUTINE" />
+        <RolePrivilege name="SHOW DATABASES" />
+      </RolePrivileges>
+      <GrantedPrivileges>
+        <GrantedPrivilege sql="GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE mysql.func TO '{0}'@'{1}'" />
+        <GrantedPrivilege sql="GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE mysql.proc TO '{0}'@'{1}'" />
+        <GrantedPrivilege sql="GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE mysql.event TO '{0}'@'{1}'" />
+      </GrantedPrivileges>
+    </Role>
+    <Role id="DBManager" display="DB Manager" description="grants full rights on all databases">
+      <RolePrivileges>
+        <RolePrivilege name="CREATE" />
+        <RolePrivilege name="DROP" />
+        <RolePrivilege name="GRANT OPTION" />
+        <RolePrivilege name="EVENT" />
+        <RolePrivilege name="ALTER" />
+        <RolePrivilege name="DELETE" />
+        <RolePrivilege name="INDEX" />
+        <RolePrivilege name="INSERT" />
+        <RolePrivilege name="SELECT" />
+        <RolePrivilege name="UPDATE" />
+        <RolePrivilege name="CREATE TEMPORARY TABLES" />
+        <RolePrivilege name="LOCK TABLES" />
+        <RolePrivilege name="TRIGGER" />
+        <RolePrivilege name="CREATE VIEW" />
+        <RolePrivilege name="SHOW VIEW" />
+        <RolePrivilege name="ALTER ROUTINE" />
+        <RolePrivilege name="CREATE ROUTINE" />
+        <RolePrivilege name="FILE" />
+        <RolePrivilege name="SHOW DATABASES" />
+      </RolePrivileges>
+      <GrantedPrivileges></GrantedPrivileges>
+    </Role>
+    <Role id="InstanceManager" display="Instance Manager" description="grants rights needed to maintain server">
+      <RolePrivileges>
+        <RolePrivilege name="EVENT" />
+        <RolePrivilege name="SELECT" />
+        <RolePrivilege name="FILE" />
+        <RolePrivilege name="RELOAD" />
+        <RolePrivilege name="SHOW DATABASES" />
+        <RolePrivilege name="SHUTDOWN" />
+        <RolePrivilege name="SUPER" />
+      </RolePrivileges>
+      <GrantedPrivileges></GrantedPrivileges>
+    </Role>
+    <Role id="MonitorAdmin" display="Monitor Admin" description="minimum set of rights needed to monitor server">
+      <RolePrivileges>
+        <RolePrivilege name="SELECT" />
+        <RolePrivilege name="CREATE ROUTINE" />
+        <RolePrivilege name="CREATE USER" />
+      </RolePrivileges>
+      <GrantedPrivileges></GrantedPrivileges>
+    </Role>
+    <Role id="ProcessAdmin" display="Process Admin" description="rights needed to assess, monitor, and kill any user process running in server">
+      <RolePrivileges>
+        <RolePrivilege name="SELECT" />
+        <RolePrivilege name="RELOAD" />
+        <RolePrivilege name="SUPER" />
+      </RolePrivileges>
+      <GrantedPrivileges></GrantedPrivileges>
+    </Role>
+    <Role id="ReplicationAdmin" display="Replication Admin" description="rights needed to setup and manage replication">
+      <RolePrivileges>
+        <RolePrivilege name="REPLICATION CLIENT" />
+        <RolePrivilege name="REPLICATION SLAVE" />
+        <RolePrivilege name="SHUTDOWN" />
+      </RolePrivileges>
+      <GrantedPrivileges></GrantedPrivileges>
+    </Role>
+    <Role id="SecurityAdmin" display="Security Admin" description="rights to manage logins and grant and revoke server and database level permission">
+      <RolePrivileges>
+        <RolePrivilege name="GRANT OPTION" />
+        <RolePrivilege name="DELETE" />
+        <RolePrivilege name="INSERT" />
+        <RolePrivilege name="SELECT" />
+        <RolePrivilege name="UPDATE" />
+        <RolePrivilege name="CREATE USER" />
+        <RolePrivilege name="RELOAD" />
+        <RolePrivilege name="SHOW DATABASES" />
+      </RolePrivileges>
+      <GrantedPrivileges>
+        <GrantedPrivilege sql="GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE mysql.columns_priv TO '{0}'@'{1}'" />
+        <GrantedPrivilege sql="GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE mysql.db TO '{0}'@'{1}'" />
+        <GrantedPrivilege sql="GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE mysql.host TO '{0}'@'{1}'" />
+        <GrantedPrivilege sql="GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE mysql.procs_priv TO '{0}'@'{1}'" />
+        <GrantedPrivilege sql="GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE mysql.tables_priv TO '{0}'@'{1}'" />
+        <GrantedPrivilege sql="GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE mysql.user TO '{0}'@'{1}'" />
+      </GrantedPrivileges>
+    </Role>
+    <Role id="UserAdmin" display="User Admin" description="grants rights to create users logins and reset passwords">
+      <RolePrivileges>
+        <RolePrivilege name="CREATE USER" />
+        <RolePrivilege name="RELOAD" />
+      </RolePrivileges>
+      <GrantedPrivileges></GrantedPrivileges>
+    </Role>
+  </Roles>
+</RoleDefinitions>
