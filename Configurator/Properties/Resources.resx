@@ -117,78 +117,24 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ErrorLoadingProducts" xml:space="preserve">
-    <value>An error was encountered loading the product catalog.</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="MySQLInstallerUpdateAvailable" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLInstallerUpdateAvailable.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="BackButtonDefaultText" xml:space="preserve">
     <value>&lt; &amp;Back</value>
   </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="developer_machine" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\developer_machine.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Failed" xml:space="preserve">
     <value>Failed</value>
   </data>
-  <data name="ConfirmCancelRequirementInstall" xml:space="preserve">
-    <value>Are you sure you want to cancel the download and installation of prerequisites?</value>
-  </data>
   <data name="CancelConfigurationQuestion" xml:space="preserve">
     <value>Are you sure you want to cancel configuring your product(s)?</value>
-  </data>
-  <data name="AtLeastOneFeatureForInstall" xml:space="preserve">
-    <value>At least one feature must be selected. </value>
-  </data>
-  <data name="AddUrlTooltip" xml:space="preserve">
-    <value>Add a new URL to the validation list.</value>
-  </data>
-  <data name="linkpanel_divider" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\linkpanel_divider.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="mysql_server" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\mysql-server.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="CommercialLicenseCaption" xml:space="preserve">
-    <value>Commercial License Agreement</value>
-  </data>
-  <data name="ActionRequiredText" xml:space="preserve">
-    <value>Action Required</value>
-  </data>
-  <data name="RequirementsCheckManualTaskText" xml:space="preserve">
-    <value>The Product "{0}" requires "{1}" but it was not detected on this computer. "{1}" requires manual installation and must be installed prior to installing "{0}". By clicking 'Execute', "{0}" will be removed from the list of products to install.  Once the "{1}" has been met, please run the MySQL Configurator again and you will be able to complete installation.</value>
-  </data>
-  <data name="DefaultCollectorURL" xml:space="preserve">
-    <value>http://wb.mysql.com/installer/result.php</value>
-  </data>
   <data name="ConfigurationSteps" xml:space="preserve">
     <value>Configuration Steps</value>
-  </data>
-  <data name="server_config_networking" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\server_config_networking.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="WelcomePageUpdateCheckLinkText" xml:space="preserve">
-    <value>Check for Updates</value>
-  </data>
-  <data name="MySQLConfigurationActionsInfoText" xml:space="preserve">
-    <value>The current MySQL Server configuration is performing the following actions. If you cancel the configuration you will have to do them manually:
-	• Creating root account.
-	• Doing something
-	• Doing something</value>
-  </data>
-  <data name="RepeatedUrl" xml:space="preserve">
-    <value>The provided URL already exists.</value>
-  </data>
-  <data name="ConvertDialogCaption" xml:space="preserve">
-    <value>Converting products from {0} to {1}</value>
-  </data>
-  <data name="UpgradeText" xml:space="preserve">
-    <value>Upgrade</value>
-  </data>
-  <data name="ConfigureTimeOutUserCancelledText" xml:space="preserve">
-    <value>User cancelled configuration operation after configuration timeout ocurred.</value>
   </data>
   <data name="ConfigOverviewConfiguringText" xml:space="preserve">
     <value>Configuring</value>
@@ -199,185 +145,30 @@
   <data name="link_arrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\link_arrow.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="SetupTypeLabelAccessibleName" xml:space="preserve">
-    <value>{0} Short Description</value>
-  </data>
   <data name="ConfigOverviewConfigurationCancelledText" xml:space="preserve">
     <value>Configuration cancelled</value>
-  </data>
-  <data name="ActionItemAddModify" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ActionItemAddModify.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="HelpButtonDefaultText" xml:space="preserve">
-    <value>&amp;Help</value>
-  </data>
-  <data name="ConfirmCancelOfCatalogDownload" xml:space="preserve">
-    <value>Are you sure you want to cancel checking for a new product catalog?</value>
-  </data>
-  <data name="String1" xml:space="preserve">
-    <value>Please visit {0} to download the latest release of the MySQL Configurator or restart the application and skip update checks to continue using the current software.</value>
-  </data>
-  <data name="AddCommercialTitle" xml:space="preserve">
-    <value>Add Commercial</value>
-  </data>
-  <data name="CatastrophicErrorCheckingCatalog" xml:space="preserve">
-    <value>We have encountered a non-recoverable error while checking for the latest product catalog. You can try checking again however you may have to uninstall and reinstall MySQL Configurator.</value>
-  </data>
-  <data name="down_arrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\down_arrow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLWebinarsDescription" xml:space="preserve">
-    <value>Watch the latest online webinars.</value>
-  </data>
-  <data name="ConfigureTimeOutUserWaitingText1" xml:space="preserve">
-    <value>Configuration taking too long and timed out, but the operation is still waiting for it to finish.</value>
-  </data>
-  <data name="NoUpgradeableProducts" xml:space="preserve">
-    <value>There are no product upgrades available.  If you believe this to be in error, you can go back to the previous screen and check for an updated product catalog.</value>
   </data>
   <data name="CompletedWithErrors" xml:space="preserve">
     <value>Completed (with errors)</value>
   </data>
-  <data name="ConfigureTimeOutUserCancelledText1" xml:space="preserve">
-    <value>User cancelled configuration operation after configuration timeout ocurred.</value>
-  </data>
-  <data name="SetupTypeLabelAccessibleDescription" xml:space="preserve">
-    <value>A label displaying a short description about the {0} setup type.</value>
-  </data>
-  <data name="MySQLTutorialsDescription" xml:space="preserve">
-    <value>Help to get you started.</value>
-  </data>
-  <data name="UpgradeAvailable" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\InstallAvailableUpdatesIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConvertProductsMissingPublicURL" xml:space="preserve">
-    <value>http://dev.mysql.com</value>
-  </data>
-  <data name="RequirementsCheckCurrentTaskText" xml:space="preserve">
-    <value>The package "{0}" must be installed now. Click on the Execute button to open a website which allows you to download and install the package. Once done come back here and re-check the requirements by clicking the Re-Check button.
-
-If you are asked to restart your computer then decline and finish the main installation first. Restart your computer after this is done.</value>
-  </data>
   <data name="RemoveSteps" xml:space="preserve">
     <value>Remove Steps</value>
-  </data>
-  <data name="license_light" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\license_light.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="NoUpgradesCanRefreshCatalog" xml:space="preserve">
-    <value>None of your products have upgrades available. If you believe this is wrong, you can use the Catalog button to check for a product catalog update.</value>
-  </data>
-  <data name="WorkBenchDescription" xml:space="preserve">
-    <value>Resources and information about MySQL Workbench.</value>
-  </data>
-  <data name="selection_light" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\selection_light.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="BigWarning" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\BigWarning.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="RequirementCheckDownloadingFile" xml:space="preserve">
-    <value>Downloading {0}</value>
-  </data>
-  <data name="NextButtonExecuteText" xml:space="preserve">
-    <value>&amp;Execute </value>
-  </data>
-  <data name="RequirementCheckNoRequirements" xml:space="preserve">
-    <value>There are no additional requirements to be installed. Please click Next to continue with the product installation.</value>
-  </data>
-  <data name="OnlyOneUpgradeAvailable" xml:space="preserve">
-    <value>There is only one upgrade available for the selected product.</value>
-  </data>
   <data name="AppName" xml:space="preserve">
     <value>MySQL Configurator</value>
   </data>
-  <data name="ConfirmRemovalTitle" xml:space="preserve">
-    <value>Confirm Removal</value>
-  </data>
-  <data name="SetupTypeAccessibleDescription" xml:space="preserve">
-    <value>An option to select the {0} setup type.</value>
-  </data>
-  <data name="resource_links_light" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\resource_links_light.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfirmCancelAndQuit" xml:space="preserve">
-    <value>Are you sure you want to cancel and quit MySQL Configurator?</value>
-  </data>
-  <data name="ConvertProductsCancelledTitle" xml:space="preserve">
-    <value>Cancelled Installation</value>
-  </data>
-  <data name="UpdateRequiredCaption" xml:space="preserve">
-    <value>Update Required</value>
-  </data>
-  <data name="check_mark" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\check_mark.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="WelcomePageModifyDescriptionText" xml:space="preserve">
-    <value>Add additional MySQL products or make changes to the features of already installed products.</value>
-  </data>
-  <data name="ConvertProductsCancelled" xml:space="preserve">
-    <value>The installation has been cancelled.</value>
-  </data>
-  <data name="RequirementCheckError" xml:space="preserve">
-    <value>Error occured during installation. Please manually install the prerequisite and restart the installer. Click on this message to open a browser window for manual installation.</value>
-  </data>
-  <data name="MySQLTutorialsURL" xml:space="preserve">
-    <value>http://dev.mysql.com/tech-resources/articles/mysql_intro.html</value>
-  </data>
-  <data name="ProductCatalogDownloadDelay" xml:space="preserve">
-    <value>Dowloading the product catalog is taking longer than expected. Do you wish to continue waiting?</value>
-  </data>
-  <data name="CustomizeProductFeaturesCheckBoxTooltip" xml:space="preserve">
-    <value>Select to enable the Select Features page where you can
-customize the features for the products to be installed.</value>
-  </data>
   <data name="Revert" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Revert.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="EnterNewPathForServerDataDirText" xml:space="preserve">
-    <value>There is a problem with the data directory location. The "{0}" product, which is planned for installation, is set to use the same directory which is already used by "{1}". The path is:
-
-{2}
-
-Do you want to select a different path? Click No to return to the feature selection.</value>
   </data>
   <data name="ConfigStepTakingTooLong" xml:space="preserve">
     <value>The configuration step [{0}] is taking longer than expected.
 It is advised to not cancel the configuration and wait.</value>
   </data>
-  <data name="NoPackagesMatchingSetupTypeDetailText" xml:space="preserve">
-    <value>MySQL Configurator did not find packages in the current bundle suitable for installation.</value>
-  </data>
-  <data name="CommercialUpdateCheckNoUpdatesAvailableText" xml:space="preserve">
-    <value>There are currently no updates for any of your installed MySQL products available.</value>
-  </data>
-  <data name="ConvertProductsPromptTitle" xml:space="preserve">
-    <value>Convert Products</value>
-  </data>
-  <data name="ConvertProductsMissingPrompt" xml:space="preserve">
-    <value>The MySQL Configurator package you downloaded does not contain the files needed to convert your {0} products to the {1} license. Please visit {2} and download the full (non-web) MySQL Configurator bundles for {3}.</value>
-  </data>
-  <data name="server_config_windows" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\server_config_windows.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="WelcomePageAboutLinkText" xml:space="preserve">
-    <value>About MySQL</value>
-  </data>
-  <data name="question_mark" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\question_mark.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="HasPathWarnings" xml:space="preserve">
     <value>You still have warnings with your selected paths.  Are you sure you want to continue?</value>
-  </data>
-  <data name="RequirementsCheckManualTooltip" xml:space="preserve">
-    <value>The Product "{0}" requires "{1}" but it was not detected on this computer.
-"{1}" requires manual installation and must be installed prior to installing "{0}".</value>
-  </data>
-  <data name="WaitScreenText" xml:space="preserve">
-    <value>Please wait while the MySQL Configurator processes the current operation.</value>
-  </data>
-  <data name="HelpDescription" xml:space="preserve">
-    <value>Show the command line options</value>
   </data>
   <data name="MainLogo_Warn" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MainLogo-Warn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -388,85 +179,17 @@ It is advised to not cancel the configuration and wait.</value>
   <data name="LicenseAgreementSubcaption" xml:space="preserve">
     <value>You have selected for install packages with a {0} license.  You must accept the following license agreement to complete that installation.</value>
   </data>
-  <data name="VerticalMiddleDivider" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\VerticalMiddleDivider.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ConfigureHasTimedOutDetail" xml:space="preserve">
     <value>Do you want to continue waiting or cancel the configuration?</value>
-  </data>
-  <data name="WelcomeMaintenance" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\WelcomeMaintenance.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="UpdatePageDownloadSucceeded" xml:space="preserve">
-    <value>The operation is complete.  Please click 'Next &gt;' to continue.</value>
-  </data>
-  <data name="left_arrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\left_arrow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="UpdateCatalogWizardCancelUpdateDetailText" xml:space="preserve">
-    <value>Are you sure you want to cancel updating your product catalog?</value>
-  </data>
-  <data name="WelcomePageAboutDescriptionText" xml:space="preserve">
-    <value>Learn more about MySQL products and better understand how you can benefit the most.</value>
-  </data>
-  <data name="CommercialUpdateCheckNewUpdatesAvailableText" xml:space="preserve">
-    <value>New updates are available. Click the Next button to browse to Oracle Support where you can download the latest package. Use the Advanced Search function to find the MySQLInstaller package.
-
-The MySQL Configurator will be closed. Please execute the downloaded package to update your system.</value>
   </data>
   <data name="HidePrefixText" xml:space="preserve">
     <value>Hide {0}</value>
   </data>
-  <data name="MySQLWebinarsURL" xml:space="preserve">
-    <value>http://www.mysql.com/news-and-events/web-seminars/index.html</value>
-  </data>
-  <data name="DetailsExpanded" xml:space="preserve">
-    <value>Details &lt;&lt;</value>
-  </data>
-  <data name="UpdatePageDownloadFailed" xml:space="preserve">
-    <value>There is an error downloading the product catalog. Please check your connection and try again later.
-The error was: {0}
-
-You can still continue by clicking 'Next &gt;'.</value>
-  </data>
-  <data name="RetryDownload" xml:space="preserve">
-    <value>Retry ({0})</value>
-  </data>
-  <data name="UpdateAvailable" xml:space="preserve">
-    <value>There is an update available to the MySQL  Installer.  Do you want to download and install it now?</value>
-  </data>
-  <data name="MySQLWhitePappersURL" xml:space="preserve">
-    <value>http://www.mysql.com/why-mysql/white-papers/</value>
-  </data>
-  <data name="DownloadingStatus" xml:space="preserve">
-    <value>Downloading...</value>
-  </data>
-  <data name="Remove" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Remove.ico;System.Drawing.Icon, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="DeleteUrlTooltip" xml:space="preserve">
-    <value>Delete the selected URL.</value>
-  </data>
   <data name="minus_sign" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\minus_sign.PNG;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ProxyInvalidPortNumber" xml:space="preserve">
-    <value>The text could not be converted to a port number.</value>
-  </data>
-  <data name="ResourcesBanner" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ResourcesBanner.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="OverviewSelection" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\overviewselection.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ConfigStepsAreExecuting" xml:space="preserve">
     <value>The following configuration steps are being executed.</value>
-  </data>
-  <data name="NoPackagesMatchingSetupTypeTitleText" xml:space="preserve">
-    <value>No packages found</value>
-  </data>
-  <data name="OKButtonDefaultText" xml:space="preserve">
-    <value>&amp;OK</value>
   </data>
   <data name="CancelQuestionText" xml:space="preserve">
     <value>Cancel?</value>
@@ -474,41 +197,11 @@ You can still continue by clicking 'Next &gt;'.</value>
   <data name="PathAlreadyUsed" xml:space="preserve">
     <value>The selected path is already being used by a pending installation or change.</value>
   </data>
-  <data name="SelectUpgrade" xml:space="preserve">
-    <value>Select Upgrade</value>
-  </data>
-  <data name="OnLatestCatalog" xml:space="preserve">
-    <value>There are no updates available to the MySQL product catalog.</value>
-  </data>
-  <data name="RequirementsCheckAllMetText" xml:space="preserve">
-    <value>All required prerequisites are met. Continue by clicking on the Next button.</value>
-  </data>
   <data name="ActionDone" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ActionDone.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ProductCatalogUpdateCancelled" xml:space="preserve">
-    <value>Product catalog update cancelled.</value>
-  </data>
-  <data name="UnableToLocateWorkbench" xml:space="preserve">
-    <value>Unable to launch MySQL Workbench.  Unable to locate the installation directory.</value>
-  </data>
   <data name="MainLogo_Error" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MainLogo-Error.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="RequirementManualIsMet" xml:space="preserve">
-    <value>This is a manual requirement that has been satisfied.</value>
-  </data>
-  <data name="DriveSpaceAvailable" xml:space="preserve">
-    <value>Space available on drive: {0}</value>
-  </data>
-  <data name="upgrade_logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\upgrade_logo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ProductCatalogLoaded" xml:space="preserve">
-    <value>Loaded product catalog.</value>
-  </data>
-  <data name="StatusPercentage" xml:space="preserve">
-    <value>{0} %</value>
   </data>
   <data name="RemoveStepsFinished" xml:space="preserve">
     <value>The configuration removal operation has completed.</value>
@@ -516,63 +209,15 @@ You can still continue by clicking 'Next &gt;'.</value>
   <data name="ConfigureHasTimedOutSubDetail" xml:space="preserve">
     <value>If you keep waiting, you may get this message again.</value>
   </data>
-  <data name="ReadyToRemoveStatusLabelText" xml:space="preserve">
-    <value>Ready to remove</value>
-  </data>
-  <data name="ProxyOutOfRangePortNumber" xml:space="preserve">
-    <value>Provide a valid port number in the range of 0 to 65536.</value>
-  </data>
-  <data name="MoveUpUrlTooltip" xml:space="preserve">
-    <value>Move up the selected URL one space.</value>
-  </data>
   <data name="RemoveSuccess" xml:space="preserve">
     <value>The configuration removal operation was successful.
 Click Finish to continue.</value>
   </data>
-  <data name="WorkBenchURL" xml:space="preserve">
-    <value>http://wb.mysql.com/</value>
-  </data>
-  <data name="CancelUpgradingProductsDetailText" xml:space="preserve">
-    <value>Are you sure you want to cancel upgrading your products?</value>
-  </data>
-  <data name="NegativeConfirmationText" xml:space="preserve">
-    <value>&amp;No</value>
-  </data>
-  <data name="ActionItemInstall" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ActionItemInstall.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLDocumentationURL" xml:space="preserve">
-    <value>http://dev.mysql.com/doc/</value>
-  </data>
   <data name="ShowPrefixText" xml:space="preserve">
     <value>Show {0}</value>
   </data>
-  <data name="AnotherVersionInstalled" xml:space="preserve">
-    <value>Another version ({0}) of this package is already installed or scheduled to be installed.</value>
-  </data>
-  <data name="DisplayedCopyrightNotice" xml:space="preserve">
-    <value>Copyright © 2012, 2019, Oracle and/or it's affiliates.   Oracle is a registered trademark of Oracle Corporation and/or it's affiliates.  Other names may be trademarks of their respective owners.</value>
-  </data>
-  <data name="RemovalFinishedTitle" xml:space="preserve">
-    <value>Uninstallation done</value>
-  </data>
-  <data name="PackagesAlreadyInstalled" xml:space="preserve">
-    <value>(available on this system)</value>
-  </data>
-  <data name="TryAgainLink" xml:space="preserve">
-    <value>Try again</value>
-  </data>
-  <data name="ProductCatalogLoadingFailed" xml:space="preserve">
-    <value>Product catalog loading failed. Exiting now.</value>
-  </data>
   <data name="RebootWarning" xml:space="preserve">
     <value>Some products, including MySQL Configurator, might not work properly until you restart your system.</value>
-  </data>
-  <data name="MOSInternetConnectionFailed" xml:space="preserve">
-    <value>Internet Connection Failed</value>
-  </data>
-  <data name="CancelAddingProductsDetailText" xml:space="preserve">
-    <value>Are you sure you want to cancel adding products?</value>
   </data>
   <data name="PathExistsWarning" xml:space="preserve">
     <value>The selected path already exists.</value>
@@ -580,55 +225,12 @@ Click Finish to continue.</value>
   <data name="warning_sign" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\warning_sign.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="LabelLastCatalogCheck" xml:space="preserve">
-    <value>Your product catalog was last checked on {0} at {1}.</value>
-  </data>
   <data name="ConfigureFailed" xml:space="preserve">
     <value>The configuration for {0} has failed.
 You can find more information about the failures in the 'Log' tab.</value>
   </data>
-  <data name="MySQLDocumentationDescription" xml:space="preserve">
-    <value>View the latest MySQL documentation.</value>
-  </data>
-  <data name="ActionItemAbout" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ActionItemAbout.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="DefaultSetupTypeDesc" xml:space="preserve">
-    <value>Installs all products needed for MySQL development, including:  
-
-- MySQL Server
-- MySQL Workbench.</value>
-  </data>
   <data name="PathInvalidError" xml:space="preserve">
     <value>The selected path is not valid.</value>
-  </data>
-  <data name="NoPackagesMatchingSetupTypeMoreInfoText" xml:space="preserve">
-    <value>The packages included in the current bundle that match the following were not found:
-  * The selected setup type: {0}
-  * The operating system architecture: {1}
-  * The MySQL Configurator license type: {2}
-</value>
-  </data>
-  <data name="MySQLInstallerConfig_Error" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLInstallerConfig_Error.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="AllMySQLProducts" xml:space="preserve">
-    <value>All MySQL Products</value>
-  </data>
-  <data name="DetailsCollapsed" xml:space="preserve">
-    <value>Details &gt;&gt;</value>
-  </data>
-  <data name="ConfigureTimeOutInvalidProductError1" xml:space="preserve">
-    <value>Invalid product found when a configure timeout event occurred.</value>
-  </data>
-  <data name="UnableToFindInstallerDirectory" xml:space="preserve">
-    <value>Unable to find the MySQL Configurator's installation directory.</value>
-  </data>
-  <data name="RequirementCheckWithRequirements" xml:space="preserve">
-    <value>The following requirements must be installed before the selected products can be installed. If you don't want a particular requirement then go back and deselect the product that requires it.</value>
-  </data>
-  <data name="ConfigureTimeOutInvalidProductError" xml:space="preserve">
-    <value>Invalid product found when a configure timeout event occurred.</value>
   </data>
   <data name="ConfigStepsFinished" xml:space="preserve">
     <value>The configuration operation has completed.</value>
@@ -636,80 +238,8 @@ You can find more information about the failures in the 'Log' tab.</value>
   <data name="plus_sign" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\plus_sign.PNG;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="PendingForUserInputStatusLabelText" xml:space="preserve">
-    <value>Pending for user input</value>
-  </data>
-  <data name="wex_product_catalog" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\wex_product_catalog.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="AppNameCommercial" xml:space="preserve">
-    <value>MySQL Configurator - Commercial Edition</value>
-  </data>
-  <data name="ConfirmCancellationTitle" xml:space="preserve">
-    <value>Confirm Cancellation</value>
-  </data>
-  <data name="ActionItemRemove" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ActionItemRemove.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="WelcomePageRemoveLinkText" xml:space="preserve">
-    <value>Remove MySQL Products</value>
-  </data>
-  <data name="ConfirmRemovalText" xml:space="preserve">
-    <value>Are you sure you want to remove all selected products?</value>
-  </data>
-  <data name="RequirementsNoManualDuringAutoSubDetail" xml:space="preserve">
-    <value>When MySQL Configurator completes the last automatic requirement, you can attempt to resolve manual items.</value>
-  </data>
-  <data name="settings" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\settings.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="WarningText" xml:space="preserve">
     <value>Warning</value>
-  </data>
-  <data name="FeatureRemoveOverlay" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Remove.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ContinueAfterDownloadErrorText" xml:space="preserve">
-    <value>Not all products could be downloaded successfully. Do you still want to install the remaining products?</value>
-  </data>
-  <data name="MySQLInstallerAbout" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLInstallerAbout.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="NextButtonDefaultText" xml:space="preserve">
-    <value>&amp;Next &gt;</value>
-  </data>
-  <data name="ConvertProductsPrompt" xml:space="preserve">
-    <value>Thanks for installing a {0} edition of MySQL Configurator. We have detected that MySQL products under the {1} license are installed. In order to proceed with this {0} installation, these {1} products need to be converted to a {0} license.
-
-Please click [Yes] to automatically convert your {1} products to {0} products.</value>
-  </data>
-  <data name="ConvertProductsMissingPromptTitle" xml:space="preserve">
-    <value>Cannot convert products</value>
-  </data>
-  <data name="WelcomePageUpdateProductsLinkText" xml:space="preserve">
-    <value>Install Updates</value>
-  </data>
-  <data name="FullSetupTypeDesc" xml:space="preserve">
-    <value>Installs all the products, including: 
-
-- MySQL Server, 
-- MySQL Workbench, 
-- the MySQL Connectors, 
-- all documention with samples.</value>
-  </data>
-  <data name="MySQLWhitePappersDescription" xml:space="preserve">
-    <value>More information about MySQL.</value>
-  </data>
-  <data name="GPLLicenseCaption" xml:space="preserve">
-    <value>GPL License Agreement</value>
-  </data>
-  <data name="AboutLicenseFileNotFoundError" xml:space="preserve">
-    <value>ERROR: The license file has not been found in the installation directory.
-
-Please repair the installation of MySQL Configurator so the file is installed again.</value>
-  </data>
-  <data name="ConfirmDataRemoval2Text" xml:space="preserve">
-    <value>Are you absolutely sure all server data files should be removed? This action cannot be undone!</value>
   </data>
   <data name="InvalidCommandLineArguments" xml:space="preserve">
     <value>Invalid command line argument '{0}'</value>
@@ -718,14 +248,8 @@ Please repair the installation of MySQL Configurator so the file is installed ag
     <value>The configuration for {0} has been cancelled.
 You can start the configure process again by clicking Retry.</value>
   </data>
-  <data name="home_bottom_line" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\home_bottom_line.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ConfirmFinishWithFailingConfig" xml:space="preserve">
     <value>The configuration of {0} has not been successfully completed.  Are you sure you want to close the wizard?</value>
-  </data>
-  <data name="WelcomePageInstallLinkText" xml:space="preserve">
-    <value>Install MySQL Products</value>
   </data>
   <data name="ActionCurrent" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ActionCurrent.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -733,144 +257,30 @@ You can start the configure process again by clicking Retry.</value>
   <data name="BadLaunchWrongArguments" xml:space="preserve">
     <value>MySQL Configurator was not launched properly. Try re-installing an installer bundle.</value>
   </data>
-  <data name="AddUrlTextboxTooltip" xml:space="preserve">
-    <value>Specify a valid URL to be added.</value>
-  </data>
-  <data name="AddGPLTitle" xml:space="preserve">
-    <value>Add GPL</value>
-  </data>
-  <data name="UpdatesAreAvailableCaption" xml:space="preserve">
-    <value>Updates Available</value>
-  </data>
-  <data name="AtLeastOneFeatureForModify" xml:space="preserve">
-    <value>At least one feature must remain enabled. To completely remove a product, please select the Remove option from the dashboard.</value>
-  </data>
-  <data name="about_mysql_light" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\about_mysql_light.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="UnhandledException" xml:space="preserve">
     <value>Internal error. ({0}) The installer will now close.</value>
   </data>
   <data name="MainLogo_Security" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MainLogo-Security.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="MySQLProductsURL" xml:space="preserve">
-    <value>http://www.mysql.com/products/</value>
-  </data>
-  <data name="ConversionProgressText" xml:space="preserve">
-    <value>Converting your MySQL {0} products to {1} products ...</value>
-  </data>
-  <data name="MySQLInstallerLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLInstallerLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MainLogo_Input" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MainLogo-Input.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="MoreInfoText" xml:space="preserve">
     <value>More information</value>
-  </data>
-  <data name="CommercialUpdateCheckFetchFailedWithErrorText" xml:space="preserve">
-    <value>Could not check for product update information. Got the following error details:
-
-{0}</value>
-  </data>
-  <data name="PackagesAvailableForDownload" xml:space="preserve">
-    <value>(available for download)</value>
   </data>
   <data name="server_machine" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\server_machine.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="WelcomePageResourcesDescriptionText" xml:space="preserve">
-    <value>Get more information on how to install MySQL and configure it to run efficiently on your computer.</value>
-  </data>
-  <data name="MySQLInstallerConfig_Done" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLInstallerConfig_Done.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ContinueRebootSystem" xml:space="preserve">
     <value>The Installer will restart your system. Do you want to continue?</value>
-  </data>
-  <data name="Add" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Add.ico;System.Drawing.Icon, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MOSAuthSuccess" xml:space="preserve">
-    <value>Authentication successful</value>
   </data>
   <data name="WizardSelection" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\WizardSelection.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="CoversionConfirmationText" xml:space="preserve">
-    <value>Thanks for installing a {0} edition of MySQL Configurator. We have
-detected that MySQL products under the {1} license are installed. In
-order to proceed with this {0} installation, these {1} products
-need to be converted to a {0} license.
-
-Please click [Yes] to automatically convert your {1} products to
-{0} products.
-
-Clicking [No] will cancel this {0} installation. You may proceed
-using {1} installers or run this {0} installer again at a later
-point in time.</value>
-  </data>
-  <data name="ConfigureTimeOutUserWaitingText" xml:space="preserve">
-    <value>Configuration taking too long and timed out, but user still waiting for it to finish.</value>
-  </data>
-  <data name="EmptyUrlList" xml:space="preserve">
-    <value>The URL list can't be empty.</value>
-  </data>
-  <data name="MySQLProductsDescription" xml:space="preserve">
-    <value>Learn about all MySQL products.</value>
-  </data>
-  <data name="ProductCatalogLoading" xml:space="preserve">
-    <value>Loading product catalog.</value>
-  </data>
-  <data name="MySQLReleaseNotesDescription" xml:space="preserve">
-    <value>Information about this and older releases.</value>
-  </data>
   <data name="Commercial" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Commercial.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigureTimeOutInvalidConfigDialogError" xml:space="preserve">
-    <value>Invalid configuration dialog (null) found when a configure timeout event occurred.</value>
-  </data>
-  <data name="RequirementsCheckRecheckButtonText" xml:space="preserve">
-    <value>Re-Check</value>
-  </data>
-  <data name="WelcomePageUpdateCheckDescriptionText" xml:space="preserve">
-    <value>Run this check to see if new maintenance releases are available and to install them.</value>
-  </data>
-  <data name="UpdateCaption" xml:space="preserve">
-    <value>Update?</value>
-  </data>
-  <data name="RequirementsNoManualDuringAutoDetail" xml:space="preserve">
-    <value>Make no attempt to install third-party software while MySQL Configurator is resolving requirements.</value>
-  </data>
-  <data name="PackagesIncludedInCurrentBundleText" xml:space="preserve">
-    <value>The packages included in the current bundle are the following:</value>
-  </data>
-  <data name="FeatureIsRequired" xml:space="preserve">
-    <value>{0} is a required feature.</value>
-  </data>
-  <data name="CheckForUpdatesOptions" xml:space="preserve">
-    <value>c|check</value>
-  </data>
-  <data name="AboutBanner" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\AboutBanner.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="PackageHasFailingRequirements" xml:space="preserve">
-    <value>{0} has failing requirements</value>
   </data>
   <data name="RemoveSuccessWithErrors" xml:space="preserve">
     <value>The configuration removal operation was successful, however, some errors were identified that may require manual intervention. Please review the log for more details.
 Click Finish to continue.</value>
-  </data>
-  <data name="ConfirmContinueTitle" xml:space="preserve">
-    <value>Continue after download errors</value>
-  </data>
-  <data name="CheckForUpdatesDescription" xml:space="preserve">
-    <value>Check for product updates</value>
-  </data>
-  <data name="up_arrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\up_arrow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Cancelled" xml:space="preserve">
     <value>Cancelled</value>
@@ -878,104 +288,17 @@ Click Finish to continue.</value>
   <data name="SidebarBackground" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\sidebarbackground.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="GPLLicenseText" xml:space="preserve">
-    <value>GPL</value>
-  </data>
-  <data name="RequirementCheckInstalling" xml:space="preserve">
-    <value>Installing prerequisite...</value>
-  </data>
-  <data name="UpdateProducts" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\UpdateProducts.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="WaitButtonDefaultText" xml:space="preserve">
-    <value>&amp;Wait</value>
-  </data>
-  <data name="TooltipProductCannotBeInstalled" xml:space="preserve">
-    <value>This product cannot be installed because another product ({0})
-is already installed or is selected for installation that cannot be installed at the same time.
-Uninstall {0} in order to allow installing this product.</value>
-  </data>
-  <data name="right_arrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\right_arrow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfirmDataRemovalTitle" xml:space="preserve">
-    <value>Confirm Data Removal</value>
-  </data>
-  <data name="WelcomePageUpdateProductsDescriptionText" xml:space="preserve">
-    <value>Select this action item to update the installed MySQL products on this machine to the latest version.</value>
-  </data>
   <data name="dedicated_machine" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\dedicated_machine.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ConfirmDataRemovalText" xml:space="preserve">
-    <value>Are you sure you want to delete the server data files?</value>
-  </data>
-  <data name="EmptyUrl" xml:space="preserve">
-    <value>The URL can't be null or empty.</value>
-  </data>
-  <data name="ActionItemAddRemove" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ActionItemAddRemove.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="error_small" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\error_small.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="Completed" xml:space="preserve">
     <value>Completed</value>
-  </data>
-  <data name="MySQLURL" xml:space="preserve">
-    <value>http://www.mysql.com/</value>
-  </data>
-  <data name="CustomSetupTypeDesc" xml:space="preserve">
-    <value>You must select which products and features will be installed.</value>
-  </data>
-  <data name="WelcomePageRemoveDescriptionText" xml:space="preserve">
-    <value>Remove individual MySQL products from your machine. Also select this item to remove all MySQL products.</value>
-  </data>
-  <data name="ImposterInstalled" xml:space="preserve">
-    <value>Conflicting product {0} is installed.</value>
-  </data>
-  <data name="UpdatedCatalog" xml:space="preserve">
-    <value>We have downloaded and updated the MySQL product catalog.</value>
-  </data>
-  <data name="HelpOptions" xml:space="preserve">
-    <value>?|help|h</value>
-  </data>
-  <data name="UpdateRequired" xml:space="preserve">
-    <value>Your existing MySQL Configurator version is incompatible with the most recent products. You will need to upgrade to get further updates to your software.
-Please visit {0} to download the latest release of the MySQL Configurator or restart the application and skip update checks to continue using the current software.</value>
-  </data>
-  <data name="left_double_arrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\left_double_arrow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="GenericProductConfigCancelWarningText" xml:space="preserve">
-    <value>Clicking Cancel will abort the current configuration, click Details for more information.</value>
-  </data>
-  <data name="ActionItemResources" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ActionItemResources.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="WelcomePageInstallDescriptionText" xml:space="preserve">
-    <value>Guide you through the installation and configuration of your MySQL products.</value>
   </data>
   <data name="CancelButtonDefaultText" xml:space="preserve">
     <value>&amp;Cancel</value>
   </data>
   <data name="MainLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MainLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="NextButtonFinishText" xml:space="preserve">
-    <value>&amp;Finish</value>
-  </data>
-  <data name="ValidationErrorTitle" xml:space="preserve">
-    <value>Validation Error</value>
-  </data>
-  <data name="MaturityComboBoxFullManifestNotFound" xml:space="preserve">
-    <value>Some MySQL products were not found. Please check your
-internet connection and restart the application to get the
-complete list of MySQL products automatically and enable
-the Maturity filter.</value>
-  </data>
-  <data name="InvalidUrl" xml:space="preserve">
-    <value>The provided URL is not valid.</value>
   </data>
   <data name="error_sign" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\error_sign.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -988,49 +311,8 @@ Click Finish to continue.</value>
     <value>The removal for some products has failed or was cancelled by the user.
 You can find more information about the failures in the 'Log' tab.</value>
   </data>
-  <data name="AutomaticInternetConnectionValidationTooltip" xml:space="preserve">
-    <value>Perform the internet connection validation
-by checking the default URLs.</value>
-  </data>
-  <data name="CommercialLicenseText" xml:space="preserve">
-    <value>Commercial</value>
-  </data>
-  <data name="WelcomeRoundedButton" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\welcomeroundedbutton.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="StatusInstalling" xml:space="preserve">
-    <value>Installing...</value>
-  </data>
-  <data name="DriveSpaceNeeded" xml:space="preserve">
-    <value>Estimated Total Space required on drive: {0}</value>
-  </data>
-  <data name="server_confirm" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\server-confirm.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="PackagesAvailableForCommercialDownload" xml:space="preserve">
-    <value>(available for commercial download)</value>
-  </data>
-  <data name="InstalledMySQLProducts" xml:space="preserve">
-    <value>Installed MySQL Products</value>
-  </data>
   <data name="MainLogo_Success" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MainLogo-Success.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="CancelModificationQuestion" xml:space="preserve">
-    <value>Are you sure you want to cancel modifying your products?</value>
-  </data>
-  <data name="CommercialUpdateCheckFetchFailedText" xml:space="preserve">
-    <value>Could not download product update information.</value>
-  </data>
-  <data name="MoveDownUrlTooltip" xml:space="preserve">
-    <value>Move down the selected URL one space.</value>
-  </data>
-  <data name="ServerOnlySetupTypeDesc" xml:space="preserve">
-    <value>Installs only MySQL Server for Windows.</value>
-  </data>
-  <data name="ManualInternetConnectionValidationTooltip" xml:space="preserve">
-    <value>Perform the internet connection validation
-by checking the URLs specified by the user.</value>
   </data>
   <data name="RemoveProductsWizardCancelConfirmationText" xml:space="preserve">
     <value>Are you sure you want to cancel removing products?</value>
@@ -1038,158 +320,23 @@ by checking the URLs specified by the user.</value>
   <data name="ActionError" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ActionError.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="UpdatesAreAvailable" xml:space="preserve">
-    <value>Updates are available for one or more of your installed MySQL products. Would you like to upgrade them now?</value>
-  </data>
-  <data name="fading_divider" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\fading_divider.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="PackagesAvailable" xml:space="preserve">
-    <value>(available in this package)</value>
-  </data>
-  <data name="MOSAuthFailed" xml:space="preserve">
-    <value>Authentication failed</value>
-  </data>
-  <data name="ConvertingProductMessage" xml:space="preserve">
-    <value>Converting {0}.  Please wait...</value>
-  </data>
-  <data name="ProxyEmptyServerName" xml:space="preserve">
-    <value>The proxy server must be provided.</value>
-  </data>
-  <data name="AddTitle" xml:space="preserve">
-    <value>Add</value>
-  </data>
-  <data name="CommercialUpdateCheckConnectionFailedText" xml:space="preserve">
-    <value>Could not connect to the update server.</value>
-  </data>
-  <data name="ConflictingLicenseInstalled" xml:space="preserve">
-    <value>A {0} version ({1}) with the same upgrade code is already installed.</value>
-  </data>
-  <data name="RequirementManualIsNotMet" xml:space="preserve">
-    <value>This is a manual requirement.  You can attempt to resolve the requirement using the information provided. When done, you can press the Check button to see if the requirment has been met.</value>
-  </data>
-  <data name="right_double_arrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\right_double_arrow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConvertProductsMissingCommercialURL" xml:space="preserve">
-    <value>https://support.oracle.com</value>
-  </data>
-  <data name="server_config_security" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\server_config_security.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="OverallStatusDownloading" xml:space="preserve">
-    <value>Downloading necessary packages...</value>
-  </data>
-  <data name="h_divider" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\h_divider.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ExecuteToTryAgain" xml:space="preserve">
-    <value>You can click Execute to try again.</value>
-  </data>
-  <data name="MySQLDevZoneDescription" xml:space="preserve">
-    <value>The MySQL developer community.</value>
-  </data>
-  <data name="MySQLDevZoneURL" xml:space="preserve">
-    <value>http://dev.mysql.com</value>
-  </data>
-  <data name="UnableToLocateShell" xml:space="preserve">
-    <value>Unable to launch MySQL Shell. Unable to locate the installation directory.</value>
-  </data>
   <data name="AppAlreadyRunning" xml:space="preserve">
     <value>Only one instance of MySQL Configurator for Windows can be run at a time.</value>
-  </data>
-  <data name="OverallStatusInstalling" xml:space="preserve">
-    <value>Installing requested packages. Please wait...</value>
-  </data>
-  <data name="UnknownReason" xml:space="preserve">
-    <value>No known reason.</value>
   </data>
   <data name="warning_sign_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\warning_sign.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="RequirementStillFailing" xml:space="preserve">
-    <value>The requirement is still failing.</value>
-  </data>
-  <data name="Maintenance" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Maintenance.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLInstallerSettings" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLInstallerSettings.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="PositiveConfirmationText" xml:space="preserve">
-    <value>&amp;Yes</value>
-  </data>
   <data name="logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\logo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ActionAbout" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ActionAbout.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ActionCurrent1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ActionCurrent1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ActionDone1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ActionDone1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ActionError1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ActionError1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ActionOpen1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ActionOpen1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ActionWarning" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ActionWarning.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="BigWarning1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\BigWarning1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="BinLogPathExtensionError" xml:space="preserve">
     <value>Path to the binary log must not have an extension.</value>
   </data>
-  <data name="ConfigDirDeleted" xml:space="preserve">
-    <value>Configuration directory deleted successfully</value>
-  </data>
-  <data name="ConfigErrorCouldNotOpenDatabase" xml:space="preserve">
-    <value>Could not open connection to database</value>
-  </data>
-  <data name="ConfigErrorInstallingSampleDatabase" xml:space="preserve">
-    <value>Error installing sample database. The error is:\n\t{0}</value>
-  </data>
-  <data name="ConfigErrorServerBadConnectionString" xml:space="preserve">
-    <value>Unable to configure as the connection string returns is null or empty</value>
-  </data>
-  <data name="ConfigErrorServerNotInstalled" xml:space="preserve">
-    <value>Unable to configure as the server product in our catalog is not installed</value>
-  </data>
-  <data name="ConfigErrorServerNotRunning" xml:space="preserve">
-    <value>Unable to configure as the server product in our catalog is not running</value>
-  </data>
-  <data name="ConfigInfoCheckingCompatibleServers" xml:space="preserve">
-    <value>Checking for compatible servers.</value>
-  </data>
-  <data name="ConfigInfoCheckingFeaturesToConfigure" xml:space="preserve">
-    <value>Checking if there are any features installed that need configuration.</value>
-  </data>
-  <data name="ConfigInfoCheckingInstalledServers" xml:space="preserve">
-    <value>Checking installed servers.</value>
-  </data>
   <data name="ConfigInfoCreatingRemovingExamplesData" xml:space="preserve">
     <value>Updating example databases...</value>
   </data>
-  <data name="ConfigInfoGetConnectionInformation" xml:space="preserve">
-    <value>Getting connection information (provide credentials if it is needed).</value>
-  </data>
   <data name="ConfigInfoNoSampleDbsToConfigure" xml:space="preserve">
     <value>No sample databases were found to configure.</value>
-  </data>
-  <data name="ConfigInfoRunScripts" xml:space="preserve">
-    <value>Running Scripts</value>
-  </data>
-  <data name="ConfigInfoStartServers" xml:space="preserve">
-    <value>Starting Server instance(s)</value>
-  </data>
-  <data name="ConfigInfoStopServers" xml:space="preserve">
-    <value>Stopping Server instance(s)</value>
   </data>
   <data name="ConfigMachineTypeDedicated" xml:space="preserve">
     <value>Dedicated Computer</value>
@@ -1215,38 +362,11 @@ by checking the URLs specified by the user.</value>
   <data name="ConfigMachineTypeServerDescription" xml:space="preserve">
     <value>Several server applications will be running on this computer.  Choose this option for web or application servers.  MySQL will have medium memory usage.</value>
   </data>
-  <data name="ConfigSuccessNoFeaturesToConfig" xml:space="preserve">
-    <value>There are no features installed that need configuration.</value>
-  </data>
-  <data name="ConfigureTimeOutInvalidConfigDialogError1" xml:space="preserve">
-    <value>Invalid configuration dialog (null) found when configure timeout event occurred.</value>
-  </data>
-  <data name="ConfigUserMySQL" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ConfigUserMySQL.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ConfigUserMySQL241" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ConfigUserMySQL24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ConfigUserMySQLRoot" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ConfigUserMySQLRoot.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConfigUserWindows24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ConfigUserWindows24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="config_logs" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\config_logs.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="config_tools" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\config_tools.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="config_win_integration" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\config_win_integration.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConnectionFailedText" xml:space="preserve">
-    <value>Connection failed.</value>
-  </data>
-  <data name="ConnectionSucceededText" xml:space="preserve">
-    <value>Connection succeeded.</value>
   </data>
   <data name="ConnectionTestingText" xml:space="preserve">
     <value>Connecting...</value>
@@ -1254,47 +374,17 @@ by checking the URLs specified by the user.</value>
   <data name="DataDirectoryInUse" xml:space="preserve">
     <value>The upgrade operation cannot continue because the files in the data directory are in use</value>
   </data>
-  <data name="dedicated_machine1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\dedicated_machine1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="developer_machine1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\developer_machine1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ExamplesConfigurationControllerCreatedText" xml:space="preserve">
-    <value>Examples configuration controller created.</value>
-  </data>
   <data name="example_databases" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\example_databases.zip;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="fading_divider1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\fading_divider1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="FailedToRetrieveMySqldProcesses" xml:space="preserve">
     <value>Failed to retrieve the list of running mysqld processes.</value>
   </data>
-  <data name="FailedToRetrieveMySqldProcesses1" xml:space="preserve">
-    <value>Failed to retrieve the list of running mysqld processes.</value>
-  </data>
-  <data name="FailedToRetrieveReadOnlyStatus" xml:space="preserve">
-    <value>Unable to get the read-only status of the instance.</value>
-  </data>
   <data name="FailedToRetrieveVariable" xml:space="preserve">
     <value>Failed to retrieve the value of the {0} variable.</value>
   </data>
-  <data name="FilesLeftBehind" xml:space="preserve">
-    <value>User generated content has been left behind in the folder {0}. Do you want to remove these files?</value>
-  </data>
-  <data name="GenericProductConfigDelayLogActionsText" xml:space="preserve">
-    <value>These are the last 10 actions in the {0} file, they may help you understand more about the service start delay reason:</value>
-  </data>
   <data name="InstallEnterpriseFirewallScriptNotFound" xml:space="preserve">
     <value>The Enterprise Firewall script could not be found.</value>
-  </data>
-  <data name="InstanceIsReadOnly" xml:space="preserve">
-    <value>The instance is configured as read-only.</value>
-  </data>
-  <data name="InvalidRootPassword" xml:space="preserve">
-    <value>{0} is an invalid root password.</value>
   </data>
   <data name="InvalidServerTemplate" xml:space="preserve">
     <value>Invalid server template</value>
@@ -1302,113 +392,14 @@ by checking the URLs specified by the user.</value>
   <data name="InvalidServiceName" xml:space="preserve">
     <value>{0} is an invalid service name.</value>
   </data>
-  <data name="LocalIpAddressNotFoundMessage" xml:space="preserve">
-    <value>Local IP Address Not Found! You will not be able to proceed with this type of configuration.</value>
-  </data>
-  <data name="LocalServerInstanceStartServerWaitUntilAcceptingConnections" xml:space="preserve">
-    <value>Waiting for the server to start accepting connections...</value>
-  </data>
-  <data name="MemConfigAgentOptionsCaption" xml:space="preserve">
-    <value>Please use this interface to specify the Agent user options</value>
-  </data>
-  <data name="MemConfigAgentOptionsGeneralUserTip" xml:space="preserve">
-    <value>This user handles general monitoring tasks that do not require SUPER level privileges, lower </value>
-  </data>
-  <data name="MemConfigAgentOptionsLimitedUserTip" xml:space="preserve">
-    <value>This user is used for statements that should be limited to a single connection, and can be run </value>
-  </data>
-  <data name="MemConfigEnterpriseMonitorOptionsAgentNameTip" xml:space="preserve">
-    <value>Agent name must not be blank.</value>
-  </data>
-  <data name="MemConfigEnterpriseMonitorOptionsAgentPasswordTip" xml:space="preserve">
-    <value>Agent password must not be blank and must match the Re-enter box below.</value>
-  </data>
-  <data name="MemConfigEnterpriseMonitorOptionsCaption" xml:space="preserve">
-    <value>Please supply the Enterprise Monitor options.</value>
-  </data>
-  <data name="MemConfigEnterpriseMonitorOptionsHostnameTip" xml:space="preserve">
-    <value>Host name must be an IP address.</value>
-  </data>
-  <data name="MemConfigEnterpriseMonitorOptionsTomcatSSLTip" xml:space="preserve">
-    <value>Must supply Tomcat port number.</value>
-  </data>
-  <data name="MemConfigEventConfigureServiceError" xml:space="preserve">
-    <value>Failed to configure agent service.</value>
-  </data>
-  <data name="MemConfigEventConfigureServiceInfo" xml:space="preserve">
-    <value>Attempting to configure agent service</value>
-  </data>
-  <data name="MemConfigEventConfigureServiceSuccess" xml:space="preserve">
-    <value>Configured agent service.</value>
-  </data>
-  <data name="MemConfigEventConnectionVerifierFailure" xml:space="preserve">
-    <value>Failed</value>
-  </data>
-  <data name="MemConfigEventConnectionVerifierSuccess" xml:space="preserve">
-    <value>Success</value>
-  </data>
-  <data name="MemConfigEventExternalProcessFailMessagePrequelError" xml:space="preserve">
-    <value>Failed with error messagese:</value>
-  </data>
-  <data name="MemConfigEventExternalProcessStartMessagePrequelInfo" xml:space="preserve">
-    <value>Attempting to run: </value>
-  </data>
-  <data name="MemConfigEventWritingBootstrapPropertiesError" xml:space="preserve">
-    <value>Failed to create bootstrap.properties file.</value>
-  </data>
-  <data name="MemConfigEventWritingBootstrapPropertiesInfo" xml:space="preserve">
-    <value>Attempting to create bootstrap.properties file.</value>
-  </data>
-  <data name="MemConfigEventWritingBootstrapPropertiesSuccess" xml:space="preserve">
-    <value>Created bootstrap.properties file.</value>
-  </data>
-  <data name="MemConfigEventWritingNewUsersError" xml:space="preserve">
-    <value>Failed to create new users</value>
-  </data>
-  <data name="MemConfigEventWritingNewUsersInfo" xml:space="preserve">
-    <value>Attempting to create new users</value>
-  </data>
-  <data name="MemConfigEventWritingNewUsersSuccess" xml:space="preserve">
-    <value>Created new users</value>
-  </data>
-  <data name="MemConfigMonitoredDBOptionsAdminPasswordTip" xml:space="preserve">
-    <value>Admin password must not be blank?</value>
-  </data>
-  <data name="MemConfigMonitoredDBOptionsAdminUserTip" xml:space="preserve">
-    <value>Admin name must not be blank.</value>
-  </data>
-  <data name="MemConfigMonitoredDBOptionsCaption" xml:space="preserve">
-    <value>Please supply the monitored database information.</value>
-  </data>
-  <data name="MemConfigMonitoredDBOptionsHostnameTip" xml:space="preserve">
-    <value>Must contain hostname or IP address.</value>
-  </data>
-  <data name="MemConfigMonitoredDBOptionsPortTip" xml:space="preserve">
-    <value>Must supply mysql port number.</value>
-  </data>
-  <data name="MemConfigMonitoringOptionsCaption" xml:space="preserve">
-    <value>Please select the types of monitoring to configure.</value>
-  </data>
   <data name="MemoryAlreadyExists" xml:space="preserve">
     <value>A shared memory object with the name '{0}' already existis.</value>
   </data>
   <data name="MinValueRequired" xml:space="preserve">
     <value>The minimum value for this field should be {0}</value>
   </data>
-  <data name="MySQLErrorLogText" xml:space="preserve">
-    <value>MySQL error log</value>
-  </data>
-  <data name="MySQLGeneralLogText" xml:space="preserve">
-    <value>MySQL general log</value>
-  </data>
-  <data name="MySQLInstallerConfig_Done1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLInstallerConfig_Done1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="MySQLInstallerConfig_DoneIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLInstallerConfig_Done.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLInstallerConfig_Error1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLInstallerConfig_Error1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="MySQLInstallerConfig_ErrorIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLInstallerConfig_Error.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -1416,38 +407,11 @@ by checking the URLs specified by the user.</value>
   <data name="MySQLInstallerConfig_InProgress" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLInstallerConfig_InProgress.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="MySQLServiceStartDelayedText" xml:space="preserve">
-    <value>{0} {1} service is taking longer than expected to start</value>
-  </data>
-  <data name="MySQLServiceStartDelayInnoDBLogText" xml:space="preserve">
-    <value>MySQL Server seems to be still writing to the InnoDB log file, you are advised to wait.</value>
-  </data>
-  <data name="MySQLServiceStartDelayUnknownText" xml:space="preserve">
-    <value>The service start delay may be caused by a variety of factors, like slow disk access or installing on a Virtual Machine. You are advised to wait.</value>
-  </data>
-  <data name="NewFabricPackageInstalled" xml:space="preserve">
-    <value>The standalone MySQL Fabric product is installed. The selected version of MySQL Utilities contains a previous version of the MySQL Fabric tool. A more recent release of MySQL Utilities is available that does not contain a previous version of MySQL Fabric.</value>
-  </data>
-  <data name="NextButtonDefaultText1" xml:space="preserve">
-    <value>&amp;Next &gt;</value>
-  </data>
-  <data name="NextButtonExecuteText1" xml:space="preserve">
-    <value>&amp;Execute</value>
-  </data>
-  <data name="NoCompatibleServers" xml:space="preserve">
-    <value>No compatible servers were found.  You'll need to cancel this wizard and install one.</value>
-  </data>
-  <data name="NoDataDirectoryFoundText" xml:space="preserve">
-    <value>No data directory for this sever installation was found.</value>
-  </data>
   <data name="OpenFirewallPort" xml:space="preserve">
     <value>Open Windows Firewall port for network access</value>
   </data>
   <data name="OpenFirewallPorts" xml:space="preserve">
     <value>Open Windows Firewall ports for network access</value>
-  </data>
-  <data name="PasswordInvalid" xml:space="preserve">
-    <value>Value given for password ({1}) for {0} is not valid.</value>
   </data>
   <data name="PipeAlreadyExists" xml:space="preserve">
     <value>A named pipe with the name '{0}' already exists.</value>
@@ -1458,24 +422,6 @@ by checking the URLs specified by the user.</value>
   <data name="ProcessNotRunningText" xml:space="preserve">
     <value>Process for {0} is not running.</value>
   </data>
-  <data name="RemoveInstallFolderCaption" xml:space="preserve">
-    <value>Remove User Generated Files</value>
-  </data>
-  <data name="RemoveOldRouterConfigurationStep" xml:space="preserve">
-    <value>Removing the configuration folder</value>
-  </data>
-  <data name="RemoveOldService" xml:space="preserve">
-    <value>Removing MySQL Router Windows service</value>
-  </data>
-  <data name="RemovePreviousUtilitiesAndFabric" xml:space="preserve">
-    <value>An older version of MySQL Utilities that contains MySQL Fabric was detected. When this installation completes, the machine will have two versions of MySQL Fabric installed. Please manually uninstall the combined MySQL Utilities and MySQL Fabric product to avoid any conflicts.</value>
-  </data>
-  <data name="RemoveRouterConfigFolderText" xml:space="preserve">
-    <value>Remove configuration folder found at "{0}" (it may contain data)?</value>
-  </data>
-  <data name="RemoveRouterConfigFolderTitle" xml:space="preserve">
-    <value>Remove configuration folder</value>
-  </data>
   <data name="RemovingConfigurationFileText" xml:space="preserve">
     <value>Removing the server configuration file.</value>
   </data>
@@ -1485,59 +431,17 @@ by checking the URLs specified by the user.</value>
   <data name="RemovingFirewallRuleText" xml:space="preserve">
     <value>Removing the Firewall rule created for port {0}.</value>
   </data>
-  <data name="RemovingOldRouterConfigurationText" xml:space="preserve">
-    <value>Removing the old router configuration.</value>
-  </data>
-  <data name="RemovingOldRouterServiceText" xml:space="preserve">
-    <value>Removing the Windows service created for this router installation.</value>
-  </data>
-  <data name="RemovingSandboxInnoDbClusterText" xml:space="preserve">
-    <value>Removing the sandbox InnoDB Cluster.</value>
-  </data>
   <data name="RemovingServiceText" xml:space="preserve">
     <value>Deleting the existing service.</value>
   </data>
   <data name="RemovingWindowsServiceText" xml:space="preserve">
     <value>Removing the Windows service created for this server installation.</value>
   </data>
-  <data name="Revert1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Revert1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="RootRoleDescription" xml:space="preserve">
     <value>All rights just the same as the root user.</value>
   </data>
-  <data name="RouterConfigNotSeedInstanceError" xml:space="preserve">
-    <value>The server is not an InnoDB Cluster seed (read/write) instance</value>
-  </data>
-  <data name="RouterConfigurationTitle" xml:space="preserve">
-    <value>MySQL Router Configuration</value>
-  </data>
-  <data name="RouterConfigureRouter" xml:space="preserve">
-    <value>Creating MySQL Router configuration files</value>
-  </data>
-  <data name="RouterInstallService" xml:space="preserve">
-    <value>Installing MySQL Router Windows service</value>
-  </data>
-  <data name="RouterReportResults" xml:space="preserve">
-    <value>MySQL Router configuration finished. Writting results to the log.</value>
-  </data>
-  <data name="RouterWindowsServiceNotFound" xml:space="preserve">
-    <value>No MySQL Router Windows service is present, nothing to remove.</value>
-  </data>
-  <data name="RunningText" xml:space="preserve">
-    <value>Running</value>
-  </data>
   <data name="SameCSPortXPort" xml:space="preserve">
     <value>The Port and the X Protocol Port cannot be the same.</value>
-  </data>
-  <data name="SamplesAllConnectionsFailed" xml:space="preserve">
-    <value>All connections failed.</value>
-  </data>
-  <data name="SamplesAllConnectionsSucceeded" xml:space="preserve">
-    <value>All connections succeeded.</value>
-  </data>
-  <data name="SamplesSomeConnectionsSucceeded" xml:space="preserve">
-    <value>Not all connections succeeded. Some instances may be configured as read-only.</value>
   </data>
   <data name="SavedConfigurationFile" xml:space="preserve">
     <value>Saved {0} configuration file.</value>
@@ -1584,9 +488,6 @@ by checking the URLs specified by the user.</value>
   <data name="ServerConfigBackupDatabaseServerStartError" xml:space="preserve">
     <value>An error occurred while trying to start MySQL Server in order to run the mysqldump tool.</value>
   </data>
-  <data name="ServerConfigBackupDatabaseStartServer" xml:space="preserve">
-    <value>Starting MySQL Server in order to run the mysqldump tool.</value>
-  </data>
   <data name="ServerConfigBackupDatabaseStep" xml:space="preserve">
     <value>Backing up MySQL database</value>
   </data>
@@ -1595,15 +496,6 @@ by checking the URLs specified by the user.</value>
   </data>
   <data name="ServerConfigCheckingAccessToLogs" xml:space="preserve">
     <value>Checking access to the server logs...</value>
-  </data>
-  <data name="ServerConfigClusterNameInvalid" xml:space="preserve">
-    <value>Please type a valid cluster name</value>
-  </data>
-  <data name="ServerConfigClusterNameMaxLengthExceeded" xml:space="preserve">
-    <value>The length of a cluster name must not exceed 40 characters.</value>
-  </data>
-  <data name="ServerConfigClusterNameRequired" xml:space="preserve">
-    <value>Cluster name is required.</value>
   </data>
   <data name="ServerConfigConvertToExplicitPermissionsFailed" xml:space="preserve">
     <value>Failed to convert inherited permissions to explicit permissions.</value>
@@ -1663,9 +555,6 @@ by checking the URLs specified by the user.</value>
     <value>Empty or blank passwords are considered insecure.
 Provide a more complex password for stronger security.</value>
   </data>
-  <data name="ServerConfigEmptyOrBlankPasswordWarning1" xml:space="preserve">
-    <value>Empty or blank passwords are considered insecure.</value>
-  </data>
   <data name="ServerConfigEmptySecurityTokens" xml:space="preserve">
     <value>No security tokens were provided.</value>
   </data>
@@ -1690,18 +579,6 @@ Provide a more complex password for stronger security.</value>
   <data name="ServerConfigEventConfigureEnterpriseFirewallSuccess" xml:space="preserve">
     <value>Configured MySQL Enterprise Firewall</value>
   </data>
-  <data name="ServerConfigEventConfigureServiceError" xml:space="preserve">
-    <value>Unable to configure service.</value>
-  </data>
-  <data name="ServerConfigEventConfigureServiceInfo" xml:space="preserve">
-    <value>Attempting to configure service.</value>
-  </data>
-  <data name="ServerConfigEventConfigureServiceSuccess" xml:space="preserve">
-    <value>Configured service.</value>
-  </data>
-  <data name="ServerConfigEventFinished" xml:space="preserve">
-    <value>Product configuration controller finished configuration.</value>
-  </data>
   <data name="ServerConfigEventFirewallSettingFailed" xml:space="preserve">
     <value>Failed to add the Windows Firewall rule.</value>
   </data>
@@ -1722,18 +599,6 @@ Provide a more complex password for stronger security.</value>
   </data>
   <data name="ServerConfigEventFirewallSettingSucceeded" xml:space="preserve">
     <value>Successfully added the Windows Firewall rule.</value>
-  </data>
-  <data name="ServerConfigEventProcessingUserError" xml:space="preserve">
-    <value>Error while creating user.</value>
-  </data>
-  <data name="ServerConfigEventProcessTemplateError" xml:space="preserve">
-    <value>Failed to process template.</value>
-  </data>
-  <data name="ServerConfigEventProcessTemplateInfo" xml:space="preserve">
-    <value>Attempting to process template.</value>
-  </data>
-  <data name="ServerConfigEventProcessTemplateSuccess" xml:space="preserve">
-    <value>Processed template.</value>
   </data>
   <data name="ServerConfigEventSecuritySettingsError" xml:space="preserve">
     <value>Unable to update security settings. {0}</value>
@@ -1770,15 +635,6 @@ Provide a more complex password for stronger security.</value>
   </data>
   <data name="ServerConfigEventStartServiceSuccess" xml:space="preserve">
     <value>Successfully started service {0}.</value>
-  </data>
-  <data name="ServerConfigEventValidTemplateError" xml:space="preserve">
-    <value>Unable to find a valid template.</value>
-  </data>
-  <data name="ServerConfigEventValidTemplateInfo" xml:space="preserve">
-    <value>Looking for valid template</value>
-  </data>
-  <data name="ServerConfigEventValidTemplateSuccess" xml:space="preserve">
-    <value>Found valid template.</value>
   </data>
   <data name="ServerConfigFailedToGetAuthorizationRules" xml:space="preserve">
     <value>Failed to get the authorization rules for: {0}.</value>
@@ -1825,23 +681,11 @@ Provide a more complex password for stronger security.</value>
   <data name="ServerConfigInstanceRunning" xml:space="preserve">
     <value>The MySQL server instance is currently running. Cannot proceed with the operation.</value>
   </data>
-  <data name="ServerConfigInvalidServerId" xml:space="preserve">
-    <value>Please type a valid Server ID</value>
-  </data>
   <data name="ServerConfigInvalidWindowsSecurityTokens" xml:space="preserve">
     <value>One or more of the given security tokens is not valid. Please verify the list entered:</value>
   </data>
   <data name="ServerConfigLocalGroupDoesNotExist" xml:space="preserve">
     <value>The selected local group no longer exists. Please refresh the list\n and select an existing local group.</value>
-  </data>
-  <data name="ServerConfigLocalInstanceNotPartOfInnoDbCluster" xml:space="preserve">
-    <value>The local instance is no longer part of a production InnoDB Cluster.</value>
-  </data>
-  <data name="ServerConfigLocalInstanceSwitchedRoles" xml:space="preserve">
-    <value>The local instance has switched roles within the production InnoDB Cluster. The connection details will be updated.</value>
-  </data>
-  <data name="ServerConfigLoggingSlowLogFilesTitle" xml:space="preserve">
-    <value>Choose a slow query log file...</value>
   </data>
   <data name="ServerConfigLogPathMissing" xml:space="preserve">
     <value>No log path was provided.</value>
@@ -1900,9 +744,6 @@ Provide a more complex password for stronger security.</value>
   <data name="ServerConfigRemovedAccessSuccess" xml:space="preserve">
     <value>Access to the data directory is removed for the {0} {1}.</value>
   </data>
-  <data name="ServerConfigResetingInnoDbExtendedSettings" xml:space="preserve">
-    <value>Reverting the InnoDB extended settings.</value>
-  </data>
   <data name="ServerConfigServerIdDuringInnoDbClusterReconfigurationNotSupported" xml:space="preserve">
     <value>Updating the server ID is not supported during InnoDB Cluster reconfiguration.</value>
   </data>
@@ -1948,26 +789,14 @@ Provide a more complex password for stronger security.</value>
   <data name="ServerConfigTableNamesNotSupported" xml:space="preserve">
     <value>Updating the Table Names Case is not supported during reconfigurations or for server versions lower than 8.0.</value>
   </data>
-  <data name="ServerConfigUnableToGenerateUnistallFirewallScript" xml:space="preserve">
-    <value>Failed to generate the MySQL Enterprise Firewall plugin uninstall script.</value>
-  </data>
   <data name="ServerConfigUnspecifiedError" xml:space="preserve">
     <value>Unspecified error</value>
   </data>
   <data name="ServerConfigUpdatingExistingService" xml:space="preserve">
     <value>Updating existing service...</value>
   </data>
-  <data name="ServerConfigUpgradePageSkipUpgradeNotAllowed" xml:space="preserve">
-    <value>Upgrading the system tables was skipped in a previous MySQL Server upgrade, skipping it again is not allowed.</value>
-  </data>
   <data name="ServerConfigUserFriendlyUnspecifiedError" xml:space="preserve">
     <value>Unable to access the Active Directory of the domain. Confirm that</value>
-  </data>
-  <data name="ServerConfigUserNameBlank" xml:space="preserve">
-    <value>Must enter a user name.</value>
-  </data>
-  <data name="ServerConfigUserNameIsRoot" xml:space="preserve">
-    <value>The root user account is reserved and</value>
   </data>
   <data name="ServerConfigWaitingForSuccesfulConnectionFailedText" xml:space="preserve">
     <value>Failed to connect to {0} after {1} attempts.</value>
@@ -1999,9 +828,6 @@ Provide a more complex password for stronger security.</value>
   <data name="ServerDeleteServiceStep" xml:space="preserve">
     <value>Removing the MySQL Windows service</value>
   </data>
-  <data name="ServerDoesNotSupportPersistSetGlobalSettings" xml:space="preserve">
-    <value>Server does not support automatic persistent global settings. Restarting server to persist settings.</value>
-  </data>
   <data name="ServerEnableEnterpriseFirewallStep" xml:space="preserve">
     <value>Updating MySQL Enterprise Firewall plugin</value>
   </data>
@@ -2010,12 +836,6 @@ Provide a more complex password for stronger security.</value>
   </data>
   <data name="ServerInstanceGetGroupReplicationMemberRoleError" xml:space="preserve">
     <value>An error occurred when trying to retrieve the group replication member role:</value>
-  </data>
-  <data name="ServerInstanceInfoExecuteScriptExecutionSuccess" xml:space="preserve">
-    <value>Script executed successfully.</value>
-  </data>
-  <data name="ServerInstanceInfoExecutingScript" xml:space="preserve">
-    <value>Executing script:</value>
   </data>
   <data name="ServerInstanceStillRunningRetryText" xml:space="preserve">
     <value>MySQL Server instance is still running. Retrying count {0}...</value>
@@ -2032,9 +852,6 @@ Provide a more complex password for stronger security.</value>
   <data name="ServerReconfigCheckAndUpgradeDatabase" xml:space="preserve">
     <value>Check and Upgrade Database</value>
   </data>
-  <data name="ServerReconfigRecreateSandboxCluster" xml:space="preserve">
-    <value>Recreate Sandbox InnoDB Cluster</value>
-  </data>
   <data name="ServerRemoveFirewallRulesStep" xml:space="preserve">
     <value>Removing Windows Firewall rules</value>
   </data>
@@ -2043,9 +860,6 @@ Provide a more complex password for stronger security.</value>
   </data>
   <data name="ServerRemovePageRemoveTitle" xml:space="preserve">
     <value>Remove Data</value>
-  </data>
-  <data name="ServerRestartProcessStep" xml:space="preserve">
-    <value>Restarting the server.</value>
   </data>
   <data name="ServerServiceNotFoundText" xml:space="preserve">
     <value>No service exists for this server installation.</value>
@@ -2101,9 +915,6 @@ Provide a more complex password for stronger security.</value>
   <data name="ServerUserAnonymousAccountWithAllHostsWarning" xml:space="preserve">
     <value>A default anonymous user account exists that takes precedence over any user account created with a '%' host wildcard.</value>
   </data>
-  <data name="ServerUserAnonymousAccountWithAllHostsWarning1" xml:space="preserve">
-    <value>A default anonymous user account exists that takes precedence over any user account created with a '%' host wildcard.</value>
-  </data>
   <data name="ServerUserInvalidAuthenticationType" xml:space="preserve">
     <value>Invalid server authentication type: </value>
   </data>
@@ -2118,21 +929,6 @@ Provide a more complex password for stronger security.</value>
   </data>
   <data name="ServerWriteConfigFileStep" xml:space="preserve">
     <value>Writing configuration file</value>
-  </data>
-  <data name="server_config_networking1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\server_config_networking1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="server_config_security1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\server_config_security1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="server_config_windows1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\server_config_windows1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="server_confirm1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\server-confirm1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="server_machine1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\server_machine1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Server_Reflection" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Server_Reflection.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -2164,14 +960,8 @@ Provide a more complex password for stronger security.</value>
   <data name="StartingServerInstanceErrorText" xml:space="preserve">
     <value>An error occurred while trying to start the MySQL Server instance.</value>
   </data>
-  <data name="StepSkipped" xml:space="preserve">
-    <value>Skipped as this is not required.</value>
-  </data>
   <data name="StoppedProcessText" xml:space="preserve">
     <value>Killed process for {0}, with ID {1}.</value>
-  </data>
-  <data name="StoppedText" xml:space="preserve">
-    <value>Stopped</value>
   </data>
   <data name="StoppingProcessText" xml:space="preserve">
     <value>Killing process for {0}, with ID {1}...</value>
@@ -2182,116 +972,8 @@ Provide a more complex password for stronger security.</value>
   <data name="StoppingServerInstanceText" xml:space="preserve">
     <value>Stopping MySQL Server instance...</value>
   </data>
-  <data name="String" xml:space="preserve">
-    <value>by another mysqld process. Please use a tool such as mysqladmin to shutdown any server</value>
-  </data>
-  <data name="String10" xml:space="preserve">
-    <value>INFORMATION_SCHEMA tables (which with large numbers of databases and tables can</value>
-  </data>
-  <data name="String11" xml:space="preserve">
-    <value>become costly), or any custom SQL that is used to monitor application specific statistics.</value>
-  </data>
-  <data name="String12" xml:space="preserve">
-    <value>If you are manually managing this user, it should have at least the SELECT and SHOW</value>
-  </data>
-  <data name="String13" xml:space="preserve">
-    <value>DATABASES privileges globally.</value>
-  </data>
-  <data name="String14" xml:space="preserve">
-    <value>Backup files will be dumped to "{0}".</value>
-  </data>
-  <data name="String15" xml:space="preserve">
-    <value>Provide a more complex password for stronger security.</value>
-  </data>
-  <data name="String16" xml:space="preserve">
-    <value>{0}</value>
-  </data>
-  <data name="String17" xml:space="preserve">
-    <value>{1}</value>
-  </data>
-  <data name="String18" xml:space="preserve">
-    <value>You can add or delete a Windows Firewall rule manually by following the instructions at this URL:</value>
-  </data>
-  <data name="String19" xml:space="preserve">
-    <value>http://windows.microsoft.com/en-US/windows-vista/Allow-a-program-to-communicate-through-Windows-Firewall</value>
-  </data>
-  <data name="String2" xml:space="preserve">
-    <value>instances targeting the same data directory.</value>
-  </data>
-  <data name="String20" xml:space="preserve">
-    <value>{0}</value>
-  </data>
-  <data name="String21" xml:space="preserve">
-    <value>Note: When working with domains, ensure the current Windows user account can access</value>
-  </data>
-  <data name="String22" xml:space="preserve">
-    <value>the Active Directory. Otherwise, select the "Validate Active Directory users with"</value>
-  </data>
-  <data name="String23" xml:space="preserve">
-    <value>check box and provide credentials for a valid user account.</value>
-  </data>
-  <data name="String24" xml:space="preserve">
-    <value>Warning: There may be some errors thrown by MySQL Server, the mysql_upgrade tool is going to be run next to attempt to fix database incompatibilities.</value>
-  </data>
-  <data name="String25" xml:space="preserve">
-    <value>the domain exists, is available, and the credentials are correct.</value>
-  </data>
-  <data name="String26" xml:space="preserve">
-    <value>cannot be used for the cluster user.</value>
-  </data>
-  <data name="String27" xml:space="preserve">
-    <value>FOR THE BEST RESULTS: Run mysqld.exe --upgrade=FORCE on the command line to upgrade the system tables manually.</value>
-  </data>
-  <data name="String28" xml:space="preserve">
-    <value>{0}</value>
-  </data>
-  <data name="String3" xml:space="preserve">
-    <value>privileged users will be used in favor of a SUPER user, unless higher privileges are required -</value>
-  </data>
-  <data name="String4" xml:space="preserve">
-    <value>in which case we temporarily log in as the SUPER privileged user, and then fall back to the</value>
-  </data>
-  <data name="String5" xml:space="preserve">
-    <value>general user.</value>
-  </data>
-  <data name="String6" xml:space="preserve">
-    <value>If you are manually managing this user, it should have at least the PROCESS, REPLICATION</value>
-  </data>
-  <data name="String7" xml:space="preserve">
-    <value>CLIENT, SELECT and SHOW DATABASES privileges globally.</value>
-  </data>
-  <data name="String8" xml:space="preserve">
-    <value>within only global SELECT privileges.</value>
-  </data>
-  <data name="String9" xml:space="preserve">
-    <value>Examples of these kinds of statements include getting database metadata from</value>
-  </data>
-  <data name="UnableToFindConfiguratorDirectory" xml:space="preserve">
-    <value>Unable to find the MySQL Configurator directory.</value>
-  </data>
-  <data name="UnableToFindIniDirectory" xml:space="preserve">
-    <value>Unable to find the server configuration file.</value>
-  </data>
   <data name="UninstallEnterpriseFirewall" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\UninstallEnterpriseFirewall.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
-  </data>
-  <data name="UninstallProductStep" xml:space="preserve">
-    <value>Uninstalling product</value>
-  </data>
-  <data name="UnknownText" xml:space="preserve">
-    <value>Unknown</value>
-  </data>
-  <data name="UpgradePreviousUtilitiesAndFabric" xml:space="preserve">
-    <value>The installed version of MySQL Utilities includes the MySQL Fabric tool. MySQL Fabric is now a stand-alone product and must be installed separately. This update does not include MySQL Fabric.</value>
-  </data>
-  <data name="UsernameEmptyOrWhiteSpace" xml:space="preserve">
-    <value>User name cannot be empty or just contain whitespaces.</value>
-  </data>
-  <data name="warning_sign1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\warning_sign1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="warning_sign_icon1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\warning_sign1.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="WindowsServiceAlreadyRunning" xml:space="preserve">
     <value>Service {0} is running already.</value>
@@ -2341,32 +1023,11 @@ Provide a more complex password for stronger security.</value>
   <data name="ActionCancelledText" xml:space="preserve">
     <value>The action '{1}' for product '{0}' was cancelled by the user.</value>
   </data>
-  <data name="ActionCurrent2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ActionCurrent2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ActionDone2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ActionDone2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ActionError2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ActionError2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ActionFailedText" xml:space="preserve">
     <value>The action '{1}' for product '{0}' failed.</value>
   </data>
-  <data name="ActionOpen2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ActionOpen2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ActionRequiredText1" xml:space="preserve">
-    <value>Action Required</value>
-  </data>
   <data name="ActionSucceededText" xml:space="preserve">
     <value>The action '{1}' for product '{0}' completed successfully.</value>
-  </data>
-  <data name="AddIn_Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\AddOnsCategoryIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="AddIn_Icon24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\AddOnsCategoryIcon24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ApplicationExceptionForLog" xml:space="preserve">
     <value>{0}
@@ -2390,94 +1051,17 @@ Stack trace:
 Thrown by: {1}.{2}
 Exception message: {3}</value>
   </data>
-  <data name="Application_Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ServerCategoryIcon1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Application_Icon24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ServerCategoryIcon24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ApplyingCatalogUpdates" xml:space="preserve">
-    <value>Applying product catalog updates.</value>
-  </data>
-  <data name="ApplyingNewManfiestFromOldDir" xml:space="preserve">
-    <value>Applying new manifest from old home directory.</value>
-  </data>
-  <data name="ApplyingNewManifest" xml:space="preserve">
-    <value>Applying new manifest.</value>
-  </data>
-  <data name="AttemptingToConnect" xml:space="preserve">
-    <value>Attempting to connect to the product update url.</value>
-  </data>
-  <data name="AuthenticationCancelledMessage" xml:space="preserve">
-    <value>Authentication cancelled by the user.</value>
-  </data>
-  <data name="AuthenticationFailedMessage" xml:space="preserve">
-    <value>Authentication failed. Please try again or leave empty user name to cancel.</value>
-  </data>
   <data name="AuthorizationRulesRetrievalFailed" xml:space="preserve">
     <value>Unable to retrieve the authorization rules for file '{0}'.</value>
-  </data>
-  <data name="AutomaticBodyTagNotFound" xml:space="preserve">
-    <value>The last response text does not have an automatic body tag attempting to auto-post a form.</value>
   </data>
   <data name="BackButtonText" xml:space="preserve">
     <value>Back</value>
   </data>
-  <data name="BottomDivider1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\BottomDivider1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="CancelButtonDefaultText1" xml:space="preserve">
-    <value>&amp;Cancel</value>
-  </data>
-  <data name="CanOnlyLoadConfigOnce" xml:space="preserve">
-    <value>You can only call InstallerConfiguration.Load once.</value>
-  </data>
-  <data name="CanOnlyLoadRegistryForInstalledProducts" xml:space="preserve">
-    <value>Registry values can only be loaded for installed products.</value>
-  </data>
-  <data name="CatalogFetchFailed" xml:space="preserve">
-    <value>Downloading of updated product catalog has failed with the error: {0}.
-
-You can retry the download by clicking the Execute button.</value>
-  </data>
-  <data name="CatalogFetchSucceeded" xml:space="preserve">
-    <value>Successfully downloaded new product catalog,</value>
-  </data>
-  <data name="CatalogUrlNotFound" xml:space="preserve">
-    <value>No valid product catalog URL was found, skipping operation.</value>
-  </data>
-  <data name="CatalogUrlOverriden" xml:space="preserve">
-    <value>Setting product catalog URL to '{0}'.</value>
-  </data>
-  <data name="CategorizingManifest" xml:space="preserve">
-    <value>Categorizing product catalog.</value>
-  </data>
-  <data name="CheckForExtraAuthSteps" xml:space="preserve">
-    <value>Parsing response text to check if extra authentication steps are needed...</value>
-  </data>
-  <data name="CheckingPackagesBundle" xml:space="preserve">
-    <value>Checking for product packages in the bundle.</value>
-  </data>
-  <data name="CheckingSessionCookies" xml:space="preserve">
-    <value>Checking session cookies for authentication...</value>
-  </data>
-  <data name="CheckLogTabForDetails" xml:space="preserve">
-    <value> (check the Log tab for details)</value>
-  </data>
   <data name="CheckMethodNotSupported" xml:space="preserve">
     <value>The {0} method is not supported.</value>
   </data>
-  <data name="CliPasswordPromptText" xml:space="preserve">
-    <value>Password: </value>
-  </data>
-  <data name="CliUserNamePromptText" xml:space="preserve">
-    <value>User Name: </value>
-  </data>
   <data name="CloseWBAdviceToDelete" xml:space="preserve">
     <value>If you want to remove a connection, please close MySQL Workbench.</value>
-  </data>
-  <data name="CommandLineOptionDuplicateKeysError" xml:space="preserve">
-    <value>There are duplicate keys which is not allowed.</value>
   </data>
   <data name="CommandLineOptionInvalidArgumentError" xml:space="preserve">
     <value>Argument '{0}' is invalid or not recognized.</value>
@@ -2588,54 +1172,13 @@ This is not the recommended option; it is better to use SSL with a "Preferred" o
   <data name="ConnectionStatusNA" xml:space="preserve">
     <value>Unknown</value>
   </data>
-  <data name="Connector_Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ConnectorCategoryIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Connector_Icon24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ConnectorCategoryIcon24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConnectoToCatalogUpdateInternetAccessValidated" xml:space="preserve">
-    <value>Validated access to the internet using URL: {0}.</value>
-  </data>
-  <data name="ConnectoToCatalogUpdateServerFailed" xml:space="preserve">
-    <value>Failed to connect to catalog update server.
-
-If you have corrected the problem, you can click Execute to try again.</value>
-  </data>
-  <data name="ConnectoToCatalogUpdateServerSucceeded" xml:space="preserve">
-    <value>Successfully connected to product catalog url.</value>
-  </data>
   <data name="ConnectSSLFailedDetailWarning" xml:space="preserve">
     <value>A possible fail reason could be that your user requires a SSL connection that is not currently supported.
 
 Please check with the Administrator if you require a SSL Connection and if he can authorize your user to login without a SSL connection.</value>
   </data>
-  <data name="ConnectToInternetFailed" xml:space="preserve">
-    <value>Failed to connect to the internet.</value>
-  </data>
-  <data name="DetailsCollapsed1" xml:space="preserve">
-    <value>Details &gt;&gt;</value>
-  </data>
-  <data name="DetailsExpanded1" xml:space="preserve">
-    <value>Details &lt;&lt;</value>
-  </data>
-  <data name="Documentation_Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\DocsCategoryIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Documentation_Icon24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\DocsCategoryIcon24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="DownloadFailedToRemoveTempFile" xml:space="preserve">
-    <value>Failed to remove the temporary file '{0}' with message: {1}</value>
-  </data>
   <data name="ErrorText" xml:space="preserve">
     <value>Error</value>
-  </data>
-  <data name="error_sign1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\error_sign1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ExecutedExtraAuthSteps" xml:space="preserve">
-    <value>{0} extra authentication step(s) performed that are automatic with regular browsers but not automatic for us.</value>
   </data>
   <data name="ExpiredPasswordLabelText" xml:space="preserve">
     <value>The password for the MySQL account has expired.
@@ -2644,23 +1187,11 @@ Please enter a new password:</value>
   <data name="ExpiredPasswordWindowTitleText" xml:space="preserve">
     <value>Password Expired</value>
   </data>
-  <data name="ExtraAuthStepResponse" xml:space="preserve">
-    <value>The response URL from the extra authentication step is: '{0}'.</value>
-  </data>
-  <data name="ExtraAuthStepsNotFound" xml:space="preserve">
-    <value>No extra authentication steps were detected.</value>
-  </data>
   <data name="FailureToLaunchWorkbench" xml:space="preserve">
     <value>MySQL Workbench failed to launch with an error (see more information for details).</value>
   </data>
   <data name="FileDoesNotExist" xml:space="preserve">
     <value>The file '{0}' does not exist.</value>
-  </data>
-  <data name="FindingInstalledPackages" xml:space="preserve">
-    <value>Finding all installed packages.</value>
-  </data>
-  <data name="FullManifestAlreadyExists" xml:space="preserve">
-    <value>A full product catalog already exists. Skipping merge operation.</value>
   </data>
   <data name="GenericButton1DefaultText" xml:space="preserve">
     <value>Button1</value>
@@ -2677,95 +1208,17 @@ Please enter a new password:</value>
   <data name="GenericMySQLError" xml:space="preserve">
     <value>MySQL Error {0}:{1}</value>
   </data>
-  <data name="GenericProductConfigCancelWarningText1" xml:space="preserve">
-    <value>Pressing Cancel will abort the current configuration, press Details for more information.</value>
-  </data>
-  <data name="GenericProductConfigDelayedText" xml:space="preserve">
-    <value>{0} {1} configuration is taking a long time to complete</value>
-  </data>
-  <data name="GenericProductConfigTimeoutUnknownText" xml:space="preserve">
-    <value>The configuration completion delay may be caused by a variety of factors, you may look at the product's log for more information.</value>
-  </data>
   <data name="HasOptionWarnings" xml:space="preserve">
     <value>You still have warnings with your selected options.  Are you sure you want to continue?</value>
-  </data>
-  <data name="HidePrefixText1" xml:space="preserve">
-    <value>Hide {0}</value>
   </data>
   <data name="HighSeverityError" xml:space="preserve">
     <value>High Severity Error</value>
   </data>
-  <data name="HtmlCodeNotFound" xml:space="preserve">
-    <value>The last response does not contain HTML text.</value>
-  </data>
-  <data name="IncompatibleServersFoundOnCliWarning" xml:space="preserve">
-    <value>WARNING: The following MySQL Server versions are not compatible with the {0} package. Although the package will install correctly, there may be problems when connecting to these servers:</value>
-  </data>
-  <data name="IncompatibleServersFoundOnGuiWarning" xml:space="preserve">
-    <value>Although the package will install correctly, there may be problems when connecting to some servers. The following MySQL Server versions are not compatible with this package:</value>
-  </data>
   <data name="InformationText" xml:space="preserve">
     <value>Information</value>
   </data>
-  <data name="InitializingRequirements" xml:space="preserve">
-    <value>Initializing product requirements.</value>
-  </data>
-  <data name="InputDataNotFoundInLoginPage" xml:space="preserve">
-    <value>No input tags were found in the login HTML page. The authentication will most likely fail.</value>
-  </data>
-  <data name="InstallationCorrupted" xml:space="preserve">
-    <value>Your installation appears to be damaged. You should uninstall and reinstall MySQL Configurator for Windows.</value>
-  </data>
-  <data name="InstallerConfigurationSaved" xml:space="preserve">
-    <value>Configuration saved.</value>
-  </data>
-  <data name="InstallerConfigurationSaving" xml:space="preserve">
-    <value>Saving configuration.</value>
-  </data>
-  <data name="InstallerConfigurationSettingsFileFound" xml:space="preserve">
-    <value>Configuration file found.</value>
-  </data>
-  <data name="InstallerConfigurationSettingsFileNotFound" xml:space="preserve">
-    <value>No settings file found. Loading default configurations.</value>
-  </data>
-  <data name="InstallerConfigurationSettingsLoaded" xml:space="preserve">
-    <value>Loaded configurations.</value>
-  </data>
-  <data name="InternetConnectionFailedMessage" xml:space="preserve">
-    <value>Internet connection failed. Please try again or leave empty user name to cancel.</value>
-  </data>
-  <data name="InternetConnectionFound" xml:space="preserve">
-    <value>Internet connection found</value>
-  </data>
-  <data name="InternetConnectionNotFound" xml:space="preserve">
-    <value>Internet connection not found</value>
-  </data>
-  <data name="InternetConnectionRequestToEnableOfflineModeConsole" xml:space="preserve">
-    <value>No internet connection was found. Do you want to enable offline mode? Offline mode can later be disabled by running the '--set --offline-mode=false' command.</value>
-  </data>
-  <data name="InternetConnectionRequestToEnableOfflineModeUI" xml:space="preserve">
-    <value>No internet connection was found. Do you want to enable offline mode? Offline mode can later be disabled from the main dashboard or in the Installer options.</value>
-  </data>
-  <data name="InternetConnectionValidatedWithUrl" xml:space="preserve">
-    <value>Validated internet connection using URL: {0}</value>
-  </data>
-  <data name="InternetConnectionValidating" xml:space="preserve">
-    <value>Validating internet connection...</value>
-  </data>
-  <data name="InvalidByteArray" xml:space="preserve">
-    <value>One of the provided byte arrays is invalid: {0} : {1}.</value>
-  </data>
-  <data name="InvalidInstallation" xml:space="preserve">
-    <value>Your MySQL Configurator installation appears to be corrupted. You should reinstall.</value>
-  </data>
-  <data name="InvalidProductCatalog" xml:space="preserve">
-    <value>The product catalog is in an invalid state. It is not possible to proceed with the merge operation.</value>
-  </data>
   <data name="InvalidPropertyGiven" xml:space="preserve">
     <value>'{0}' is not recognized as a valid keyword.</value>
-  </data>
-  <data name="InvalidServiceName1" xml:space="preserve">
-    <value>{0} is an invalid service name.</value>
   </data>
   <data name="LaunchWorkbenchCancelledExeNotFound" xml:space="preserve">
     <value>Not opening MySQL Workbench because the executable file ({0}) is not found.</value>
@@ -2779,20 +1232,11 @@ Please enter a new password:</value>
   <data name="LaunchWorkbenchCancelledNoServerInstance" xml:space="preserve">
     <value>Not opening MySQL Workbench because no server instance was specified.</value>
   </data>
-  <data name="linkpanel_divider1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\linkpanel_divider1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="LoadingProductCatalog" xml:space="preserve">
-    <value>Loading product catalog.</value>
-  </data>
   <data name="LogFileNotDefinedError" xml:space="preserve">
     <value>The Logger properties that define a log file path and name have not been set.</value>
   </data>
   <data name="LogFileNotExistsErrorText" xml:space="preserve">
     <value>Log file {0} does not exist</value>
-  </data>
-  <data name="MainLogo1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MainLogo1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="MandatoryUpgradeAvailableConsoleText" xml:space="preserve">
     <value>There is a mandatory upgrade available for MySQL Configurator.
@@ -2805,62 +1249,6 @@ Do you want to apply this upgrade now?</value>
   </data>
   <data name="MandatoryUpgradeAvailableGuiTitleText" xml:space="preserve">
     <value>Mandatory MySQL Configurator Upgrade Available</value>
-  </data>
-  <data name="ManifestInvalidCaption" xml:space="preserve">
-    <value>Invalid product catalog</value>
-  </data>
-  <data name="ManifestInvalidText" xml:space="preserve">
-    <value>MySQL Configurator found an invalid product catalog. A valid product catalog is required for operation of the application.
-    The application must quit.
-
-  Please contact MySQL support for help correcting this issue.
-</value>
-  </data>
-  <data name="ManifestNoPackagesToMerge" xml:space="preserve">
-    <value>There are no packages to merge.</value>
-  </data>
-  <data name="ManifestNotAppliedBecauseBadFormat" xml:space="preserve">
-    <value>The downloaded product catalog was not applied as it doesn't have the required format. The new product catalog is supported by MySQL Configurator 1.4.36 or greater.</value>
-  </data>
-  <data name="ManifestNotAppliedBecauseOlder" xml:space="preserve">
-    <value>The newly downloaded product catalog was not applied because it does not contain any updates for the current product catalog.</value>
-  </data>
-  <data name="ManifestNotAppliedErrorTitle" xml:space="preserve">
-    <value>The published manifest is not supported.</value>
-  </data>
-  <data name="ManifestNotAppliedRequireUpgrade" xml:space="preserve">
-    <value>The new product catalog was not applied because it would require an Installer upgrade.
-    Please relaunch the Installer's graphical user interface to apply the upgrade.</value>
-  </data>
-  <data name="ManifestNotLoadableCaption" xml:space="preserve">
-    <value>Could not load the product catalog.</value>
-  </data>
-  <data name="ManifestPathDoesNotExist" xml:space="preserve">
-    <value>The manifest path '{0}' does not exist.</value>
-  </data>
-  <data name="ManifestPendingToBeProcessed" xml:space="preserve">
-    <value>A new manifest already exists. Skipping the manifest download.</value>
-  </data>
-  <data name="ManifestUpdateFailed" xml:space="preserve">
-    <value>Failed to update the product catalog. Please check the log for more information.</value>
-  </data>
-  <data name="ManifestUpdateFailedByUserChoice" xml:space="preserve">
-    <value>Unable to update the product catalog because an upgrade was postponed by the user.</value>
-  </data>
-  <data name="ManifestUpdateFailedUpdaterRunning" xml:space="preserve">
-    <value>Unable to update the product catalog because an upgrade of MySQL Configurator is in progress.</value>
-  </data>
-  <data name="MEB32bitFileNameSubstring" xml:space="preserve">
-    <value>32bit</value>
-  </data>
-  <data name="MEB64bitFileNameSubstring" xml:space="preserve">
-    <value>64bit</value>
-  </data>
-  <data name="MergingManifest" xml:space="preserve">
-    <value>Attempting to merge manifest...</value>
-  </data>
-  <data name="MergingProductCatalog" xml:space="preserve">
-    <value>Attempting to merge the product catalog.</value>
   </data>
   <data name="MigrateConnectionsToWorkbenchInfoDetail" xml:space="preserve">
     <value>Connections will be migrated to use MySQL Workbench's connections file.</value>
@@ -2879,53 +1267,8 @@ If you choose not to migrate connections now, you will be prompted later to perf
   <data name="MigrateConnectionsToWorkbenchInfoTitle" xml:space="preserve">
     <value>Database connections will be migrated</value>
   </data>
-  <data name="MigratePreviousProductCache" xml:space="preserve">
-    <value>MySQL Configurator has detected a product cache folder from a previous MySQL Configurator, do you want to migrate to the new product cache folder? Keep in mind that if you choose not to migrate, the previous Program Data folder for the older MySQL Configurator will be deleted and this action cannot be undone.</value>
-  </data>
-  <data name="minus_sign1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\minus_sign1.PNG;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="MissingParameterGenericError" xml:space="preserve">
     <value>The '{0}' was not provided.</value>
-  </data>
-  <data name="MoreInfoText1" xml:space="preserve">
-    <value>More Info</value>
-  </data>
-  <data name="MosAccountLoginText1" xml:space="preserve">
-    <value>Some packages require access to your My Oracle Support account.  Please enter your credentials:</value>
-  </data>
-  <data name="MosAccountLoginText2" xml:space="preserve">
-    <value>Leave user name blank to cancel.</value>
-  </data>
-  <data name="MOSLoginFailedText" xml:space="preserve">
-    <value>Invalid  credentials or lack of support identifiers. Support Identifiers are the "contract" between your organization and Oracle. They define the privileges you have to file service requests, download
-patches and more. These privileges are approved and set by an administrator
-in your organization. You need at least one support identifier in your
-account to get to most features.</value>
-  </data>
-  <data name="MOSLoginPromptEmptyUserOrPassword" xml:space="preserve">
-    <value>Credentials required</value>
-  </data>
-  <data name="MOSLoginPromptFailed" xml:space="preserve">
-    <value>Login Failed !</value>
-  </data>
-  <data name="MOSLoginPromptVerifying" xml:space="preserve">
-    <value>-     Verifying    -</value>
-  </data>
-  <data name="MOSUserAlreadyAuthenticated" xml:space="preserve">
-    <value>User is already authenticated.</value>
-  </data>
-  <data name="mos_logo_new" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\mos-logo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLInstallerCaption" xml:space="preserve">
-    <value>MySQL Configurator</value>
-  </data>
-  <data name="MySQLInstallerUpdaterExecuted" xml:space="preserve">
-    <value>Successfully executed the MySQLInstallerUpdater.exe.</value>
-  </data>
-  <data name="MySQLInstallerUpdaterExecuting" xml:space="preserve">
-    <value>Attempting to execute MySQLInstallerUpdater.exe.</value>
   </data>
   <data name="MySqlSchemaTableNameAllDigitsError" xml:space="preserve">
     <value>The name cannot consist of only digits.</value>
@@ -2987,9 +1330,6 @@ account to get to most features.</value>
   <data name="MySqlServerUsernameRequired" xml:space="preserve">
     <value>User name is required.</value>
   </data>
-  <data name="MySqlUserNameRequiredError" xml:space="preserve">
-    <value>User name is required to establish a connection.</value>
-  </data>
   <data name="my_template_5_6" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\my-template-5.6.ini;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;iso-8859-1</value>
   </data>
@@ -3002,17 +1342,8 @@ account to get to most features.</value>
   <data name="my_template_8_x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\my-template-8.x.ini;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  <data name="NegativeConfirmationText1" xml:space="preserve">
-    <value>&amp;No</value>
-  </data>
-  <data name="NewProductsFound" xml:space="preserve">
-    <value>{0} new products have been found.</value>
-  </data>
   <data name="NoButtonText" xml:space="preserve">
     <value>No</value>
-  </data>
-  <data name="NoConfigFileFound" xml:space="preserve">
-    <value>Configuration file was not found.  Please reinstall a MySQL Configurator bundle.</value>
   </data>
   <data name="NoNetworkConnectionNoIpAddressesLoadedText" xml:space="preserve">
     <value>No connection was detected, local IP addresses could not be loaded.</value>
@@ -3029,17 +1360,8 @@ account to get to most features.</value>
   <data name="NotProperValueForUInt" xml:space="preserve">
     <value>{0} cannot be used as an unsigned integer value.</value>
   </data>
-  <data name="OfflineModeEnabled" xml:space="preserve">
-    <value>Offline mode is currently enabled. Skipping operation.</value>
-  </data>
-  <data name="OKButtonDefaultText1" xml:space="preserve">
-    <value>&amp;OK</value>
-  </data>
   <data name="OkButtonDefaultText2" xml:space="preserve">
     <value>OK</value>
-  </data>
-  <data name="OkToContinue" xml:space="preserve">
-    <value>Press OK to continue or cancel to go back and change it.</value>
   </data>
   <data name="ok_sign" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ok_sign.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -3047,23 +1369,8 @@ account to get to most features.</value>
   <data name="OldPasswordLabelText" xml:space="preserve">
     <value>Old Password:</value>
   </data>
-  <data name="OptionalUpgradeAvailableConsoleText" xml:space="preserve">
-    <value>There is an optional upgrade available for MySQL Configurator.
-You will continue receiving product catalog updates if you do not apply the upgrade.
-
-Do you want to apply this upgrade now?</value>
-  </data>
-  <data name="OptionalUpgradeAvailableGuiDetailText" xml:space="preserve">
-    <value>You  will continue receiving product catalog updates if you do not apply the upgrade.</value>
-  </data>
-  <data name="OptionalUpgradeAvailableGuiTitleText" xml:space="preserve">
-    <value>Optional MySQL Configurator Upgrade Available</value>
-  </data>
   <data name="PackageAlreadyQueued" xml:space="preserve">
     <value>Package has already been queued.</value>
-  </data>
-  <data name="ParseAsNumberFailed" xml:space="preserve">
-    <value>Failed to parse {0} as a number.</value>
   </data>
   <data name="PasswordDialogLargeTitle" xml:space="preserve">
     <value>Please provide a {0} Login</value>
@@ -3071,14 +1378,8 @@ Do you want to apply this upgrade now?</value>
   <data name="PasswordDialogRequiredError" xml:space="preserve">
     <value>The password cannot be empty and is required.</value>
   </data>
-  <data name="PasswordInvalid1" xml:space="preserve">
-    <value>Value given for password ({1}) for {0} is not valid.</value>
-  </data>
   <data name="PasswordLabelText" xml:space="preserve">
     <value>Password:</value>
-  </data>
-  <data name="PasswordNotGoodEnough" xml:space="preserve">
-    <value>The password does not meet the minimum length requirement of 4 characters.</value>
   </data>
   <data name="PasswordResetErrorDetail" xml:space="preserve">
     <value>Error resetting password.</value>
@@ -3102,14 +1403,8 @@ Please select your MySQL connection again to retry.</value>
   <data name="PasswordsMismatchErrorText" xml:space="preserve">
     <value>The new password and its confirmation do not match. Please enter them again and make sure they match.</value>
   </data>
-  <data name="PathAlreadyUsed1" xml:space="preserve">
-    <value>The selected path is already being used by a pending installation or change.</value>
-  </data>
   <data name="PathDoesNotExist" xml:space="preserve">
     <value>The path '{0}' does not exist.</value>
-  </data>
-  <data name="PathExistsWarning1" xml:space="preserve">
-    <value>The selected path already exists.</value>
   </data>
   <data name="PathInvalidBadCharactersError" xml:space="preserve">
     <value>The path contains invalid characters.</value>
@@ -3119,9 +1414,6 @@ Please select your MySQL connection again to retry.</value>
   </data>
   <data name="PathInvalidEndsInDotError" xml:space="preserve">
     <value>The path cannot end with a \".\". character.</value>
-  </data>
-  <data name="PathInvalidError1" xml:space="preserve">
-    <value>The selected path is not valid.</value>
   </data>
   <data name="PathInvalidFormatError" xml:space="preserve">
     <value>The path does not conform to an absolute path starting with \"&lt;drive letter&gt;:\\.\"</value>
@@ -3135,18 +1427,6 @@ Please select your MySQL connection again to retry.</value>
   <data name="PathInvalidUnableToGetDrivesError" xml:space="preserve">
     <value>Failed to retrieve the drives in this machine. Check that you have the correct permissions.</value>
   </data>
-  <data name="PayloadAssembleFailed" xml:space="preserve">
-    <value>The response has a non-OK status: {0}. Cannot assemble a payload.</value>
-  </data>
-  <data name="PerformExtrasPostRequest" xml:space="preserve">
-    <value>Preparing new payload for extra POST to URL '{0}'.</value>
-  </data>
-  <data name="PerformGetRequest" xml:space="preserve">
-    <value>Performing an initial GET request to the {0} URL...</value>
-  </data>
-  <data name="PerformPostRequest" xml:space="preserve">
-    <value>Sending a POST request to authenticate into MOS using URL: '{0}'...</value>
-  </data>
   <data name="PipeOrSharedMemoryNameBackSlashesError" xml:space="preserve">
     <value>The {0} name cannot contain back slashes ('\').</value>
   </data>
@@ -3155,51 +1435,6 @@ Please select your MySQL connection again to retry.</value>
   </data>
   <data name="PipeOrSharedMemoryNameRequiredError" xml:space="preserve">
     <value>The {0} name is required, it cannot be null, empty or contain only white spaces.</value>
-  </data>
-  <data name="plus_sign1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\plus_sign1.PNG;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="PortNotAvailable1" xml:space="preserve">
-    <value>Port {0} is not currently available.</value>
-  </data>
-  <data name="PositiveConfirmationText1" xml:space="preserve">
-    <value>&amp;Yes</value>
-  </data>
-  <data name="ProcessRegistryKeyFailed" xml:space="preserve">
-    <value>Error processing the registry key {0}. The error was: {1}.</value>
-  </data>
-  <data name="ProductCatalogDownloadSkipped" xml:space="preserve">
-    <value>Skipping download of the product catalog.</value>
-  </data>
-  <data name="ProductCatalogMerged" xml:space="preserve">
-    <value>The new product catalog has been merged with the existing product catalog.</value>
-  </data>
-  <data name="ProductCatalogNotMerged" xml:space="preserve">
-    <value>No packages found to merge.</value>
-  </data>
-  <data name="ProductCatalogNotYetLoaded" xml:space="preserve">
-    <value>The product catalog has not yet been loaded. Skipping merge operation.</value>
-  </data>
-  <data name="ProxyRetrievalFailed" xml:space="preserve">
-    <value>Failed to get the proxy details. Please ensure that the proxy is set up correctly in your system settings.</value>
-  </data>
-  <data name="RefreshingRequirementsData" xml:space="preserve">
-    <value>Refreshing package requirements</value>
-  </data>
-  <data name="RegistryKeyMissing" xml:space="preserve">
-    <value>No registry key was provided.</value>
-  </data>
-  <data name="RegistryValueNameMissing" xml:space="preserve">
-    <value>No matching property with the specified Value Name was found for {0}.</value>
-  </data>
-  <data name="RemoteFileNotFound" xml:space="preserve">
-    <value>No valid download found for product {0}</value>
-  </data>
-  <data name="RemoveDataFolderCaption" xml:space="preserve">
-    <value>Remove Data Folder?</value>
-  </data>
-  <data name="RemoveDataFolderText" xml:space="preserve">
-    <value>Remove data folder found at '{0}'?</value>
   </data>
   <data name="RepositoryFileAttemptingToRecreate" xml:space="preserve">
     <value>Attempting to recreate the {0} file...</value>
@@ -3257,38 +1492,8 @@ Error message:
   <data name="RepositoryFileSavingErrorDetail" xml:space="preserve">
     <value>Unable to save repository XML file.</value>
   </data>
-  <data name="RequirementsProceedWithFailingDetail" xml:space="preserve">
-    <value>Those products with missing requirements will not be installed or upgraded.</value>
-  </data>
-  <data name="RequirementsProceedWithFailingSubDetail" xml:space="preserve">
-    <value>Do you want to continue?</value>
-  </data>
-  <data name="RequirementsProceedWithFailingTitle" xml:space="preserve">
-    <value>One or more product requirements have not been satisfied</value>
-  </data>
-  <data name="ResponseStatus" xml:space="preserve">
-    <value>Response has a status of {0}.</value>
-  </data>
-  <data name="Revert2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Revert2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="RuleNotFound" xml:space="preserve">
-    <value>Requirement rule not found.  Installation could be corrupted.  </value>
-  </data>
-  <data name="RulesFileDoesNotExist" xml:space="preserve">
-    <value>Package rules file does not exist.</value>
-  </data>
-  <data name="ScheduledTaskRemoveFailed" xml:space="preserve">
-    <value>Unable to delete the {0} scheduled task. Please remove it manually.</value>
-  </data>
-  <data name="ScheduledTaskRemoveSucceeded" xml:space="preserve">
-    <value>The {0} scheduled task has been successfully deleted.</value>
-  </data>
   <data name="ServerConfigPortInUse" xml:space="preserve">
     <value>The specified port is already in use.</value>
-  </data>
-  <data name="ServerInstanceGetGroupReplicationMemberRoleError1" xml:space="preserve">
-    <value>The following error occurred when trying to retrieve the group replication member role:</value>
   </data>
   <data name="ServerInstanceGetServerIdError" xml:space="preserve">
     <value>The following error occurred when trying to retrieve the server ID:</value>
@@ -3314,29 +1519,11 @@ Error message:
   <data name="ServerUserMissingWindowsTokensList" xml:space="preserve">
     <value>Windows authorization requires a token list.</value>
   </data>
-  <data name="Server_Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ServerCategoryIcon2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Server_Icon24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ServerCategoryIcon241.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Server_Reflection1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Server_Reflection1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ShowPrefixText1" xml:space="preserve">
-    <value>Show {0}</value>
-  </data>
   <data name="SidNotProvided" xml:space="preserve">
     <value>An invalid SID instance was provided.</value>
   </data>
   <data name="SingletonPropertySetError" xml:space="preserve">
     <value>Can't set a value if the singleton is already instantiated.</value>
-  </data>
-  <data name="Standard32bitFileNameSubstring" xml:space="preserve">
-    <value>win32</value>
-  </data>
-  <data name="Standard64bitFileNameSubstring" xml:space="preserve">
-    <value>winx64</value>
   </data>
   <data name="StartedAndExitedProcessSuccessfullyText" xml:space="preserve">
     <value>Process for {0}, with ID {1}, was run successfully and exited with code {2}.</value>
@@ -3359,23 +1546,11 @@ Error message:
   <data name="TEnumNotEnumTypeException" xml:space="preserve">
     <value>Type parameter TEnum must be an Enum</value>
   </data>
-  <data name="TryAgainLink1" xml:space="preserve">
-    <value>Try again</value>
-  </data>
-  <data name="Tutorials_Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\TutorialsCategoryIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Tutorials_Icon24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\TutorialsCategoryIcon24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="UnableToDeleteConnectionErrorDetail" xml:space="preserve">
     <value>Unable to remove connection.</value>
   </data>
   <data name="UnableToDeleteConnectionsWhenWBRunning" xml:space="preserve">
     <value>Deleting connections is not allowed while MySQL Workbench is running.</value>
-  </data>
-  <data name="UnableToFindInstallerDirectory1" xml:space="preserve">
-    <value>Unable to find the MySQL Configurator's installation directory.</value>
   </data>
   <data name="UnableToMergeConnectionsErrorDetail" xml:space="preserve">
     <value>Unable to merge existing connections with MySQL Workbench.</value>
@@ -3390,59 +1565,17 @@ Please close MySQL Workbench and restart {0} to perform the merge.</value>
   <data name="UnhandledExceptionText" xml:space="preserve">
     <value>Unhandled Exception</value>
   </data>
-  <data name="UninstallProductStep1" xml:space="preserve">
-    <value>Removing product {0}</value>
-  </data>
-  <data name="UpdateCheckTimeoutExceeded" xml:space="preserve">
-    <value>Timeout expired during update check.</value>
-  </data>
-  <data name="UpdateProductsSuccessful" xml:space="preserve">
-    <value>Successfully updated product catalog.</value>
-  </data>
-  <data name="UpdatingProductCatalog" xml:space="preserve">
-    <value>Attempting to update the product catalog.</value>
-  </data>
-  <data name="UpdatingProductList" xml:space="preserve">
-    <value>Attempting to update the list of products.</value>
-  </data>
-  <data name="UpgradeAvailableGuiSubDetailText" xml:space="preserve">
-    <value>Do you want to apply this upgrade now?</value>
-  </data>
-  <data name="UrlNotProvided" xml:space="preserve">
-    <value>No URL was provided.</value>
-  </data>
   <data name="UsernamePasswordConfirmationPasswordDoNotMatch" xml:space="preserve">
     <value>The passwords do not match.</value>
   </data>
   <data name="UsernamePasswordConfirmationPasswordNotGoodEnough" xml:space="preserve">
     <value>The password does not meet the minimum length requirement of 4 characters.</value>
   </data>
-  <data name="UserNotAllowedToQueryEnvVariables" xml:space="preserve">
-    <value>The current user does not have the required permission to query environment variables.</value>
-  </data>
-  <data name="ValidatingManifestExists" xml:space="preserve">
-    <value>Checking if full manifest exists.</value>
-  </data>
   <data name="VersionProcessingFailed" xml:space="preserve">
     <value>Failed to extract the version number for the {0} variable. Format of the version entry must be of type: &lt;var_name&gt;="&lt;version_number&gt;".</value>
   </data>
-  <data name="WaitButtonDefaultText1" xml:space="preserve">
-    <value>&amp;Wait</value>
-  </data>
   <data name="WarningsText" xml:space="preserve">
     <value>Warning</value>
-  </data>
-  <data name="WarningText1" xml:space="preserve">
-    <value>Warning</value>
-  </data>
-  <data name="warning_sign2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\warning_sign2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="WelcomeMaintenance1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\WelcomeMaintenance1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="WmiQueryMissing" xml:space="preserve">
-    <value>No WMI query was provided.</value>
   </data>
   <data name="YesButtonText" xml:space="preserve">
     <value>Yes</value>
@@ -3452,5 +1585,11 @@ Please close MySQL Workbench and restart {0} to perform the merge.</value>
   </data>
   <data name="MySql_Data" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySql.Data.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="CommandLineOptionDuplicateKeysError" xml:space="preserve">
+    <value>Duplicate keys found.</value>
+  </data>
+  <data name="NextButtonDefaultText" xml:space="preserve">
+    <value>&amp;Next &gt;</value>
   </data>
 </root>
