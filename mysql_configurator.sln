@@ -7,14 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySQLConfigurator", "Config
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Commercial|Any CPU = Commercial|Any CPU
-		Commercial|Mixed Platforms = Commercial|Mixed Platforms
-		Commercial|Win32 = Commercial|Win32
-		Commercial|x86 = Commercial|x86
-		Community|Any CPU = Community|Any CPU
-		Community|Mixed Platforms = Community|Mixed Platforms
-		Community|Win32 = Community|Win32
-		Community|x86 = Community|x86
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
 		Debug|Win32 = Debug|Win32
@@ -25,22 +17,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Commercial|Any CPU.ActiveCfg = Commercial|Any CPU
-		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Commercial|Any CPU.Build.0 = Commercial|Any CPU
-		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Commercial|Mixed Platforms.ActiveCfg = Commercial|Any CPU
-		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Commercial|Mixed Platforms.Build.0 = Commercial|Any CPU
-		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Commercial|Win32.ActiveCfg = Commercial|Any CPU
-		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Commercial|Win32.Build.0 = Commercial|Any CPU
-		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Commercial|x86.ActiveCfg = Commercial|Any CPU
-		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Commercial|x86.Build.0 = Commercial|Any CPU
-		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Community|Any CPU.ActiveCfg = Community|Any CPU
-		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Community|Any CPU.Build.0 = Community|Any CPU
-		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Community|Mixed Platforms.ActiveCfg = Community|Any CPU
-		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Community|Mixed Platforms.Build.0 = Community|Any CPU
-		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Community|Win32.ActiveCfg = Community|Any CPU
-		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Community|Win32.Build.0 = Community|Any CPU
-		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Community|x86.ActiveCfg = Community|Any CPU
-		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Community|x86.Build.0 = Community|Any CPU
 		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

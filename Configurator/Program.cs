@@ -71,9 +71,7 @@ namespace MySql.Configurator
         Utilities.InitializeLogger(false);
         CustomizeUtilityDialogs();
         Application.ApplicationExit += ApplicationExit;
-#if COMMUNITY
-        AppConfiguration.License = LicenseType.Community;
-#elif COMMERCIAL
+#if COMMERCIAL
         AppConfiguration.License = LicenseType.Commercial;
 #else
         AppConfiguration.License = LicenseType.Community;
