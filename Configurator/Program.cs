@@ -71,6 +71,13 @@ namespace MySql.Configurator
         Utilities.InitializeLogger(false);
         CustomizeUtilityDialogs();
         Application.ApplicationExit += ApplicationExit;
+#if COMMUNITY
+        AppConfiguration.License = LicenseType.Community;
+#elif COMMERCIAL
+        AppConfiguration.License = LicenseType.Commercial;
+#else
+        AppConfiguration.License = LicenseType.Community;
+#endif
 
         // Make sure our app cannot run twice.
         var exists = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location)).Count() > 1;

@@ -68,7 +68,7 @@ namespace MySql.Configurator.Controls
       this.ProductAndVersionLabel.AccessibleName = "Current Product And Version";
       this.ProductAndVersionLabel.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.ProductAndVersionLabel.ForeColor = System.Drawing.Color.White;
-      this.ProductAndVersionLabel.Location = new System.Drawing.Point(0, 0);
+      this.ProductAndVersionLabel.Location = new System.Drawing.Point(0, -2);
       this.ProductAndVersionLabel.Name = "ProductAndVersionLabel";
       this.ProductAndVersionLabel.Padding = new System.Windows.Forms.Padding(25, 0, 0, 0);
       this.ProductAndVersionLabel.Size = new System.Drawing.Size(213, 25);
@@ -89,6 +89,7 @@ namespace MySql.Configurator.Controls
       this.Size = new System.Drawing.Size(219, 562);
       this.ProductAndVersionPanel.ResumeLayout(false);
       this.ResumeLayout(false);
+
     }
 
     #endregion

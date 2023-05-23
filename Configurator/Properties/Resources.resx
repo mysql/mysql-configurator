@@ -1592,4 +1592,10 @@ Please close MySQL Workbench and restart {0} to perform the merge.</value>
   <data name="NextButtonDefaultText" xml:space="preserve">
     <value>&amp;Next &gt;</value>
   </data>
+  <data name="AboutButton" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\AboutButton.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SplashScreen" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\SplashScreen.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

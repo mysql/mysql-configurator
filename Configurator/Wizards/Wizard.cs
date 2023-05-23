@@ -15,10 +15,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using MySql.Configurator.Controls;
+using MySql.Configurator.Core.Classes;
 using MySql.Configurator.Core.Interfaces;
 using MySql.Configurator.Core.Wizard;
 using MySql.Configurator.Dialogs;
@@ -140,7 +140,7 @@ namespace MySql.Configurator.Wizards
       page.Visible = false;
       Pages.Add(page);
       Controls.Add(page);
-      page.Location = new Point(220, 0);
+      page.Location = new System.Drawing.Point(220, 0);
       page.Wizard = this;
       AddSideBarTabForPage(page);
     }
@@ -406,6 +406,12 @@ namespace MySql.Configurator.Wizards
       }
 
       UpdateWizardPage(1);
+    }
+
+    private void AboutButton_Click(object sender, EventArgs e)
+    {
+      var aboutScreenPage = new AboutScreenForm(AppConfiguration.Version, AppConfiguration.License);
+      aboutScreenPage.Show();
     }
   }
 }

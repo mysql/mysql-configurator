@@ -46,7 +46,6 @@ namespace MySql.Configurator.Wizards
     /// </summary>
     private void InitializeComponent()
     {
-      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Wizard));
       this.WizardBackButton = new System.Windows.Forms.Button();
       this.WizardCancelButton = new System.Windows.Forms.Button();
       this.WizardNextButton = new System.Windows.Forms.Button();
@@ -55,7 +54,9 @@ namespace MySql.Configurator.Wizards
       this.WizardFinishButton = new System.Windows.Forms.Button();
       this.WizardExecuteButton = new System.Windows.Forms.Button();
       this.SeparatorLinePanel = new System.Windows.Forms.Panel();
+      this.AboutButton = new System.Windows.Forms.Button();
       this.WizardSideBar = new MySql.Configurator.Controls.InstallWizardSideBarControl();
+      this.MySQLConfiguratorLabel = new System.Windows.Forms.Label();
       this.FooterAreaFlowLayoutPanel.SuspendLayout();
       this.SuspendLayout();
       // 
@@ -190,12 +191,29 @@ namespace MySql.Configurator.Wizards
       this.SeparatorLinePanel.Size = new System.Drawing.Size(564, 1);
       this.SeparatorLinePanel.TabIndex = 1;
       // 
+      // AboutButton
+      // 
+      this.AboutButton.AccessibleDescription = "A button to show the about page";
+      this.AboutButton.AccessibleName = "About";
+      this.AboutButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
+      this.AboutButton.BackgroundImage = global::MySql.Configurator.Properties.Resources.AboutButton;
+      this.AboutButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+      this.AboutButton.FlatAppearance.BorderSize = 0;
+      this.AboutButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+      this.AboutButton.Location = new System.Drawing.Point(183, 12);
+      this.AboutButton.Name = "AboutButton";
+      this.AboutButton.Size = new System.Drawing.Size(25, 25);
+      this.AboutButton.TabIndex = 6;
+      this.AboutButton.UseVisualStyleBackColor = false;
+      this.AboutButton.Click += new System.EventHandler(this.AboutButton_Click);
+      // 
       // WizardSideBar
       // 
       this.WizardSideBar.AccessibleDescription = "A side bar at the left of the wizard that shows information about a current produ" +
     "ct and the flow of wizard pages";
       this.WizardSideBar.AccessibleName = "Wizard Side Bar";
-      this.WizardSideBar.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("WizardSideBar.BackgroundImage")));
+      this.WizardSideBar.BackgroundImage = global::MySql.Configurator.Properties.Resources.SidebarBackground;
+      this.WizardSideBar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
       this.WizardSideBar.Dock = System.Windows.Forms.DockStyle.Left;
       this.WizardSideBar.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.WizardSideBar.Location = new System.Drawing.Point(0, 0);
@@ -204,12 +222,29 @@ namespace MySql.Configurator.Wizards
       this.WizardSideBar.TabIndex = 0;
       this.WizardSideBar.TabStop = false;
       // 
+      // MySQLConfiguratorLabel
+      // 
+      this.MySQLConfiguratorLabel.AccessibleDescription = "A label with the text mysql configurator";
+      this.MySQLConfiguratorLabel.AccessibleName = "MySQL Configurator";
+      this.MySQLConfiguratorLabel.AutoSize = true;
+      this.MySQLConfiguratorLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
+      this.MySQLConfiguratorLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+      this.MySQLConfiguratorLabel.ForeColor = System.Drawing.Color.White;
+      this.MySQLConfiguratorLabel.Location = new System.Drawing.Point(29, 34);
+      this.MySQLConfiguratorLabel.Name = "MySQLConfiguratorLabel";
+      this.MySQLConfiguratorLabel.Size = new System.Drawing.Size(186, 25);
+      this.MySQLConfiguratorLabel.TabIndex = 7;
+      this.MySQLConfiguratorLabel.Text = "MySQL Configurator";
+      // 
       // Wizard
       // 
       this.AccessibleDescription = "A wizard control containing pages and navigation buttons";
       this.AccessibleName = "Wizard";
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
       this.BackColor = System.Drawing.Color.White;
+      this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+      this.Controls.Add(this.AboutButton);
+      this.Controls.Add(this.MySQLConfiguratorLabel);
       this.Controls.Add(this.SeparatorLinePanel);
       this.Controls.Add(this.FooterAreaFlowLayoutPanel);
       this.Controls.Add(this.WizardSideBar);
@@ -219,6 +254,7 @@ namespace MySql.Configurator.Wizards
       this.Size = new System.Drawing.Size(784, 562);
       this.FooterAreaFlowLayoutPanel.ResumeLayout(false);
       this.ResumeLayout(false);
+      this.PerformLayout();
 
     }
 
@@ -233,5 +269,7 @@ namespace MySql.Configurator.Wizards
     private System.Windows.Forms.Button WizardExecuteButton;
     private System.Windows.Forms.Button WizardFinishButton;
     private System.Windows.Forms.Panel SeparatorLinePanel;
+    private System.Windows.Forms.Button AboutButton;
+    private System.Windows.Forms.Label MySQLConfiguratorLabel;
   }
 }

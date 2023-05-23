@@ -69,6 +69,26 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Community|AnyCPU'">
+    <OutputPath>bin\Community\</OutputPath>
+    <DefineConstants>TRACE COMMUNITY</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Commercial|AnyCPU'">
+    <OutputPath>bin\Commercial\</OutputPath>
+    <DefineConstants>TRACE COMMERCIAL</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualBasic" />
@@ -350,6 +370,12 @@
     <Compile Include="Core\Wizard\WizardPage.designer.cs">
       <DependentUpon>WizardPage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\AboutScreenForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\AboutScreenForm.Designer.cs">
+      <DependentUpon>AboutScreenForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\UpgradeFromServerPreGaWarningDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -579,6 +605,9 @@
     <EmbeddedResource Include="Core\Wizard\WizardPage.resx">
       <DependentUpon>WizardPage.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\AboutScreenForm.resx">
+      <DependentUpon>AboutScreenForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\UpgradeFromServerPreGaWarningDialog.resx">
       <DependentUpon>UpgradeFromServerPreGaWarningDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -721,12 +750,14 @@
     <None Include="Resources\WizardSelection.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\SplashScreen.png" />
     <None Include="Wizards\Scripts\UninstallEnterpriseFirewall.sql" />
     <None Include="Wizards\Scripts\PreInstallEnterpriseFirewall.sql" />
     <None Include="Wizards\Scripts\InstallEnterpriseFirewall.sql" />
     <None Include="Resources\Commercial.png" />
     <None Include="Resources\error_sign.png" />
     <Content Include="mysql-server.ico" />
+    <Content Include="Resources\AboutButton.png" />
     <Content Include="Resources\BigWarning.png" />
     <None Include="Resources\config_win_integration.png" />
     <None Include="Resources\ConfigUserMySQL.png" />
