@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2010, 2018, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2023, Oracle and/or its affiliates.
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -13,35 +13,30 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
 
-using System.Windows.Forms;
 using MySql.Configurator.Core.Classes;
+using MySql.Configurator.Core.Enums;
+using System;
+using System.Windows.Forms;
 
-namespace MySql.Configurator.Controls
+namespace MySql.Configurator.Dialogs
 {
-  public partial class ResourcesLink : UserControl
+  public partial class AboutScreenForm : Form
   {
-    public ResourcesLink()
+    public AboutScreenForm(Version version, LicenseType license)
     {
       InitializeComponent();
+      VersionLicenseLabel.Text = $"Version {version.Major}.{version.Minor}.{version.Build} ({license.ToString()})";
     }
 
-    public string Title
+    protected override void OnLoad(EventArgs e)
     {
-      get { return TitleLinkLabel.Text; }
-      set { TitleLinkLabel.Text = value; }
+      Utilities.NormalizeFont(this);
+      base.OnLoad(e);
     }
 
-    public string Url { get; set; }
-
-    public string Description
+    private void AboutScreenForm_Deactivate(object sender, EventArgs e)
     {
-      get { return DescriptionLabel.Text; }
-      set { DescriptionLabel.Text = value; }
-    }
-
-    private void TitleLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-    {
-      Utilities.OpenBrowser(Url);
+      Close();
     }
   }
 }

@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2010, 2023, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2023, Oracle and/or its affiliates.
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ namespace MySql.Configurator.Core.Classes
 
     public static LicenseType License { get; set; }
 
-    public static Version InstallerVersion
+    public static Version Version
     {
       get
       {
@@ -51,8 +51,6 @@ namespace MySql.Configurator.Core.Classes
           : Assembly.GetExecutingAssembly().GetName().Version;
       }
     }
-
-    public static Version VersionLaunched { get; set; }
 
     public static AppConfigurationData Instance { get; private set; }
 

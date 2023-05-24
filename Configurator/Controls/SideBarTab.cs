@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2014, 2018, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2023, Oracle and/or its affiliates.
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -19,10 +19,6 @@ namespace MySql.Configurator.Controls
 {
   public class SideBarTab
   {
-    public SideBarTab()
-    {
-    }
-
     public SideBarTab(string name, bool selected)
     {
       Name = name;

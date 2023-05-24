@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2010, 2023, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2023, Oracle and/or its affiliates.
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -71,6 +71,11 @@ namespace MySql.Configurator
         Utilities.InitializeLogger(false);
         CustomizeUtilityDialogs();
         Application.ApplicationExit += ApplicationExit;
+#if COMMERCIAL
+        AppConfiguration.License = LicenseType.Commercial;
+#else
+        AppConfiguration.License = LicenseType.Community;
+#endif
 
         // Make sure our app cannot run twice.
         var exists = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location)).Count() > 1;
