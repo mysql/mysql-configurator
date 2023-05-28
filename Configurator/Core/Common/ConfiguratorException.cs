@@ -16,7 +16,6 @@
 using System;
 using MySql.Configurator.Core.Classes;
 using MySql.Configurator.Core.Enums;
-using MySql.Utility.Classes;
 
 namespace MySql.Configurator.Core.Common
 {

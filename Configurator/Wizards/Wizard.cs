@@ -40,7 +40,6 @@ namespace MySql.Configurator.Wizards
     public Wizard()
     {
       InitializeComponent();
-      FromMsi = false;
       Pages = new List<WizardPage>();
       _firstPageIndex = _lastPageIndex = -1;
     }
@@ -117,8 +116,6 @@ namespace MySql.Configurator.Wizards
     public Button ExecuteButton => WizardExecuteButton;
 
     public Button FinishButton => WizardFinishButton;
-
-    public bool FromMsi { get; set; }
 
     public string Log { get; set; }
 

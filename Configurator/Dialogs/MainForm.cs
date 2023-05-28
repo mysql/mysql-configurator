@@ -26,6 +26,7 @@ using MySql.Configurator.Core.Product;
 using MySql.Configurator.Wizards;
 using MySql.Configurator.Wizards.ConfigWizard;
 using MySql.Configurator.Wizards.RemoveWizard;
+using MySql.Configurator.Wizards.UpgradeWizard;
 
 namespace MySql.Configurator.Dialogs
 {
@@ -147,6 +148,15 @@ namespace MySql.Configurator.Dialogs
           removeWizard.ShowWizard(package, this);
           break;
 
+        case "upgrade":
+          configurationType = ConfigurationType.Upgrade;
+          var upgradeWizard = new ConfigWizard();
+          Controls.Add(upgradeWizard);
+          upgradeWizard.WizardCanceled += WizardClosed;
+          upgradeWizard.WizardClosed += WizardClosed;
+          upgradeWizard.ShowWizard(package, this, configurationType);
+          break;
+
         default:
           break;
       }
@@ -170,12 +180,6 @@ namespace MySql.Configurator.Dialogs
 
     private void WizardClosed(object sender, EventArgs e)
     {
-      bool isMsi = false;
-      if (sender is ConfigWizard configWizard)
-      {
-        isMsi = configWizard.FromMsi;
-      }
-
       RemoveContainer(sender as Wizard);
       DisposeWizard(sender as Wizard);
       Close();
@@ -184,11 +188,6 @@ namespace MySql.Configurator.Dialogs
     private void WizardCanceled(object sender, EventArgs e)
     {
       bool isMsi = false;
-      if (sender is ConfigWizard configWizard)
-      {
-        isMsi = configWizard.FromMsi;
-      }
-
       RemoveContainer(sender as Wizard);
       if (isMsi)
       {

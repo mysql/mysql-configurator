@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
-namespace MySql.Utility.Classes
+namespace MySql.Configurator.Core.Classes
 {
   /// <summary>
   /// Contains data to indicate if a migration was successful and any error message related to it.

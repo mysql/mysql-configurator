@@ -737,21 +737,6 @@ namespace MySql.Configurator.Wizards.Server
         return;
       }
 
-      if (ConfigurationType == ConfigurationType.Upgrade
-          && IsSeriesUpgrade)
-      {
-        var previousVersionController = Package.UpgradeTarget.Controller as ServerConfigurationController;
-        var controller = Package.Controller as ServerConfigurationController;
-        controller.DataDirectory = previousVersionController.DataDirectory;
-        controller.Settings.IniDirectory = previousVersionController.Settings.IniDirectory;
-        if (previousVersionController.Settings.ConfigureAsService)
-        {
-          controller.Settings.ServiceName = previousVersionController.Settings.ServiceName;
-          controller.OldSettings.ConfigureAsService = previousVersionController.Settings.ConfigureAsService;
-          controller.OldSettings.ServiceName = previousVersionController.Settings.ServiceName;
-        }
-      }
-
       Settings.PipeName = GetUniquePipeOrMemoryName(true);
       Settings.SharedMemoryName = GetUniquePipeOrMemoryName(false);
     }
@@ -782,10 +767,9 @@ namespace MySql.Configurator.Wizards.Server
     public override void SetPages()
     {
       Pages.Clear();
+
       if (ConfigurationType == ConfigurationType.Upgrade
-          && (IsSeriesUpgrade
-              ||
-              (!IsSeriesUpgrade && IsThereServerDataFiles)))
+          && IsThereServerDataFiles)
       {
         Logger.LogInformation(Resources.SettingUpUpgrade);
         if (ServerVersion.ServerSupportsCachingSha2Authentication()

@@ -19,10 +19,8 @@ using System;
 using System.Linq;
 using System.Windows.Forms;
 using MySql.Configurator.Core.Classes;
-using MySql.Configurator.Core.Forms;
-using MySql.Utility.Classes;
 
-namespace MySql.Utility.Forms
+namespace MySql.Configurator.Core.Forms
 {
   /// <summary>
   /// A dialog that introduces a common validating infrastructure for input fields.

@@ -254,7 +254,7 @@ namespace MySql.Configurator.Core.IniFile.Template
         {
           var assembly = Assembly.GetExecutingAssembly();
           var resources = assembly.GetManifestResourceNames();
-          Stream stream = assembly.GetManifestResourceStream($"MySql.Configurator.Core.Resources.{templateName}");
+          Stream stream = assembly.GetManifestResourceStream($"MySql.Configurator.Resources.{templateName}");
           reader = new StreamReader(stream);
         }
         

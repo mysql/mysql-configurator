@@ -79,10 +79,10 @@ namespace MySql.Configurator.Wizards.RemoveWizard
     {
       WizardSideBar.ShowConfigPanel(package.NameWithVersion);
       ClearPages();
-      if (package.License != AppConfiguration.License)
-      {
-        return;
-      }
+      //if (package.License != AppConfiguration.License)
+      //{
+      //  return;
+      //}
 
       package.Controller.ConfigurationType = ConfigurationType.Remove;
       package.Controller.UpdateRemoveSteps();
@@ -90,10 +90,12 @@ namespace MySql.Configurator.Wizards.RemoveWizard
       if (package.Controller.Pages == null
           || package.Controller.Pages.Count == 0)
       {
+        AddPage(new RemoveErrorPage());
+        base.ShowWizard(parentMainForm);
         return;
       }
-      ProductsToRemove.Add(package);
 
+      ProductsToRemove.Add(package);
       foreach (var page in package.Controller.Pages.Where(page => page.ValidForType(package.Controller.ConfigurationType)))
       {
         AddPage(page);

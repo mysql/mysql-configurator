@@ -44,7 +44,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>3</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -446,6 +446,12 @@
       <DependentUpon>ConfigCompletePage.cs</DependentUpon>
     </Compile>
     <Compile Include="Wizards\Examples\ExampleDatabaseInfo.cs" />
+    <Compile Include="Wizards\RemoveWizard\RemoveErrorPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\RemoveWizard\RemoveErrorPage.Designer.cs">
+      <DependentUpon>RemoveErrorPage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Wizards\RemoveWizard\RemoveApplyPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -557,6 +563,12 @@
     <Compile Include="Wizards\Server\ServerUpgradeStatus.cs" />
     <Compile Include="Wizards\Server\ServerUser.cs" />
     <Compile Include="Wizards\Server\Service.cs" />
+    <Compile Include="Wizards\UpgradeWizard\UpgradeWelcomePage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\UpgradeWizard\UpgradeWelcomePage.Designer.cs">
+      <DependentUpon>UpgradeWelcomePage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Wizards\Utilities\UtilitiesConfigurationController.cs" />
     <Compile Include="Wizards\Wizard.cs">
       <SubType>UserControl</SubType>
@@ -646,6 +658,9 @@
     <EmbeddedResource Include="Wizards\ConfigWizard\ConfigCompletePage.resx">
       <DependentUpon>ConfigCompletePage.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\RemoveWizard\RemoveErrorPage.resx">
+      <DependentUpon>RemoveErrorPage.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Wizards\RemoveWizard\RemoveApplyPage.resx">
       <DependentUpon>RemoveApplyPage.cs</DependentUpon>
     </EmbeddedResource>
@@ -699,6 +714,9 @@
       <DependentUpon>ServerRemovePage.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\UpgradeWizard\UpgradeWelcomePage.resx">
+      <DependentUpon>UpgradeWelcomePage.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Wizards\Wizard.resx">
       <DependentUpon>Wizard.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -744,13 +762,14 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\example_databases.zip" />
-    <None Include="Resources\my-template-5.6.ini" />
-    <None Include="Resources\my-template-5.7.ini" />
-    <None Include="Resources\my-template-8.0.ini" />
-    <None Include="Resources\my-template-8.x.ini" />
+    <EmbeddedResource Include="Resources\my-template-5.6.ini" />
+    <EmbeddedResource Include="Resources\my-template-5.7.ini" />
+    <EmbeddedResource Include="Resources\my-template-8.0.ini" />
+    <EmbeddedResource Include="Resources\my-template-8.x.ini" />
     <None Include="Resources\WizardSelection.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\upgrade_logo.png" />
     <None Include="Resources\SplashScreen.png" />
     <None Include="Wizards\Scripts\UninstallEnterpriseFirewall.sql" />
     <None Include="Wizards\Scripts\PreInstallEnterpriseFirewall.sql" />

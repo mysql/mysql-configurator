@@ -25,7 +25,6 @@ using System.Windows.Forms;
 using System.Xml;
 using MySql.Configurator.Core.Classes.Logging;
 using MySql.Configurator.Properties;
-using MySql.Utility.Classes;
 using MySql.Configurator.Core.Classes.Forms;
 
 namespace MySql.Configurator.Core.Classes.MySqlWorkbench

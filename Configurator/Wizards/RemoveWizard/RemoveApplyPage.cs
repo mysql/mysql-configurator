@@ -137,10 +137,10 @@ namespace MySql.Configurator.Wizards.RemoveWizard
       bool showExpandCollapseButtons = false;
       foreach (var package in removeWizard.ProductsToRemove)
       {
-        if (package.License != AppConfiguration.License)
-        {
-          continue;
-        }
+        //if (package.License != AppConfiguration.License)
+        //{
+        //  continue;
+        //}
 
         package.Controller.UpdateRemoveSteps();
         var executingSteps = package.Controller.RemoveSteps.Where(step => step.Execute).ToList();

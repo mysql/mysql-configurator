@@ -21,7 +21,6 @@ using MySql.Configurator.Core.Classes.VisualStyles;
 using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Properties;
 using MySql.Configurator.Core.Structs;
-using MySql.Utility.Forms;
 using System;
 using System.ComponentModel;
 using System.Drawing;
