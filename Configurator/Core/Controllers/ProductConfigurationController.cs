@@ -103,11 +103,6 @@ namespace MySql.Configurator.Core.Controllers
       set => Settings.InstallDirectory = value;
     }
 
-    /// <summary>
-    /// Gets a value indicating whether the upgrade is being made from one series to another.
-    /// </summary>
-    public bool IsSeriesUpgrade { get; set; }
-
     public Package.Package Package { get; set; }
 
     public List<ConfigWizardPage> Pages { get; protected set; }

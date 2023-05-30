@@ -17,7 +17,6 @@
 
 using MySql.Configurator.Core.Classes.Logging;
 using MySql.Configurator.Properties;
-using MySql.Utility.Classes;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -38,13 +38,13 @@ namespace MySql.Configurator.Wizards.Common
 
     #endregion Fields
 
-    public ConfigOverviewPage(Wizard parentWizard, List<Package> packageList, ConfigurationType configType)
+    public ConfigOverviewPage(Wizard parentWizard, Package package, ConfigurationType configType)
     {
       _configWizard = null;
       _parentWizard = parentWizard;
       InitializeComponent();
-      PackageList = packageList;
-      PageVisible = PackageList.Count != 0;
+      Package = package;
+      PageVisible = package != null;
       _configurationType = configType;
     }
 
@@ -61,22 +61,19 @@ namespace MySql.Configurator.Wizards.Common
 
     public MainForm MainForm => (MainForm)Application.OpenForms[0];
 
-    public List<Package> PackageList { get; set; }
+    public Package Package { get; set; }
 
     #endregion Properties
 
     public override void Activate()
     {
-      foreach (var package in PackageList)
-      {
-        var item = package.Product.Name.ToLower().Contains("server")
-          ? ProductsListView.Items.Insert(0, string.Empty)
-          : ProductsListView.Items.Add(string.Empty);
-        item.Name = package.NameWithVersion;
-        item.Tag = package;
-        item.SubItems.Add(package.NameWithVersion);
-        item.SubItems.Add("Ready to configure");
-      }
+      var item = Package.Product.Name.ToLower().Contains("server")
+        ? ProductsListView.Items.Insert(0, string.Empty)
+        : ProductsListView.Items.Add(string.Empty);
+      item.Name = Package.NameWithVersion;
+      item.Tag = Package;
+      item.SubItems.Add(Package.NameWithVersion);
+      item.SubItems.Add("Ready to configure");
 
       base.Activate();
     }
@@ -98,25 +95,6 @@ namespace MySql.Configurator.Wizards.Common
       _configWizard.WizardClosed += ConfigWizardClosed;
       _configWizard.ShowWizard(package, MainForm, _configurationType);
       return false;
-    }
-
-    public void RefreshConfiguringPackages()
-    {
-      var configuringPackages = new List<Package>();
-      foreach (var package in PackageList.Where(p => p.IsInstalled))
-      {
-        package.Initialize(((ServerProductConfigurationController)package.Controller).Settings.DataDirectory);
-        if (!package.Controller.CanConfigure(_configurationType))
-        {
-          continue;
-        }
-
-        configuringPackages.Add(package);
-      }
-
-      PageVisible = configuringPackages.Count > 0;
-      _parentWizard.Refresh();
-      PackageList = configuringPackages;
     }
 
     private void ConfigWizardCanceled(object sender, EventArgs e)

@@ -16,7 +16,6 @@
 // 02110-1301  USA
 
 using MySql.Configurator.Core.Classes.Security;
-using MySql.Utility.Classes;
 using System;
 using System.IO;
 using System.Security.Cryptography;

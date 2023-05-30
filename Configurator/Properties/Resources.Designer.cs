@@ -293,6 +293,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to cancel upgrading your server installation?.
+        /// </summary>
+        public static string CancelUpgradingProductsDetailText {
+            get {
+                return ResourceManager.GetString("CancelUpgradingProductsDetailText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The {0} method is not supported..
         /// </summary>
         public static string CheckMethodNotSupported {
@@ -1517,9 +1526,7 @@ namespace MySql.Configurator.Properties {
         ///##  # [PORT]=&quot;port&quot;
         ///##  port=3306
         ///##
-        ///## Note - In the example, the formula consists of a variable named &apos;port&apos; which must be defined before processing.
-        ///##
-        ///## In additi [rest of string was truncated]&quot;;.
+        ///## Note - In the example, the formula consists of a variable named &apos;port&apos; which must be defined before processing. [rest of string was truncated]&quot;;.
         /// </summary>
         public static string my_template_8_x {
             get {
@@ -4274,6 +4281,16 @@ namespace MySql.Configurator.Properties {
         public static string UninstallEnterpriseFirewall {
             get {
                 return ResourceManager.GetString("UninstallEnterpriseFirewall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap upgrade_logo {
+            get {
+                object obj = ResourceManager.GetObject("upgrade_logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

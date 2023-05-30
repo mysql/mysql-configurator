@@ -46,7 +46,7 @@ namespace MySql.Configurator
     #endregion
 
     /// <summary>
-    /// Customizes the looks of some dialogs found in the MySQL.Utility for ExcelInterop.
+    /// Customizes the looks of common dialogs.
     /// </summary>
     private static void CustomizeUtilityDialogs()
     {
@@ -147,7 +147,7 @@ namespace MySql.Configurator
       foreach (var argument in arguments)
       {
         var items = argument.Split('=');
-        var option = items[0].Substring(2);
+        var option = items[0].Substring(2).ToLowerInvariant();
         var value = items.Length > 1
           ? items[1]
           : null;

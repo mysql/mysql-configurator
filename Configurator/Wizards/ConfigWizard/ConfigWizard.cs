@@ -23,6 +23,7 @@ using MySql.Configurator.Core.Package;
 using MySql.Configurator.Dialogs;
 using MySql.Configurator.Properties;
 using MySql.Configurator.Wizards.Common;
+using MySql.Configurator.Wizards.UpgradeWizard;
 
 namespace MySql.Configurator.Wizards.ConfigWizard
 {
@@ -73,6 +74,12 @@ namespace MySql.Configurator.Wizards.ConfigWizard
       ConfigurationType = configurationType;
       configurationController.PrepareForConfigure();
       WizardSideBar.ShowConfigPanel(package.NameWithVersion);
+
+      if (configurationController.ConfigurationType == ConfigurationType.Upgrade)
+      {
+        AddPage(new UpgradeWelcomeBackPage());
+      }
+
       configurationController.SetPages();
       foreach (var page in configurationController.Pages.Where(page => page.ValidForType(configurationType)))
       {
