@@ -365,16 +365,6 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Commercial {
-            get {
-                object obj = ResourceManager.GetObject("Commercial", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Completed.
         /// </summary>
         public static string Completed {
@@ -1230,16 +1220,6 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap link_arrow {
-            get {
-                object obj = ResourceManager.GetObject("link_arrow", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The Logger properties that define a log file path and name have not been set..
         /// </summary>
         public static string LogFileNotDefinedError {
@@ -1526,7 +1506,9 @@ namespace MySql.Configurator.Properties {
         ///##  # [PORT]=&quot;port&quot;
         ///##  port=3306
         ///##
-        ///## Note - In the example, the formula consists of a variable named &apos;port&apos; which must be defined before processing. [rest of string was truncated]&quot;;.
+        ///## Note - In the example, the formula consists of a variable named &apos;port&apos; which must be defined before processing.
+        ///##
+        ///## In additi [rest of string was truncated]&quot;;.
         /// </summary>
         public static string my_template_8_x {
             get {
@@ -2156,7 +2138,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Are you sure you want to cancel removing products?.
+        ///   Looks up a localized string similar to Are you sure you want to cancel removing the MySQL Server configurations?.
         /// </summary>
         public static string RemoveProductsWizardCancelConfirmationText {
             get {

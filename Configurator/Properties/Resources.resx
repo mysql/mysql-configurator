@@ -142,9 +142,6 @@
   <data name="ConfigureHasTimedOutTitle" xml:space="preserve">
     <value>{0} configuration is taking longer than expected</value>
   </data>
-  <data name="link_arrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\link_arrow.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ConfigOverviewConfigurationCancelledText" xml:space="preserve">
     <value>Configuration cancelled</value>
   </data>
@@ -275,9 +272,6 @@ You can start the configure process again by clicking Retry.</value>
   <data name="WizardSelection" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\WizardSelection.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Commercial" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Commercial.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="RemoveSuccessWithErrors" xml:space="preserve">
     <value>The configuration removal operation was successful, however, some errors were identified that may require manual intervention. Please review the log for more details.
 Click Finish to continue.</value>
@@ -315,7 +309,7 @@ You can find more information about the failures in the 'Log' tab.</value>
     <value>..\Resources\MainLogo-Success.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="RemoveProductsWizardCancelConfirmationText" xml:space="preserve">
-    <value>Are you sure you want to cancel removing products?</value>
+    <value>Are you sure you want to cancel removing the MySQL Server configurations?</value>
   </data>
   <data name="ActionError" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ActionError.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
