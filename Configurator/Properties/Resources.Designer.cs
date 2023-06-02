@@ -266,7 +266,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Are you sure you want to cancel configuring your product(s)?.
+        ///   Looks up a localized string similar to Are you sure you want to cancel the MySQL Server configuration?.
         /// </summary>
         public static string CancelConfigurationQuestion {
             get {
@@ -1506,9 +1506,7 @@ namespace MySql.Configurator.Properties {
         ///##  # [PORT]=&quot;port&quot;
         ///##  port=3306
         ///##
-        ///## Note - In the example, the formula consists of a variable named &apos;port&apos; which must be defined before processing.
-        ///##
-        ///## In additi [rest of string was truncated]&quot;;.
+        ///## Note - In the example, the formula consists of a variable named &apos;port&apos; which must be defined before processing. [rest of string was truncated]&quot;;.
         /// </summary>
         public static string my_template_8_x {
             get {
@@ -4187,6 +4185,16 @@ namespace MySql.Configurator.Properties {
         public static string TEnumNotEnumTypeException {
             get {
                 return ResourceManager.GetString("TEnumNotEnumTypeException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap TransparentSakilaLogo {
+            get {
+                object obj = ResourceManager.GetObject("TransparentSakilaLogo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

@@ -55,8 +55,8 @@ namespace MySql.Configurator.Wizards
       this.WizardExecuteButton = new System.Windows.Forms.Button();
       this.SeparatorLinePanel = new System.Windows.Forms.Panel();
       this.AboutButton = new System.Windows.Forms.Button();
-      this.WizardSideBar = new MySql.Configurator.Controls.InstallWizardSideBarControl();
       this.MySQLConfiguratorLabel = new System.Windows.Forms.Label();
+      this.WizardSideBar = new MySql.Configurator.Controls.InstallWizardSideBarControl();
       this.FooterAreaFlowLayoutPanel.SuspendLayout();
       this.SuspendLayout();
       // 
@@ -207,21 +207,6 @@ namespace MySql.Configurator.Wizards
       this.AboutButton.UseVisualStyleBackColor = false;
       this.AboutButton.Click += new System.EventHandler(this.AboutButton_Click);
       // 
-      // WizardSideBar
-      // 
-      this.WizardSideBar.AccessibleDescription = "A side bar at the left of the wizard that shows information about a current produ" +
-    "ct and the flow of wizard pages";
-      this.WizardSideBar.AccessibleName = "Wizard Side Bar";
-      this.WizardSideBar.BackgroundImage = global::MySql.Configurator.Properties.Resources.SidebarBackground;
-      this.WizardSideBar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-      this.WizardSideBar.Dock = System.Windows.Forms.DockStyle.Left;
-      this.WizardSideBar.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.WizardSideBar.Location = new System.Drawing.Point(0, 0);
-      this.WizardSideBar.Name = "WizardSideBar";
-      this.WizardSideBar.Size = new System.Drawing.Size(220, 562);
-      this.WizardSideBar.TabIndex = 0;
-      this.WizardSideBar.TabStop = false;
-      // 
       // MySQLConfiguratorLabel
       // 
       this.MySQLConfiguratorLabel.AccessibleDescription = "A label with the text mysql configurator";
@@ -230,11 +215,26 @@ namespace MySql.Configurator.Wizards
       this.MySQLConfiguratorLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
       this.MySQLConfiguratorLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
       this.MySQLConfiguratorLabel.ForeColor = System.Drawing.Color.White;
-      this.MySQLConfiguratorLabel.Location = new System.Drawing.Point(29, 34);
+      this.MySQLConfiguratorLabel.Location = new System.Drawing.Point(29, 55);
       this.MySQLConfiguratorLabel.Name = "MySQLConfiguratorLabel";
-      this.MySQLConfiguratorLabel.Size = new System.Drawing.Size(186, 25);
+      this.MySQLConfiguratorLabel.Size = new System.Drawing.Size(120, 15);
       this.MySQLConfiguratorLabel.TabIndex = 7;
       this.MySQLConfiguratorLabel.Text = "MySQL Configurator";
+      // 
+      // WizardSideBar
+      // 
+      this.WizardSideBar.AccessibleDescription = "A side bar at the left of the wizard that shows information about a current produ" +
+    "ct and the flow of wizard pages";
+      this.WizardSideBar.AccessibleName = "Wizard Side Bar";
+      this.WizardSideBar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
+      this.WizardSideBar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+      this.WizardSideBar.Dock = System.Windows.Forms.DockStyle.Left;
+      this.WizardSideBar.Font = new System.Drawing.Font("Segoe UI", 9F);
+      this.WizardSideBar.Location = new System.Drawing.Point(0, 0);
+      this.WizardSideBar.Name = "WizardSideBar";
+      this.WizardSideBar.Size = new System.Drawing.Size(220, 562);
+      this.WizardSideBar.TabIndex = 0;
+      this.WizardSideBar.TabStop = false;
       // 
       // Wizard
       // 

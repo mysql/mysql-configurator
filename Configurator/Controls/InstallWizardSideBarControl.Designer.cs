@@ -28,12 +28,12 @@ namespace MySql.Configurator.Controls
     /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
     protected override void Dispose(bool disposing)
     {
-        if (disposing && (components != null))
-        {
-            components.Dispose();
-        }
+      if (disposing && (components != null))
+      {
+        components.Dispose();
+      }
 
-        base.Dispose(disposing);
+      base.Dispose(disposing);
     }
 
     #region Component Designer generated code
@@ -46,7 +46,9 @@ namespace MySql.Configurator.Controls
     {
       this.ProductAndVersionPanel = new System.Windows.Forms.Panel();
       this.ProductAndVersionLabel = new System.Windows.Forms.Label();
+      this.LogoPictureBox = new System.Windows.Forms.PictureBox();
       this.ProductAndVersionPanel.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).BeginInit();
       this.SuspendLayout();
       // 
       // ProductAndVersionPanel
@@ -56,7 +58,7 @@ namespace MySql.Configurator.Controls
       this.ProductAndVersionPanel.AccessibleName = "Current Product And Version";
       this.ProductAndVersionPanel.BackColor = System.Drawing.Color.Transparent;
       this.ProductAndVersionPanel.Controls.Add(this.ProductAndVersionLabel);
-      this.ProductAndVersionPanel.Location = new System.Drawing.Point(3, 56);
+      this.ProductAndVersionPanel.Location = new System.Drawing.Point(3, 73);
       this.ProductAndVersionPanel.Name = "ProductAndVersionPanel";
       this.ProductAndVersionPanel.Size = new System.Drawing.Size(213, 31);
       this.ProductAndVersionPanel.TabIndex = 2;
@@ -76,18 +78,31 @@ namespace MySql.Configurator.Controls
       this.ProductAndVersionLabel.Text = "MySQL Server 5.6.14";
       this.ProductAndVersionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
       // 
+      // LogoPictureBox
+      // 
+      this.LogoPictureBox.Image = global::MySql.Configurator.Properties.Resources.TransparentSakilaLogo;
+      this.LogoPictureBox.InitialImage = null;
+      this.LogoPictureBox.Location = new System.Drawing.Point(29, 8);
+      this.LogoPictureBox.Name = "LogoPictureBox";
+      this.LogoPictureBox.Size = new System.Drawing.Size(50, 48);
+      this.LogoPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+      this.LogoPictureBox.TabIndex = 3;
+      this.LogoPictureBox.TabStop = false;
+      // 
       // InstallWizardSideBarControl
       // 
       this.AccessibleDescription = "A side bar at the left of a wizard that shows information about a current product" +
     " and the flow of wizard pages";
       this.AccessibleName = "Wizard Side Bar";
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
-      this.BackgroundImage = global::MySql.Configurator.Properties.Resources.SidebarBackground;
+      this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(65)))), ((int)(((byte)(65)))), ((int)(((byte)(65)))));
+      this.Controls.Add(this.LogoPictureBox);
       this.Controls.Add(this.ProductAndVersionPanel);
       this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.Name = "InstallWizardSideBarControl";
       this.Size = new System.Drawing.Size(219, 562);
       this.ProductAndVersionPanel.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -96,5 +111,6 @@ namespace MySql.Configurator.Controls
 
     private System.Windows.Forms.Panel ProductAndVersionPanel;
     private System.Windows.Forms.Label ProductAndVersionLabel;
+    private System.Windows.Forms.PictureBox LogoPictureBox;
   }
 }

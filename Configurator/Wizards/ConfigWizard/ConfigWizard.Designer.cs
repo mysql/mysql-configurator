@@ -45,12 +45,18 @@ namespace MySql.Configurator.Wizards.ConfigWizard
     {
       this.SuspendLayout();
       // 
+      // WizardSideBar
+      // 
+      this.WizardSideBar.BackgroundImage = null;
+      // 
       // ConfigWizard
       // 
       this.AccessibleDescription = "A wizard containing pages to configure MySQL products";
       this.AccessibleName = "Configure Products Wizard";
       this.Name = "ConfigWizard";
       this.ResumeLayout(false);
+      this.PerformLayout();
+
     }
 
     #endregion
