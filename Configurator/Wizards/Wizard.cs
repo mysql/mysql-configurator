@@ -408,7 +408,7 @@ namespace MySql.Configurator.Wizards
     private void AboutButton_Click(object sender, EventArgs e)
     {
       var aboutScreenPage = new AboutScreenForm(AppConfiguration.Version, AppConfiguration.License);
-      aboutScreenPage.Show();
+      aboutScreenPage.ShowDialog();
     }
   }
 }

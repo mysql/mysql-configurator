@@ -266,7 +266,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Are you sure you want to cancel configuring your product(s)?.
+        ///   Looks up a localized string similar to Are you sure you want to cancel the MySQL Server configuration?.
         /// </summary>
         public static string CancelConfigurationQuestion {
             get {
@@ -361,16 +361,6 @@ namespace MySql.Configurator.Properties {
         public static string CommandLineOptionRequiresValueError {
             get {
                 return ResourceManager.GetString("CommandLineOptionRequiresValueError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Commercial {
-            get {
-                object obj = ResourceManager.GetObject("Commercial", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -1226,16 +1216,6 @@ namespace MySql.Configurator.Properties {
         public static string LicenseAgreementSubcaption {
             get {
                 return ResourceManager.GetString("LicenseAgreementSubcaption", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap link_arrow {
-            get {
-                object obj = ResourceManager.GetObject("link_arrow", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -2156,7 +2136,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Are you sure you want to cancel removing products?.
+        ///   Looks up a localized string similar to Are you sure you want to cancel removing the MySQL Server configurations?.
         /// </summary>
         public static string RemoveProductsWizardCancelConfirmationText {
             get {
@@ -4205,6 +4185,16 @@ namespace MySql.Configurator.Properties {
         public static string TEnumNotEnumTypeException {
             get {
                 return ResourceManager.GetString("TEnumNotEnumTypeException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap TransparentSakilaLogo {
+            get {
+                object obj = ResourceManager.GetObject("TransparentSakilaLogo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

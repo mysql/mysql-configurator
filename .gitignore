@@ -1,0 +1,14 @@
+*.bak
+*.pdb
+*.obj
+*.csproj.user
+**/bin
+**/obj
+**/bin/**
+**/obj/**
+*.suo
+**/Thumbs.db
+*.msi
+*.diff
+packages/*/
+.vs/

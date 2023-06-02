@@ -26,7 +26,7 @@ using MySql.Configurator.Core.Product;
 using MySql.Configurator.Wizards;
 using MySql.Configurator.Wizards.ConfigWizard;
 using MySql.Configurator.Wizards.RemoveWizard;
-using MySql.Configurator.Wizards.UpgradeWizard;
+// using MySql.Configurator.Wizards.UpgradeWizard;
 
 namespace MySql.Configurator.Dialogs
 {
@@ -203,28 +203,14 @@ namespace MySql.Configurator.Dialogs
     /// <returns>True if we can shut down, false otherwise.</returns>
     public bool CanClose()
     {
-/*
-      bool result = (Current == welcomeControl ||
-        (Current is InstallerPanel && (Current as InstallerPanel).WorkDone));
-      if (!result)
-        if (Current == installWizardControl)
-          result = installWizardControl.WorkDone || installWizardControl.CurrentPanel.WorkDone;
-        else
-          if (Current == removeWizardControl)
-            result = removeWizardControl.WorkDone;
-
-      if (!result)
+      var wizard = this.Controls.Cast<Wizard>().FirstOrDefault();
+      if (wizard == null)
       {
-        DialogResult answer = MessageBox.Show(
-          Resources.ConfirmCancelAndQuit, Resources.ConfirmCancellationTitle,
-          MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
-        result = (answer == DialogResult.Yes);
-        if (result && Current == installWizardControl)
-          result = installWizardControl.CancelActions();
+        // This is unexpected, a Wizard should be already in the Controls collection, but if not found just let the form close.
+        return true;
       }
-*/
-      bool result = true;
-      return result;
+
+      return wizard.CanCancel;
     }
 
     #region Event handling

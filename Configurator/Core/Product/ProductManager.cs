@@ -120,9 +120,7 @@ namespace MySql.Configurator.Core.Product
 
       package.NormalizedVersion = Utilities.NormalVersion(package.Version);
       package.Initialize(dataDir);
-
-      // TODO: Ask RE to add this to registry.
-      //package.License = LicenseType.Commercial;
+      package.License = AppConfiguration.License;
 
       return package;
     }

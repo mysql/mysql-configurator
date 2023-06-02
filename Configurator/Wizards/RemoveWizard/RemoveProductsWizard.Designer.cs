@@ -45,12 +45,17 @@ namespace MySql.Configurator.Wizards.RemoveWizard
     {
       this.SuspendLayout();
       // 
+      // WizardSideBar
+      // 
+      this.WizardSideBar.BackgroundImage = null;
+      // 
       // RemoveProductsWizard
       // 
       this.AccessibleDescription = "A wizard containing pages to to remove installed MySQL products";
       this.AccessibleName = "Remove Products Wizard";
       this.Name = "RemoveProductsWizard";
       this.ResumeLayout(false);
+      this.PerformLayout();
 
     }
 

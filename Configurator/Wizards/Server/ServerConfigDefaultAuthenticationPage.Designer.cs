@@ -103,9 +103,9 @@ namespace MySql.Configurator.Wizards.Server
       this.UseSha256AuthenticationDescription1Label.Name = "UseSha256AuthenticationDescription1Label";
       this.UseSha256AuthenticationDescription1Label.Size = new System.Drawing.Size(513, 47);
       this.UseSha256AuthenticationDescription1Label.TabIndex = 2;
-      this.UseSha256AuthenticationDescription1Label.Text = "MySQL 8 supports a new authentication based on improved stronger SHA256-based pas" +
-    "sword methods. It is recommended that all new MySQL Server installations use thi" +
-    "s method going forward.";
+      this.UseSha256AuthenticationDescription1Label.Text = "MySQL supports an authentication method based on improved stronger SHA256-based p" +
+    "assword methods. It is recommended that all new MySQL Server installations use t" +
+    "his method going forward.";
       // 
       // UseSha256AuthenticationDescription3Label
       // 
@@ -144,7 +144,9 @@ namespace MySql.Configurator.Wizards.Server
       this.UseSha256AuthenticationDescription2Label.Name = "UseSha256AuthenticationDescription2Label";
       this.UseSha256AuthenticationDescription2Label.Size = new System.Drawing.Size(451, 46);
       this.UseSha256AuthenticationDescription2Label.TabIndex = 3;
-      this.UseSha256AuthenticationDescription2Label.Text = resources.GetString("UseSha256AuthenticationDescription2Label.Text");
+      this.UseSha256AuthenticationDescription2Label.Text = "Attention: This authentication plugin on the server side requires new versions of" +
+    " connectors and clients that add support for this default authentication (cachin" +
+    "g_sha2_password authentication).";
       // 
       // WarningPictureBox
       // 

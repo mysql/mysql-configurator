@@ -82,7 +82,9 @@ namespace MySql.Configurator.Core.Wizard
       set => subCaptionLabel.Text = value;
     }
 
-    public virtual string TabTitle => captionLabel.Text;
+    public string AlternateTabTitle { get; set; }
+
+    public virtual string TabTitle => AlternateTabTitle ?? captionLabel.Text;
 
     public IWizard Wizard { get; set; }
 

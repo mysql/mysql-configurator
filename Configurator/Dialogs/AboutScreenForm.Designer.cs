@@ -51,6 +51,7 @@ namespace MySql.Configurator.Dialogs
       this.VersionLicenseLabel = new System.Windows.Forms.Label();
       this.ConfiguratorLabel = new System.Windows.Forms.Label();
       this.MySqlLabel = new System.Windows.Forms.Label();
+      this.OkButton = new System.Windows.Forms.Button();
       this.SuspendLayout();
       // 
       // LoadingActionLabel
@@ -63,7 +64,7 @@ namespace MySql.Configurator.Dialogs
       this.LoadingActionLabel.ForeColor = System.Drawing.Color.White;
       this.LoadingActionLabel.Location = new System.Drawing.Point(108, 148);
       this.LoadingActionLabel.Name = "LoadingActionLabel";
-      this.LoadingActionLabel.Size = new System.Drawing.Size(0, 32);
+      this.LoadingActionLabel.Size = new System.Drawing.Size(0, 21);
       this.LoadingActionLabel.TabIndex = 0;
       // 
       // CopyrightLabel
@@ -72,11 +73,11 @@ namespace MySql.Configurator.Dialogs
       this.CopyrightLabel.AccessibleName = "Copyright Years";
       this.CopyrightLabel.AutoSize = true;
       this.CopyrightLabel.BackColor = System.Drawing.Color.Transparent;
-      this.CopyrightLabel.Font = new System.Drawing.Font("Arial", 7F);
+      this.CopyrightLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.CopyrightLabel.ForeColor = System.Drawing.Color.Gray;
-      this.CopyrightLabel.Location = new System.Drawing.Point(102, 224);
+      this.CopyrightLabel.Location = new System.Drawing.Point(102, 200);
       this.CopyrightLabel.Name = "CopyrightLabel";
-      this.CopyrightLabel.Size = new System.Drawing.Size(298, 16);
+      this.CopyrightLabel.Size = new System.Drawing.Size(241, 13);
       this.CopyrightLabel.TabIndex = 1;
       this.CopyrightLabel.Text = "Copyright (c) 2023, Oracle and/or its affiliates.";
       this.CopyrightLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -87,11 +88,11 @@ namespace MySql.Configurator.Dialogs
       this.RegisteredTrademarkLabel.AccessibleName = "Oracle Trademark";
       this.RegisteredTrademarkLabel.AutoSize = true;
       this.RegisteredTrademarkLabel.BackColor = System.Drawing.Color.Transparent;
-      this.RegisteredTrademarkLabel.Font = new System.Drawing.Font("Arial", 7F);
+      this.RegisteredTrademarkLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.RegisteredTrademarkLabel.ForeColor = System.Drawing.Color.Gray;
-      this.RegisteredTrademarkLabel.Location = new System.Drawing.Point(102, 243);
+      this.RegisteredTrademarkLabel.Location = new System.Drawing.Point(102, 218);
       this.RegisteredTrademarkLabel.Name = "RegisteredTrademarkLabel";
-      this.RegisteredTrademarkLabel.Size = new System.Drawing.Size(520, 16);
+      this.RegisteredTrademarkLabel.Size = new System.Drawing.Size(417, 13);
       this.RegisteredTrademarkLabel.TabIndex = 2;
       this.RegisteredTrademarkLabel.Text = "Oracle, Java, and MySQL are registered trademarks of Oracle and/or its affiliates" +
     ".";
@@ -104,11 +105,11 @@ namespace MySql.Configurator.Dialogs
       this.OtherNamesLabel.AccessibleName = "Other names trademark";
       this.OtherNamesLabel.AutoSize = true;
       this.OtherNamesLabel.BackColor = System.Drawing.Color.Transparent;
-      this.OtherNamesLabel.Font = new System.Drawing.Font("Arial", 7F);
+      this.OtherNamesLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.OtherNamesLabel.ForeColor = System.Drawing.Color.Gray;
-      this.OtherNamesLabel.Location = new System.Drawing.Point(102, 257);
+      this.OtherNamesLabel.Location = new System.Drawing.Point(102, 237);
       this.OtherNamesLabel.Name = "OtherNamesLabel";
-      this.OtherNamesLabel.Size = new System.Drawing.Size(384, 16);
+      this.OtherNamesLabel.Size = new System.Drawing.Size(311, 13);
       this.OtherNamesLabel.TabIndex = 3;
       this.OtherNamesLabel.Text = "Other names may be trademarks of their respective owners.";
       this.OtherNamesLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -123,7 +124,7 @@ namespace MySql.Configurator.Dialogs
       this.CopyrightSymbolLabel.ForeColor = System.Drawing.Color.White;
       this.CopyrightSymbolLabel.Location = new System.Drawing.Point(184, 41);
       this.CopyrightSymbolLabel.Name = "CopyrightSymbolLabel";
-      this.CopyrightSymbolLabel.Size = new System.Drawing.Size(29, 28);
+      this.CopyrightSymbolLabel.Size = new System.Drawing.Size(21, 19);
       this.CopyrightSymbolLabel.TabIndex = 2;
       this.CopyrightSymbolLabel.Text = "©";
       this.CopyrightSymbolLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -134,11 +135,11 @@ namespace MySql.Configurator.Dialogs
       this.VersionLicenseLabel.AccessibleName = "Version And License";
       this.VersionLicenseLabel.AutoSize = true;
       this.VersionLicenseLabel.BackColor = System.Drawing.Color.Transparent;
-      this.VersionLicenseLabel.Font = new System.Drawing.Font("Arial", 7F);
+      this.VersionLicenseLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.VersionLicenseLabel.ForeColor = System.Drawing.Color.White;
       this.VersionLicenseLabel.Location = new System.Drawing.Point(103, 110);
       this.VersionLicenseLabel.Name = "VersionLicenseLabel";
-      this.VersionLicenseLabel.Size = new System.Drawing.Size(174, 16);
+      this.VersionLicenseLabel.Size = new System.Drawing.Size(147, 15);
       this.VersionLicenseLabel.TabIndex = 4;
       this.VersionLicenseLabel.Text = "Version 8.1.0 (Community)";
       this.VersionLicenseLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -153,7 +154,7 @@ namespace MySql.Configurator.Dialogs
       this.ConfiguratorLabel.ForeColor = System.Drawing.Color.White;
       this.ConfiguratorLabel.Location = new System.Drawing.Point(96, 63);
       this.ConfiguratorLabel.Name = "ConfiguratorLabel";
-      this.ConfiguratorLabel.Size = new System.Drawing.Size(301, 55);
+      this.ConfiguratorLabel.Size = new System.Drawing.Size(207, 37);
       this.ConfiguratorLabel.TabIndex = 3;
       this.ConfiguratorLabel.Text = "Configurator";
       this.ConfiguratorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -168,20 +169,34 @@ namespace MySql.Configurator.Dialogs
       this.MySqlLabel.ForeColor = System.Drawing.Color.White;
       this.MySqlLabel.Location = new System.Drawing.Point(99, 33);
       this.MySqlLabel.Name = "MySqlLabel";
-      this.MySqlLabel.Size = new System.Drawing.Size(142, 40);
+      this.MySqlLabel.Size = new System.Drawing.Size(97, 29);
       this.MySqlLabel.TabIndex = 1;
       this.MySqlLabel.Text = "MySQL";
       this.MySqlLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
       // 
+      // OkButton
+      // 
+      this.OkButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.OkButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.OkButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.OkButton.Location = new System.Drawing.Point(487, 262);
+      this.OkButton.Name = "OkButton";
+      this.OkButton.Size = new System.Drawing.Size(75, 23);
+      this.OkButton.TabIndex = 5;
+      this.OkButton.Text = "OK";
+      this.OkButton.UseVisualStyleBackColor = true;
+      // 
       // AboutScreenForm
       // 
+      this.AcceptButton = this.OkButton;
       this.AccessibleDescription = "The about screen shown to display information about the application";
       this.AccessibleName = "About Screen";
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.BackgroundImage = global::MySql.Configurator.Properties.Resources.SplashScreen;
       this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-      this.ClientSize = new System.Drawing.Size(560, 321);
-      this.ControlBox = false;
+      this.CancelButton = this.OkButton;
+      this.ClientSize = new System.Drawing.Size(574, 321);
+      this.Controls.Add(this.OkButton);
       this.Controls.Add(this.VersionLicenseLabel);
       this.Controls.Add(this.ConfiguratorLabel);
       this.Controls.Add(this.CopyrightSymbolLabel);
@@ -191,14 +206,14 @@ namespace MySql.Configurator.Dialogs
       this.Controls.Add(this.CopyrightLabel);
       this.Controls.Add(this.LoadingActionLabel);
       this.DoubleBuffered = true;
-      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
       this.MaximizeBox = false;
       this.MinimizeBox = false;
       this.Name = "AboutScreenForm";
       this.ShowIcon = false;
       this.ShowInTaskbar = false;
-      this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-      this.Text = "SplashScreen";
+      this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+      this.Text = "About MySQL Configurator";
       this.Deactivate += new System.EventHandler(this.AboutScreenForm_Deactivate);
       this.ResumeLayout(false);
       this.PerformLayout();
@@ -215,5 +230,6 @@ namespace MySql.Configurator.Dialogs
     private System.Windows.Forms.Label VersionLicenseLabel;
     private System.Windows.Forms.Label ConfiguratorLabel;
     private System.Windows.Forms.Label MySqlLabel;
+    private System.Windows.Forms.Button OkButton;
   }
 }

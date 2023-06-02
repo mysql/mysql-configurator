@@ -62,7 +62,7 @@ namespace MySql.Configurator.Wizards.ConfigWizard
           if (serverController.Settings.ConfigurationFileExists == false)
           {
             configurationType = ConfigurationType.New;
-            AddPage(new WelcomePage());
+            AddPage(new WelcomePage() { AlternateTabTitle = "Welcome" });
           }
           else if (serverController.Settings.PendingSystemTablesUpgrade)
           {
