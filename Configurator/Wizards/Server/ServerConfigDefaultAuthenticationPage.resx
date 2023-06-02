@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <metadata name="ToolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+  <metadata name="ValidationsTimer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>109, 17</value>
+  </metadata>
+  <metadata name="ValidationsErrorProvider.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>252, 17</value>
+  </metadata>
   <metadata name="UseSha256AuthenticationRadioButton.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -130,7 +139,7 @@
     <value>True</value>
   </metadata>
   <data name="UseSha256AuthenticationDescription3Label.Text" xml:space="preserve">
-    <value>Currently MySQL 8.0 Connectors and community drivers which use libmysqlclient 8.0 support this new method. If clients and applications cannot be updated to support this new authentication method, the MySQL 8.0 Server can be configured to use the legacy MySQL Authentication Method below.</value>
+    <value>Currently MySQL-enabled (8.0 and later) connectors and community drivers that use libmysqlclient 8.0 or later support this new method. If clients and applications cannot be updated to support this new authentication method, the MySQL  Server can be configured to use the legacy MySQL Authentication Method below.</value>
   </data>
   <metadata name="UseNativeAuthenticationDescriptionLabel.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -138,22 +147,22 @@
   <data name="UseNativeAuthenticationDescriptionLabel.Text" xml:space="preserve">
     <value>Using the old MySQL 5.x legacy authentication method should only be considered in the following cases:
 
-- If applications cannot be updated to use MySQL 8 enabled Connectors and drivers.
+- If applications cannot be updated to use MySQL-enabled connectors (8.0 and later) and drivers.
 - For cases where re-compilation of an existing application is not feasible.
 - An updated, language specific connector or driver is not yet available.
 
-Security Guidance: When possible, we highly recommend taking needed steps towards upgrading your applications, libraries, and database servers to the new stronger authentication. This new method will significantly improve your security.</value>
+Security Guidance: When possible, consider taking needed steps towards upgrading your applications, libraries, and database servers to the recommended stronger authentication. This method will significantly improve your security.</value>
   </data>
   <metadata name="UseSha256AuthenticationDescription2Label.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="UseSha256AuthenticationDescription2Label.Text" xml:space="preserve">
-    <value>Attention: This new authentication plugin on the server side requires new versions of connectors and clients which add support for this new 8.0 default authentication (caching_sha2_password authentication).</value>
-  </data>
   <metadata name="WarningPictureBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="$this.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
+  </metadata>
+  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>102</value>
   </metadata>
 </root>

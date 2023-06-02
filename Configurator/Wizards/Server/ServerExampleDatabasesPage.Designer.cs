@@ -61,8 +61,8 @@ namespace MySql.Configurator.Wizards.Server
       // 
       // captionLabel
       // 
-      this.captionLabel.Size = new System.Drawing.Size(174, 25);
-      this.captionLabel.Text = "Example Databases";
+      this.captionLabel.Size = new System.Drawing.Size(165, 25);
+      this.captionLabel.Text = "Sample Databases";
       // 
       // InstructionsLabel
       // 
@@ -72,9 +72,11 @@ namespace MySql.Configurator.Wizards.Server
       this.InstructionsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(102)))), ((int)(((byte)(102)))), ((int)(((byte)(102)))));
       this.InstructionsLabel.Location = new System.Drawing.Point(27, 63);
       this.InstructionsLabel.Name = "InstructionsLabel";
-      this.InstructionsLabel.Size = new System.Drawing.Size(520, 75);
+      this.InstructionsLabel.Size = new System.Drawing.Size(520, 51);
       this.InstructionsLabel.TabIndex = 1;
-      this.InstructionsLabel.Text = resources.GetString("InstructionsLabel.Text");
+      this.InstructionsLabel.Text = "MySQL databases samples can be installed or removed as part of this configuration" +
+    ". These samples provide test data to use when developing applications for the My" +
+    "SQL ecosystem.";
       // 
       // CreateRemoveSakilaDatabaseCheckBox
       // 
@@ -82,9 +84,9 @@ namespace MySql.Configurator.Wizards.Server
       this.CreateRemoveSakilaDatabaseCheckBox.AccessibleName = "Create Remove Sakila Database";
       this.CreateRemoveSakilaDatabaseCheckBox.AutoSize = true;
       this.CreateRemoveSakilaDatabaseCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.CreateRemoveSakilaDatabaseCheckBox.Location = new System.Drawing.Point(33, 160);
+      this.CreateRemoveSakilaDatabaseCheckBox.Location = new System.Drawing.Point(33, 150);
       this.CreateRemoveSakilaDatabaseCheckBox.Name = "CreateRemoveSakilaDatabaseCheckBox";
-      this.CreateRemoveSakilaDatabaseCheckBox.Size = new System.Drawing.Size(215, 29);
+      this.CreateRemoveSakilaDatabaseCheckBox.Size = new System.Drawing.Size(143, 19);
       this.CreateRemoveSakilaDatabaseCheckBox.TabIndex = 3;
       this.CreateRemoveSakilaDatabaseCheckBox.Text = "Create Sakila database";
       this.CreateRemoveSakilaDatabaseCheckBox.UseVisualStyleBackColor = true;
@@ -95,9 +97,9 @@ namespace MySql.Configurator.Wizards.Server
       this.CreateRemoveWorldDatabaseCheckBox.AccessibleName = "Create Remove World Database";
       this.CreateRemoveWorldDatabaseCheckBox.AutoSize = true;
       this.CreateRemoveWorldDatabaseCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.CreateRemoveWorldDatabaseCheckBox.Location = new System.Drawing.Point(33, 192);
+      this.CreateRemoveWorldDatabaseCheckBox.Location = new System.Drawing.Point(33, 182);
       this.CreateRemoveWorldDatabaseCheckBox.Name = "CreateRemoveWorldDatabaseCheckBox";
-      this.CreateRemoveWorldDatabaseCheckBox.Size = new System.Drawing.Size(218, 29);
+      this.CreateRemoveWorldDatabaseCheckBox.Size = new System.Drawing.Size(145, 19);
       this.CreateRemoveWorldDatabaseCheckBox.TabIndex = 4;
       this.CreateRemoveWorldDatabaseCheckBox.Text = "Create World database";
       this.CreateRemoveWorldDatabaseCheckBox.UseVisualStyleBackColor = true;
@@ -108,7 +110,7 @@ namespace MySql.Configurator.Wizards.Server
       this.DynamicLabel.AccessibleName = "Instructions Dynamic Text";
       this.DynamicLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.DynamicLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(102)))), ((int)(((byte)(102)))), ((int)(((byte)(102)))));
-      this.DynamicLabel.Location = new System.Drawing.Point(28, 128);
+      this.DynamicLabel.Location = new System.Drawing.Point(28, 118);
       this.DynamicLabel.Name = "DynamicLabel";
       this.DynamicLabel.Size = new System.Drawing.Size(520, 33);
       this.DynamicLabel.TabIndex = 5;
@@ -118,7 +120,7 @@ namespace MySql.Configurator.Wizards.Server
       // 
       this.AccessibleName = "Server Access Page";
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
-      this.Caption = "Example Databases";
+      this.Caption = "Sample Databases";
       this.Controls.Add(this.DynamicLabel);
       this.Controls.Add(this.CreateRemoveWorldDatabaseCheckBox);
       this.Controls.Add(this.CreateRemoveSakilaDatabaseCheckBox);
