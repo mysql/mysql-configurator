@@ -40,14 +40,17 @@ namespace MySql.Configurator.Dialogs
 
     private string _dataDirPath;
 
+    private string _installDirPath;
+
     #endregion
 
-    public MainForm(string version, string dataDirPath, string action)
+    public MainForm(string version, string dataDirPath, string installDirPath, string action)
     {
       InitializeComponent();
       _action = action;
       _version = version;
       _dataDirPath = dataDirPath;
+      _installDirPath = installDirPath;
       SetWindowPosition();
     }
 
@@ -111,20 +114,12 @@ namespace MySql.Configurator.Dialogs
       Package package = null;
       try
       {
-        package = ProductManager.LoadPackage(_version, _dataDirPath);
+        package = ProductManager.LoadPackage(_version, _dataDirPath, _installDirPath);
       }
       catch (ConfiguratorException ex)
       {
         InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties($"MySQL Server {_version} not found", ex.Message));
         Close();
-      }
-
-      if (package == null
-          || !package.IsInstalled)
-      {
-        InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties($"MySQL Server {_version} not installed", $"No matching product was found."));
-        Close();
-        return;
       }
 
       ConfigurationType configurationType;

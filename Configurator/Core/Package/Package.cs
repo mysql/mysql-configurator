@@ -432,7 +432,7 @@ namespace MySql.Configurator.Core.Package
       return list;
     }
 
-    public void Initialize(string dataDir)
+    public void Initialize(string dataDir, string installDir)
     {
       if (Controller == null)
       {
@@ -458,6 +458,12 @@ namespace MySql.Configurator.Core.Package
       {
         var controller = (ServerProductConfigurationController)Controller;
         controller.Settings.DataDirectory = dataDir;
+      }
+
+      if (!string.IsNullOrEmpty(installDir))
+      {
+        var controller = (ServerProductConfigurationController)Controller;
+        controller.Settings.InstallDirectory = installDir;
       }
 
       Controller.LoadState();

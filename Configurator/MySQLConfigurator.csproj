@@ -445,6 +445,12 @@
     <Compile Include="Wizards\ConfigWizard\ConfigCompletePage.Designer.cs">
       <DependentUpon>ConfigCompletePage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Wizards\ConfigWizard\ConfigureErrorPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\ConfigWizard\ConfigureErrorPage.Designer.cs">
+      <DependentUpon>ConfigureErrorPage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Wizards\Examples\ExampleDatabaseInfo.cs" />
     <Compile Include="Wizards\RemoveWizard\RemoveErrorPage.cs">
       <SubType>UserControl</SubType>
@@ -657,6 +663,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Wizards\ConfigWizard\ConfigCompletePage.resx">
       <DependentUpon>ConfigCompletePage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\ConfigWizard\ConfigureErrorPage.resx">
+      <DependentUpon>ConfigureErrorPage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Wizards\RemoveWizard\RemoveErrorPage.resx">
       <DependentUpon>RemoveErrorPage.cs</DependentUpon>

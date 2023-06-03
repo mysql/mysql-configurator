@@ -767,7 +767,6 @@ namespace MySql.Configurator.Wizards.Server
     public override void SetPages()
     {
       Pages.Clear();
-
       if (ConfigurationType == ConfigurationType.Upgrade
           && IsThereServerDataFiles)
       {
@@ -1089,11 +1088,16 @@ namespace MySql.Configurator.Wizards.Server
       ReportStatus(string.Format(Resources.ServerConfigGrantingPermissionsToAccount, Settings.ServiceAccountUsername));
       try
       {
+        // Validate access to data directory.
         DirectoryServicesWrapper.GrantUserPermissionToDirectory(Settings.DataDirectory, Settings.ServiceAccountUsername, FileSystemRights.FullControl, AccessControlType.Allow);
         ReportStatus(Resources.ServerConfigGrantedPermissionsToDataDirectory);
 
         // Validate the service account has access to log files.
         ConfigureFilePermissionsForServerLogs(Settings.ServiceAccountUsername);
+
+        // Validate access to install dir.
+        DirectoryServicesWrapper.GrantUserPermissionToDirectory(Settings.InstallDirectory, Settings.ServiceAccountUsername, FileSystemRights.ReadAndExecute, AccessControlType.Allow);
+        ReportStatus("Granted permissions to the install directory.");
       }
       catch (Exception ex)
       {
@@ -2063,6 +2067,11 @@ namespace MySql.Configurator.Wizards.Server
       SecurityIdentifier serviceAccountSid = null;
       if (Settings.ConfigureAsService)
       {
+        if (string.IsNullOrEmpty(Settings.ServiceAccountUsername))
+        {
+          return false;
+        }
+
         var serviceAccountUsername = Settings.ServiceAccountUsername.StartsWith(".")
                                        ? Settings.ServiceAccountUsername.Replace(".", Environment.MachineName)
                                        : Settings.ServiceAccountUsername;

@@ -47,76 +47,13 @@ namespace MySql.Configurator.Core.Controllers
 
     public void LoadState()
     {
-      // Load registry key.
-      RegistryKey registryKey = OpenRegistryKey();
-      if (registryKey.IsNull())
+      if (string.IsNullOrEmpty(InstallDirectory))
       {
-        throw new ConfiguratorException(ConfiguratorError.RegistryKeyNotFound);
-      }
-
-      // Load version.
-      var versionObject = registryKey?.GetValue<string>("Version");
-      if (versionObject == null
-          || !Version.TryParse(versionObject.ToString(), out Version version))
-      {
-        throw new ConfiguratorException(ConfiguratorError.VersionNotFound);
-      }
-
-      if (Package.NormalizedVersion.Major != version.Major
-          || Package.NormalizedVersion.Minor != version.Minor
-          || Package.NormalizedVersion.Build != version.Build)
-      {
-        throw new ConfiguratorException(ConfiguratorError.VersionMismatch);
-      }
-
-      // Load installation directory.
-      var installPath = registryKey?.GetValue<string>("Location");
-      if (string.IsNullOrEmpty(installPath))
-      {
-        throw new ConfiguratorException(ConfiguratorError.InstallDirKeyNotFound);
-      }
-
-      if (!Directory.Exists(installPath))
-      {
-        throw new ConfiguratorException(ConfiguratorError.InstallDirKeyNotFound);
-      }
-
-      if (Directory.EnumerateFiles(installPath).Count() == 0)
-      {
-        throw new ConfiguratorException(ConfiguratorError.InstallDirFilesNotFound);
-      }
-
-      Package.IsInstalled = true;
-
-      // Load license.
-      // TODO: Check with server team if this is valid.
-      var license = registryKey?.GetValue<string>("Location");
-      if (!string.IsNullOrEmpty(installPath))
-      {
-        Package.License = license.Equals("Commercial", StringComparison.InvariantCultureIgnoreCase)
-          ? LicenseType.Commercial
-          : license.Equals("Community", StringComparison.InvariantCultureIgnoreCase)
-            ? LicenseType.Community
-            : LicenseType.Unknown;
+        return;
       }
       
-      using (registryKey)
-      {
-        Logger.LogInformation("Controller Settings - Load State - Load Installed");
-        LoadInstalled(registryKey);
-      }
-
-      if (!Package.IsInstalled)
-      {
-        if (Package.UpgradeTarget != null)
-        {
-          LoadDefaultsForUpgrade();
-        }
-        else
-        {
-          LoadDefaultsForInstall();
-        }
-      }
+      Package.IsInstalled = true;
+      LoadInstalled();
     }
 
     [ControllerSetting("Overrides the default installation directory.", "install_dir,installdir")]
@@ -142,11 +79,8 @@ namespace MySql.Configurator.Core.Controllers
       DefaultInstallDirectory = InstallDirectory;
     }
 
-    protected virtual void LoadInstalled(RegistryKey key)
+    protected virtual void LoadInstalled()
     {
-      Logger.LogInformation("Controller Settings - Load Installed - setting Install Dir from registry");
-      InstallDirectory = key?.GetValue<string>("Location");
-      Logger.LogInformation("Controller Settings - Load Installed - InstallDir " + InstallDirectory);
       if (string.IsNullOrEmpty(InstallDirectory))
       {
         InstallDirectory = MsiInterop.GetProperty(Package.Id, "InstallLocation");

@@ -373,10 +373,9 @@ namespace MySql.Configurator.Wizards.Server
       VerifySecureFilePrivFolder();
     }
 
-    protected override void LoadInstalled(RegistryKey key)
+    protected override void LoadInstalled()
     {
-      Logger.LogInformation("Server Settings - Load Installed - calling base");
-      base.LoadInstalled(key);
+      base.LoadInstalled();
       Logger.LogInformation("Server Settings - Load Installed - load service information");
       LoadServiceInformation();
       Logger.LogInformation("Server Settings - Load Installed - Load my Ini Settings");

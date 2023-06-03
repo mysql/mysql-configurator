@@ -23,6 +23,7 @@ using MySql.Configurator.Core.Interfaces;
 using MySql.Configurator.Core.Package;
 using MySql.Configurator.Dialogs;
 using MySql.Configurator.Properties;
+using MySql.Configurator.Wizards.Server;
 
 namespace MySql.Configurator.Wizards.RemoveWizard
 {
@@ -87,11 +88,22 @@ namespace MySql.Configurator.Wizards.RemoveWizard
       package.Controller.ConfigurationType = ConfigurationType.Remove;
       package.Controller.UpdateRemoveSteps();
       package.Controller.SetPages();
-      if (package.Controller.Pages == null
-          || package.Controller.Pages.Count == 0)
+      var serverController = package.Controller as ServerConfigurationController;
+      if (serverController != null)
       {
-        AddPage(new RemoveErrorPage());
-        base.ShowWizard(parentMainForm);
+        if (!serverController.IsDeleteServiceStepNeeded
+            && !serverController.IsRemoveFirewallRuleStepNeeded)
+        {
+          AddPage(new RemoveErrorPage());
+          base.ShowWizard(parentMainForm);
+          return;
+        }
+      }
+
+      if (!serverController.IsDeleteServiceStepNeeded
+          && !serverController.IsRemoveFirewallRuleStepNeeded
+          && !serverController.IsDeleteDataDirectoryStepNeeded)
+      {
         return;
       }
 
