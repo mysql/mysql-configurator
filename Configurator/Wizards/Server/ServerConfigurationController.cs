@@ -1671,7 +1671,7 @@ namespace MySql.Configurator.Wizards.Server
       {
         // Read the install script from the share folder.
         string firewallScript;
-        using (var reader = new StreamReader($"{InstallDirectory}share\\win_install_firewall.sql"))
+        using (var reader = new StreamReader($"{InstallDirectory}\\share\\win_install_firewall.sql"))
         {
           firewallScript = reader.ReadToEnd();
         }
