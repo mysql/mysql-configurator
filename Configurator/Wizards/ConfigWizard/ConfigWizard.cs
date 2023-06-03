@@ -23,6 +23,7 @@ using MySql.Configurator.Core.Package;
 using MySql.Configurator.Dialogs;
 using MySql.Configurator.Properties;
 using MySql.Configurator.Wizards.Common;
+using MySql.Configurator.Wizards.ConfigureWizard;
 using MySql.Configurator.Wizards.UpgradeWizard;
 
 namespace MySql.Configurator.Wizards.ConfigWizard
@@ -53,6 +54,12 @@ namespace MySql.Configurator.Wizards.ConfigWizard
     {
       ClearPages();
       var configurationController = package.Controller;
+      if (string.IsNullOrEmpty(package.Controller.InstallDirectory))
+      {
+        AddPage(new ConfigureErrorPage());
+        base.ShowWizard(parentMainForm);
+        return;
+      }
 
       // Need to assign correctly for some operations how will behave the configuration UI and backend operations
       if (configurationType == ConfigurationType.Reconfiguration

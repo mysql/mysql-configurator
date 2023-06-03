@@ -41,6 +41,8 @@ namespace MySql.Configurator
 
     private static string _dataDirPath;
 
+    private static string _installDirPath;
+
     private static string _action;
 
     #endregion
@@ -91,7 +93,7 @@ namespace MySql.Configurator
         
         // Uncomment the following line to print to the debug output console messages indicating what control got focus.
         //Application.AddMessageFilter(new LastFocusedControlFilter(true));
-        Application.Run(new MainForm(_version, _dataDirPath, _action));
+        Application.Run(new MainForm(_version, _dataDirPath, _installDirPath, _action));
       }
       catch (ConfiguratorException ex)
       {
@@ -138,11 +140,6 @@ namespace MySql.Configurator
     {
       string[] arguments = Environment.GetCommandLineArgs();
       // Process arguments.
-      //if (arguments.Length != 3)
-      //{
-      //  throw new ConfiguratorException(ConfiguratorError.IncorrectArgumentCount);
-      //}
-
       arguments = arguments.Skip(1).ToArray();
       foreach (var argument in arguments)
       {
@@ -154,23 +151,6 @@ namespace MySql.Configurator
 
         switch (option)
         {
-          case "version":
-            _version = value;
-            if (!Version.TryParse(_version, out Version tempVersion))
-            {
-              throw new ConfiguratorException(ConfiguratorError.InvalidVersion, _version);
-            }
-
-            if (_version.Split('.').Length < 3)
-            {
-              throw new ConfiguratorException(ConfiguratorError.ShortVersion, _version);
-            }
-            break;
-
-          case "data_dir":
-            _dataDirPath = value;
-            break;
-
           case "configure":
           case "remove":
           case "upgrade":
@@ -183,51 +163,62 @@ namespace MySql.Configurator
       }
 
       // Set default version.
-      if (string.IsNullOrEmpty(_version))
+      try
       {
+        // Set install dir.
         var assembly = Assembly.GetExecutingAssembly();
-        var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-        var version = new Version(fvi.FileVersion);
-        _version = $"{version.Major}.{version.Minor}.{version.Build}";
+        var assemblyFileInfo = new FileInfo(assembly.Location);
+        var installDirPath = assemblyFileInfo.Directory.Parent.FullName;
+        _installDirPath = installDirPath;
+
+#if DEBUG
+        _installDirPath = "C:\\Program Files\\MySQL\\MySQL Server 8.1";
+#endif
+
+        // Validate install dir.
+        var pathToMySqld = Path.Combine(_installDirPath, "bin\\mysqld.exe");
+        if (!Directory.Exists(_installDirPath)
+            || !File.Exists(pathToMySqld))
+        {
+          _installDirPath = null;
+        }
+
+        // Set version.
+        FileVersionInfo versionInfo = null;
+        Version versionItem = null;
+        if (!string.IsNullOrEmpty(_installDirPath))
+        {
+          versionInfo = FileVersionInfo.GetVersionInfo(pathToMySqld);
+          versionItem = new Version(versionInfo.FileVersion);
+        }
+        else
+        {
+          versionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+          versionItem = new Version(versionInfo.FileVersion);
+        }
+
+        _version = $"{versionItem.Major}.{versionItem.Minor}.{versionItem.Build}";
+
+        // Set default data dir.
+        if (string.IsNullOrEmpty(_dataDirPath)
+            && versionItem != null)
+        {
+          _dataDirPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+            $@"MySQL\MySQL Server {versionItem.Major}.{versionItem.Minor}\");
+        }
+      }
+      catch (Exception ex)
+      {
+        Logger.LogException(ex);
       }
 
-      // Set default data dir.
-      if (string.IsNullOrEmpty(_dataDirPath))
-      {
-        var version = new Version(_version);
-        _dataDirPath = Path.Combine(
-          Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-          $@"MySQL\MySQL Server {version.Major}.{version.Minor}\");
-      }
 
       // Set default action.
       if (string.IsNullOrEmpty(_action))
       {
         _action = "configure";
       }
-    }
-
-    /// <summary>
-    /// Processes the command line arguments provided when executing the application without enforcing the order on which to provide each argument.
-    /// </summary>
-    /// <param name="arguments">An array of string arguments.</param>
-    /// <returns><c>true</c> if the processing of the command line arguments was successful; otherwise, <c>false</c>.</returns>
-    private static bool ProcessCommandLineArguments(string[] arguments)
-    {
-      for (int index = 0; index < arguments.Length; index++)
-      {
-        arguments[index] = arguments[index].ToLowerInvariant();
-      }
-
-      var options = new CommandLineOptions
-      {
-        new CommandLineOption("license", arg => ProcessArgument(new KeyValuePair<string, string>("license", arg)), true, "community,commercial"),
-        new CommandLineOption("version", arg => ProcessArgument(new KeyValuePair<string, string>("version", arg)), true),
-        new CommandLineOption("productcode", arg => ProcessArgument(new KeyValuePair<string, string>("productcode", arg)), true),
-        new CommandLineOption("nosplash", arg => ProcessArgument(new KeyValuePair<string, string>("nosplash", arg)), true, "true,false")
-      };
-      options.Parse(arguments);
-      return true;
     }
 
     /// <summary>

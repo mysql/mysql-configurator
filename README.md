@@ -17,7 +17,7 @@ No installation is required as the tool is distributed as a stand-alone exe whic
 ### Prerequisites
 
 * Visual Studio 2022
-* .NET Framework 4.6.2
+* .NET Framework 4.8
 * MS Build Community Tasks 1.5.0+
 
 ### Building

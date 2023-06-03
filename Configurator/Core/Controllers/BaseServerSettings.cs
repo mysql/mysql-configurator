@@ -334,15 +334,13 @@ namespace MySql.Configurator.Core.Controllers
       PendingSystemTablesUpgrade = true;
     }
 
-    protected override void LoadInstalled(RegistryKey key)
+    protected override void LoadInstalled()
     {
-      base.LoadInstalled(key);
+      base.LoadInstalled();
       if (!string.IsNullOrEmpty(DataDirectory))
       {
         return;
       }
-
-      DataDirectory = key?.GetValue<string>("DataLocation");
 
       if (string.IsNullOrEmpty(DataDirectory))
       {

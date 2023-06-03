@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MySql.Configurator.Core.Classes;
+using MySql.Configurator.Core.Enums;
 
 namespace MySql.Configurator.Core.Product
 {
@@ -81,7 +82,7 @@ namespace MySql.Configurator.Core.Product
         Package.Package package = Package.Package.FromProductInfo(twoKey.Item2, upgradeCode);
         package.UpgradeCode = upgradeCode;
         package.IsInstalled = true;
-        package.Initialize(null);
+        package.Initialize(null, null);
         InstalledPackages.Add(package);
       }
     }
@@ -109,7 +110,7 @@ namespace MySql.Configurator.Core.Product
       return InstalledPackages.FirstOrDefault(package => package.Id == productGuid);
     }
 
-    public static Package.Package LoadPackage(string version, string dataDir)
+    public static Package.Package LoadPackage(string version, string dataDir, string installDir)
     {
       var package = new Package.Package
       {
@@ -119,7 +120,8 @@ namespace MySql.Configurator.Core.Product
       };
 
       package.NormalizedVersion = Utilities.NormalVersion(package.Version);
-      package.Initialize(dataDir);
+      package.Initialize(dataDir, installDir);
+      package.Architecture = PackageArchitecture.X64;
       package.License = AppConfiguration.License;
 
       return package;
