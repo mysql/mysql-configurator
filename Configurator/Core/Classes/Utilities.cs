@@ -1543,6 +1543,7 @@ namespace MySql.Configurator.Core.Classes
     /// This argument is only relevant when <paramref name="consoleMode"/> is set to <c>true</c>.</param>
     public static void InitializeLogger(bool consoleMode, bool logToConsole = false)
     {
+      Logger.Initialize(AppConfiguration.HomeDir, "configurator", consoleMode, logToConsole, "mysql-configurator", true);
       Logger.PrependUserNameToLogFileName = true;
     }
 
@@ -2446,12 +2447,73 @@ namespace MySql.Configurator.Core.Classes
     }
 
     /// <summary>
+    /// Validates a given file path.
+    /// </summary>
+    /// <param name="filePath">A file path.</param>
+    /// <returns>An error message if the file path is invalid, or <c>null</c> if it's valid.</returns>
+    public static string ValidateFilePath(string filePath)
+    {
+      string errorMessage = null;
+      try
+      {
+        var directoryPath = Path.GetDirectoryName(filePath);
+        if (!string.IsNullOrEmpty(directoryPath)
+            && !Path.IsPathRooted(filePath))
+        {
+          errorMessage = Resources.PathNotAbsoluteError;
+        }
+
+        if (string.IsNullOrEmpty(errorMessage))
+        {
+          var absolutePath = Path.GetFullPath(filePath);
+          if (!string.IsNullOrEmpty(absolutePath))
+          {
+            var fileName = Path.GetFileName(absolutePath);
+            if (string.IsNullOrEmpty(fileName))
+            {
+              errorMessage = Resources.PathContainsNoFileError;
+            }
+
+            if (string.IsNullOrEmpty(errorMessage)
+                && !string.IsNullOrEmpty(directoryPath)
+                && !Directory.Exists(directoryPath))
+            {
+              errorMessage = Resources.PathNonExistentDirectoryError;
+            }
+          }
+        }
+      }
+      catch (ArgumentNullException)
+      {
+        errorMessage = Resources.PathIsNullError;
+      }
+      catch (ArgumentException)
+      {
+        errorMessage = Resources.PathContainsInvalidCharactersError;
+      }
+      catch (PathTooLongException)
+      {
+        errorMessage = Resources.PathTooLongError;
+      }
+      catch (NotSupportedException)
+      {
+        errorMessage = Resources.PathContainsColonError;
+      }
+      catch (Exception)
+      {
+        errorMessage = Resources.PathUnknownError;
+      }
+
+      return errorMessage;
+    }
+
+    /// <summary>
     /// Validates that the provided path is valid.
     /// </summary>
     /// <param name="path">The path to validate.</param>
     /// <returns>An empty strng if the path is valid; otherwise, an error message string.</returns>
     /// <remarks>This method does not check that path exists, it only validates that the format is valid.</remarks>
-    public static string ValidateFilePath(string path)
+    public static string ValidateAbsoluteFilePath(string path)
     {
       // Check if the path has the required minimum length.
       if (string.IsNullOrEmpty(path)
@@ -2470,7 +2532,9 @@ namespace MySql.Configurator.Core.Classes
       }
 
       // Check if the path is rooted.
-      if (!Path.IsPathRooted(path))
+      var directoryPath = Path.GetDirectoryName(path);
+      if (!string.IsNullOrEmpty(directoryPath)
+          && !Path.IsPathRooted(path))
       {
         return Resources.PathInvalidNotAbsoluteError;
       }

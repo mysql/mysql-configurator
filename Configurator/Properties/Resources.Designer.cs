@@ -1963,6 +1963,33 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The given path contains a colon (&quot;:&quot;) that is not part of a volume identifier (for example, &quot;c:\&quot;)..
+        /// </summary>
+        public static string PathContainsColonError {
+            get {
+                return ResourceManager.GetString("PathContainsColonError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid characters found in the path, or the path is badly formed..
+        /// </summary>
+        public static string PathContainsInvalidCharactersError {
+            get {
+                return ResourceManager.GetString("PathContainsInvalidCharactersError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No file name was specified in the given path..
+        /// </summary>
+        public static string PathContainsNoFileError {
+            get {
+                return ResourceManager.GetString("PathContainsNoFileError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The path &apos;{0}&apos; does not exist..
         /// </summary>
         public static string PathDoesNotExist {
@@ -2049,6 +2076,51 @@ namespace MySql.Configurator.Properties {
         public static string PathInvalidUnableToGetDrivesError {
             get {
                 return ResourceManager.GetString("PathInvalidUnableToGetDrivesError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The given file path is null..
+        /// </summary>
+        public static string PathIsNullError {
+            get {
+                return ResourceManager.GetString("PathIsNullError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The directory in the given path does not exist..
+        /// </summary>
+        public static string PathNonExistentDirectoryError {
+            get {
+                return ResourceManager.GetString("PathNonExistentDirectoryError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The given path is not an absolute path..
+        /// </summary>
+        public static string PathNotAbsoluteError {
+            get {
+                return ResourceManager.GetString("PathNotAbsoluteError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Absolute path exceeds the maximum length allowed for a path..
+        /// </summary>
+        public static string PathTooLongError {
+            get {
+                return ResourceManager.GetString("PathTooLongError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The given file path is invalid..
+        /// </summary>
+        public static string PathUnknownError {
+            get {
+                return ResourceManager.GetString("PathUnknownError", resourceCulture);
             }
         }
         
