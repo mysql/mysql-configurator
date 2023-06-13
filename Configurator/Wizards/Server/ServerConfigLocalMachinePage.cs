@@ -139,14 +139,11 @@ namespace MySql.Configurator.Wizards.Server
       _settings.EnterpriseFirewallEnabled = enable;
 
       // Enable de Named Pipe configuration page if required.
-      if (_controller.ServerVersion.ServerSupportsNamedPipeFullAccessGroupVariable())
+      var namedPipesPage = _controller.Pages.FirstOrDefault(page => page is ServerConfigNamedPipesPage);
+      if (namedPipesPage != null)
       {
-        var namedPipesPage = _controller.Pages.FirstOrDefault(page => page is ServerConfigNamedPipesPage);
-        if (namedPipesPage != null)
-        {
-          namedPipesPage.PageVisible = _settings.EnableNamedPipe;
-          Parent.Refresh();
-        }
+        namedPipesPage.PageVisible = _settings.EnableNamedPipe;
+        Parent.Refresh();
       }
 
       return base.Next();

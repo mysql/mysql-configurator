@@ -1090,26 +1090,6 @@ namespace MySql.Configurator.Core.Classes
     }
 
     /// <summary>
-    /// Gets a value indicating whether the MySQL Server supports the named_pipe_full_access_group variable.
-    /// </summary>
-    /// <param name="serverVersion">The MySQL Server version.</param>
-    /// <returns><c>true</c> if the MySQL Server support the named_pipe_full_acess_group variable; otherwise, <c>false</c>.</returns>
-    public static bool ServerSupportsNamedPipeFullAccessGroupVariable(this Version serverVersion)
-    {
-      return (serverVersion.Major == 8
-              && serverVersion.Minor == 0
-              && serverVersion.Build > 13)
-             ||
-             (serverVersion.Major == 5
-              && serverVersion.Minor == 7
-              && serverVersion.Build > 24)
-             ||
-             (serverVersion.Major == 5
-              && serverVersion.Minor == 6
-              && serverVersion.Build > 42);
-    }
-
-    /// <summary>
     /// Gets a value indicating whether the super_read_only variable is supported by the MySQL Server version.
     /// </summary>
     /// <param name="serverVersion">The MySQL Server version.</param>
