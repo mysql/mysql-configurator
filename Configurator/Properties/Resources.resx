@@ -1601,4 +1601,28 @@ Please close MySQL Workbench and restart {0} to perform the merge.</value>
   <data name="TransparentSakilaLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\TransparentSakilaLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="PathContainsColonError" xml:space="preserve">
+    <value>The given path contains a colon (":") that is not part of a volume identifier (for example, "c:\").</value>
+  </data>
+  <data name="PathContainsInvalidCharactersError" xml:space="preserve">
+    <value>Invalid characters found in the path, or the path is badly formed.</value>
+  </data>
+  <data name="PathContainsNoFileError" xml:space="preserve">
+    <value>No file name was specified in the given path.</value>
+  </data>
+  <data name="PathIsNullError" xml:space="preserve">
+    <value>The given file path is null.</value>
+  </data>
+  <data name="PathNonExistentDirectoryError" xml:space="preserve">
+    <value>The directory in the given path does not exist.</value>
+  </data>
+  <data name="PathNotAbsoluteError" xml:space="preserve">
+    <value>The given path is not an absolute path.</value>
+  </data>
+  <data name="PathTooLongError" xml:space="preserve">
+    <value>Absolute path exceeds the maximum length allowed for a path.</value>
+  </data>
+  <data name="PathUnknownError" xml:space="preserve">
+    <value>The given file path is invalid.</value>
+  </data>
 </root>
