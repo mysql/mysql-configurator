@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -23,7 +24,6 @@ using System.Windows.Forms;
 using MySql.Configurator.Core.Classes;
 using MySql.Configurator.Core.Classes.Forms;
 using MySql.Configurator.Core.Classes.Logging;
-using MySql.Configurator.Core.Classes.Options;
 using MySql.Configurator.Core.Common;
 using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Core.Forms;
@@ -53,12 +53,12 @@ namespace MySql.Configurator
     private static void CustomizeUtilityDialogs()
     {
       InfoDialog.ApplicationName = Application.ProductName;
-      InfoDialog.SuccessLogo = Resources.MainLogo_Success;
+      InfoDialog.SuccessLogo = Resources.MainLogo;
       InfoDialog.ErrorLogo = Resources.MainLogo_Error;
       InfoDialog.WarningLogo = Resources.MainLogo_Warn;
       InfoDialog.InformationLogo = Resources.MainLogo;
       PasswordDialog.ApplicationIcon = Resources.mysql_server;
-      PasswordDialog.SecurityLogo = Resources.MainLogo_Security;
+      PasswordDialog.SecurityLogo = Resources.MainLogo;
     }
 
     /// <summary>
@@ -73,6 +73,18 @@ namespace MySql.Configurator
         Utilities.InitializeLogger(false);
         CustomizeUtilityDialogs();
         Application.ApplicationExit += ApplicationExit;
+
+#if DEBUG
+        /* Before debugging, update the path to the server installation directory in the "installationDirectory" key of the app.config file.
+           The path set as the installation directory must be the root directory of the server installation. 
+           This directory is expected to contain the bin, share, etc and other server directories.
+           
+           For MSI installations this path is usually "C:\Program Files\MySQL\MySQL Server 8.1" or the custom path set during installation.
+           For ZIP installations this path is whichever location where the server files were extracted to.
+        */
+        _installDirPath = ConfigurationManager.AppSettings["installationDirectory"];
+#endif
+
 #if COMMERCIAL
         AppConfiguration.License = LicenseType.Commercial;
 #else
@@ -165,15 +177,15 @@ namespace MySql.Configurator
       // Set default version.
       try
       {
-        // Set install dir.
         var assembly = Assembly.GetExecutingAssembly();
+
+#if !DEBUG
+        // Set install dir.
         var assemblyFileInfo = new FileInfo(assembly.Location);
         var installDirPath = assemblyFileInfo.Directory.Parent.FullName;
         _installDirPath = installDirPath;
-
-#if DEBUG
-        _installDirPath = "C:\\Program Files\\MySQL\\MySQL Server 8.1";
 #endif
+
 
         // Validate install dir.
         var pathToMySqld = Path.Combine(_installDirPath, "bin\\mysqld.exe");

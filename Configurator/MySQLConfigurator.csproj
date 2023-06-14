@@ -100,6 +100,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
@@ -771,42 +772,29 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\example_databases.zip" />
-    <EmbeddedResource Include="Resources\my-template-5.6.ini" />
-    <EmbeddedResource Include="Resources\my-template-5.7.ini" />
-    <EmbeddedResource Include="Resources\my-template-8.0.ini" />
     <EmbeddedResource Include="Resources\my-template-8.x.ini" />
     <None Include="Resources\WizardSelection.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\TransparentSakilaLogo.png" />
-    <None Include="Resources\TransparentSakilaWhiteLogo.png" />
     <None Include="Resources\upgrade_logo.png" />
     <None Include="Resources\SplashScreen.png" />
     <None Include="Wizards\Scripts\UninstallEnterpriseFirewall.sql" />
     <None Include="Wizards\Scripts\PreInstallEnterpriseFirewall.sql" />
     <None Include="Wizards\Scripts\InstallEnterpriseFirewall.sql" />
-    <None Include="Resources\Commercial.png" />
     <None Include="Resources\error_sign.png" />
     <Content Include="mysql-server.ico" />
     <Content Include="Resources\AboutButton.png" />
     <Content Include="Resources\BigWarning.png" />
     <None Include="Resources\config_win_integration.png" />
-    <None Include="Resources\ConfigUserMySQL.png" />
     <None Include="Resources\ConfigUserMySQL24.png" />
-    <None Include="Resources\ConfigUserMySQLRoot.png" />
-    <None Include="Resources\ConfigUserWindows24.png" />
     <None Include="Resources\MainLogo.png" />
     <None Include="Resources\MainLogo-Error.png" />
-    <None Include="Resources\MainLogo-Success.png" />
     <None Include="Resources\MainLogo-Warn.png" />
-    <None Include="Resources\MainLogo-Security.png" />
     <None Include="Resources\mysql-server.ico" />
     <None Include="Resources\logo.png" />
     <None Include="Resources\Server_Reflection.png" />
     <None Include="Resources\ServerCategoryIcon.png" />
-    <None Include="Resources\MySQLInstallerConfig_Done.ico" />
-    <None Include="Resources\MySQLInstallerConfig_Error.ico" />
-    <None Include="Resources\MySQLInstallerConfig_InProgress.ico" />
     <EmbeddedResource Include="Resources\UninstallEnterpriseFirewall.sql" />
     <EmbeddedResource Include="Resources\user-roles.xml" />
     <None Include="Resources\ok_sign.png" />
@@ -817,11 +805,13 @@
     <None Include="Resources\ActionDone.png" />
     <None Include="Resources\ActionError.png" />
     <None Include="Resources\ActionOpen.png" />
-    <Content Include="Resources\link_arrow.png" />
     <None Include="Resources\minus_sign.PNG" />
     <None Include="Resources\server_machine.png" />
     <None Include="Resources\plus_sign.png" />
     <None Include="Resources\Revert.png" />
+    <None Include="Resources\Config_Done.ico" />
+    <None Include="Resources\Config_Error.ico" />
+    <None Include="Resources\Config_InProgress.ico" />
     <Content Include="Resources\SidebarBackground.png" />
     <None Include="Resources\warning_sign.png" />
   </ItemGroup>

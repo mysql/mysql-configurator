@@ -149,7 +149,7 @@ namespace MySql.Configurator.Wizards.Server
       Cursor = Cursors.WaitCursor;
       _credsOk = false;
       ResultLabel.Text = Resources.StartingServerAndTestingConnection;
-      var providerProperties = new ErrorProviderProperties(Resources.StartingServerAndTestingConnection, Resources.MySQLInstallerConfig_InProgress, true);
+      var providerProperties = new ErrorProviderProperties(Resources.StartingServerAndTestingConnection, Resources.Config_InProgressIcon, true);
       ConnectionErrorProvider.SetProperties(CheckButton, providerProperties);
       _validatedPassword = ExistingRootPasswordTextBox.Text.Sanitize();
       var connectionResult = LocalServerInstance.CanConnect(_controller, out string errorMessage, _validatedPassword, true, true);
@@ -163,8 +163,8 @@ namespace MySql.Configurator.Wizards.Server
         ? connectionResult.GetDescription()
         : errorMessage;
       providerProperties.ErrorIcon = _credsOk
-        ? Resources.MySQLInstallerConfig_DoneIcon
-        : Resources.MySQLInstallerConfig_ErrorIcon;
+        ? Resources.Config_DoneIcon
+        : Resources.Config_ErrorIcon;
       ConnectionErrorProvider.SetProperties(CheckButton, providerProperties);
       ResultLabel.Text = providerProperties.ErrorMessage;
       UpdateButtons();
