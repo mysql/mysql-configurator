@@ -257,9 +257,6 @@ You can start the configure process again by clicking Retry.</value>
   <data name="UnhandledException" xml:space="preserve">
     <value>Internal error. ({0}) The installer will now close.</value>
   </data>
-  <data name="MainLogo_Security" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MainLogo-Security.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="MoreInfoText" xml:space="preserve">
     <value>More information</value>
   </data>
@@ -304,9 +301,6 @@ Click Finish to continue.</value>
   <data name="RemoveFailed" xml:space="preserve">
     <value>The removal for some products has failed or was cancelled by the user.
 You can find more information about the failures in the 'Log' tab.</value>
-  </data>
-  <data name="MainLogo_Success" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MainLogo-Success.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="RemoveProductsWizardCancelConfirmationText" xml:space="preserve">
     <value>Are you sure you want to cancel removing the MySQL Server configurations?</value>
@@ -391,15 +385,6 @@ You can find more information about the failures in the 'Log' tab.</value>
   </data>
   <data name="MinValueRequired" xml:space="preserve">
     <value>The minimum value for this field should be {0}</value>
-  </data>
-  <data name="MySQLInstallerConfig_DoneIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLInstallerConfig_Done.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLInstallerConfig_ErrorIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLInstallerConfig_Error.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLInstallerConfig_InProgress" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLInstallerConfig_InProgress.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="OpenFirewallPort" xml:space="preserve">
     <value>Open Windows Firewall port for network access</value>
@@ -1324,15 +1309,6 @@ If you choose not to migrate connections now, you will be prompted later to perf
   <data name="MySqlServerUsernameRequired" xml:space="preserve">
     <value>User name is required.</value>
   </data>
-  <data name="my_template_5_6" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\my-template-5.6.ini;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;iso-8859-1</value>
-  </data>
-  <data name="my_template_5_7" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\my-template-5.7.ini;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="my_template_8_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\my-template-8.0.ini;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
   <data name="my_template_8_x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\my-template-8.x.ini;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
@@ -1600,6 +1576,15 @@ Please close MySQL Workbench and restart {0} to perform the merge.</value>
   </data>
   <data name="TransparentSakilaLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\TransparentSakilaLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Config_DoneIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Config_Done.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Config_ErrorIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Config_Error.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Config_InProgressIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Config_InProgress.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="PathContainsColonError" xml:space="preserve">
     <value>The given path contains a colon (":") that is not part of a volume identifier (for example, "c:\").</value>

@@ -1,10 +1,11 @@
 # MySQL Configurator
 
-MySQL Configurator is a server tool that provides a GUI to configure the MySQL Server in a Windows environment. It configures many aspects of their server installation through a series of wizard pages and can also migrate an existing data directory into a recent MySQL Server installation.
+MySQL Configurator is a standalone application designed to ease the complexity of configuring a MySQL server to run MySQL on Microsoft Windows. It is bundled with the MySQL server, in both the MSI and standalone Zip archive.
+It performs the initial configuration, a reconfiguration, and also functions as part of the uninstallation process.
 
 ## Licensing
 
-Please refer to the [LICENSE](LICENSE) file, available in this repository, and [Legal Notices in documentation](https://dev.mysql.com/doc/refman/8.1/en/preface.html) for further details.
+Please refer to the license files, available in this repository, and [Legal Notices in documentation](https://dev.mysql.com/doc/refman/8.1/en/preface.html) for further details.
 
 ## Download and build
 
@@ -39,3 +40,12 @@ No installation is required as the tool is distributed as a stand-alone exe whic
 ```
 
 Finally, you will find the **mysql_configurator.exe** file in the corresponding **Configurator/bin/[CONFIGURATION_TYPE]** folder.
+
+### Debugging
+
+Before debugging, update the path to the server installation directory in the **installationDirectory** key of the **app.config** file.
+The path set as the installation directory must be the root directory of the server installation. 
+This directory is expected to contain the bin, share, etc and other server directories.
+           
+For MSI installations this path is usually "C:\Program Files\MySQL\MySQL Server 8.1" or the custom path set during installation.
+For ZIP installations this path is whichever location where the server files were extracted to.

@@ -119,13 +119,13 @@ namespace MySql.Configurator.Wizards.Server
     {
       Cursor = Cursors.WaitCursor;
       _rootPasswordOk = false;
-      var providerProperties = new ErrorProviderProperties(Resources.ConnectionTestingText, Resources.MySQLInstallerConfig_InProgress, true);
+      var providerProperties = new ErrorProviderProperties(Resources.ConnectionTestingText, Resources.Config_InProgressIcon, true);
       ConnectionErrorProvider.SetProperties(PasswordCheckButton, providerProperties);
       var connectionResult = LocalServerInstance.CanConnect(_controller, CurrentRootPasswordTextBox.Text, _controller.ConfigurationType == ConfigurationType.Reconfiguration);
       _rootPasswordOk = connectionResult == ConnectionResultType.ConnectionSuccess;
       providerProperties.ErrorIcon = _rootPasswordOk
-        ? Resources.MySQLInstallerConfig_DoneIcon
-        : Resources.MySQLInstallerConfig_ErrorIcon;
+        ? Resources.Config_DoneIcon
+        : Resources.Config_ErrorIcon;
       providerProperties.ErrorMessage = connectionResult.GetDescription();
       ConnectionErrorProvider.SetProperties(PasswordCheckButton, providerProperties);
       Cursor = Cursors.Default;

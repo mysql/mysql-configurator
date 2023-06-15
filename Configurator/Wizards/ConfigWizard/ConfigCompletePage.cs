@@ -15,9 +15,8 @@
 
 using System;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Windows.Forms;
+using MySql.Configurator.Core.Classes;
 using MySql.Configurator.Core.Wizard;
 using Utilities = MySql.Configurator.Core.Classes.Utilities;
 
@@ -78,11 +77,6 @@ namespace MySql.Configurator.Wizards.ConfigWizard
 
     #region Events
 
-    private void ClusterOptionsBlogLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-    {
-      Core.Classes.Utilities.OpenBrowser("https://dev.mysql.com/blog-archive/mysql-innodb-cluster-changing-cluster-options-live/");
-    }
-
     private void CopyLogToClipboardButton_Click(object sender, EventArgs e)
     {
       Clipboard.SetText(string.IsNullOrEmpty(Wizard.Log) ? " " : Wizard.Log);
@@ -90,7 +84,7 @@ namespace MySql.Configurator.Wizards.ConfigWizard
 
     private void MySQLServerDocumentationLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
-      Core.Classes.Utilities.OpenBrowser("https://dev.mysql.com/doc/refman/8.0/en/");
+      Core.Classes.Utilities.OpenBrowser($"https://dev.mysql.com/doc/refman/{AppConfiguration.Version.Major}.{AppConfiguration.Version.Minor}/en/");
     }
 
     #endregion
