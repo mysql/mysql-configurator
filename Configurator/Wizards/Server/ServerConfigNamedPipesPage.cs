@@ -15,7 +15,6 @@
 
 using System;
 using System.DirectoryServices;
-using System.IO;
 using System.Windows.Forms;
 using MySql.Configurator.Core.Classes;
 using MySql.Configurator.Core.Classes.Logging;
@@ -267,7 +266,7 @@ namespace MySql.Configurator.Wizards.Server
 
     private void NamedPipeFullAccessGroupDocumentationLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
-      Core.Classes.Utilities.OpenBrowser("https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_named_pipe_full_access_group");
+      Core.Classes.Utilities.OpenBrowser($"https://dev.mysql.com/doc/refman/{AppConfiguration.Version.Major}.{AppConfiguration.Version.Minor}/en/server-system-variables.html#sysvar_named_pipe_full_access_group");
     }
   }
 }

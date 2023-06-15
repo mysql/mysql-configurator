@@ -69,7 +69,7 @@ namespace MySql.Configurator.Wizards.Server
     private List<ConfigurationStep> _classicConfigurationSteps;
     private ConfigurationStep _createRemoveExampleDatabasesStep;
     private ConfigurationStep _initializeServerConfigurationStep;
-    private ConfigurationStep _prepareAuthenticationPluginChangeStep;
+    //private ConfigurationStep _prepareAuthenticationPluginChangeStep;
     private List<ConfigurationStep> _selfContainedUpgradeSteps;
     private ConfigurationStep _setLocalInstanceAsWritableStep;
     private ConfigurationStep _startAndUpgradeServerConfigStep;
@@ -166,8 +166,9 @@ namespace MySql.Configurator.Wizards.Server
     /// <summary>
     /// Gets a value indicating if there was a change of the default authentication plugin during the configuration.
     /// </summary>
-    public bool DefaultAuthenticationPluginChanged => OldSettings != null
-                                                      && OldSettings.DefaultAuthenticationPlugin != Settings.DefaultAuthenticationPlugin;
+    //public bool DefaultAuthenticationPluginChanged => OldSettings != null
+    //                                                  && OldSettings.DefaultAuthenticationPlugin != Settings.DefaultAuthenticationPlugin;
+    public bool DefaultAuthenticationPluginChanged => false;
 
     /// <summary>
     /// Gets the file path for the server error log.
@@ -558,8 +559,7 @@ namespace MySql.Configurator.Wizards.Server
         builder.SharedMemoryName = currentSettings.SharedMemoryName;
       }
 
-      if (ServerVersion.ServerSupportsNamedPipeFullAccessGroupVariable()
-          && currentSettings.IsNamedPipeTheOnlyEnabledProtocol)
+      if (currentSettings.IsNamedPipeTheOnlyEnabledProtocol)
       {
         builder.AllowPublicKeyRetrieval = true;
         builder.SslMode = MySqlSslMode.Disabled;
@@ -775,7 +775,7 @@ namespace MySql.Configurator.Wizards.Server
             && Settings != null
             && Settings.DefaultAuthenticationPlugin != MySqlAuthenticationPluginType.CachingSha2Password)
         {
-          Pages.Add(new ServerConfigDefaultAuthenticationPage(this));
+          //Pages.Add(new ServerConfigDefaultAuthenticationPage(this));
           var configUsersPage = new ServerConfigUserAccountsPage(this) { PageVisible = false };
           Pages.Add(configUsersPage);
         }
@@ -799,16 +799,13 @@ namespace MySql.Configurator.Wizards.Server
 
       Logger.LogInformation(ConfigurationType == ConfigurationType.Reconfiguration ? Resources.SettingUpReconfiguration : Resources.SettingUpNewInstallation);
       Pages.Add(new ServerConfigLocalMachinePage(this));
-      if (ServerVersion.ServerSupportsNamedPipeFullAccessGroupVariable())
-      {
-        Pages.Add(new ServerConfigNamedPipesPage(this) { PageVisible = Settings != null
-                                                                       && Settings.EnableNamedPipe});
-      }
-
-      if (ServerVersion.ServerSupportsCachingSha2Authentication())
-      {
-        Pages.Add(new ServerConfigDefaultAuthenticationPage(this));
-      }
+      Pages.Add(new ServerConfigNamedPipesPage(this) { PageVisible = Settings != null
+                                                       && Settings.EnableNamedPipe});
+      
+      //if (ServerVersion.ServerSupportsCachingSha2Authentication())
+      //{
+      //  Pages.Add(new ServerConfigDefaultAuthenticationPage(this));
+      //}
 
       Pages.Add(new ServerConfigUserAccountsPage(this));
       Pages.Add(new ServerConfigServicePage(this));
@@ -845,7 +842,7 @@ namespace MySql.Configurator.Wizards.Server
         else if (step == _setLocalInstanceAsWritableStep) _setLocalInstanceAsWritableStep.Execute = IsSetLocalInstanceAsWritableStepNeeded;
         else if (step == _stopServerConfigurationStep) _stopServerConfigurationStep.Execute = IsStopServerConfigurationStepNeeded;
         else if (step == _startServerConfigurationStep) _startServerConfigurationStep.Execute = IsStartServerConfigurationStepNeeded;
-        else if (step == _prepareAuthenticationPluginChangeStep) _prepareAuthenticationPluginChangeStep.Execute = DefaultAuthenticationPluginChanged;
+        //else if (step == _prepareAuthenticationPluginChangeStep) _prepareAuthenticationPluginChangeStep.Execute = DefaultAuthenticationPluginChanged;
         else if (step == _updateSecurityStep) _updateSecurityStep.Execute = IsUpdateSecurityConfigurationStepNeeded;
         else if (step == _updateUsersStep) _updateUsersStep.Execute = IsUpdateUsersConfigurationStepNeeded;
         else if (step == _updateEnterpriseFirewallPluginConfigStep) _updateEnterpriseFirewallPluginConfigStep.Execute = IsUpdateEnterpriseFirewallPluginConfigurationStepNeeded;
@@ -1755,7 +1752,7 @@ namespace MySql.Configurator.Wizards.Server
       _backupDatabaseStep = new ConfigurationStep(Resources.ServerConfigBackupDatabaseStep, 60, BackupDatabase, true, ConfigurationType.Upgrade);
       _createRemoveExampleDatabasesStep = new ConfigurationStep("Updating example databases", 10, CreateRemoveExampleDatabases, false, ConfigurationType.New | ConfigurationType.Reconfiguration);
       _initializeServerConfigurationStep = new ConfigurationStep(Resources.ServerInitializeDatabaseStep, 900, InitializeServer, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
-      _prepareAuthenticationPluginChangeStep = new ConfigurationStep(Resources.ServerPrepareAuthenticationPluginChangeStep, 20, PrepareAuthenticationPluginChange, true, ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
+      //_prepareAuthenticationPluginChangeStep = new ConfigurationStep(Resources.ServerPrepareAuthenticationPluginChangeStep, 20, PrepareAuthenticationPluginChange, true, ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
       _setLocalInstanceAsWritableStep = new ConfigurationStep(Resources.SetLocalInstanceAsWritableStep, 10, SetLocalInstanceAsWritableStep);
       _startServerConfigurationStep = new ConfigurationStep(Resources.ServerStartProcessStep, 90, StartServerStep);
       _stopServerConfigurationStep = new ConfigurationStep(Resources.ServerStopProcessStep, 40, StopServerSafe);
@@ -1785,7 +1782,7 @@ namespace MySql.Configurator.Wizards.Server
     {
       _classicConfigurationSteps = new List<ConfigurationStep>
       {
-        _prepareAuthenticationPluginChangeStep,
+        //_prepareAuthenticationPluginChangeStep,
         _stopServerConfigurationStep,
         _writeConfigurationFileStep,
         _updateWindowsFirewallRulesStep,
@@ -1817,7 +1814,7 @@ namespace MySql.Configurator.Wizards.Server
         _updateWindowsServiceStep,
         _startAndUpgradeServerConfigStep,
         _setLocalInstanceAsWritableStep,
-        _prepareAuthenticationPluginChangeStep,
+        //_prepareAuthenticationPluginChangeStep,
         _stopServerConfigurationStep,
         _writeConfigurationFileStep,
         _startServerConfigurationStep,

@@ -383,6 +383,36 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        public static System.Drawing.Icon Config_DoneIcon {
+            get {
+                object obj = ResourceManager.GetObject("Config_DoneIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        public static System.Drawing.Icon Config_ErrorIcon {
+            get {
+                object obj = ResourceManager.GetObject("Config_ErrorIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        public static System.Drawing.Icon Config_InProgressIcon {
+            get {
+                object obj = ResourceManager.GetObject("Config_InProgressIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap config_win_integration {
@@ -1270,26 +1300,6 @@ namespace MySql.Configurator.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap MainLogo_Security {
-            get {
-                object obj = ResourceManager.GetObject("MainLogo_Security", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap MainLogo_Success {
-            get {
-                object obj = ResourceManager.GetObject("MainLogo_Success", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         public static System.Drawing.Bitmap MainLogo_Warn {
             get {
                 object obj = ResourceManager.GetObject("MainLogo_Warn", resourceCulture);
@@ -1417,81 +1427,6 @@ namespace MySql.Configurator.Properties {
         /// <summary>
         ///   Looks up a localized string similar to ## MySQL Server Instance Configuration File Template
         ///## ----------------------------------------------------------------------
-        ///## Version 1.0.10
-        ///##
-        ///## &lt;-- Indicates Template comment.  These lines will not be in the output
-        ///##
-        ///## Replaceable things must be like:
-        ///## 
-        ///## # [VARIABLE_NAME]=&quot;Formula&quot;
-        ///## parameter=default value
-        ///##
-        ///##  For example:
-        ///##
-        ///##  # [PORT]=&quot;port&quot;
-        ///##  port=3306
-        ///##
-        ///## Note - In the example, the formula consists of a variable named &apos;port&apos; which must be defined before processing [rest of string was truncated]&quot;;.
-        /// </summary>
-        public static string my_template_5_6 {
-            get {
-                return ResourceManager.GetString("my_template_5_6", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ## MySQL Server Instance Configuration File Template
-        ///## ----------------------------------------------------------------------
-        ///## Version 1.0.10
-        ///##
-        ///## &lt;-- Indicates Template comment.  These lines will not be in the output
-        ///##
-        ///## Replaceable things must be like:
-        ///## 
-        ///## # [VARIABLE_NAME]=&quot;Formula&quot;
-        ///## parameter=default value
-        ///##
-        ///##  For example:
-        ///##
-        ///##  # [PORT]=&quot;port&quot;
-        ///##  port=3306
-        ///##
-        ///## Note - In the example, the formula consists of a variable named &apos;port&apos; which must be defined before processing [rest of string was truncated]&quot;;.
-        /// </summary>
-        public static string my_template_5_7 {
-            get {
-                return ResourceManager.GetString("my_template_5_7", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ## MySQL Server Instance Configuration File Template
-        ///## ----------------------------------------------------------------------
-        ///## Version 1.0.0
-        ///##
-        ///## &lt;-- Indicates Template comment.  These lines will not be in the output
-        ///##
-        ///## Replaceable things must be like:
-        ///## 
-        ///## # [VARIABLE_NAME]=&quot;Formula&quot;
-        ///## parameter=default value
-        ///##
-        ///##  For example:
-        ///##
-        ///##  # [PORT]=&quot;port&quot;
-        ///##  port=3306
-        ///##
-        ///## Note - In the example, the formula consists of a variable named &apos;port&apos; which must be defined before processing. [rest of string was truncated]&quot;;.
-        /// </summary>
-        public static string my_template_8_0 {
-            get {
-                return ResourceManager.GetString("my_template_8_0", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ## MySQL Server Instance Configuration File Template
-        ///## ----------------------------------------------------------------------
         ///## Version 1.0.0
         ///##
         ///## &lt;-- Indicates Template comment.  These lines will not be in the output
@@ -1530,36 +1465,6 @@ namespace MySql.Configurator.Properties {
         public static System.Drawing.Icon mysql_server {
             get {
                 object obj = ResourceManager.GetObject("mysql_server", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        public static System.Drawing.Icon MySQLInstallerConfig_DoneIcon {
-            get {
-                object obj = ResourceManager.GetObject("MySQLInstallerConfig_DoneIcon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        public static System.Drawing.Icon MySQLInstallerConfig_ErrorIcon {
-            get {
-                object obj = ResourceManager.GetObject("MySQLInstallerConfig_ErrorIcon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        public static System.Drawing.Icon MySQLInstallerConfig_InProgress {
-            get {
-                object obj = ResourceManager.GetObject("MySQLInstallerConfig_InProgress", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -1963,6 +1868,33 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The given path contains a colon (&quot;:&quot;) that is not part of a volume identifier (for example, &quot;c:\&quot;)..
+        /// </summary>
+        public static string PathContainsColonError {
+            get {
+                return ResourceManager.GetString("PathContainsColonError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid characters found in the path, or the path is badly formed..
+        /// </summary>
+        public static string PathContainsInvalidCharactersError {
+            get {
+                return ResourceManager.GetString("PathContainsInvalidCharactersError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No file name was specified in the given path..
+        /// </summary>
+        public static string PathContainsNoFileError {
+            get {
+                return ResourceManager.GetString("PathContainsNoFileError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The path &apos;{0}&apos; does not exist..
         /// </summary>
         public static string PathDoesNotExist {
@@ -2049,6 +1981,51 @@ namespace MySql.Configurator.Properties {
         public static string PathInvalidUnableToGetDrivesError {
             get {
                 return ResourceManager.GetString("PathInvalidUnableToGetDrivesError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The given file path is null..
+        /// </summary>
+        public static string PathIsNullError {
+            get {
+                return ResourceManager.GetString("PathIsNullError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The directory in the given path does not exist..
+        /// </summary>
+        public static string PathNonExistentDirectoryError {
+            get {
+                return ResourceManager.GetString("PathNonExistentDirectoryError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The given path is not an absolute path..
+        /// </summary>
+        public static string PathNotAbsoluteError {
+            get {
+                return ResourceManager.GetString("PathNotAbsoluteError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Absolute path exceeds the maximum length allowed for a path..
+        /// </summary>
+        public static string PathTooLongError {
+            get {
+                return ResourceManager.GetString("PathTooLongError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The given file path is invalid..
+        /// </summary>
+        public static string PathUnknownError {
+            get {
+                return ResourceManager.GetString("PathUnknownError", resourceCulture);
             }
         }
         
