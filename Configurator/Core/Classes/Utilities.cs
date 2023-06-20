@@ -512,12 +512,13 @@ namespace MySql.Configurator.Core.Classes
 #else
         var assembly = Assembly.GetExecutingAssembly();
         var assemblyLocation = new DirectoryInfo(assembly.Location);
-        if (assemblyLocation.Parent == null)
+        if (assemblyLocation.Parent == null
+            || assemblyLocation.Parent.Parent == null)
         {
           return false;
         }
 
-        assemblyInstallLocation = assemblyLocation.Parent.FullName;
+        assemblyInstallLocation = assemblyLocation.Parent.Parent.FullName;
 #endif
 
         var installLocationDirInfo = new DirectoryInfo(installLocation);
