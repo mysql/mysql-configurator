@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -102,6 +103,11 @@ namespace MySql.Configurator.Core.Classes
     /// The regex used to validate MySQL user and cluster names.
     /// </summary>
     public const string NAME_REGEX_VALIDATION = @"^(\w|\d|_|\s)+$";
+
+    /// <summary>
+    /// The base string used to identify the location of a server registry key.
+    /// </summary>
+    private const string REGISTRY_KEY_TEMPLATE = "SOFTWARE\\MySQL AB\\MySQL Server {0}.{1}";
 
     /// <summary>
     /// The maximum length allowed for MySQL user names.
@@ -454,6 +460,76 @@ namespace MySql.Configurator.Core.Classes
       var currentUserId = WindowsIdentity.GetCurrent();
       var currentPrincial = new WindowsPrincipal(currentUserId);
       return currentPrincial.IsInRole(WindowsBuiltInRole.Administrator);
+    }
+
+    /// <summary>
+    /// Gets a value indicating if the installation originates from an MSI.
+    /// </summary>
+    /// <returns><c>true</c> if the application executable originates from an MSI installation; otherwise, <c>true</c>.</returns>
+    public static bool ExecutionIsFromMSI(Version version)
+    {
+      if (version == null)
+      {
+        return false;
+      }
+
+      var keyName = string.Format(REGISTRY_KEY_TEMPLATE, version.Major, version.Minor);
+      RegistryKey key = null;
+      try
+      {
+        // Get installation reg key.
+        key = Registry.LocalMachine.OpenSubKey(keyName);
+        if (key == null
+            && Win32.Is64BitOs)
+        {
+          key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(keyName);
+        }
+
+        if (key == null)
+        {
+          return false;
+        }
+
+        // Get registry key install location.
+        var installLocation = key?.GetValue<string>("Location");
+        if (string.IsNullOrEmpty(installLocation))
+        {
+          return false;
+        }
+
+        // Verify install location exists and has files. It's been identified that the server reg key will sometimes
+        // not be removed, hence it is better to also check for the path to exist.
+        if (!Directory.Exists(installLocation)
+            || Directory.GetFiles(installLocation).Length == 0)
+        {
+          return false;
+        }
+
+        // Identify if exe is running from the MSI install location.
+        string assemblyInstallLocation = null;
+#if DEBUG
+        assemblyInstallLocation = ConfigurationManager.AppSettings["installationDirectory"];
+#else
+        var assembly = Assembly.GetExecutingAssembly();
+        var assemblyLocation = new DirectoryInfo(assembly.Location);
+        if (assemblyLocation.Parent == null)
+        {
+          return false;
+        }
+
+        assemblyInstallLocation = assemblyLocation.Parent.FullName;
+#endif
+
+        var installLocationDirInfo = new DirectoryInfo(installLocation);
+        var assemblyInstallLocationDirInfo = new DirectoryInfo(assemblyInstallLocation);
+        return string.Compare(installLocationDirInfo.FullName.TrimEnd('\\'), assemblyInstallLocationDirInfo.FullName.TrimEnd('\\'), StringComparison.InvariantCultureIgnoreCase) == 0;
+      }
+      catch (Exception ex)
+      {
+        Logger.LogException(ex);
+      }
+
+      return false;
     }
 
     /// <summary>

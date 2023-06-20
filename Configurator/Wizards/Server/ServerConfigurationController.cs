@@ -328,8 +328,9 @@ namespace MySql.Configurator.Wizards.Server
     /// <summary>
     /// Gets a value indicating whether the configuration step that updates the Start menu links needs to run.
     /// </summary>
-    public bool IsUpdateStartMenuLinksConfigurationStepNeeded => ConfigurationType != ConfigurationType.Reconfiguration
-                                                                 || IsThereServerDataFiles;
+    public bool IsUpdateStartMenuLinksConfigurationStepNeeded => (ConfigurationType != ConfigurationType.Reconfiguration
+                                                                 || IsThereServerDataFiles)
+                                                                 && Core.Classes.Utilities.ExecutionIsFromMSI(Package.NormalizedVersion);
 
     /// <summary>
     /// Gets a value indicating whether the configuration step that updates user accounts needs to run.
@@ -1757,7 +1758,7 @@ namespace MySql.Configurator.Wizards.Server
       _startServerConfigurationStep = new ConfigurationStep(Resources.ServerStartProcessStep, 90, StartServerStep);
       _stopServerConfigurationStep = new ConfigurationStep(Resources.ServerStopProcessStep, 40, StopServerSafe);
       _updateEnterpriseFirewallPluginConfigStep = new ConfigurationStep(Resources.ServerEnableEnterpriseFirewallStep, 45, InstallEnterpriseFirewallPlugin, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
-      _updateStartMenuLinksStep = new ConfigurationStep(Resources.ServerUpdateStartMenuLinkStep, 20, UpdateStartMenuLink);
+      _updateStartMenuLinksStep = new ConfigurationStep(Resources.ServerUpdateStartMenuLinkStep, 20, UpdateStartMenuLink, false, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
       _updateSecurityStep = new ConfigurationStep(Resources.ServerApplySecurityStep, 20, UpdateSecurity, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
       _updateAccessPermissions = new ConfigurationStep(Resources.ServerUpdateServerFilePermissions, 10, UpdateServerFilesPermissions, false, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
       _updateUsersStep = new ConfigurationStep(Resources.ServerCreateUsersStep, 20, UpdateUsers, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
@@ -2626,10 +2627,18 @@ namespace MySql.Configurator.Wizards.Server
     {
       CancellationToken.ThrowIfCancellationRequested();
       ReportStatus(Resources.ServerConfigEventShortcutInfo);
+
       try
       {
         string mysqlStartMenu = $"{((Folder2)GetShell32NameSpaceFolder(ShellSpecialFolderConstants.ssfCOMMONSTARTMENU)).Self.Path}\\Programs\\MySQL\\MySQL Server {Package.NormalizedVersion.ToString(2)}\\";
         var folder = GetShell32NameSpaceFolder(mysqlStartMenu);
+        if (folder == null)
+        {
+          ReportStatus(string.Format(Resources.PathDoesNotExist, mysqlStartMenu));
+          CurrentStep.Status = ConfigurationStepStatus.Error;
+          return;
+        }
+
         var newConfigFilePath = Settings.FullConfigFilePath;
         foreach (FolderItem fi in folder.Items())
         {
