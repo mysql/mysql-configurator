@@ -1620,6 +1620,20 @@ namespace MySql.Configurator.Core.Classes
     /// This argument is only relevant when <paramref name="consoleMode"/> is set to <c>true</c>.</param>
     public static void InitializeLogger(bool consoleMode, bool logToConsole = false)
     {
+      try
+      {
+        if (!Directory.Exists(AppConfiguration.HomeDir))
+        {
+          Directory.CreateDirectory(AppConfiguration.HomeDir);
+        }
+      }
+      catch (Exception)
+      {
+        // If it is not possible to create the logging directory, then we don't initialize the logger in which
+        // case nothing will be logged but the app won't fail.
+        return;
+      }
+
       Logger.Initialize(AppConfiguration.HomeDir, "configurator", consoleMode, logToConsole, "mysql-configurator", true);
       Logger.PrependUserNameToLogFileName = true;
     }
