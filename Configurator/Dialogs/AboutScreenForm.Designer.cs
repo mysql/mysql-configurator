@@ -141,7 +141,7 @@ namespace MySql.Configurator.Dialogs
       this.VersionLicenseLabel.Name = "VersionLicenseLabel";
       this.VersionLicenseLabel.Size = new System.Drawing.Size(147, 15);
       this.VersionLicenseLabel.TabIndex = 4;
-      this.VersionLicenseLabel.Text = "Version 8.1.0 (Community)";
+      this.VersionLicenseLabel.Text = "";
       this.VersionLicenseLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
       // 
       // ConfiguratorLabel
