@@ -652,7 +652,7 @@ namespace MySql.Configurator.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to The configuration for {0} was successful.
-        ///Click Finish to continue..
+        ///Click Next to continue..
         /// </summary>
         public static string ConfigureSuccess {
             get {

@@ -296,7 +296,7 @@ Click Finish to continue.</value>
   </data>
   <data name="ConfigureSuccess" xml:space="preserve">
     <value>The configuration for {0} was successful.
-Click Finish to continue.</value>
+Click Next to continue.</value>
   </data>
   <data name="RemoveFailed" xml:space="preserve">
     <value>The removal for some products has failed or was cancelled by the user.
