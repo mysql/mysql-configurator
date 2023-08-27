@@ -1107,7 +1107,8 @@ namespace MySql.Configurator.Core.IniFile.Template
         new DeprecatedServerVariable("innodbclusterport", ServerSeriesType.S57 | ServerSeriesType.S80),
         new DeprecatedServerVariable("innodbclustertypeselection", ServerSeriesType.S57 | ServerSeriesType.S80),
         new DeprecatedServerVariable("sync_master_info", ServerSeriesType.S80, new Version(8,0,26)),
-        new DeprecatedServerVariable("default_authentication_plugin", ServerSeriesType.S80, new Version(8,0,27))
+        new DeprecatedServerVariable("default_authentication_plugin", ServerSeriesType.S80, new Version(8,0,27)),
+        new DeprecatedServerVariable("sync_relay_log_info=", ServerSeriesType.S80 | ServerSeriesType.S8x, new Version(8,0,34))
       };
     }
   }
