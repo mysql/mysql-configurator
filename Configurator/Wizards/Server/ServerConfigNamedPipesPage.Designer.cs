@@ -256,7 +256,7 @@ namespace MySql.Configurator.Wizards.Server
       // LocalGroupNameComboBox
       // 
       this.LocalGroupNameComboBox.AccessibleDescription = "A combo box to select an existing windows group for named pipe access";
-      this.LocalGroupNameComboBox.AccessibleName = "Local Group Name";
+      this.LocalGroupNameComboBox.AccessibleName = "Local Group Name List";
       this.LocalGroupNameComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
       this.LocalGroupNameComboBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.LocalGroupNameComboBox.FormattingEnabled = true;

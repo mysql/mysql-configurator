@@ -176,6 +176,7 @@ namespace MySql.Configurator.Dialogs
       // 
       // OkButton
       // 
+      this.OkButton.AccessibleName = "Ok";
       this.OkButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.OkButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
       this.OkButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
