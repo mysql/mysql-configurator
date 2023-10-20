@@ -219,7 +219,6 @@ namespace MySql.Configurator.Core.IniFile.Template
       }
     }
 
-    public bool SkipInnodb { get; set; }
     public string SlowQueryLog { get; set; }
     public string SlowQueryLogFile { get; set; }
     public double UseQueryCache { get; set; }
@@ -593,10 +592,6 @@ namespace MySql.Configurator.Core.IniFile.Template
                 result = itv.DefaultValue;
                 itv.ReduceResult = false;
               }
-              break;
-
-            case "SKIP_INNODB":
-              itv.Disabled = SkipInnodb;
               break;
 
             case "NAMED_PIPE_FULL_ACCESS_GROUP":
@@ -1001,7 +996,6 @@ namespace MySql.Configurator.Core.IniFile.Template
             case "STATE_CHANGE":
             case "SQL_MODE":
             case "INNODB_LOG_FILE_SIZE":
-            case "SKIP_INNODB":
               break;
 
             case "SERVER_ID":
@@ -1070,7 +1064,6 @@ namespace MySql.Configurator.Core.IniFile.Template
       InnoDBHomeDir = string.Empty;
       DefaultStorageEngine = "INNODB";
       Port = BaseServerSettings.DEFAULT_PORT;
-      SkipInnodb = false;
       IsValid = false;
       OutputExists = false;
       ServerType = ServerInstallationType.Developer;
