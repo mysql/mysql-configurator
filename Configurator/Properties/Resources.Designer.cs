@@ -615,6 +615,7 @@ namespace MySql.Configurator.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to The configuration for {0} has failed.
+        ///Relevant configurations have been reverted to its original state.
         ///You can find more information about the failures in the &apos;Log&apos; tab..
         /// </summary>
         public static string ConfigureFailed {
@@ -652,7 +653,7 @@ namespace MySql.Configurator.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to The configuration for {0} was successful.
-        ///Click Next to continue..
+        ///Click Finish to continue..
         /// </summary>
         public static string ConfigureSuccess {
             get {
@@ -957,6 +958,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The given data directory is not empty. For a new installation the data directory must be empty..
+        /// </summary>
+        public static string DataDirectoryNotEmptyError {
+            get {
+                return ResourceManager.GetString("DataDirectoryNotEmptyError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap dedicated_machine {
@@ -1002,6 +1012,34 @@ namespace MySql.Configurator.Properties {
             get {
                 object obj = ResourceManager.GetObject("example_databases", resourceCulture);
                 return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data directory name will be renamed to
+        ///&quot;{0}&quot; before the data is upgraded..
+        /// </summary>
+        public static string ExistingDataDirectoryIsDefaultAndWillBeRenamed {
+            get {
+                return ResourceManager.GetString("ExistingDataDirectoryIsDefaultAndWillBeRenamed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The existing server installation instance to be replaced must be running..
+        /// </summary>
+        public static string ExistingServerInstanceNotRunningError {
+            get {
+                return ResourceManager.GetString("ExistingServerInstanceNotRunningError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No existing server installation instance to be replaced was set..
+        /// </summary>
+        public static string ExistingServerInstanceNotSetError {
+            get {
+                return ResourceManager.GetString("ExistingServerInstanceNotSetError", resourceCulture);
             }
         }
         
@@ -1904,6 +1942,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The specified path exists and it is not empty..
+        /// </summary>
+        public static string PathExistsAndIsNotEmpty {
+            get {
+                return ResourceManager.GetString("PathExistsAndIsNotEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The selected path already exists..
         /// </summary>
         public static string PathExistsWarning {
@@ -2026,6 +2073,16 @@ namespace MySql.Configurator.Properties {
         public static string PathUnknownError {
             get {
                 return ResourceManager.GetString("PathUnknownError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to query for persisted system variables with the following error:
+        ///{0}.
+        /// </summary>
+        public static string PersistedVariablesQueryError {
+            get {
+                return ResourceManager.GetString("PersistedVariablesQueryError", resourceCulture);
             }
         }
         
@@ -2187,6 +2244,33 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Removing the general settings file..
+        /// </summary>
+        public static string RemovingGeneralSettingsFileText {
+            get {
+                return ResourceManager.GetString("RemovingGeneralSettingsFileText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Removing the following {0} unsupported persisted variables from MySQL Server: {1}.
+        /// </summary>
+        public static string RemovingPersistedServerVariables {
+            get {
+                return ResourceManager.GetString("RemovingPersistedServerVariables", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to remove one or more unsupported persisted variables from MySQL Server..
+        /// </summary>
+        public static string RemovingPersistedServerVariablesError {
+            get {
+                return ResourceManager.GetString("RemovingPersistedServerVariablesError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Deleting the existing service..
         /// </summary>
         public static string RemovingServiceText {
@@ -2201,6 +2285,24 @@ namespace MySql.Configurator.Properties {
         public static string RemovingWindowsServiceText {
             get {
                 return ResourceManager.GetString("RemovingWindowsServiceText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Renaming the existing data directory.
+        /// </summary>
+        public static string RenameExistingDataDirectoryStep {
+            get {
+                return ResourceManager.GetString("RenameExistingDataDirectoryStep", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to rename the data directory to &quot;{0}&quot;..
+        /// </summary>
+        public static string RenamingDataDirectoryError {
+            get {
+                return ResourceManager.GetString("RenamingDataDirectoryError", resourceCulture);
             }
         }
         
@@ -2378,6 +2480,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Instances with the same version have been selected..
+        /// </summary>
+        public static string SameVersionError {
+            get {
+                return ResourceManager.GetString("SameVersionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Saved {0} configuration file..
         /// </summary>
         public static string SavedConfigurationFile {
@@ -2525,15 +2636,6 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error occurred while trying to start MySQL Server in order to run the mysqldump tool..
-        /// </summary>
-        public static string ServerConfigBackupDatabaseServerStartError {
-            get {
-                return ResourceManager.GetString("ServerConfigBackupDatabaseServerStartError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Backing up MySQL database.
         /// </summary>
         public static string ServerConfigBackupDatabaseStep {
@@ -2665,6 +2767,15 @@ namespace MySql.Configurator.Properties {
         public static string ServerConfigDataDirectoryDoesNotExist {
             get {
                 return ResourceManager.GetString("ServerConfigDataDirectoryDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Renamed the data directory from &apos;{0}&apos; to &apos;{1}&apos;..
+        /// </summary>
+        public static string ServerConfigDataDirectoryRenamed {
+            get {
+                return ResourceManager.GetString("ServerConfigDataDirectoryRenamed", resourceCulture);
             }
         }
         
@@ -2972,6 +3083,33 @@ namespace MySql.Configurator.Properties {
         public static string ServerConfigEventStartServiceSuccess {
             get {
                 return ResourceManager.GetString("ServerConfigEventStartServiceSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The existing MySQL Server instance to be replaced is not running, so no need to stop it..
+        /// </summary>
+        public static string ServerConfigExistingInstanceNotRunning {
+            get {
+                return ResourceManager.GetString("ServerConfigExistingInstanceNotRunning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The existing MySQL Server instance has been started..
+        /// </summary>
+        public static string ServerConfigExistingInstanceStarted {
+            get {
+                return ResourceManager.GetString("ServerConfigExistingInstanceStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The existing MySQL Server instances has been stopped..
+        /// </summary>
+        public static string ServerConfigExistingInstanceStopped {
+            get {
+                return ResourceManager.GetString("ServerConfigExistingInstanceStopped", resourceCulture);
             }
         }
         
@@ -3309,6 +3447,87 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Removing the existing MySQL Server instance....
+        /// </summary>
+        public static string ServerConfigRemovingExistingInstance {
+            get {
+                return ResourceManager.GetString("ServerConfigRemovingExistingInstance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Removing the settings file....
+        /// </summary>
+        public static string ServerConfigRemovingSettingFile {
+            get {
+                return ResourceManager.GetString("ServerConfigRemovingSettingFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attempting to rename the data directory from &apos;{0}&apos; to &apos;{1}&apos;....
+        /// </summary>
+        public static string ServerConfigRenamingDataDirectory {
+            get {
+                return ResourceManager.GetString("ServerConfigRenamingDataDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to revert the data directory renaming with message: {0}..
+        /// </summary>
+        public static string ServerConfigRevertDataDirRenameError {
+            get {
+                return ResourceManager.GetString("ServerConfigRevertDataDirRenameError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reverted the data directory renaming..
+        /// </summary>
+        public static string ServerConfigRevertedDataDirRename {
+            get {
+                return ResourceManager.GetString("ServerConfigRevertedDataDirRename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reverting the data directory renaming....
+        /// </summary>
+        public static string ServerConfigRevertingDataDirRename {
+            get {
+                return ResourceManager.GetString("ServerConfigRevertingDataDirRename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reverting changes to the ini file....
+        /// </summary>
+        public static string ServerConfigRevertingIniFile {
+            get {
+                return ResourceManager.GetString("ServerConfigRevertingIniFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rollback operation completed..
+        /// </summary>
+        public static string ServerConfigRollbackFinished {
+            get {
+                return ResourceManager.GetString("ServerConfigRollbackFinished", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rollback operation started. A rollback was initiated to revert any configuration changes due to an error preventing from proceeding with the configuration or upgrade..
+        /// </summary>
+        public static string ServerConfigRollbackStarted {
+            get {
+                return ResourceManager.GetString("ServerConfigRollbackStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Updating the server ID is not supported during InnoDB Cluster reconfiguration..
         /// </summary>
         public static string ServerConfigServerIdDuringInnoDbClusterReconfigurationNotSupported {
@@ -3341,6 +3560,33 @@ namespace MySql.Configurator.Properties {
         public static string ServerConfigServiceAdded {
             get {
                 return ResourceManager.GetString("ServerConfigServiceAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Windows service rename reverted to &apos;{0}&apos;..
+        /// </summary>
+        public static string ServerConfigServiceRenameReverted {
+            get {
+                return ResourceManager.GetString("ServerConfigServiceRenameReverted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Windows service rename failed with message: {0}..
+        /// </summary>
+        public static string ServerConfigServiceRenameRevertFailed {
+            get {
+                return ResourceManager.GetString("ServerConfigServiceRenameRevertFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reverting the Windows service renaming....
+        /// </summary>
+        public static string ServerConfigServiceRenameReverting {
+            get {
+                return ResourceManager.GetString("ServerConfigServiceRenameReverting", resourceCulture);
             }
         }
         
@@ -3381,11 +3627,56 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to revert the settings files with message: {0}..
+        /// </summary>
+        public static string ServerConfigSettingsFilesReverFailed {
+            get {
+                return ResourceManager.GetString("ServerConfigSettingsFilesReverFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The settings files have been reverted..
+        /// </summary>
+        public static string ServerConfigSettingsFilesReverted {
+            get {
+                return ResourceManager.GetString("ServerConfigSettingsFilesReverted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reverting changes to the settings files....
+        /// </summary>
+        public static string ServerConfigSettingsFilesReverting {
+            get {
+                return ResourceManager.GetString("ServerConfigSettingsFilesReverting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred while trying to shutdown the existing MySQL Server instance to replace.&quot;.
+        /// </summary>
+        public static string ServerConfigShutdownExistingInstanceError {
+            get {
+                return ResourceManager.GetString("ServerConfigShutdownExistingInstanceError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to retrieve the SID for the &apos;{0}&apos; principal..
         /// </summary>
         public static string ServerConfigSidRetrievalFailure {
             get {
                 return ResourceManager.GetString("ServerConfigSidRetrievalFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting the existing MySQL Server instance..
+        /// </summary>
+        public static string ServerConfigStartingExistingInstance {
+            get {
+                return ResourceManager.GetString("ServerConfigStartingExistingInstance", resourceCulture);
             }
         }
         
@@ -3426,6 +3717,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Attempting to stop the existing MySQL Server instance....
+        /// </summary>
+        public static string ServerConfigStoppingExistingInstance {
+            get {
+                return ResourceManager.GetString("ServerConfigStoppingExistingInstance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to It is suggested to specify a Server ID if binary logging is enabled..
         /// </summary>
         public static string ServerConfigSuggestServerId {
@@ -3458,6 +3758,15 @@ namespace MySql.Configurator.Properties {
         public static string ServerConfigUpdatingExistingService {
             get {
                 return ResourceManager.GetString("ServerConfigUpdatingExistingService", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating service name from &quot;{0}&quot; to &quot;{1}&quot;..
+        /// </summary>
+        public static string ServerConfigUpdatingExistingServiceWithNewName {
+            get {
+                return ResourceManager.GetString("ServerConfigUpdatingExistingServiceWithNewName", resourceCulture);
             }
         }
         
@@ -3579,6 +3888,24 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to retrieve the installation directory from the MySQL Server instance..
+        /// </summary>
+        public static string ServerInstanceFailedToRetrieveBaseDir {
+            get {
+                return ResourceManager.GetString("ServerInstanceFailedToRetrieveBaseDir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to retrieve the data directory from the MySQL Server instance..
+        /// </summary>
+        public static string ServerInstanceFailedToRetrieveDataDir {
+            get {
+                return ResourceManager.GetString("ServerInstanceFailedToRetrieveDataDir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occurred when trying to retrieve the group replication member role:.
         /// </summary>
         public static string ServerInstanceGetGroupReplicationMemberRoleError {
@@ -3687,6 +4014,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Removing existing MySQL Server installation being replaced.
+        /// </summary>
+        public static string ServerRemoveOldInstallationStep {
+            get {
+                return ResourceManager.GetString("ServerRemoveOldInstallationStep", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Existing InnoDB Cluster Setup.
         /// </summary>
         public static string ServerRemovePageReconfigurationTitle {
@@ -3701,6 +4037,15 @@ namespace MySql.Configurator.Properties {
         public static string ServerRemovePageRemoveTitle {
             get {
                 return ResourceManager.GetString("ServerRemovePageRemoveTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Removing deprecated variables set using SET PERSIST.
+        /// </summary>
+        public static string ServerResetPersistedVariablesStep {
+            get {
+                return ResourceManager.GetString("ServerResetPersistedVariablesStep", resourceCulture);
             }
         }
         
@@ -3809,6 +4154,15 @@ namespace MySql.Configurator.Properties {
         public static string ServerStopProcessStep {
             get {
                 return ResourceManager.GetString("ServerStopProcessStep", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating example databases.
+        /// </summary>
+        public static string ServerUpdateExampleDatabasesText {
+            get {
+                return ResourceManager.GetString("ServerUpdateExampleDatabasesText", resourceCulture);
             }
         }
         
@@ -4121,6 +4475,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Stopping the MySQL Server instance that will be replaced and removed.
+        /// </summary>
+        public static string StoppingExistingServerInstanceStep {
+            get {
+                return ResourceManager.GetString("StoppingExistingServerInstanceStep", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Killing process for {0}, with ID {1}....
         /// </summary>
         public static string StoppingProcessText {
@@ -4216,7 +4579,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Internal error. ({0}) The installer will now close..
+        ///   Looks up a localized string similar to Internal error. ({0}) The Configurator will now close..
         /// </summary>
         public static string UnhandledException {
             get {
@@ -4258,6 +4621,25 @@ namespace MySql.Configurator.Properties {
             get {
                 object obj = ResourceManager.GetObject("upgrade_logo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The selected server instance is of a higher version..
+        /// </summary>
+        public static string UpgradeHigherVersionError {
+            get {
+                return ResourceManager.GetString("UpgradeHigherVersionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upgrading from &apos;{0}&apos; to &apos;{1}&apos; is not officially supported. Continuing with
+        ///the upgrade may result in an upgrade failure, proceed at your own risk..
+        /// </summary>
+        public static string UpgradeNotSupportedError {
+            get {
+                return ResourceManager.GetString("UpgradeNotSupportedError", resourceCulture);
             }
         }
         

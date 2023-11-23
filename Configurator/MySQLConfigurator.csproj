@@ -100,6 +100,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.DirectoryServices" />
@@ -108,9 +109,13 @@
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
     <Reference Include="System.Net" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System.Security" />
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Text.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
@@ -138,7 +143,6 @@
     <Compile Include="Core\Classes\ExtensionMethods.cs" />
     <Compile Include="Core\Classes\ImageComboBoxItem.cs" />
     <Compile Include="Core\Classes\InfoDialogProperties.cs" />
-    <Compile Include="Core\Classes\InnoDbClusterAttribute.cs" />
     <Compile Include="Core\Classes\LastFocusedControlFilter.cs" />
     <Compile Include="Core\Classes\LinkActivationEventArgs.cs" />
     <Compile Include="Core\Classes\ListViewHelper.cs" />
@@ -261,6 +265,7 @@
     <Compile Include="Core\Enums\GroupReplicationMemberRoleType.cs" />
     <Compile Include="Core\Enums\IniLineType.cs" />
     <Compile Include="Core\Enums\InstallAction.cs" />
+    <Compile Include="Core\Enums\InstallLevel.cs" />
     <Compile Include="Core\Enums\InstallLogMode.cs" />
     <Compile Include="Core\Enums\InstallMessage.cs" />
     <Compile Include="Core\Enums\InstallProgressState.cs" />
@@ -288,6 +293,7 @@
     <Compile Include="Core\Enums\SchemaInformationType.cs" />
     <Compile Include="Core\Enums\ServerConfigurationType.cs" />
     <Compile Include="Core\Enums\ServerInstallationType.cs" />
+    <Compile Include="Core\Enums\ServerMaturity.cs" />
     <Compile Include="Core\Enums\ServerSeriesType.cs" />
     <Compile Include="Core\Enums\ServiceAccountMissingRequirement.cs" />
     <Compile Include="Core\Enums\StepType.cs" />
@@ -503,6 +509,12 @@
     <Compile Include="Wizards\Server\ServerConfigAdvancedOptionsPage.Designer.cs">
       <DependentUpon>ServerConfigAdvancedOptionsPage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Wizards\Server\ServerConfigDataDirectoryPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigDataDirectoryPage.Designer.cs">
+      <DependentUpon>ServerConfigDataDirectoryPage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Wizards\Server\ServerConfigDefaultAuthenticationPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -533,17 +545,23 @@
     <Compile Include="Wizards\Server\ServerConfigSecurityPage.Designer.cs">
       <DependentUpon>ServerConfigSecurityPage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Wizards\Server\ServerConfigServerInstallationsPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Wizards\Server\ServerConfigServerInstallationsPage.Designer.cs">
+      <DependentUpon>ServerConfigServerInstallationsPage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Wizards\Server\ServerConfigServicePage.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Wizards\Server\ServerConfigServicePage.Designer.cs">
       <DependentUpon>ServerConfigServicePage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigUpgradePage.cs">
+    <Compile Include="Wizards\Server\ServerConfigBackupPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigUpgradePage.Designer.cs">
-      <DependentUpon>ServerConfigUpgradePage.cs</DependentUpon>
+    <Compile Include="Wizards\Server\ServerConfigBackupPage.Designer.cs">
+      <DependentUpon>ServerConfigBackupPage.cs</DependentUpon>
     </Compile>
     <Compile Include="Wizards\Server\ServerConfigurationController.cs" />
     <Compile Include="Wizards\Server\ServerConfigUserAccountsPage.cs">
@@ -566,6 +584,7 @@
     <Compile Include="Wizards\Server\ServerRemovePage.Designer.cs">
       <DependentUpon>ServerRemovePage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Wizards\Server\ServerRevertController.cs" />
     <Compile Include="Wizards\Server\ServerStartStatus.cs" />
     <Compile Include="Wizards\Server\ServerUpgradeStatus.cs" />
     <Compile Include="Wizards\Server\ServerUser.cs" />
@@ -687,6 +706,9 @@
     <EmbeddedResource Include="Wizards\Server\ServerConfigAdvancedOptionsPage.resx">
       <DependentUpon>ServerConfigAdvancedOptionsPage.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Server\ServerConfigDataDirectoryPage.resx">
+      <DependentUpon>ServerConfigDataDirectoryPage.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Wizards\Server\ServerConfigDefaultAuthenticationPage.resx">
       <DependentUpon>ServerConfigDefaultAuthenticationPage.cs</DependentUpon>
     </EmbeddedResource>
@@ -705,13 +727,15 @@
       <DependentUpon>ServerConfigSecurityPage.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Wizards\Server\ServerConfigServerInstallationsPage.resx">
+      <DependentUpon>ServerConfigServerInstallationsPage.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Wizards\Server\ServerConfigServicePage.resx">
       <DependentUpon>ServerConfigServicePage.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Server\ServerConfigUpgradePage.resx">
-      <DependentUpon>ServerConfigUpgradePage.cs</DependentUpon>
-      <SubType>Designer</SubType>
+    <EmbeddedResource Include="Wizards\Server\ServerConfigBackupPage.resx">
+      <DependentUpon>ServerConfigBackupPage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Wizards\Server\ServerConfigUserAccountsPage.resx">
       <DependentUpon>ServerConfigUserAccountsPage.cs</DependentUpon>

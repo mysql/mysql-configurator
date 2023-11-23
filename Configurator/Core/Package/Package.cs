@@ -22,6 +22,7 @@ using System.Text;
 using System.Xml.Serialization;
 using MySql.Configurator.Core.Classes;
 using MySql.Configurator.Core.Classes.Logging;
+using MySql.Configurator.Core.Common;
 using MySql.Configurator.Core.Controllers;
 using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Core.Interfaces;
@@ -432,7 +433,11 @@ namespace MySql.Configurator.Core.Package
       return list;
     }
 
-    public void Initialize(string dataDir, string installDir)
+    /// <summary>
+    /// Initializes the server package.
+    /// </summary>
+    /// <param name="installDir">The installation directory.</param>
+    public void Initialize(string installDir)
     {
       if (Controller == null)
       {
@@ -454,12 +459,6 @@ namespace MySql.Configurator.Core.Package
       }
 
       Logger.LogInformation("Package - Installed - Loading controller state");
-      if (!string.IsNullOrEmpty(dataDir))
-      {
-        var controller = (ServerProductConfigurationController)Controller;
-        controller.Settings.DataDirectory = dataDir;
-      }
-
       if (!string.IsNullOrEmpty(installDir))
       {
         var controller = (ServerProductConfigurationController)Controller;

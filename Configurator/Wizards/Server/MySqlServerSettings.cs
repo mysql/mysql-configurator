@@ -49,7 +49,7 @@ namespace MySql.Configurator.Wizards.Server
     public const int X_PROTOCOL_DEFAULT_PORT = 33060;
     private const string DATABASE_BACKUP_DIRECTORY = @"Backup";
     private const string DATABASE_BACKUP_BASE_FILE_NAME = @"mysql_dump";
-    private const string SECURE_FILE_PRIV_DIRECTORY = @"Uploads";
+    public const string SECURE_FILE_PRIV_DIRECTORY = @"Uploads";
 
     #endregion Constants
 
@@ -342,7 +342,7 @@ namespace MySql.Configurator.Wizards.Server
       template.LooseMySqlXPort = MySqlXPort == 0 ? X_PROTOCOL_DEFAULT_PORT : MySqlXPort;
       template.NamedPipeFullAccessGroup = NamedPipeFullAccessGroup;
       template.ProcessTemplate(false, true, skipExistingValues);
-      SaveExtendedSettings();
+      SaveGeneralSettings();
     }
 
     public bool ServiceExists()
@@ -375,6 +375,7 @@ namespace MySql.Configurator.Wizards.Server
 
     protected override void LoadInstalled()
     {
+      base.LoadGeneralSettings();
       base.LoadInstalled();
       Logger.LogInformation("Server Settings - Load Installed - load service information");
       LoadServiceInformation();
@@ -382,7 +383,11 @@ namespace MySql.Configurator.Wizards.Server
       LoadIniSettings();
     }
 
-    private string GetDefaultServiceName()
+    /// <summary>
+    /// Gets the default service name based on the version of the package.
+    /// </summary>
+    /// <returns>A string representing the default service name.</returns>
+    public string GetDefaultServiceName()
     {
       string baseName = $"MYSQL{Package.NormalizedVersion.Major}{Package.NormalizedVersion.Minor}";
       int i = 1;
@@ -407,7 +412,7 @@ namespace MySql.Configurator.Wizards.Server
 
       if (configFileExists.HasValue && configFileExists.Value)
       {
-        t = new IniTemplate(InstallDirectory, DataDirectory, FullConfigFilePath, Package.NormalizedVersion, ServerInstallType);
+        t = new IniTemplate(InstallDirectory, DataDirectory, FullConfigFilePath, Package.NormalizedVersion, ServerInstallType, null);
       }
       else
       {
@@ -424,15 +429,18 @@ namespace MySql.Configurator.Wizards.Server
       return isRuleEnabled;
     }
 
-    public override void LoadExtendedSettings()
+    /// <summary>
+    /// Loads the general server settings.
+    /// </summary>
+    public override void LoadGeneralSettings()
     {
-      base.LoadExtendedSettings();
-      if (ExtendedSettings == null)
+      base.LoadGeneralSettings();
+      if (GeneralSettings == null)
       {
         return;
       }
 
-      Plugins.Enable("mysql_firewall", ExtendedSettings.EnterpriseFirewallEnabled);
+      Plugins.Enable("mysql_firewall", GeneralSettings.EnterpriseFirewallEnabled);
     }
 
     private void LoadIniSettings()
@@ -551,7 +559,7 @@ namespace MySql.Configurator.Wizards.Server
         }
       }
 
-      LoadExtendedSettings();
+      LoadGeneralSettings();
     }
 
     private void LoadLogsDefault()
@@ -573,15 +581,15 @@ namespace MySql.Configurator.Wizards.Server
     {
       ServiceName = GetDefaultServiceName();
       var sm = new MySqlServiceControlManager(InstallDirectory);
-      if (string.IsNullOrEmpty(sm.ServiceName)
-          || !MySqlServiceControlManager.ServiceExists(sm.ServiceName))
+      if (sm.ServiceInfos.Length == 0)
       {
         return;
       }
 
       ConfigureAsService = true;
-      ServiceName = sm.ServiceName;
-      Service s = sm.GetServiceDetails(ServiceName);
+      var configFileDirectory = !string.IsNullOrEmpty(IniDirectory) ? IniDirectory : DataDirectory;
+      ServiceName = sm.GetBestServiceNameMatchingConfigFileDirectory(configFileDirectory);
+      Service s = MySqlServiceControlManager.GetServiceDetails(ServiceName);
       ServiceAccountUsername = s.StartName;
       ServiceStartAtStartup = s.StartMode == "Auto";
     }

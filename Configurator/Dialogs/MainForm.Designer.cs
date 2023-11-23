@@ -45,14 +45,53 @@ namespace MySql.Configurator.Dialogs
         /// </summary>
         private void InitializeComponent()
         {
+      this.StatusStrip = new System.Windows.Forms.StatusStrip();
+      this.ConfigurationTypeLabel = new System.Windows.Forms.ToolStripStatusLabel();
+      this.VersionLabel = new System.Windows.Forms.ToolStripStatusLabel();
+      this.DataDirectoryLabel = new System.Windows.Forms.ToolStripStatusLabel();
+      this.StatusStrip.SuspendLayout();
       this.SuspendLayout();
+      // 
+      // StatusStrip
+      // 
+      this.StatusStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
+      this.StatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ConfigurationTypeLabel,
+            this.VersionLabel,
+            this.DataDirectoryLabel});
+      this.StatusStrip.Location = new System.Drawing.Point(0, 556);
+      this.StatusStrip.Name = "StatusStrip";
+      this.StatusStrip.Size = new System.Drawing.Size(806, 28);
+      this.StatusStrip.TabIndex = 1;
+      // 
+      // ConfigurationTypeLabel
+      // 
+      this.ConfigurationTypeLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ConfigurationTypeLabel.Margin = new System.Windows.Forms.Padding(28, 4, 10, 3);
+      this.ConfigurationTypeLabel.Name = "ConfigurationTypeLabel";
+      this.ConfigurationTypeLabel.Size = new System.Drawing.Size(0, 21);
+      // 
+      // VersionLabel
+      // 
+      this.VersionLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.VersionLabel.Margin = new System.Windows.Forms.Padding(10, 4, 10, 3);
+      this.VersionLabel.Name = "VersionLabel";
+      this.VersionLabel.Size = new System.Drawing.Size(0, 21);
+      // 
+      // DataDirectoryLabel
+      // 
+      this.DataDirectoryLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DataDirectoryLabel.Margin = new System.Windows.Forms.Padding(10, 4, 10, 3);
+      this.DataDirectoryLabel.Name = "DataDirectoryLabel";
+      this.DataDirectoryLabel.Size = new System.Drawing.Size(0, 21);
       // 
       // MainForm
       // 
       this.AccessibleDescription = "The main application form";
       this.AccessibleName = "MySQL Configurator";
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-      this.ClientSize = new System.Drawing.Size(784, 561);
+      this.ClientSize = new System.Drawing.Size(786, 584);
+      this.Controls.Add(this.StatusStrip);
       this.DoubleBuffered = true;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
       this.Icon = global::MySql.Configurator.Properties.Resources.mysql_server;
@@ -62,11 +101,18 @@ namespace MySql.Configurator.Dialogs
       this.Text = "MySQL Configurator";
       this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
       this.Shown += new System.EventHandler(this.MainForm_Shown);
+      this.StatusStrip.ResumeLayout(false);
+      this.StatusStrip.PerformLayout();
       this.ResumeLayout(false);
+      this.PerformLayout();
 
         }
 
-        #endregion
+    #endregion
 
-    }
+    public System.Windows.Forms.StatusStrip StatusStrip;
+    public System.Windows.Forms.ToolStripStatusLabel ConfigurationTypeLabel;
+    public System.Windows.Forms.ToolStripStatusLabel VersionLabel;
+    public System.Windows.Forms.ToolStripStatusLabel DataDirectoryLabel;
+  }
 }

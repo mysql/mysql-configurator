@@ -75,19 +75,7 @@ namespace MySql.Configurator.Core.Controllers
     /// <summary>
     /// Gets a value indicating whether the data directory exists and contains files (i.e. the database has been initialized).
     /// </summary>
-    public bool IsThereServerDataFiles
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(DataDirectory))
-        {
-          return false;
-        }
-
-        string databaseDataDir = Path.Combine(DataDirectory, "data");
-        return Directory.Exists(databaseDataDir) && Directory.EnumerateFiles(databaseDataDir).Any();
-      }
-    }
+    public bool IsThereServerDataFiles => HasDataSubDirectoryWithFiles(DataDirectory);
 
     public string ServerExecutableDirPath => Path.Combine(InstallDirectory, BINARY_DIRECTORY_NAME);
 
@@ -96,6 +84,22 @@ namespace MySql.Configurator.Core.Controllers
     public new BaseServerSettings Settings => settings as BaseServerSettings;
 
     #endregion Properties
+
+    /// <summary>
+    /// Checks if a given directory path contains a Data subdirectory with contents in it.
+    /// </summary>
+    /// <param name="directoryPath">A full directory path.</param>
+    /// <returns><c>true</c> if the given directory path contains a Data subdirectory with contents in it, <c>false</c> otherwise.</returns>
+    public bool HasDataSubDirectoryWithFiles(string directoryPath)
+    {
+      if (string.IsNullOrEmpty(directoryPath))
+      {
+        return false;
+      }
+
+      string dataDirectory = Path.Combine(directoryPath, "Data");
+      return Directory.Exists(dataDirectory) && Directory.EnumerateFiles(dataDirectory).Any();
+    }
 
     public string GetConnectionString(bool promptIfNecessary, bool useOldSettings)
     {

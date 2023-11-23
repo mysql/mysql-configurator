@@ -19,9 +19,11 @@ using System.Drawing;
 using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using MySql.Configurator.Core.Classes;
 using MySql.Configurator.Core.Classes.Logging;
+using MySql.Configurator.Core.Classes.MySql;
 using MySql.Configurator.Core.Wizard;
 
 namespace MySql.Configurator.Wizards.Server
@@ -81,7 +83,7 @@ namespace MySql.Configurator.Wizards.Server
     #endregion Fields
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ServerConfigUpgradePage"/> class.
+    /// Initializes a new instance of the <see cref="ServerConfigSecurityPage"/> class.
     /// </summary>
     /// <param name="controller">The <seealso cref="ServerConfigurationController"/> used to perform actions.</param>
     public ServerConfigSecurityPage(ServerConfigurationController controller)
@@ -106,6 +108,12 @@ namespace MySql.Configurator.Wizards.Server
     public override void Activate()
     {
       base.Activate();
+
+      // Set the updated data directory.
+      _dataDirectory = _controller.IsDataDirectoryRenameNeeded
+        ? Regex.Replace(_dataDirectory, MySqlServerInstance.DEFAULT_DATADIR_NAME_REGEX, $"MySQL Server {_controller.ServerVersion.ToString(2)}", RegexOptions.IgnoreCase)
+        : _controller.DataDirectory ?? Path.Combine(_controller.DataDirectory, "Data");
+      DataDirectoryPathLabel.Text = _dataDirectory;
 
       // Refresh the user running the Windows Service to be marked for full control on the data directory.
       if (_controller.Settings.ConfigureAsService)

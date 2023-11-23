@@ -14,6 +14,7 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
 
 using System;
+using System.Configuration;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -26,6 +27,7 @@ using MySql.Configurator.Core.Product;
 using MySql.Configurator.Wizards;
 using MySql.Configurator.Wizards.ConfigWizard;
 using MySql.Configurator.Wizards.RemoveWizard;
+using MySql.Configurator.Wizards.Server;
 // using MySql.Configurator.Wizards.UpgradeWizard;
 
 namespace MySql.Configurator.Dialogs
@@ -38,18 +40,15 @@ namespace MySql.Configurator.Dialogs
 
     private string _version;
 
-    private string _dataDirPath;
-
     private string _installDirPath;
 
     #endregion
 
-    public MainForm(string version, string dataDirPath, string installDirPath, string action)
+    public MainForm(string version, string installDirPath, string action)
     {
       InitializeComponent();
       _action = action;
       _version = version;
-      _dataDirPath = dataDirPath;
       _installDirPath = installDirPath;
       SetWindowPosition();
     }
@@ -114,7 +113,7 @@ namespace MySql.Configurator.Dialogs
       Package package = null;
       try
       {
-        package = ProductManager.LoadPackage(_version, _dataDirPath, _installDirPath);
+        package = ProductManager.LoadPackage(_version, _installDirPath);
       }
       catch (ConfiguratorException ex)
       {
@@ -143,19 +142,35 @@ namespace MySql.Configurator.Dialogs
           removeWizard.ShowWizard(package, this);
           break;
 
-        case "upgrade":
-          configurationType = ConfigurationType.Upgrade;
-          var upgradeWizard = new ConfigWizard();
-          Controls.Add(upgradeWizard);
-          upgradeWizard.WizardCanceled += WizardClosed;
-          upgradeWizard.WizardClosed += WizardClosed;
-          upgradeWizard.ShowWizard(package, this, configurationType);
+        default:
+          configurationType = ConfigurationType.New;
+          break;
+      }
+
+      StatusStrip.Visible = true;
+      VersionLabel.Text = $"MySQL Server {_version}";
+      var controllerConfigurationType = package.Controller.ConfigurationType;
+      var stringConfigurationType = string.Empty;
+      switch (controllerConfigurationType)
+      {
+        case (ConfigurationType.New):
+          stringConfigurationType = $"{controllerConfigurationType} configuration";
           break;
 
         default:
+          stringConfigurationType = controllerConfigurationType.ToString();
           break;
       }
       
+      ConfigurationTypeLabel.Text = stringConfigurationType;
+      if (controllerConfigurationType == ConfigurationType.Reconfiguration
+          || controllerConfigurationType == ConfigurationType.Remove)
+      {
+        var serverController = package.Controller as ServerConfigurationController;
+        DataDirectoryLabel.Text = $"Data Directory: {serverController.DataDirectory}";
+      }
+
+      StatusStrip.Refresh();
     }
 
     /// <summary>
@@ -198,7 +213,7 @@ namespace MySql.Configurator.Dialogs
     /// <returns>True if we can shut down, false otherwise.</returns>
     public bool CanClose()
     {
-      var wizard = this.Controls.Cast<Wizard>().FirstOrDefault();
+      var wizard = Controls.OfType<Wizard>().FirstOrDefault();
       if (wizard == null)
       {
         // This is unexpected, a Wizard should be already in the Controls collection, but if not found just let the form close.

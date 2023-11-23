@@ -29,6 +29,7 @@ using MySql.Configurator.Core.Controllers;
 using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Core.IniFile.Template.Formula;
 using MySql.Configurator.Properties;
+using MySql.Configurator.Wizards.Server;
 
 namespace MySql.Configurator.Core.IniFile.Template
 {
@@ -64,7 +65,13 @@ namespace MySql.Configurator.Core.IniFile.Template
     /// <param name="dataDir">Directory of the MySQL Data folder</param>
     /// <param name="existingConfigFilePath">Path of the existing configuration file</param>
     /// <param name="serverVersion">The MySQL Server version.</param>
-    public IniTemplate(string baseDir, string dataDir, string existingConfigFilePath, Version serverVersion, ServerInstallationType iniServerType)
+    public IniTemplate(
+      string baseDir, 
+      string dataDir, 
+      string existingConfigFilePath, 
+      Version serverVersion, 
+      ServerInstallationType iniServerType,
+      ServerRevertController revertController)
       :this(serverVersion, iniServerType)
     {
       BaseDir = baseDir;
@@ -73,7 +80,7 @@ namespace MySql.Configurator.Core.IniFile.Template
       ConfigurationFile = existingConfigFilePath;
       if (File.Exists(ConfigurationFile))
       {
-        BackupConfigFile(ConfigurationFile, Path.GetDirectoryName(ConfigurationFile));
+        BackupConfigFile(ConfigurationFile, Path.GetDirectoryName(ConfigurationFile), revertController);
       }
 
       IsValid = ParseConfigurationFile(ConfigurationFile);
@@ -88,7 +95,15 @@ namespace MySql.Configurator.Core.IniFile.Template
     /// <param name="outputDir">Directory where the config file will be located</param>
     /// <param name="configFileName">The name of the config file that will be created</param>
     /// <param name="serverVersion">The MySQL Server version.</param>
-    public IniTemplate(string baseDir, string dataDir, string templateName, string outputDir, string configFileName, Version serverVersion, ServerInstallationType iniServerType)
+    public IniTemplate(
+      string baseDir, 
+      string dataDir, 
+      string templateName, 
+      string outputDir, 
+      string configFileName, 
+      Version serverVersion, 
+      ServerInstallationType iniServerType,
+      ServerRevertController revertController)
       :this(serverVersion, iniServerType)
     {
       BaseDir = baseDir;
@@ -96,7 +111,7 @@ namespace MySql.Configurator.Core.IniFile.Template
       ConfigurationFile = outputDir.Contains(configFileName) ? outputDir : Path.Combine(outputDir, configFileName);
       if (File.Exists(ConfigurationFile))
       {
-        BackupConfigFile(ConfigurationFile, outputDir);
+        BackupConfigFile(ConfigurationFile, outputDir, revertController);
       }
 
       _template = templateName;
@@ -219,6 +234,7 @@ namespace MySql.Configurator.Core.IniFile.Template
       }
     }
 
+    public bool SkipInnodb { get; set; }
     public string SlowQueryLog { get; set; }
     public string SlowQueryLogFile { get; set; }
     public double UseQueryCache { get; set; }
@@ -594,6 +610,10 @@ namespace MySql.Configurator.Core.IniFile.Template
               }
               break;
 
+            case "SKIP_INNODB":
+              itv.Disabled = SkipInnodb;
+              break;
+
             case "NAMED_PIPE_FULL_ACCESS_GROUP":
               itv.Disabled = !EnableNamedPipe;
               itv.SupportsEmptyResult = true;
@@ -816,7 +836,13 @@ namespace MySql.Configurator.Core.IniFile.Template
       writer.Dispose();
     }
 
-    private void BackupConfigFile(string configFile, string outputDir)
+    /// <summary>
+    /// Creates a backup of the specified server ini file.
+    /// </summary>
+    /// <param name="configFile">The file to backup.</param>
+    /// <param name="outputDir">The output directory.</param>
+    /// <param name="revertController">A revert controller used to keep track of the changes made to the file.</param>
+    private void BackupConfigFile(string configFile, string outputDir, ServerRevertController revertController)
     {
       // Create a backup of the existing file(s).
       string datetime = DateTime.Now.GetDateTimeFormats('s')[0].Replace(':', '-');
@@ -829,6 +855,12 @@ namespace MySql.Configurator.Core.IniFile.Template
       }
 
       File.Copy(configFile, newConfig);
+      if (revertController != null)
+      {
+        revertController.IniFileUpdated = true;
+        revertController.OldIniFileName = string.IsNullOrEmpty(revertController.OldIniFileName) ? newConfig : revertController.OldIniFileName;
+      }
+
       OutputExists = true;
     }
 
@@ -996,6 +1028,7 @@ namespace MySql.Configurator.Core.IniFile.Template
             case "STATE_CHANGE":
             case "SQL_MODE":
             case "INNODB_LOG_FILE_SIZE":
+            case "SKIP_INNODB":
               break;
 
             case "SERVER_ID":
@@ -1064,6 +1097,7 @@ namespace MySql.Configurator.Core.IniFile.Template
       InnoDBHomeDir = string.Empty;
       DefaultStorageEngine = "INNODB";
       Port = BaseServerSettings.DEFAULT_PORT;
+      SkipInnodb = false;
       IsValid = false;
       OutputExists = false;
       ServerType = ServerInstallationType.Developer;

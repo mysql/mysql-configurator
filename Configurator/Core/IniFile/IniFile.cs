@@ -145,7 +145,10 @@ namespace MySql.Configurator.Core.IniFile
         }
 
         //Key-Value pairs
-        if (!string.IsNullOrEmpty(currentSection) && !lineTrimmed.Contains(' '))
+        bool isKeyValuePair = lineTrimmed.Split('=').Length == 2;
+        if (!string.IsNullOrEmpty(currentSection) && 
+            (!lineTrimmed.Contains(' ')
+             || isKeyValuePair))
         {
           var keyPair = lineTrimmed.Split(new[] { '=' }, 2);
           var lineType = IniLineType.KeyValuePair;

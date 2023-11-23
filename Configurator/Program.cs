@@ -22,11 +22,15 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using MySql.Configurator.Core.Classes;
+using MySql.Configurator.Core.Classes.Configuration;
 using MySql.Configurator.Core.Classes.Forms;
 using MySql.Configurator.Core.Classes.Logging;
 using MySql.Configurator.Core.Common;
+using MySql.Configurator.Core.Controllers;
 using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Core.Forms;
+using MySql.Configurator.Core.IniFile;
+using MySql.Configurator.Core.IniFile.Template;
 using MySql.Configurator.Dialogs;
 using MySql.Configurator.Properties;
 using Utilities = MySql.Configurator.Core.Classes.Utilities;
@@ -38,8 +42,6 @@ namespace MySql.Configurator
     #region Fields
 
     private static string _version;
-
-    private static string _dataDirPath;
 
     private static string _installDirPath;
 
@@ -105,7 +107,7 @@ namespace MySql.Configurator
         
         // Uncomment the following line to print to the debug output console messages indicating what control got focus.
         //Application.AddMessageFilter(new LastFocusedControlFilter(true));
-        Application.Run(new MainForm(_version, _dataDirPath, _installDirPath, _action));
+        Application.Run(new MainForm(_version, _installDirPath, _action));
       }
       catch (ConfiguratorException ex)
       {
@@ -165,7 +167,6 @@ namespace MySql.Configurator
         {
           case "configure":
           case "remove":
-          case "upgrade":
             _action = option;
             break;
 
@@ -210,15 +211,6 @@ namespace MySql.Configurator
         }
 
         _version = $"{versionItem.Major}.{versionItem.Minor}.{versionItem.Build}";
-
-        // Set default data dir.
-        if (string.IsNullOrEmpty(_dataDirPath)
-            && versionItem != null)
-        {
-          _dataDirPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-            $@"MySQL\MySQL Server {versionItem.Major}.{versionItem.Minor}\");
-        }
       }
       catch (Exception ex)
       {

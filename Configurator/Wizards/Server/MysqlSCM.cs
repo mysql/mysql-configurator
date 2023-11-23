@@ -14,6 +14,7 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -31,6 +32,44 @@ using MySql.Configurator.Properties;
 
 namespace MySql.Configurator.Wizards.Server
 {
+  /// <summary>
+  /// Contains information about a Windows service used to run a MySQL Server instance.
+  /// </summary>
+  public class MySqlServiceInfo
+  {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MySqlServiceInfo"/> class.
+    /// </summary>
+    /// <param name="serviceName">The name of the Windows service.</param>
+    /// <param name="iniDirectory">The path of the directory containing the configuration file used by the Windows service.</param>
+    /// <param name="configFile">The name of the configuration file used by the Windows service.</param>
+    public MySqlServiceInfo(string serviceName, string iniDirectory, string configFile)
+    {
+      ConfigFile = configFile;
+      IniDirectory = iniDirectory;
+      ServiceName = serviceName;
+    }
+
+    #region Properties
+
+    /// <summary>
+    /// Gets the name of the configuration file used by the Windows service.
+    /// </summary>
+    public string ConfigFile { get; private set; }
+
+    /// <summary>
+    /// Gets the path of the directory containing the configuration file used by the Windows service.
+    /// </summary>
+    public string IniDirectory { get; private set; }
+
+    /// <summary>
+    /// Gets the name of the Windows service.
+    /// </summary>
+    public string ServiceName { get; private set; }
+
+    #endregion Properties
+  }
+
   public class MySqlServiceControlManager
   {
     #region Constants
@@ -45,39 +84,70 @@ namespace MySql.Configurator.Wizards.Server
     /// </summary>
     public const int DEFAULT_SERVICE_EXISTS_RETRY_COUNT = 5;
 
+    /// <summary>
+    /// The default regular expression pattern to match a MySQL Server's global configuration file used in a Windows service.
+    /// </summary>
+    public const string DEFAULT_SERVICE_CONFIG_FILE_PATTERN = @" --defaults-file=""(?<iniLocation>.+)?"" ";
+
     public const string STANDARD_SERVICE_ACCOUNT = @"NT AUTHORITY\NetworkService";
 
     #endregion
 
+    #region Fields
+
     private static CancellationToken _cancellationToken = new CancellationToken(false);
 
-    public MySqlServiceControlManager()
+    private Regex _defaultsFileRegex;
+
+    private List<MySqlServiceInfo> _serviceInfos;
+
+    #endregion Fields
+
+    /// <summary>
+    /// Creates an instance of the <see cref="MySqlServiceControlManager"/> class.
+    /// </summary>
+    /// <param name="configFileDirectory">A directory path containing a MySQL Server's global configuration file.</param>
+    public MySqlServiceControlManager(string configFileDirectory)
     {
+      _serviceInfos = new List<MySqlServiceInfo>();
+      foreach (var serviceName in FindServiceNamesWithBaseDirectory(configFileDirectory))
+      {
+        var match = DefaultsFileRegex.Match(GetBinaryPath(serviceName));
+        if (match.Success)
+        {
+          var configFilePath = Path.GetFullPath(match.Groups["iniLocation"].Value);
+          var configFileExists = File.Exists(configFilePath);
+          var verifiedConfigFileDirectory = configFileExists ? Path.GetDirectoryName(configFilePath) : string.Empty;
+          var verifiedConfigFileName = configFileExists ? Path.GetFileName(configFilePath) : string.Empty;
+          _serviceInfos.Add(new MySqlServiceInfo(serviceName, verifiedConfigFileDirectory, verifiedConfigFileName));
+        }
+      }
     }
 
-    public MySqlServiceControlManager(string directory)
+    #region Properties
+
+    /// <summary>
+    /// Gets an array of objects containing basic information about Windows services associated to this MySQL Server instance.
+    /// </summary>
+    public MySqlServiceInfo[] ServiceInfos => _serviceInfos.ToArray();
+
+    /// <summary>
+    /// A regular expression to match a MySQL Server's global configuration file used in a Windows service.
+    /// </summary>
+    private Regex DefaultsFileRegex
     {
-      ServiceName = FindServiceName(directory);
-      if (ServiceName == null)
+      get
       {
-        return;
-      }
+        if ( _defaultsFileRegex == null)
+        {
+          _defaultsFileRegex = new Regex(DEFAULT_SERVICE_CONFIG_FILE_PATTERN);
+        }
 
-      var defaultsFilePattern = new Regex(@" --defaults-file=""(?<iniLocation>.+)?"" ");
-      var match = defaultsFilePattern.Match(BinaryPath(ServiceName));
-      if (!match.Success)
-      {
-        return;
+        return _defaultsFileRegex;
       }
-
-      string existingConfigFile = Path.GetFullPath(match.Groups["iniLocation"].Value);
-      IniDirectory = Path.GetDirectoryName(existingConfigFile);
-      ConfigFile = Path.GetFileName(existingConfigFile);
     }
 
-    public string ConfigFile { get; set; }
-    public string IniDirectory { get; set; }
-    public string ServiceName { get; set; }
+    #endregion Properties
 
     public static void Add(string serviceName, string displayName, string fileName, string userName, string password, bool startAtStarUp)
     {
@@ -113,11 +183,7 @@ namespace MySql.Configurator.Wizards.Server
     /// specified Windows service.</param>
     /// <returns><c>true</c> if the service was deleted successfully, <c>false</c> if the service was marked for deletion without
     /// actually being deleted and <c>null</c> if an error occurred when attempting to delete the service.</returns>
-    public static bool? Delete(string serviceName,
-      bool throwOnFail = true,
-      bool waitForServiceDeletion = true,
-      int serviceExistsRetryCount = DEFAULT_SERVICE_EXISTS_RETRY_COUNT,
-      int sleepTimeBetweenRetries = DEFAULT_SERVICE_EXISTS_SLEEP_TIME)
+    public static bool? Delete(string serviceName, bool throwOnFail = true, bool waitForServiceDeletion = true, int serviceExistsRetryCount = DEFAULT_SERVICE_EXISTS_RETRY_COUNT, int sleepTimeBetweenRetries = DEFAULT_SERVICE_EXISTS_SLEEP_TIME)
     {
       if (string.IsNullOrEmpty(serviceName))
       {
@@ -164,6 +230,108 @@ namespace MySql.Configurator.Wizards.Server
       }
     }
 
+    /// <summary>
+    /// Finds Windows services that match the given base directory and returns their names.
+    /// </summary>
+    /// <param name="baseDirectory"A directory path.></param>
+    /// <returns>An array of service names matching the given base directory.</returns>
+    public static string[] FindServiceNamesWithBaseDirectory(string baseDirectory)
+    {
+      var foundServiceNames = new List<string>();
+      var scmServices = ServiceController.GetServices();
+      foreach (var scmService in scmServices)
+      {
+        using (var superServiceController = new ExpandedServiceController(scmService))
+        {
+          string regexSeed = Path.GetFullPath(baseDirectory) + ".";
+          regexSeed = regexSeed.Replace(@"\", @"[\/\\]");
+          regexSeed = regexSeed.Replace(@"(", @"\(");
+          regexSeed = regexSeed.Replace(@")", @"\)");
+
+          var localTemplate = new Regex(regexSeed);
+          var localMatch = localTemplate.Match(superServiceController.BinaryPath);
+
+          if (localMatch.Success)
+          {
+            foundServiceNames.Add(superServiceController.ServiceName);
+          }
+        }
+
+        scmService.Close();
+      }
+
+      return foundServiceNames.ToArray();
+    }
+
+    /// <summary>
+    /// Gets the name of a Windows service running a MySQL Server that best matches the given configuration file directory.
+    /// </summary>
+    /// <param name="configFileDirectory">A directory containing a global configuration file for a MySQL Server.</param>
+    /// <returns>The name of a Windows service running a MySQL Server that best matches the given configuration file directory, or an empty string if no match is found.</returns>
+    public string GetBestServiceNameMatchingConfigFileDirectory(string configFileDirectory)
+    {
+      return _serviceInfos.Count == 0
+             ? string.Empty
+             : (_serviceInfos.Count == 1
+                ? _serviceInfos[0].ServiceName
+                : _serviceInfos.FirstOrDefault(si => Path.GetFullPath(si.IniDirectory).Equals(Path.GetFullPath(configFileDirectory)))?.ServiceName ?? _serviceInfos[0].ServiceName);
+    }
+
+    public static string GetBinaryPath(string serviceName)
+    {
+      if (string.IsNullOrEmpty(serviceName))
+      {
+        return string.Empty;
+      }
+
+      string binaryPath = string.Empty;
+      try
+      {
+        using (var ssc = new ExpandedServiceController(serviceName))
+        {
+          binaryPath = ssc.BinaryPath;
+          ssc.Close();
+        }
+      }
+      catch (Exception e)
+      {
+        Logger.LogException(e);
+      }
+
+      return binaryPath;
+    }
+
+    public static Service GetServiceDetails(string serviceName)
+    {
+      using (var managementBaseObject = new ManagementObjectSearcher(new SelectQuery($"SELECT * FROM Win32_Service WHERE Name = '{serviceName}'")).Get())
+      {
+        var managementObject = managementBaseObject.Cast<ManagementObject>().FirstOrDefault();
+        if (managementObject == null)
+        {
+          return null;
+        }
+
+        var service = new Service
+        {
+          AcceptPause = managementObject["AcceptPause"] != null && (bool)managementObject["AcceptPause"],
+          AcceptStop = managementObject["AcceptStop"] != null && (bool)managementObject["AcceptStop"],
+          Caption = managementObject["Caption"]?.ToString() ?? string.Empty,
+          Description = managementObject["Description"]?.ToString() ?? string.Empty,
+          DisplayName = managementObject["DisplayName"]?.ToString() ?? string.Empty,
+          Name = managementObject["Name"]?.ToString() ?? string.Empty,
+          PathName = managementObject["PathName"]?.ToString() ?? string.Empty,
+          ProcessId = managementObject["ProcessId"] != null ? Convert.ToInt32(managementObject["ProcessId"]) : 0,
+          ServiceType = managementObject["ServiceType"]?.ToString() ?? string.Empty,
+          Started = managementObject["Started"] != null && (bool)managementObject["Started"],
+          StartMode = managementObject["StartMode"]?.ToString() ?? string.Empty,
+          StartName = managementObject["StartName"]?.ToString() ?? string.Empty,
+          State = managementObject["State"]?.ToString() ?? string.Empty,
+          Status = managementObject["Status"]?.ToString() ?? string.Empty,
+        };
+        return service;
+      }
+    }
+
     public static ServiceControllerStatus GetServiceStatus(string serviceName)
     {
       var currentStatus = ServiceControllerStatus.Stopped;
@@ -186,6 +354,43 @@ namespace MySql.Configurator.Wizards.Server
       }
 
       return currentStatus;
+    }
+
+    public static void Restart(string serviceName)
+    {
+      _cancellationToken = new CancellationToken(false);
+      Restart(serviceName, _cancellationToken);
+    }
+
+    public static void Restart(string serviceName, CancellationToken cancellationToken)
+    {
+      if (string.IsNullOrEmpty(serviceName))
+      {
+        return;
+      }
+
+      try
+      {
+        using (var ssc = new ExpandedServiceController(serviceName))
+        {
+          if (ssc.Status == ServiceControllerStatus.Running)
+          {
+            Logger.LogVerbose($"{DateTime.Now} - Attempting to stop {serviceName} service.");
+            ssc.Stop();
+          }
+
+          ssc.WaitForStatus(ServiceControllerStatus.Stopped, cancellationToken);
+          Logger.LogVerbose($"{DateTime.Now} - Attempting to start {serviceName} service.");
+          ssc.Start();
+          ssc.WaitForStatus(ServiceControllerStatus.Running, cancellationToken);
+          ssc.Close();
+        }
+      }
+      catch (Exception e)
+      {
+        Logger.LogException(e);
+        throw;
+      }
     }
 
     /// <summary>
@@ -510,142 +715,6 @@ namespace MySql.Configurator.Wizards.Server
       return !ServiceNameIsAvailable(serviceName)
         ? Resources.WindowsServiceNameInUseError
         : null;
-    }
-
-    public string BinaryPath(string serviceName)
-    {
-      if (string.IsNullOrEmpty(serviceName))
-      {
-        return string.Empty;
-      }
-
-      string binaryPath = string.Empty;
-      try
-      {
-        using (var ssc = new ExpandedServiceController(serviceName))
-        {
-          binaryPath = ssc.BinaryPath;
-          ssc.Close();
-        }
-      }
-      catch (Exception e)
-      {
-        Logger.LogException(e);
-      }
-
-      return binaryPath;
-    }
-
-    public string FindServiceName(string baseDirectory)
-    {
-      string foundService = string.Empty;
-
-      //// Search through all the registry keys for each reference to each instance's bin location.
-      try
-      {
-        var scmServices = ServiceController.GetServices();
-        foreach (var scmService in scmServices)
-        {
-          var superServiceController = new ExpandedServiceController(scmService);
-
-          string regexSeed = Path.GetFullPath(baseDirectory) + ".";
-          regexSeed = regexSeed.Replace(@"\", @"[\/\\]");
-          regexSeed = regexSeed.Replace(@"(", @"\(");
-          regexSeed = regexSeed.Replace(@")", @"\)");
-
-          var localTemplate = new Regex(regexSeed);
-          var localMatch = localTemplate.Match(superServiceController.BinaryPath);
-
-          if (localMatch.Success)
-          {
-            foundService = superServiceController.ServiceName;
-          }
-
-          superServiceController.Close();
-          scmService.Close();
-        }
-      }
-      catch (Exception e)
-      {
-        Logger.LogException(e);
-      }
-
-      return foundService;
-    }
-
-    public string GetIniInfo(string serviceName)
-    {
-      var defaultsFilePattern = new Regex(@" --defaults-file=""(?<iniLocation>.+)?"" ");
-      var match = defaultsFilePattern.Match(BinaryPath(serviceName));
-      return !match.Success ? null : match.Groups["iniLocation"].Value;
-    }
-
-    public Service GetServiceDetails(string serviceName)
-    {
-      using (var managementBaseObject = new ManagementObjectSearcher(new SelectQuery($"SELECT * FROM Win32_Service WHERE Name = '{serviceName}'")).Get())
-      {
-        var managementObject = managementBaseObject.Cast<ManagementObject>().FirstOrDefault();
-        if (managementObject == null)
-        {
-          return null;
-        }
-
-        var service = new Service
-        {
-          AcceptPause = managementObject["AcceptPause"] != null && (bool)managementObject["AcceptPause"],
-          AcceptStop = managementObject["AcceptStop"] != null && (bool)managementObject["AcceptStop"],
-          Caption = managementObject["Caption"]?.ToString() ?? string.Empty,
-          Description = managementObject["Description"]?.ToString() ?? string.Empty,
-          DisplayName = managementObject["DisplayName"]?.ToString() ?? string.Empty,
-          Name = managementObject["Name"]?.ToString() ?? string.Empty,
-          PathName = managementObject["PathName"]?.ToString() ?? string.Empty,
-          ProcessId = managementObject["ProcessId"] != null ? Convert.ToInt32(managementObject["ProcessId"]) : 0,
-          ServiceType = managementObject["ServiceType"]?.ToString() ?? string.Empty,
-          Started = managementObject["Started"] != null && (bool)managementObject["Started"],
-          StartMode = managementObject["StartMode"]?.ToString() ?? string.Empty,
-          StartName = managementObject["StartName"]?.ToString() ?? string.Empty,
-          State = managementObject["State"]?.ToString() ?? string.Empty,
-          Status = managementObject["Status"]?.ToString() ?? string.Empty,
-        };
-        return service;
-      }
-    }
-
-    public void Restart(string serviceName)
-    {
-      _cancellationToken = new CancellationToken(false);
-      Restart(serviceName, _cancellationToken);
-    }
-
-    public void Restart(string serviceName, CancellationToken cancellationToken)
-    {
-      if (string.IsNullOrEmpty(serviceName))
-      {
-        return;
-      }
-
-      try
-      {
-        using (var ssc = new ExpandedServiceController(serviceName))
-        {
-          if (ssc.Status == ServiceControllerStatus.Running)
-          {
-            Logger.LogVerbose($"{DateTime.Now} - Attempting to stop {serviceName} service.");
-            ssc.Stop();
-          }
-
-          ssc.WaitForStatus(ServiceControllerStatus.Stopped, cancellationToken);
-          Logger.LogVerbose($"{DateTime.Now} - Attempting to start {serviceName} service.");
-          ssc.Start();
-          ssc.WaitForStatus(ServiceControllerStatus.Running, cancellationToken);
-          ssc.Close();
-        }
-      }
-      catch (Exception e)
-      {
-        Logger.LogException(e);
-        throw;
-      }
     }
   }
 }

@@ -55,12 +55,26 @@ namespace MySql.Configurator.Wizards.Server
     /// </summary>
     private ServerConfigurationController _controller;
 
+    /// <summary>
+    /// The MySQL Server package corresponding to this server instance.
+    /// </summary>
+    private Core.Package.Package _serverPackage;
+
     #endregion Fields
 
     /// <summary>
     /// Initializes a new instance of the <seealso cref="LocalServerInstance"/> class.
     /// </summary>
-    /// <param name="type">The <seealso cref="InnoDbClusterType"/> this instance was configured as.</param>
+    /// <param name="serverPackage">The MySQL Server package corresponding to this server instance.</param>
+    /// <param name="reportStatusDelegate">An <seealso cref="System.Action"/> to output status messages.</param>
+    public LocalServerInstance(Core.Package.Package serverPackage, Action<string> reportStatusDelegate = null)
+      : this(serverPackage.Controller as ServerConfigurationController, reportStatusDelegate)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <seealso cref="LocalServerInstance"/> class.
+    /// </summary>
     /// <param name="controller">The <see cref="ServerConfigurationController"/> related to this instance.</param>
     /// <param name="reportStatusDelegate">An <seealso cref="System.Action"/> to output status messages.</param>
     /// <param name="port">The port where this instance listens for connections.</param>
@@ -68,6 +82,7 @@ namespace MySql.Configurator.Wizards.Server
       : base(port, reportStatusDelegate)
     {
       _controller = controller ?? throw new ArgumentNullException(nameof(controller));
+      _serverPackage = controller.Package ?? throw new ArgumentNullException(nameof(controller.Package));
       MaxConnectionRetries = DEFAULT_MAX_CONNECTION_RETRIES;
       Type = ServerConfigurationType.StandAlone;
       ParseErrorLogForAcceptingConnections = true;
@@ -90,11 +105,6 @@ namespace MySql.Configurator.Wizards.Server
     public string ConfigurationRootPassword => _controller.Settings.ExistingRootPassword;
 
     /// <summary>
-    /// Gets a value indicating whether this instance is running and connections can be made.
-    /// </summary>
-    public bool IsRunning => RunningProcess != null;
-
-    /// <summary>
     /// Gets or sets the maximum number of retries to perform with the connection.
     /// </summary>
     public int MaxConnectionRetries { get; set; }
@@ -113,23 +123,6 @@ namespace MySql.Configurator.Wizards.Server
     /// Gets or sets a value indicating whether to determine if the server is accepting connections after starting it by parsing its error log, or by attempting connecting to it.
     /// </summary>
     public bool ParseErrorLogForAcceptingConnections { get; set; }
-
-    /// <summary>
-    /// Gets the ID of the process associated with this Server instance.
-    /// </summary>
-    public int ProcessId => Core.Classes.Utilities.GetServerInstanceProcessId(_controller.DataDirectory);
-
-    /// <summary>
-    /// Gets a running <seealso cref="Process"/> associated with this Server instance.
-    /// </summary>
-    public Process RunningProcess
-    {
-      get
-      {
-        var processId = ProcessId;
-        return processId > 0 ? Core.Classes.Utilities.GetRunningProcess(processId) : null;
-      }
-    }
 
     /// <summary>
     /// Gets the full file path for the Server configuration file.
@@ -151,6 +144,16 @@ namespace MySql.Configurator.Wizards.Server
         return _controller.Settings.ServerId ?? 1;
       }
     }
+
+    /// <summary>
+    /// Gets a flag indicating if a Windows service for this instance exists.
+    /// </summary>
+    public bool ServiceExists => _controller.Settings.ServiceExists();
+
+    /// <summary>
+    /// Gets the service name.
+    /// </summary>
+    public string ServiceName => _controller.Settings.ServiceName;
 
     /// <summary>
     /// Gets the <seealso cref="ServerConfigurationType"/> this instance was configured as.
@@ -269,6 +272,16 @@ namespace MySql.Configurator.Wizards.Server
 
       errorMessage = GetDataDirectoryInUseErrorMessage(mySqlErrorLog, controller);
       return connectionResult;
+    }
+
+    /// <summary>
+    /// Checks if a connection to this instance can be established with the credentials in <see cref="MySqlServerInstance.UserAccount"/>.
+    /// This method omits validating if a process was associated to this instance.
+    /// </summary>
+    /// <returns>A <see cref="ConnectionResultType"/> value.</returns>
+    public ConnectionResultType CanConnectWithoutDedicatedProcess()
+    {
+      return base.CanConnect();
     }
 
     /// <summary>
@@ -445,35 +458,11 @@ namespace MySql.Configurator.Wizards.Server
     }
 
     /// <summary>
-    /// Kills this MySQL Server instance's related process.
-    /// </summary>
-    public void KillInstanceProcess()
-    {
-      var processToKill = RunningProcess;
-      if (processToKill == null)
-      {
-        ReportStatus(string.Format(Resources.ProcessNotRunningText, NameWithVersion));
-        return;
-      }
-
-      var processId = processToKill.Id;
-      ReportStatus(string.Format(Resources.StoppingProcessText, NameWithVersion, processId));
-      if (!processToKill.HasExited)
-      {
-        processToKill.Kill();
-        processToKill.WaitForExit();
-      }
-
-      processToKill.Dispose();
-      ReportStatus(string.Format(Resources.StoppedProcessText, NameWithVersion, processId));
-    }
-
-    /// <summary>
     /// Attempts to connect to the Server instance and do a graceful shutdown before stopping it.
     /// </summary>
     /// <param name="useOldSettings">Flag indicating whether the old settings must be used instead of the new settings to build the command line options.</param>
     /// <returns><c>true</c> if the Server is stopped (gracefully or not), <c>false</c> otherwise.</returns>
-    public bool ShutdownInstance(bool useOldSettings)
+    public new bool ShutdownInstance(bool useOldSettings)
     {
       if (_controller.Package.License == LicenseType.Commercial
           && _controller.ConfigurationType == ConfigurationType.New
@@ -548,7 +537,7 @@ namespace MySql.Configurator.Wizards.Server
     /// <summary>
     /// Stops this Server instance as previously configured (Windows Service or process).
     /// </summary>
-    public void StopInstance()
+    public override void StopInstance()
     {
       if (!IsRunning)
       {
@@ -1006,28 +995,6 @@ namespace MySql.Configurator.Wizards.Server
       }
 
       return startStatus;
-    }
-
-    /// <summary>
-    /// Determines whether the server is running, specifying time to wait and certain number of retries until is not running.
-    /// </summary>
-    /// <param name="waitingSeconds">The waiting time in seconds.</param>
-    /// <param name="maxRetries">The maximum number of retries.</param>
-    /// <returns><c>true</c> if the instance is not running, <c>false</c> if running even when exhausting the number of retries.</returns>
-    private bool WaitUntilNotRunning(int waitingSeconds, int maxRetries)
-    {
-      for (int i = 0; i < maxRetries; i++)
-      {
-        if (!IsRunning)
-        {
-          return true;
-        }
-
-        Thread.Sleep(waitingSeconds * 1000);
-        ReportStatus(string.Format(Resources.ServerInstanceStillRunningRetryText, i + 1));
-      }
-
-      return false;
     }
   }
 }

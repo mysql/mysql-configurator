@@ -44,11 +44,6 @@ namespace MySql.Configurator.Wizards.Server
     /// </summary>
     private MySqlServerSettings _settings;
 
-    /// <summary>
-    /// The password that has been validated by testing the connection.
-    /// </summary>
-    private string _validatedPassword;
-
     #endregion Fields
 
     /// <summary>
@@ -65,7 +60,6 @@ namespace MySql.Configurator.Wizards.Server
       InitializeComponent();
       _controller = controller;
       _credsOk = false;
-      _validatedPassword = null;
       if (_controller.ConfigurationType != ConfigurationType.Remove)
       {
         captionLabel.Text = Resources.ServerRemovePageReconfigurationTitle;
@@ -96,9 +90,8 @@ namespace MySql.Configurator.Wizards.Server
     /// Disables the Next button if not all required values are set.
     /// </summary>
     /// <returns><c>true</c> if the Next button should be enabled, <c>false</c> otherwise.</returns>
-    public override bool NextOk => _settings.InnoDbClusterType != ServerConfigurationType.AddToCluster
-                                   || ((_controller.ConfigurationType != ConfigurationType.Upgrade
-                                        || _credsOk))
+    public override bool NextOk => (_controller.ConfigurationType != ConfigurationType.Upgrade
+                                    || _credsOk)
                                    && base.NextOk;
 
     #endregion Properties
@@ -113,14 +106,6 @@ namespace MySql.Configurator.Wizards.Server
       if (_controller.ConfigurationType == ConfigurationType.Remove)
       {
         _controller.RemoveDataDirectory = RemoveDataDirectoryPanel.Visible && RemoveDataDirectoryCheckBox.Checked;
-      }
-
-      if (_controller.ConfigurationType == ConfigurationType.Upgrade
-          && _settings.InnoDbClusterType == ServerConfigurationType.AddToCluster)
-      {
-        _controller.Settings.ExistingRootPassword =
-          _controller.Settings.RootPassword =
-            _validatedPassword;
       }
 
       return base.Next();
@@ -148,22 +133,14 @@ namespace MySql.Configurator.Wizards.Server
         return;
       }
 
+      PageVisible = true;
+
       // Removing the data directory is exclusive to a Remove/Uninstall operation.
       if (_controller.ConfigurationType == ConfigurationType.Remove
           && _controller.IsThereServerDataFiles)
       {
         RemoveDataDirectoryPanel.Visible = true;
-        PageVisible = true;
-        return;
       }
-
-      if (_controller.ConfigurationType == ConfigurationType.New
-          && _settings.InnoDbClusterType != ServerConfigurationType.Sandbox)
-      {
-        return;
-      }
-
-      PageVisible = true;
     }
   }
 }

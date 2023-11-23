@@ -45,8 +45,9 @@ namespace MySql.Configurator.Wizards.Server
       _controller = controller;
       _dataDirectoryConfigured = _controller.IsDataDirectoryConfigured;
       _settings = controller.Settings;
-      _rootPasswordOk = false;
+      _rootPasswordOk = !string.IsNullOrEmpty(_controller.RootPassword);
       _addEditUsersListViewSorter = new ColumnSorter();
+      CurrentRootPasswordTextBox.Text = _controller.RootPassword;
       UserAccountsListView.ListViewItemSorter = _addEditUsersListViewSorter;
 
       // Verify application resources are available.

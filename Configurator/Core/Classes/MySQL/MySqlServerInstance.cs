@@ -16,11 +16,20 @@
 // 02110-1301  USA
 
 using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
+using System.Text;
+using System.Text.RegularExpressions;
 using MySql.Configurator.Core.Classes.Logging;
+using MySql.Configurator.Core.Controllers;
 using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Properties;
+using MySql.Configurator.Wizards.Server;
 using MySql.Data.MySqlClient;
 
 namespace MySql.Configurator.Core.Classes.MySql
@@ -33,9 +42,19 @@ namespace MySql.Configurator.Core.Classes.MySql
     #region Constants
 
     /// <summary>
+    /// The default name assigned to data directories.
+    /// </summary>
+    public const string DEFAULT_DATADIR_NAME_REGEX = @"MySQL Server (?<Series>\d{1,3}\.\d{1,3})";
+
+    /// <summary>
     /// The MySQL default port.
     /// </summary>
     public const int DEFAULT_PORT = 3306;
+
+    /// <summary>
+    /// The default name assigned to windows service names.
+    /// </summary>
+    public const string DEFAULT_SERVICE_NAME_REGEX = @"^MySQL(?<Series>\d\d)$";
 
     /// <summary>
     /// The regex string to validate host names.
@@ -91,18 +110,49 @@ namespace MySql.Configurator.Core.Classes.MySql
     /// The waiting time in milliseconds between connection attempts.
     /// </summary>
     public const int WAITING_TIME_BETWEEN_CONNECTIONS_IN_MILLISECONDS = 3000;
-  
+
     #endregion Constants
 
     #region Fields
 
     /// <summary>
+    /// The base directory containing the MySQL Server instance installation files.
+    /// </summary>
+    private string _baseDir;
+
+    /// <summary>
+    /// The directory where the MySQL Server instance stores the data files.
+    /// </summary>
+    private string _dataDir;
+
+    /// <summary>
     /// The member role of this instance in a group replication cluster.
     /// </summary>
     private GroupReplicationMemberRoleType _groupReplicationMemberRole;
+
+    /// <summary>
+    /// The ID of the process associated with this MySQL Server instance.
+    /// </summary>
+    private int _processId;
+
+    /// <summary>
+    /// The running <seealso cref="Process"/> associated with this Server instance.
+    /// </summary>
+    private Process _runningProcess;
+
     /// The version number of the instance.
     /// </summary>
     private Version _serverVersion;
+
+    /// <summary>
+    /// The MySQL service control manager associated to Windows services related to this instance (if any).
+    /// </summary>
+    private MySqlServiceControlManager _serviceControlManager;
+
+    /// <summary>
+    /// A dictionary with versions and variables that have been removed on each one since version 8.0.0.
+    /// </summary>
+    private static Dictionary<Version, List<string>> _removedVariables;
 
     #endregion Fields
 
@@ -138,14 +188,171 @@ namespace MySql.Configurator.Core.Classes.MySql
     #region Properties
 
     /// <summary>
+    /// Gets a dictionary with versions and variables that have been removed on each one since version 8.0.0.
+    /// </summary>
+    public static Dictionary<Version, List<string>> RemovedVariables
+    {
+      get
+      {
+        if (_removedVariables == null)
+        {
+          _removedVariables = new Dictionary<Version, List<string>>
+          {
+            {
+              new Version(8, 0, 0),
+              new List<string>() { "bootstrap",
+                                   "com_alter_db_upgrade",
+                                   "ignore-db-dir",
+                                   "ignore_db_dirs",
+                                   "innodb_checksums",
+                                   "innodb_disable_resize_buffer_pool_debug",
+                                   "innodb_file_format",
+                                   "innodb_file_format_check",
+                                   "innodb_file_format_max",
+                                   "innodb_large_prefix",
+                                   "innodb_locks_unsafe_for_binlog",
+                                   "innodb_stats_sample_pages",
+                                   "innodb_support_xa",
+                                   "partition",
+                                   "skip-partition",
+                                   "sync_frm" }
+            },
+            {
+              new Version(8, 0, 1),
+              new List<string>() { "show_compatibility_56",
+                                   "slave_heartbeat_period",
+                                   "slave_last_heartbeat",
+                                   "slave_received_heartbeats",
+                                   "slave_retried_transactions",
+                                   "slave_running",
+                                   "temp-pool" }
+            },
+            {
+              new Version(8, 0, 2),
+              new List<string>() { "innodb_available_undo_logs",
+                                   "innodb_undo_logs" }
+            },
+            {
+              new Version(8, 0, 3),
+              new List<string>() { "date_format",
+                                   "datetime_format",
+                                   "have_crypt",
+                                   "des-key-file",
+                                   "ignore_builtin_innodb",
+                                   "log-warnings",
+                                   "max_tmp_tables",
+                                   "multi_range_count",
+                                   "qcache_free_blocks",
+                                   "qcache_free_memory",
+                                   "qcache_hits",
+                                   "qcache_inserts",
+                                   "qcache_lowmem_prunes",
+                                   "qcache_not_cached",
+                                   "qcache_queries_in_cache",
+                                   "qcache_total_blocks",
+                                   "query_cache_limit",
+                                   "query_cache_min_res_unit",
+                                   "query_cache_size",
+                                   "query_cache_type",
+                                   "query_cache_wlock_invalidate",
+                                   "secure_auth",
+                                   "time_format",
+                                   "tx_isolation",
+                                   "tx_read_only" }
+            },
+            {
+              new Version(8, 0, 4),
+              new List<string>() { "group_replication_allow_local_disjoint_gtids_join",
+                                   "innodb_scan_directories",
+                                   "log_error_filter_rules" }
+            },
+            {
+              new Version(8, 0, 11),
+              new List<string>() { "log_builtin_as_identified_by_password",
+                                   "old_passwords" }
+            },
+            {
+              new Version(8, 0, 13),
+              new List<string>() { "log_syslog",
+                                   "log_syslog_facility",
+                                   "log_syslog_include_pid",
+                                   "log_syslog_tag",
+                                   "metadata_locks_cache_size",
+                                   "metadata_locks_hash_instances" }
+            },
+            { 
+              new Version(8, 0, 16),
+              new List<string>() { "internal_tmp_disk_storage_engine" }
+            },
+            { new Version(8, 0, 30),
+              new List<string>() { "myisam_repair_threads" }
+            }
+          };
+        }
+
+        return _removedVariables;
+      }
+    }
+
+    /// <summary>
     /// Flag indicating that RSA public keys should be retrieved from the server.
     /// </summary>
     public bool AllowPublicKeyRetrieval { get; set; }
 
     /// <summary>
+    /// Gets the base directory containing the MySQL Server instance installation files.
+    /// </summary>
+    public string BaseDir
+    {
+      get
+      {
+        if (string.IsNullOrEmpty(_baseDir))
+        {
+          var boxedBaseDir = ExecuteScalar("SELECT @@basedir;", out var error);
+          if (string.IsNullOrEmpty(error))
+          {
+            _baseDir = boxedBaseDir.ToString();
+          }
+          else
+          {
+            Logger.LogError(Resources.ServerInstanceFailedToRetrieveBaseDir);
+            Logger.LogError(error);
+          }
+        }
+
+        return _baseDir;
+      }
+    }
+
+    /// <summary>
     /// Gets or sets the <see cref="MySqlConnectionProtocol"/> for establishing connections.
     /// </summary>
     public MySqlConnectionProtocol ConnectionProtocol { get; set; }
+
+    /// <summary>
+    /// Gets the directory where the MySQL Server instance stores the data files.
+    /// </summary>
+    public string DataDir
+    {
+      get
+      {
+        if (string.IsNullOrEmpty(_dataDir))
+        {
+          var boxedDataDir = ExecuteScalar("SELECT @@datadir;", out var error);
+          if (string.IsNullOrEmpty(error))
+          {
+            _dataDir = boxedDataDir.ToString();
+          }
+          else
+          {
+            Logger.LogError(Resources.ServerInstanceFailedToRetrieveDataDir);
+            Logger.LogError(error);
+          }
+        }
+
+        return _dataDir;
+      }
+    }
 
     /// <summary>
     /// Flag indicating if any reporting of statuses is disabled even if the <seealso cref="ReportStatusDelegate"/> exists.
@@ -169,6 +376,12 @@ namespace MySql.Configurator.Core.Classes.MySql
         return _groupReplicationMemberRole;
       }
     }
+
+    /// <summary>
+    /// Gets a value indicating whether this instance is running and connections can be made.
+    /// </summary>
+    public bool IsRunning => RunningProcess != null
+                             && !RunningProcess.HasExited;
 
     /// <summary>
     /// Gets a value indicating if the username is valid.
@@ -204,9 +417,41 @@ namespace MySql.Configurator.Core.Classes.MySql
     public uint Port { get; protected set; }
 
     /// <summary>
+    /// Gets the ID of the process associated with this Server instance.
+    /// </summary>
+    public int ProcessId
+    {
+      get
+      {
+        if (_processId == 0)
+        {
+          _processId = Utilities.GetServerInstanceProcessId(DataDir);
+        }
+
+        return _processId;
+      }
+    }
+
+    /// <summary>
     /// Gets an <seealso cref="System.Action"/> to output status messages.
     /// </summary>
-    public Action<string> ReportStatusDelegate { get; }
+    public Action<string> ReportStatusDelegate { get; set; }
+
+    /// <summary>
+    /// Gets a running <seealso cref="Process"/> associated with this Server instance.
+    /// </summary>
+    public Process RunningProcess
+    {
+      get
+      {
+        if (_runningProcess == null && ProcessId > 0)
+        {
+          _runningProcess = Utilities.GetRunningProcess(ProcessId);
+        }
+
+        return _runningProcess;
+      }
+    }
 
     /// <summary>
     /// Gets the Server ID of this instance.
@@ -240,6 +485,23 @@ namespace MySql.Configurator.Core.Classes.MySql
     }
 
     /// <summary>
+    /// Gets the MySQL service control manager associated to Windows services related to this instance (if any).
+    /// </summary>
+    public MySqlServiceControlManager ServiceControlManager
+    {
+      get
+      {
+        if (_serviceControlManager == null
+            && !string.IsNullOrEmpty(BaseDir))
+        {
+          _serviceControlManager = new MySqlServiceControlManager(BaseDir);
+        }
+
+        return _serviceControlManager;
+      }
+    }
+
+    /// <summary>
     /// Flag to specifiy the desired security state of the connection to the server.
     /// </summary>
     public MySqlSslMode SslMode { get; set; }
@@ -250,6 +512,23 @@ namespace MySql.Configurator.Core.Classes.MySql
     public MySqlServerUser UserAccount { get; set; }
 
     #endregion Properties
+
+    /// <summary>
+    /// Checks if the name of the data directory matches the default name assigned by the configurator.
+    /// </summary>
+    /// <param name="checkForVersion">If not <c>null</c>, it also checks the first 2 digits of the given version are not used in the name.</param>
+    /// <returns><c>true</c> if name of the data directory matches the default name assigned by the configurator, <c>false</c> otherwise.</returns>
+    public bool IsDataDirNameDefault(Version differentToVersion = null)
+    {
+      if (string.IsNullOrEmpty(DataDir))
+      {
+        throw new Exception(Resources.ServerInstanceFailedToRetrieveDataDir);
+      }
+
+      var parentFolder = new DirectoryInfo(DataDir).Parent.Name;
+      var match = Regex.Match(parentFolder, DEFAULT_DATADIR_NAME_REGEX, RegexOptions.IgnoreCase);
+      return differentToVersion != null ? match.Success && match.Groups["Series"].Value != differentToVersion.ToString(2) : match.Success;
+    }
 
     /// <summary>
     /// Verifies if a given host name represents a local connection.
@@ -299,6 +578,23 @@ namespace MySql.Configurator.Core.Classes.MySql
              || exeName.EndsWith("mysqld-nt.exe")
              || exeName.EndsWith("mysqld")
              || exeName.EndsWith("mysqld-nt");
+    }
+
+    /// <summary>
+    /// Validates if the provided service name follows the default naming convention.
+    /// </summary>
+    /// <param name="serviceName">The service name.</param>
+    /// <param name="differentToVersion">Flag to indicate if the comparison should validate that the service doesn't match the provided version.</param>
+    /// <returns><c>true</c> if the service name follows the default naming convention; otherwise, <c>false</c>.</returns>
+    public bool IsServiceNameDefault(string serviceName, Version differentToVersion = null)
+    {
+      if (string.IsNullOrEmpty(serviceName))
+      {
+        return false;
+      }
+
+      var match = Regex.Match(serviceName, DEFAULT_SERVICE_NAME_REGEX, RegexOptions.IgnoreCase);
+      return differentToVersion != null ? match.Success && match.Groups["Series"].Value != differentToVersion.ToString(2) : match.Success;
     }
 
     /// <summary>
@@ -491,12 +787,11 @@ namespace MySql.Configurator.Core.Classes.MySql
       }
 
       ConnectionResultType connectionResult;
-      var mySqlConnection = new MySqlConnection(GetConnectionStringBuilder().ConnectionString);
-      using (mySqlConnection)
+      using (var connection = new MySqlConnection(GetConnectionStringBuilder().ConnectionString))
       {
         try
         {
-          mySqlConnection.Open();
+          connection.Open();
           connectionResult = ConnectionResultType.ConnectionSuccess;
         }
         catch (MySqlException mySqlException)
@@ -585,6 +880,32 @@ namespace MySql.Configurator.Core.Classes.MySql
       }
 
       return affectedRecordsCount;
+    }
+
+    /// <summary>
+    /// Executes a query that returns a <see cref="DataTable"/>.
+    /// </summary>
+    /// <param name="sqlQuery">A query that returns a <see cref="DataTable"/>.</param>
+    /// <param name="error">An error message if an error occurred.</param>
+    /// <returns>A <see cref="DataTable"/> with the query results, or <c>null</c> if an error occurs.</returns>
+    public virtual DataTable ExecuteQuery(string sqlQuery, out string error)
+    {
+      error = null;
+      DataTable dataTable = null;
+      using (var connection = new MySqlConnection(GetConnectionStringBuilder().ConnectionString))
+      {
+        try
+        {
+          connection.Open();
+          dataTable = Utilities.GetTableFromQuery(connection, sqlQuery);
+        }
+        catch (Exception ex)
+        {
+          error = ex.Message;
+        }
+      }
+
+      return dataTable;
     }
 
     /// <summary>
@@ -822,6 +1143,30 @@ namespace MySql.Configurator.Core.Classes.MySql
     }
 
     /// <summary>
+    /// Kills this MySQL Server instance's related process.
+    /// </summary>
+    public void KillInstanceProcess()
+    {
+      if (_runningProcess == null)
+      {
+        ReportStatus(string.Format(Resources.ProcessNotRunningText, NameWithVersion));
+        return;
+      }
+
+      var processId = _runningProcess.Id;
+      ReportStatus(string.Format(Resources.StoppingProcessText, NameWithVersion, processId));
+      if (!_runningProcess.HasExited)
+      {
+        _runningProcess.Kill();
+        _runningProcess.WaitForExit();
+      }
+
+      _runningProcess.Dispose();
+      _runningProcess = null;
+      ReportStatus(string.Format(Resources.StoppedProcessText, NameWithVersion, processId));
+    }
+
+    /// <summary>
     /// Executes a RESET PERSIST statement for the specified variable.
     /// </summary>
     /// <param name="name">The name of the variable.</param>
@@ -843,6 +1188,20 @@ namespace MySql.Configurator.Core.Classes.MySql
 
       ReportStatus($"{string.Format(Resources.ServerInstanceResetPersistenceFail, name)} {error}");
       return false;
+    }
+
+    /// <summary>
+    /// Resets the running process.
+    /// </summary>
+    public void ResetRunningProcess()
+    {
+      if (_runningProcess == null)
+      {
+        return;
+      }
+
+      _runningProcess = null;
+      _processId = 0;
     }
 
     /// <summary>
@@ -872,6 +1231,85 @@ namespace MySql.Configurator.Core.Classes.MySql
     }
 
     /// <summary>
+    /// Attempts to connect to the Server instance and do a graceful shutdown before stopping it.
+    /// </summary>
+    /// <param name="useOldSettings">Flag indicating whether the old settings must be used instead of the new settings to build the command line options.</param>
+    /// <returns><c>true</c> if the Server is stopped (gracefully or not), <c>false</c> otherwise.</returns>
+    public bool ShutdownInstance()
+    {
+      if (UserAccount != null && !string.IsNullOrEmpty(BaseDir))
+      {
+        var tempConfigFileWithPassword = Utilities.CreateTempConfigurationFile(IniFile.IniFile.GetClientPasswordLines(UserAccount.Password));
+        var sendingPasswordInCommandLine = tempConfigFileWithPassword == null;
+        var connectionOptions = sendingPasswordInCommandLine
+          ? $"--password={UserAccount.Password} "
+          : $"--defaults-extra-file=\"{tempConfigFileWithPassword}\" ";
+        connectionOptions += GetCommandLineConnectionOptions(false);
+        ReportStatus(Resources.ServerShutdownSettingInnoDbFastShutdown);
+        var result = Utilities.RunProcess(
+          Path.Combine(BaseDir, ServerProductConfigurationController.BINARY_DIRECTORY_NAME, ServerProductConfigurationController.CLIENT_EXECUTABLE_FILENAME),
+          $" {connectionOptions} -e\"SET GLOBAL innodb_fast_shutdown = 0\"",
+          null,
+          ReportStatus,
+          ReportStatus,
+          true);
+        ReportStatus(result.ExitCode == 0
+          ? Resources.ServerShutdownSettingInnoDbFastShutdownSuccess
+          : Resources.ServerShutdownSettingInnoDbFastShutdownError);
+
+        ReportStatus(Resources.ServerShutdownMySqlAdminShutDown);
+        result = Utilities.RunProcess(
+          Path.Combine(BaseDir, ServerProductConfigurationController.BINARY_DIRECTORY_NAME, ServerProductConfigurationController.ADMIN_TOOL_EXECUTABLE_FILENAME),
+          $" {connectionOptions} shutdown",
+          null,
+          ReportStatus,
+          ReportStatus,
+          true);
+        ReportStatus(result.ExitCode == 0
+          ? Resources.ServerShutdownMySqlAdminShutDownSuccess
+          : Resources.ServerShutdownMySqlAdminShutDownError);
+        Utilities.DeleteFile(tempConfigFileWithPassword, 10, 500);
+      }
+
+      StopInstance();
+      return WaitUntilNotRunning(1, 30);
+    }
+
+    /// <summary>
+    /// Stops this Server instance as previously configured (Windows Service or process).
+    /// </summary>
+    public virtual void StopInstance()
+    {
+      if (!IsRunning)
+      {
+        return;
+      }
+
+      ReportStatus(Resources.StoppingServerInstanceText);
+      try
+      {
+        if (ServiceControlManager != null)
+        {
+          var serviceName = ServiceControlManager.GetBestServiceNameMatchingConfigFileDirectory(DataDir);
+          if (!string.IsNullOrEmpty(serviceName))
+          {
+            ReportStatus(Resources.ServerInstanceStoppingWindowsServiceText);
+            MySqlServiceControlManager.Stop(serviceName);
+            ReportStatus(Resources.ServerInstanceStoppedWindowsServiceText);
+          }
+        }
+        else if (IsRunning)
+        {
+          KillInstanceProcess();
+        }
+      }
+      catch (Exception ex)
+      {
+        ReportStatus(string.Format(Resources.StoppingServerInstanceErrorText, ex.Message));
+      }
+    }
+
+    /// <summary>
     /// Outputs a status message using the <seealso cref="ReportStatusDelegate"/>.
     /// </summary>
     /// <param name="statusMessage">The status message.</param>
@@ -885,6 +1323,76 @@ namespace MySql.Configurator.Core.Classes.MySql
       }
 
       ReportStatusDelegate(statusMessage);
+    }
+
+    /// <summary>
+    /// Determines whether the server is running, specifying time to wait and certain number of retries until it is not accepting connections.
+    /// </summary>
+    /// <param name="waitingSeconds">The waiting time in seconds.</param>
+    /// <param name="maxRetries">The maximum number of retries.</param>
+    /// <returns><c>true</c> if the instance is not running, <c>false</c> if running even when exhausting the number of retries.</returns>
+    protected bool WaitUntilNotRunning(int waitingSeconds, int maxRetries)
+    {
+      for (int i = 0; i < maxRetries; i++)
+      {
+        if (!IsRunning)
+        {
+          return true;
+        }
+
+        Thread.Sleep(waitingSeconds * 1000);
+        ReportStatus(string.Format(Resources.ServerInstanceStillRunningRetryText, i + 1));
+      }
+
+      return false;
+    }
+
+    /// <summary>
+    /// Assembles a connection options string for a MySQL command line program like the MySQL client.
+    /// </summary>
+    /// <param name="includePassword">Flag indicating whether the password is to be included in the options.</param>
+    /// <returns>A connection options string for a MySQL command line program like the MySQL client.</returns>
+    private string GetCommandLineConnectionOptions(bool includePassword)
+    {
+      if (UserAccount == null)
+      {
+        return string.Empty;
+      }
+
+      var builder = new StringBuilder("--user=");
+      builder.Append(UserAccount.Username);
+      if (includePassword
+          && !string.IsNullOrEmpty(UserAccount.Password))
+      {
+        builder.Append(" --password=");
+        builder.Append(UserAccount.Password);
+      }
+
+      if (ServerVersion.ServerSupportsCachingSha2Authentication())
+      {
+        builder.Append(" --default-auth=");
+        builder.Append(UserAccount.AuthenticationPlugin.GetDescription());
+      }
+
+      if (ConnectionProtocol == MySqlConnectionProtocol.Tcp && Port > 0)
+      {
+        builder.Append(" --host=");
+        builder.Append(MySqlServerUser.LOCALHOST);
+        builder.Append(" --port=");
+        builder.Append(Port.ToString());
+      }
+      else if (ConnectionProtocol == MySqlConnectionProtocol.NamedPipe && !string.IsNullOrEmpty(PipeOrSharedMemoryName))
+      {
+        builder.Append(" --pipe=");
+        builder.Append(PipeOrSharedMemoryName);
+      }
+      else if (ConnectionProtocol == MySqlConnectionProtocol.SharedMemory && !string.IsNullOrEmpty(PipeOrSharedMemoryName))
+      {
+        builder.Append(" --shared-memory-base-name=");
+        builder.Append(PipeOrSharedMemoryName);
+      }
+
+      return builder.ToString();
     }
 
     /// <summary>

@@ -126,4 +126,14 @@
   <metadata name="ValidationsErrorProvider.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>338, 17</value>
   </metadata>
+  <data name="BackupDatabaseLabel.Text" xml:space="preserve">
+    <value>Before the upgrade, a backup of the MySQL databases will be performed to ensure data can be restored later in case of any failure. This operation can be time consuming but can be skipped if you have already performed a backup or simply want to skip ths operation.
+</value>
+  </data>
+  <metadata name="ConnectionErrorProvider.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>597, 17</value>
+  </metadata>
+  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>55</value>
+  </metadata>
 </root>

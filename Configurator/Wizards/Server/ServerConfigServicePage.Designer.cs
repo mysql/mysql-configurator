@@ -69,6 +69,7 @@ namespace MySql.Configurator.Wizards.Server
       // 
       // subCaptionLabel
       // 
+      this.subCaptionLabel.Font = new System.Drawing.Font("Segoe UI", 4F);
       this.subCaptionLabel.Location = new System.Drawing.Point(24, 66);
       this.subCaptionLabel.Size = new System.Drawing.Size(522, 16);
       this.subCaptionLabel.Visible = false;
@@ -88,7 +89,7 @@ namespace MySql.Configurator.Wizards.Server
       this.ConfigureAsServiceCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
       this.ConfigureAsServiceCheckBox.Location = new System.Drawing.Point(30, 67);
       this.ConfigureAsServiceCheckBox.Name = "ConfigureAsServiceCheckBox";
-      this.ConfigureAsServiceCheckBox.Size = new System.Drawing.Size(286, 19);
+      this.ConfigureAsServiceCheckBox.Size = new System.Drawing.Size(435, 29);
       this.ConfigureAsServiceCheckBox.TabIndex = 2;
       this.ConfigureAsServiceCheckBox.Text = "Configure MySQL Server as a Windows Service";
       this.ConfigureAsServiceCheckBox.UseVisualStyleBackColor = true;
@@ -126,7 +127,7 @@ namespace MySql.Configurator.Wizards.Server
       this.WindowsServiceLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
       this.WindowsServiceLabel.Location = new System.Drawing.Point(1, 13);
       this.WindowsServiceLabel.Name = "WindowsServiceLabel";
-      this.WindowsServiceLabel.Size = new System.Drawing.Size(144, 15);
+      this.WindowsServiceLabel.Size = new System.Drawing.Size(220, 25);
       this.WindowsServiceLabel.TabIndex = 0;
       this.WindowsServiceLabel.Text = "Windows Service Details";
       // 
@@ -136,7 +137,7 @@ namespace MySql.Configurator.Wizards.Server
       this.CustomUserPasswordTextBox.AccessibleName = "Password";
       this.CustomUserPasswordTextBox.Location = new System.Drawing.Point(116, 341);
       this.CustomUserPasswordTextBox.Name = "CustomUserPasswordTextBox";
-      this.CustomUserPasswordTextBox.Size = new System.Drawing.Size(240, 23);
+      this.CustomUserPasswordTextBox.Size = new System.Drawing.Size(240, 31);
       this.CustomUserPasswordTextBox.TabIndex = 14;
       this.CustomUserPasswordTextBox.UseSystemPasswordChar = true;
       this.CustomUserPasswordTextBox.Visible = false;
@@ -149,7 +150,7 @@ namespace MySql.Configurator.Wizards.Server
       this.CustomUserUsernameTextBox.AccessibleName = "User Name";
       this.CustomUserUsernameTextBox.Location = new System.Drawing.Point(116, 313);
       this.CustomUserUsernameTextBox.Name = "CustomUserUsernameTextBox";
-      this.CustomUserUsernameTextBox.Size = new System.Drawing.Size(240, 23);
+      this.CustomUserUsernameTextBox.Size = new System.Drawing.Size(240, 31);
       this.CustomUserUsernameTextBox.TabIndex = 12;
       this.CustomUserUsernameTextBox.Visible = false;
       this.CustomUserUsernameTextBox.TextChanged += new System.EventHandler(this.TextChangedHandler);
@@ -162,7 +163,7 @@ namespace MySql.Configurator.Wizards.Server
       this.CustomUserPasswordLabel.AutoSize = true;
       this.CustomUserPasswordLabel.Location = new System.Drawing.Point(50, 344);
       this.CustomUserPasswordLabel.Name = "CustomUserPasswordLabel";
-      this.CustomUserPasswordLabel.Size = new System.Drawing.Size(60, 15);
+      this.CustomUserPasswordLabel.Size = new System.Drawing.Size(91, 25);
       this.CustomUserPasswordLabel.TabIndex = 13;
       this.CustomUserPasswordLabel.Text = "Password:";
       this.CustomUserPasswordLabel.Visible = false;
@@ -174,7 +175,7 @@ namespace MySql.Configurator.Wizards.Server
       this.CustomUserUsernameLabel.AutoSize = true;
       this.CustomUserUsernameLabel.Location = new System.Drawing.Point(42, 315);
       this.CustomUserUsernameLabel.Name = "CustomUserUsernameLabel";
-      this.CustomUserUsernameLabel.Size = new System.Drawing.Size(68, 15);
+      this.CustomUserUsernameLabel.Size = new System.Drawing.Size(103, 25);
       this.CustomUserUsernameLabel.TabIndex = 11;
       this.CustomUserUsernameLabel.Text = "User Name:";
       this.CustomUserUsernameLabel.Visible = false;
@@ -188,7 +189,7 @@ namespace MySql.Configurator.Wizards.Server
       this.CustomUserDescriptionLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(102)))), ((int)(((byte)(102)))), ((int)(((byte)(102)))));
       this.CustomUserDescriptionLabel.Location = new System.Drawing.Point(43, 291);
       this.CustomUserDescriptionLabel.Name = "CustomUserDescriptionLabel";
-      this.CustomUserDescriptionLabel.Size = new System.Drawing.Size(347, 15);
+      this.CustomUserDescriptionLabel.Size = new System.Drawing.Size(521, 25);
       this.CustomUserDescriptionLabel.TabIndex = 10;
       this.CustomUserDescriptionLabel.Text = "An existing user account can be selected for advanced scenarios.";
       // 
@@ -201,7 +202,7 @@ namespace MySql.Configurator.Wizards.Server
       this.StandardSystemAccountDescriptionLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(102)))), ((int)(((byte)(102)))), ((int)(((byte)(102)))));
       this.StandardSystemAccountDescriptionLabel.Location = new System.Drawing.Point(43, 242);
       this.StandardSystemAccountDescriptionLabel.Name = "StandardSystemAccountDescriptionLabel";
-      this.StandardSystemAccountDescriptionLabel.Size = new System.Drawing.Size(191, 15);
+      this.StandardSystemAccountDescriptionLabel.Size = new System.Drawing.Size(288, 25);
       this.StandardSystemAccountDescriptionLabel.TabIndex = 8;
       this.StandardSystemAccountDescriptionLabel.Text = "Recommended for most scenarios.";
       // 
@@ -213,7 +214,7 @@ namespace MySql.Configurator.Wizards.Server
       this.CustomUserRadioButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.CustomUserRadioButton.Location = new System.Drawing.Point(24, 266);
       this.CustomUserRadioButton.Name = "CustomUserRadioButton";
-      this.CustomUserRadioButton.Size = new System.Drawing.Size(93, 19);
+      this.CustomUserRadioButton.Size = new System.Drawing.Size(139, 29);
       this.CustomUserRadioButton.TabIndex = 9;
       this.CustomUserRadioButton.TabStop = true;
       this.CustomUserRadioButton.Text = "Custom User";
@@ -228,7 +229,7 @@ namespace MySql.Configurator.Wizards.Server
       this.StandardSystemAccountRadioButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.StandardSystemAccountRadioButton.Location = new System.Drawing.Point(24, 218);
       this.StandardSystemAccountRadioButton.Name = "StandardSystemAccountRadioButton";
-      this.StandardSystemAccountRadioButton.Size = new System.Drawing.Size(161, 19);
+      this.StandardSystemAccountRadioButton.Size = new System.Drawing.Size(240, 29);
       this.StandardSystemAccountRadioButton.TabIndex = 7;
       this.StandardSystemAccountRadioButton.TabStop = true;
       this.StandardSystemAccountRadioButton.Text = "Standard System Account";
@@ -256,7 +257,7 @@ namespace MySql.Configurator.Wizards.Server
       this.RunWindowsServiceAsLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
       this.RunWindowsServiceAsLabel.Location = new System.Drawing.Point(1, 164);
       this.RunWindowsServiceAsLabel.Name = "RunWindowsServiceAsLabel";
-      this.RunWindowsServiceAsLabel.Size = new System.Drawing.Size(154, 15);
+      this.RunWindowsServiceAsLabel.Size = new System.Drawing.Size(239, 25);
       this.RunWindowsServiceAsLabel.TabIndex = 5;
       this.RunWindowsServiceAsLabel.Text = "Run Windows Service as ...";
       // 
@@ -270,7 +271,7 @@ namespace MySql.Configurator.Wizards.Server
       this.StartWindowsServiceAtStartupCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.StartWindowsServiceAtStartupCheckBox.Location = new System.Drawing.Point(24, 101);
       this.StartWindowsServiceAtStartupCheckBox.Name = "StartWindowsServiceAtStartupCheckBox";
-      this.StartWindowsServiceAtStartupCheckBox.Size = new System.Drawing.Size(241, 19);
+      this.StartWindowsServiceAtStartupCheckBox.Size = new System.Drawing.Size(364, 29);
       this.StartWindowsServiceAtStartupCheckBox.TabIndex = 4;
       this.StartWindowsServiceAtStartupCheckBox.Text = "Start the MySQL Server at System Startup";
       this.StartWindowsServiceAtStartupCheckBox.UseVisualStyleBackColor = true;
@@ -283,7 +284,7 @@ namespace MySql.Configurator.Wizards.Server
       this.WindowsServiceNameLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.WindowsServiceNameLabel.Location = new System.Drawing.Point(1, 75);
       this.WindowsServiceNameLabel.Name = "WindowsServiceNameLabel";
-      this.WindowsServiceNameLabel.Size = new System.Drawing.Size(134, 15);
+      this.WindowsServiceNameLabel.Size = new System.Drawing.Size(202, 25);
       this.WindowsServiceNameLabel.TabIndex = 2;
       this.WindowsServiceNameLabel.Text = "Windows Service Name:";
       // 
@@ -294,7 +295,7 @@ namespace MySql.Configurator.Wizards.Server
       this.WindowsServiceNameTextBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.WindowsServiceNameTextBox.Location = new System.Drawing.Point(141, 72);
       this.WindowsServiceNameTextBox.Name = "WindowsServiceNameTextBox";
-      this.WindowsServiceNameTextBox.Size = new System.Drawing.Size(194, 23);
+      this.WindowsServiceNameTextBox.Size = new System.Drawing.Size(194, 31);
       this.WindowsServiceNameTextBox.TabIndex = 3;
       this.WindowsServiceNameTextBox.WordWrap = false;
       this.WindowsServiceNameTextBox.TextChanged += new System.EventHandler(this.TextChangedHandler);

@@ -224,6 +224,7 @@ Click Finish to continue.</value>
   </data>
   <data name="ConfigureFailed" xml:space="preserve">
     <value>The configuration for {0} has failed.
+Relevant configurations have been reverted to its original state.
 You can find more information about the failures in the 'Log' tab.</value>
   </data>
   <data name="PathInvalidError" xml:space="preserve">
@@ -255,7 +256,7 @@ You can start the configure process again by clicking Retry.</value>
     <value>MySQL Configurator was not launched properly. Try re-installing an installer bundle.</value>
   </data>
   <data name="UnhandledException" xml:space="preserve">
-    <value>Internal error. ({0}) The installer will now close.</value>
+    <value>Internal error. ({0}) The Configurator will now close.</value>
   </data>
   <data name="MoreInfoText" xml:space="preserve">
     <value>More information</value>
@@ -296,7 +297,7 @@ Click Finish to continue.</value>
   </data>
   <data name="ConfigureSuccess" xml:space="preserve">
     <value>The configuration for {0} was successful.
-Click Next to continue.</value>
+Click Finish to continue.</value>
   </data>
   <data name="RemoveFailed" xml:space="preserve">
     <value>The removal for some products has failed or was cancelled by the user.
@@ -463,9 +464,6 @@ You can find more information about the failures in the 'Log' tab.</value>
   </data>
   <data name="ServerConfigBackupDatabaseDumpRunSuccess" xml:space="preserve">
     <value>Finished backing up database with mysqldump tool.</value>
-  </data>
-  <data name="ServerConfigBackupDatabaseServerStartError" xml:space="preserve">
-    <value>An error occurred while trying to start MySQL Server in order to run the mysqldump tool.</value>
   </data>
   <data name="ServerConfigBackupDatabaseStep" xml:space="preserve">
     <value>Backing up MySQL database</value>
@@ -1609,5 +1607,137 @@ Please close MySQL Workbench and restart {0} to perform the merge.</value>
   </data>
   <data name="PathUnknownError" xml:space="preserve">
     <value>The given file path is invalid.</value>
+  </data>
+  <data name="ServerRemoveOldInstallationStep" xml:space="preserve">
+    <value>Removing existing MySQL Server installation being replaced</value>
+  </data>
+  <data name="ServerResetPersistedVariablesStep" xml:space="preserve">
+    <value>Removing deprecated variables set using SET PERSIST</value>
+  </data>
+  <data name="RemovingPersistedServerVariables" xml:space="preserve">
+    <value>Removing the following {0} unsupported persisted variables from MySQL Server: {1}</value>
+  </data>
+  <data name="RemovingPersistedServerVariablesError" xml:space="preserve">
+    <value>Failed to remove one or more unsupported persisted variables from MySQL Server.</value>
+  </data>
+  <data name="ServerInstanceFailedToRetrieveBaseDir" xml:space="preserve">
+    <value>Failed to retrieve the installation directory from the MySQL Server instance.</value>
+  </data>
+  <data name="ServerInstanceFailedToRetrieveDataDir" xml:space="preserve">
+    <value>Failed to retrieve the data directory from the MySQL Server instance.</value>
+  </data>
+  <data name="PersistedVariablesQueryError" xml:space="preserve">
+    <value>Failed to query for persisted system variables with the following error:
+{0}</value>
+  </data>
+  <data name="DataDirectoryNotEmptyError" xml:space="preserve">
+    <value>The given data directory is not empty. For a new installation the data directory must be empty.</value>
+  </data>
+  <data name="ExistingDataDirectoryIsDefaultAndWillBeRenamed" xml:space="preserve">
+    <value>The data directory name will be renamed to
+"{0}" before the data is upgraded.</value>
+  </data>
+  <data name="ExistingServerInstanceNotRunningError" xml:space="preserve">
+    <value>The existing server installation instance to be replaced must be running.</value>
+  </data>
+  <data name="ExistingServerInstanceNotSetError" xml:space="preserve">
+    <value>No existing server installation instance to be replaced was set.</value>
+  </data>
+  <data name="RenameExistingDataDirectoryStep" xml:space="preserve">
+    <value>Renaming the existing data directory</value>
+  </data>
+  <data name="StoppingExistingServerInstanceStep" xml:space="preserve">
+    <value>Stopping the MySQL Server instance that will be replaced and removed</value>
+  </data>
+  <data name="PathExistsAndIsNotEmpty" xml:space="preserve">
+    <value>The specified path exists and it is not empty.</value>
+  </data>
+  <data name="RemovingGeneralSettingsFileText" xml:space="preserve">
+    <value>Removing the general settings file.</value>
+  </data>
+  <data name="ServerUpdateExampleDatabasesText" xml:space="preserve">
+    <value>Updating example databases</value>
+  </data>
+  <data name="RenamingDataDirectoryError" xml:space="preserve">
+    <value>Failed to rename the data directory to "{0}".</value>
+  </data>
+  <data name="ServerConfigUpdatingExistingServiceWithNewName" xml:space="preserve">
+    <value>Updating service name from "{0}" to "{1}".</value>
+  </data>
+  <data name="ServerConfigDataDirectoryRenamed" xml:space="preserve">
+    <value>Renamed the data directory from '{0}' to '{1}'.</value>
+  </data>
+  <data name="ServerConfigExistingInstanceNotRunning" xml:space="preserve">
+    <value>The existing MySQL Server instance to be replaced is not running, so no need to stop it.</value>
+  </data>
+  <data name="ServerConfigExistingInstanceStarted" xml:space="preserve">
+    <value>The existing MySQL Server instance has been started.</value>
+  </data>
+  <data name="ServerConfigExistingInstanceStopped" xml:space="preserve">
+    <value>The existing MySQL Server instances has been stopped.</value>
+  </data>
+  <data name="ServerConfigRemovingExistingInstance" xml:space="preserve">
+    <value>Removing the existing MySQL Server instance...</value>
+  </data>
+  <data name="ServerConfigRemovingSettingFile" xml:space="preserve">
+    <value>Removing the settings file...</value>
+  </data>
+  <data name="ServerConfigRenamingDataDirectory" xml:space="preserve">
+    <value>Attempting to rename the data directory from '{0}' to '{1}'...</value>
+  </data>
+  <data name="ServerConfigRevertDataDirRenameError" xml:space="preserve">
+    <value>Failed to revert the data directory renaming with message: {0}.</value>
+  </data>
+  <data name="ServerConfigRevertedDataDirRename" xml:space="preserve">
+    <value>Reverted the data directory renaming.</value>
+  </data>
+  <data name="ServerConfigRevertingDataDirRename" xml:space="preserve">
+    <value>Reverting the data directory renaming...</value>
+  </data>
+  <data name="ServerConfigRevertingIniFile" xml:space="preserve">
+    <value>Reverting changes to the ini file...</value>
+  </data>
+  <data name="ServerConfigRollbackFinished" xml:space="preserve">
+    <value>Rollback operation completed.</value>
+  </data>
+  <data name="ServerConfigRollbackStarted" xml:space="preserve">
+    <value>Rollback operation started. A rollback was initiated to revert any configuration changes due to an error preventing from proceeding with the configuration or upgrade.</value>
+  </data>
+  <data name="ServerConfigServiceRenameReverted" xml:space="preserve">
+    <value>Windows service rename reverted to '{0}'.</value>
+  </data>
+  <data name="ServerConfigServiceRenameRevertFailed" xml:space="preserve">
+    <value>Windows service rename failed with message: {0}.</value>
+  </data>
+  <data name="ServerConfigServiceRenameReverting" xml:space="preserve">
+    <value>Reverting the Windows service renaming...</value>
+  </data>
+  <data name="ServerConfigSettingsFilesReverFailed" xml:space="preserve">
+    <value>Failed to revert the settings files with message: {0}.</value>
+  </data>
+  <data name="ServerConfigSettingsFilesReverted" xml:space="preserve">
+    <value>The settings files have been reverted.</value>
+  </data>
+  <data name="ServerConfigSettingsFilesReverting" xml:space="preserve">
+    <value>Reverting changes to the settings files...</value>
+  </data>
+  <data name="ServerConfigShutdownExistingInstanceError" xml:space="preserve">
+    <value>An error occurred while trying to shutdown the existing MySQL Server instance to replace."</value>
+  </data>
+  <data name="ServerConfigStartingExistingInstance" xml:space="preserve">
+    <value>Starting the existing MySQL Server instance.</value>
+  </data>
+  <data name="ServerConfigStoppingExistingInstance" xml:space="preserve">
+    <value>Attempting to stop the existing MySQL Server instance...</value>
+  </data>
+  <data name="UpgradeHigherVersionError" xml:space="preserve">
+    <value>The selected server instance is of a higher version.</value>
+  </data>
+  <data name="UpgradeNotSupportedError" xml:space="preserve">
+    <value>Upgrading from '{0}' to '{1}' is not officially supported. Continuing with
+the upgrade may result in an upgrade failure, proceed at your own risk.</value>
+  </data>
+  <data name="SameVersionError" xml:space="preserve">
+    <value>Instances with the same version have been selected.</value>
   </data>
 </root>
