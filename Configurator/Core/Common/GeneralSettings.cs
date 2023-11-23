@@ -57,6 +57,11 @@ namespace MySql.Configurator.Core.Common
     public const string CONFIGURATOR_SETTINGS_FILE_NAME = "configurator_settings.json";
 
     /// <summary>
+    /// Gets or sets a flag to indicate if a warning has been shown to the user related to not being able to load the settings file.
+    /// </summary
+    public static bool LoadWarningShown { get; set; }
+
+    /// <summary>
     /// Deletes the general settings file from the specified path.
     /// </summary>
     /// <param name="path">The path where the file is located.</param>

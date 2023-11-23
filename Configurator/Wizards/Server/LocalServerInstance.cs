@@ -151,9 +151,13 @@ namespace MySql.Configurator.Wizards.Server
     public bool ServiceExists => _controller.Settings.ServiceExists();
 
     /// <summary>
-    /// Gets the service name.
+    /// Gets or sets the service name.
     /// </summary>
-    public string ServiceName => _controller.Settings.ServiceName;
+    public string ServiceName
+    {
+      get { return _controller.Settings.ServiceName; }
+      set { _controller.Settings.ServiceName = value; }
+    }
 
     /// <summary>
     /// Gets the <seealso cref="ServerConfigurationType"/> this instance was configured as.

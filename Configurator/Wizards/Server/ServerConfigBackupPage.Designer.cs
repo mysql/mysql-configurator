@@ -109,7 +109,7 @@ namespace MySql.Configurator.Wizards.Server
       this.SkipBackupRadioButton.Name = "SkipBackupRadioButton";
       this.SkipBackupRadioButton.Size = new System.Drawing.Size(360, 29);
       this.SkipBackupRadioButton.TabIndex = 6;
-      this.SkipBackupRadioButton.Text = "No thanks, I have alrady run a backup";
+      this.SkipBackupRadioButton.Text = "No thanks, I have already run a backup";
       this.SkipBackupRadioButton.UseVisualStyleBackColor = true;
       // 
       // RunBackupRadioButton

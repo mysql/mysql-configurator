@@ -207,6 +207,11 @@ namespace MySql.Configurator.Wizards.ConfigWizard
           if (serverController != null)
           {
             var revertedSteps = serverController.RevertedSteps;
+            if (revertedSteps == null)
+            {
+              break;
+            }
+
             foreach (var revertedStep in revertedSteps)
             {
               var control = ExecutionStepsTabPage.Controls.OfType<ConfigStepControl>().FirstOrDefault(configStepControl => configStepControl.Step.Description.Equals(revertedStep));

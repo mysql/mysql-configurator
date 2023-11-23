@@ -2160,6 +2160,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to See the Configurator log for additional details..
+        /// </summary>
+        public static string ReferToLogMessage {
+            get {
+                return ResourceManager.GetString("ReferToLogMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The removal for some products has failed or was cancelled by the user.
         ///You can find more information about the failures in the &apos;Log&apos; tab..
         /// </summary>
@@ -4325,6 +4334,15 @@ namespace MySql.Configurator.Properties {
         public static string SetLocalInstanceAsWritableStep {
             get {
                 return ResourceManager.GetString("SetLocalInstanceAsWritableStep", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to read file at &apos;{0}\\{1}&apos;. Configurator will run in new configuration mode..
+        /// </summary>
+        public static string SettingsFileReadError {
+            get {
+                return ResourceManager.GetString("SettingsFileReadError", resourceCulture);
             }
         }
         

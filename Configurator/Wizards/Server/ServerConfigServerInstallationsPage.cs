@@ -118,10 +118,19 @@ namespace MySql.Configurator.Wizards.Server
         _controller.ExistingServerInstallationInstance = _existingServerInstallationInstance;
         _controller.Settings.ExistingRootPassword = RootPasswordTextBox.Text;
         _controller.IsRemoveExistingServerInstallationStepNeeded = true;
+
+        // Find if existing instance is configured as service.
+        var serviceNames = MySqlServiceControlManager.FindServiceNamesWithBaseDirectory(_existingServerInstallationInstance.BaseDir);
+        if (serviceNames.Length > 0)
+        {
+          _existingServerInstallationInstance.ServiceName = serviceNames[0];
+          _controller.Settings.ServiceName = _existingServerInstallationInstance.ServiceName;
+          _controller.Settings.ConfigureAsService = true;
+        }
+
         _controller.IsServiceRenameNeeded = _existingServerInstallationInstance.IsServiceNameDefault(
-          _controller.Settings.ServiceName,
+          _existingServerInstallationInstance.ServiceName,
           _existingServerInstallationInstance.ServerVersion);
-        //_controller.Package.Version = VersionTextBox.Text.Trim();
         _controller.IsDataDirectoryRenameNeeded = DataDirectoryRenameWarningProvider.HasErrors();
         DetermineExistingServerPersistedVariablesToReset();
       }
@@ -457,17 +466,23 @@ namespace MySql.Configurator.Wizards.Server
         {
           case 0:
             controller.Settings.Port = port;
+            _controller.Settings.Port = controller.Settings.Port;
             controller.Settings.EnableTcpIp = true;
+            _controller.Settings.EnableTcpIp = controller.Settings.EnableTcpIp;
             break;
 
           case 1:
             controller.Settings.PipeName = PipeOrSharedMemoryNameTextBox.Text.Trim();
+            _controller.Settings.PipeName = controller.Settings.PipeName;
             controller.Settings.EnableNamedPipe = true;
+            _controller.Settings.EnableNamedPipe = controller.Settings.EnableNamedPipe;
             break;
 
           case 2:
             controller.Settings.SharedMemoryName = PipeOrSharedMemoryNameTextBox.Text.Trim();
+            _controller.Settings.SharedMemoryName = controller.Settings.SharedMemoryName;
             controller.Settings.EnableSharedMemory = true;
+            _controller.Settings.EnableSharedMemory = controller.Settings.EnableSharedMemory;
             break;
         }
 

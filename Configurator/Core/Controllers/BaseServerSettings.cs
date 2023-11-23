@@ -16,12 +16,15 @@
 using System;
 using System.ComponentModel;
 using System.IO;
+using System.Windows.Forms;
 using System.Xml.Serialization;
 using MySql.Configurator.Core.Classes;
+using MySql.Configurator.Core.Classes.Forms;
 using MySql.Configurator.Core.Classes.Logging;
 using MySql.Configurator.Core.Common;
 using MySql.Configurator.Core.IniFile;
 using MySql.Configurator.Properties;
+using static MySql.Configurator.Core.Classes.Forms.InfoDialog;
 
 namespace MySql.Configurator.Core.Controllers
 {
@@ -262,9 +265,16 @@ namespace MySql.Configurator.Core.Controllers
       }
 
       _generalSettings = GeneralSettingsManager.ReadSettings(InstallDirectory);
-      //_generalSettings = GeneralSettingsRegistryManager.ReadSettings(Package.NormalizedVersion);
       if (_generalSettings == null)
       {
+        if (!GeneralSettingsManager.LoadWarningShown)
+        {
+          InfoDialog.ShowDialog(InfoDialogProperties.GetWarningDialogProperties(Resources.AppName,
+          string.Format(Resources.SettingsFileReadError, InstallDirectory, GeneralSettingsManager.CONFIGURATOR_SETTINGS_FILE_NAME),
+          Resources.ReferToLogMessage));
+          GeneralSettingsManager.LoadWarningShown = true;
+        }
+
         return;
       }
 

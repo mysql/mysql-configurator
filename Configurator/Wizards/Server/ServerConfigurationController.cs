@@ -2636,7 +2636,10 @@ namespace MySql.Configurator.Wizards.Server
 
           // Verify that the Windows service does exist
           if (Settings.ConfigureAsService
-              && !MySqlServiceControlManager.ServiceExists(Settings.ServiceName)
+              && !MySqlServiceControlManager.ServiceExists(
+                ExistingServerInstallationInstance == null
+                 ? Settings.ServiceName
+                 : ExistingServerInstallationInstance.ServiceName)
               && IsThereServerDataFiles
               && (ConfigurationType != ConfigurationType.Upgrade
                  || !IsServiceRenameNeeded))
@@ -2787,8 +2790,8 @@ namespace MySql.Configurator.Wizards.Server
 
       // If server was previously configured as a service but now it will run as a process.
       bool existingService = (OldSettings != null
-                             && OldSettings.ServiceExists())
-                             || (ExistingServerInstallationInstance != null
+                              && OldSettings.ServiceExists())
+                              || (ExistingServerInstallationInstance != null
                                  && ExistingServerInstallationInstance.ServiceExists);
       bool isNew = ConfigurationType == ConfigurationType.New;
       if (existingService

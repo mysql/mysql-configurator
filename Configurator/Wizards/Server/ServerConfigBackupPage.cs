@@ -57,7 +57,6 @@ namespace MySql.Configurator.Wizards.Server
     /// </summary>
     public override void Activate()
     {
-      RunBackupRadioButton.Checked = BackupDatabase;
       base.Activate();
     }
 

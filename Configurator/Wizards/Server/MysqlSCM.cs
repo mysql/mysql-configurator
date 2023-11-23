@@ -237,6 +237,11 @@ namespace MySql.Configurator.Wizards.Server
     /// <returns>An array of service names matching the given base directory.</returns>
     public static string[] FindServiceNamesWithBaseDirectory(string baseDirectory)
     {
+      if (string.IsNullOrEmpty(baseDirectory))
+      {
+        return null;
+      }
+
       var foundServiceNames = new List<string>();
       var scmServices = ServiceController.GetServices();
       foreach (var scmService in scmServices)
