@@ -17,6 +17,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MySql.Configurator.Core.Classes;
+using MySql.Configurator.Core.Classes.Logging;
+using MySql.Configurator.Core.Common;
 using MySql.Configurator.Core.Enums;
 
 namespace MySql.Configurator.Core.Product
@@ -51,66 +53,13 @@ namespace MySql.Configurator.Core.Product
       }
     }
 
-    //private static void FindInstalledPackagesWithoutUpgradeCodes(TwoKey<Version, Guid>[] packageCodes)
-    //{
-    //  foreach (TwoKey<Version, Guid> packageCode in packageCodes)
-    //  {
-    //    Package.Package package = Manifest.NoUpgradeCode[packageCode];
-    //    InstallState state = MsiInterop.MsiQueryProductState(packageCode.Item2.ToString("B"));
-    //    package.IsInstalled = state == InstallState.Default;
-    //    if (!package.IsInstalled)
-    //    {
-    //      continue;
-    //    }
-
-    //    package.IsInstalled = true;
-    //    package.Initialize();
-    //    InstalledPackages.Add(package);
-    //  }
-    //}
-
-    private static void FindInstalledPackagesWithUpgradeCodes(Guid upgradeCode)
-    {
-      var relatedProducts = MSI.Installer.GetRelatedProducts(upgradeCode);
-      if (relatedProducts == null)
-      {
-        return;
-      }
-
-      foreach (var twoKey in relatedProducts)
-      {
-        Package.Package package = Package.Package.FromProductInfo(twoKey.Item2, upgradeCode);
-        package.UpgradeCode = upgradeCode;
-        package.IsInstalled = true;
-        package.Initialize(null, null);
-        InstalledPackages.Add(package);
-      }
-    }
-
-    public static void LoadProducts(Guid upgradeCodeGuid)
-    {
-      InstalledPackages = new List<Package.Package>();
-      FindInstalledPackagesWithUpgradeCodes(upgradeCodeGuid);
-      //FindInstalledPackagesWithoutUpgradeCodes();
-    }
-
     /// <summary>
-    /// Gets the main product.
+    /// Create a package based on the version and installation directory provided.
     /// </summary>
-    /// <param name="productGuid"></param>
-    /// <returns></returns>
-    public static Package.Package GetMatchingProduct(Guid productGuid)
-    {
-      if (InstalledPackages == null
-          || InstalledPackages.Count == 0)
-      {
-        return null;
-      }
-
-      return InstalledPackages.FirstOrDefault(package => package.Id == productGuid);
-    }
-
-    public static Package.Package LoadPackage(string version, string dataDir, string installDir)
+    /// <param name="version">The version to assign to the package.</param>
+    /// <param name="installDir">The installation directoy to assing to the package.</param>
+    /// <returns>An initialized MySQL Server package with the specified values.</returns>
+    public static Package.Package LoadPackage(string version, string installDir)
     {
       var package = new Package.Package
       {
@@ -120,7 +69,27 @@ namespace MySql.Configurator.Core.Product
       };
 
       package.NormalizedVersion = Utilities.NormalVersion(package.Version);
-      package.Initialize(dataDir, installDir);
+      package.Initialize(installDir);
+      package.Architecture = PackageArchitecture.X64;
+      package.License = AppConfiguration.License;
+
+      return package;
+    }
+
+    /// <summary>
+    /// Creates a generic package.
+    /// </summary>
+    /// <returns>A non-initialized generic MySQL Server package.</returns>
+    public static Package.Package LoadGenericPackage()
+    {
+      var package = new Package.Package
+      {
+        Version = "8.0.0",
+        Publisher = "MySQL AB",
+        DisplayName = "MySQL Server",
+      };
+
+      package.NormalizedVersion = Utilities.NormalVersion(package.Version);
       package.Architecture = PackageArchitecture.X64;
       package.License = AppConfiguration.License;
 

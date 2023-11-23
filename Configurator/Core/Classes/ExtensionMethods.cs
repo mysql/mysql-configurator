@@ -34,6 +34,7 @@ using MySql.Configurator.Core.Classes.Attributes;
 using MySql.Configurator.Core.Classes.MySqlWorkbench;
 using System.Drawing.Imaging;
 using MySql.Configurator.Core.Classes.VisualStyles;
+using MySql.Configurator.Core.Classes.MySql;
 
 namespace MySql.Configurator.Core.Classes
 {
@@ -737,6 +738,32 @@ namespace MySql.Configurator.Core.Classes
     }
 
     /// <summary>
+    /// Gets a list of MySQL Server's system variables that have been removed between the version where persisting system variables using SET PERSIST was first supported, and the given version.
+    /// </summary>
+    /// <param name="serverVersion"></param>
+    /// <returns>A list of MySQL Server's system variables that have been removed between the version where persisting system variables using SET PERSIST was first supported, and the given version.</returns>
+    public static List<string> GetUnsupportedPersistedServerVariables(this Version serverVersion)
+    {
+      var unsupportedVariables = new List<string>();
+      if (serverVersion.ServerSupportsPersistedSystemVariables())
+      {
+        foreach (var versionAndVars in MySqlServerInstance.RemovedVariables)
+        {
+          var version = versionAndVars.Key;
+          var removedVars = versionAndVars.Value;
+          if (version > serverVersion)
+          {
+            break;
+          }
+
+          unsupportedVariables.AddRange(removedVars);
+        }
+      }
+
+      return unsupportedVariables;
+    }
+
+    /// <summary>
     /// Gets the width of text drawn on the given control that can fit within its drawing area by splitting the text in lines.
     /// </summary>
     /// <param name="control">The control where we want to draw the text, normally a label.</param>
@@ -1041,13 +1068,13 @@ namespace MySql.Configurator.Core.Classes
     }
 
     /// <summary>
-    /// Gets a value indicating whether the MySQL Server supports SET PERSIST feature that can modify some global variables without the need of restart the Server.
+    /// Gets a value indicating whether persisting system variables using SET PERSIST is supported.
     /// </summary>
     /// <param name="serverVersion">The MySQL Server version.</param>
-    /// <returns><c>true</c> if the MySQL Server supports SET PERSIST feature, <c>false</c> otherwise.</returns>
-    public static bool ServerSupportsPersistSetGlobalSettings(this Version serverVersion)
+    /// <returns><c>true</c> if persisting system variables using SET PERSIST is supported, <c>false</c> otherwise.</returns>
+    public static bool ServerSupportsPersistedSystemVariables(this Version serverVersion)
     {
-      return serverVersion >= new Version("8.0.11");
+      return serverVersion >= new Version("8.0.0");
     }
 
     /// <summary>
@@ -1077,6 +1104,79 @@ namespace MySql.Configurator.Core.Classes
     public static bool ServerSupportsCachingSha2Authentication(this Version serverVersion)
     {
       return serverVersion >= new Version("8.0.4");
+    }
+
+    /// <summary>
+    /// Validates if the specified server version supports an inplace upgrade based on the rules outlined by the new versioning scheme.
+    /// </summary>
+    /// <param name="newVersion">The version to which the upgrade will be made to.</param>
+    /// <param name="oldVersion">The version of the existing server instance.</param>
+    /// <param name="newVersionMaturiy">The maturity of the version to which the upgrade will be made to.</param>
+    /// <param name="oldVersionMaturity">The maturity of the version of the existing server instance.</param>
+    /// <returns>An null string if the upgrade is supported; otherwise, an error message describing the cause of the upgrade not being supported.</returns>
+    public static string ServerSupportsInPlaceUpgrades(this Version newVersion,
+      Version oldVersion,
+      ServerMaturity newVersionMaturiy = ServerMaturity.Unknown,
+      ServerMaturity oldVersionMaturity = ServerMaturity.Unknown)
+    {
+      string errorMessage = null;
+
+      // Assign maturities if they have not been set.
+      if (oldVersionMaturity == ServerMaturity.Unknown)
+      {
+        oldVersionMaturity = Utilities.GetServerMaturity(oldVersion);
+      }
+
+      if (newVersionMaturiy == ServerMaturity.Unknown)
+      {
+        newVersionMaturiy = Utilities.GetServerMaturity(newVersion);
+      }
+
+      if (oldVersion > newVersion)
+      {
+        errorMessage = Resources.UpgradeHigherVersionError;
+      }
+      else if (oldVersion.Major == newVersion.Major
+               && oldVersion.Minor == newVersion.Minor
+               && oldVersion.Build == newVersion.Build)
+      {
+        errorMessage = Resources.SameVersionError;
+      }
+      else if (
+              // If 8.0.X to 8.Y Innovation. X>=35, Y=1
+              (oldVersionMaturity == ServerMaturity.Older
+               && oldVersion >= new Version(8, 0, 35)
+               && newVersionMaturiy == ServerMaturity.Innovation
+               && newVersion.Major == 8
+               && newVersion.Minor == 1)
+              // If 8.0.X to 8.4 LTS. X>=35
+              || (oldVersionMaturity == ServerMaturity.Older
+                  && oldVersion >= new Version(8, 0, 35)
+                  && newVersionMaturiy == ServerMaturity.LTS
+                  && newVersion.Major == 8
+                  && newVersion.Minor == 4)
+              // Upgrade within same LTS. E.g 8.4.X LTS to 8.4.Y LTS
+              || (oldVersionMaturity == ServerMaturity.LTS
+                  && newVersionMaturiy == ServerMaturity.LTS
+                  && oldVersion.Major == newVersion.Major
+                  && oldVersion.Minor == newVersion.Minor)
+              // Upgrade from one LTS to the next innovation release. E.g. 8.4.X LTS to 9.0.0 Innovation
+              || (oldVersionMaturity == ServerMaturity.LTS
+                  && newVersionMaturiy == ServerMaturity.Innovation
+                  && newVersion == new Version(oldVersion.Major + 1, 0, 0))
+              // Upgrade from one LTS to the next LTS. E.g. 8.4.X LTS to 9.7.Y LTS
+              || (oldVersionMaturity == ServerMaturity.LTS
+                  && newVersionMaturiy == ServerMaturity.LTS
+                  && oldVersion.Major + 1 == newVersion.Major))
+      {
+        errorMessage = string.Empty;
+      }
+      else
+      {
+        errorMessage = string.Format(Resources.UpgradeNotSupportedError, oldVersion, newVersion);
+      }
+
+      return errorMessage;
     }
 
     /// <summary>

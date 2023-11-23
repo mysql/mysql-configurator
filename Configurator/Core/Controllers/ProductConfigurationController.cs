@@ -224,13 +224,6 @@ namespace MySql.Configurator.Core.Controllers
         settings = new ControllerSettings(Package);
       }
 
-      if (!Utilities.RunningOnConsole()
-          && !Utilities.RunningOnTask())
-      {
-        Logger.LogInformation("Product Configuration Controller - Init - Setting pages");
-        SetPages();
-      }
-
       ResetCancellationToken();
     }
 

@@ -126,13 +126,12 @@
   <metadata name="ValidationsErrorProvider.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>338, 17</value>
   </metadata>
-  <data name="SelfContainedUpgradeLabel.Text" xml:space="preserve">
-    <value>This upgrade process is performed by MySQL Server, without relying on the mysql_upgrade client. The server will be started, then the data dictionary and system tables will be checked and upgraded automatically. After this process finishes, the server will be able to accept incoming connections.</value>
+  <data name="DataDirectoryDescriptionLabel.Text" xml:space="preserve">
+    <value>Information managed by MySQL Server is stored under a directory known as the data directory.
+
+Enter the path to the data directory to begin with the configuration process (if the path does not exist it will be created):</value>
   </data>
-  <metadata name="ConnectionErrorProvider.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+  <metadata name="DataDirectoryBrowserDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>597, 17</value>
-  </metadata>
-  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>55</value>
   </metadata>
 </root>

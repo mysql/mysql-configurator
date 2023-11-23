@@ -466,65 +466,6 @@ namespace MySql.Configurator.Core.Controllers
       return text.EndsWith(ver);
     }
 
-    RegistryKey OpenRegistryKey(string keyname)
-    {
-      keyname = keyname.Replace("[major]", Package.NormalizedVersion.Major.ToString());
-      keyname = keyname.Replace("[minor]", Package.NormalizedVersion.Minor.ToString());
-      keyname = keyname.Replace("[build]", Package.NormalizedVersion.Revision.ToString());
-
-      var key = Registry.LocalMachine.OpenSubKey(keyname);
-      if (key == null && Win32.Is64BitOs)
-      {
-        // Check for a 32-bit install
-        key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(keyname);
-      }
-
-      return key;
-    }
-
-    RegistryKey OpenRegistryKey()
-    {
-      string subKey = Package.RegistryKeyTemplate;
-      if (!string.IsNullOrEmpty(subKey))
-      {
-        return OpenRegistryKey(subKey);
-      }
-
-      subKey = null;
-      if (!string.IsNullOrEmpty(subKey))
-      {
-        return OpenRegistryKey(subKey);
-      }
-
-      subKey = Package.Product.RegistryKeyTemplate;
-      if (!string.IsNullOrEmpty(subKey))
-      {
-        return OpenRegistryKey(subKey);
-      }
-
-      return GenerateDefaultRegistryKeyTemplates().Select(OpenRegistryKey).FirstOrDefault(key => key != null);
-    }
-
-    private IEnumerable<string> GenerateDefaultRegistryKeyTemplates()
-    {
-      string baseDisplayName = Package.BaseDisplayName;
-      string baseTitle = Package.Product.BaseTitle;
-      var myList = new List<string>
-      {
-        $"SOFTWARE\\{Package.Publisher}\\{(Package.DisplayName.Contains("MySQL") ? Package.DisplayName : string.Concat("MySQL", " ", Package.DisplayName))}",
-        $"SOFTWARE\\{Package.Publisher}\\{(Package.NameWithVersion.Contains("MySQL") ? Package.NameWithVersion : string.Concat("MySQL", " ", Package.NameWithVersion))}",
-        $"SOFTWARE\\MySQL AB\\{(Package.DisplayName.Contains("MySQL") ? Package.DisplayName : string.Concat("MySQL", " ", Package.DisplayName))}",
-        $"SOFTWARE\\MySQL AB\\{(Package.NameWithVersion.Contains("MySQL") ? Package.NameWithVersion : string.Concat("MySQL", " ", Package.NameWithVersion))}",
-        $"SOFTWARE\\{Package.Publisher}\\{(baseDisplayName.Contains("MySQL") ? baseDisplayName : string.Concat("MySQL", " ", baseDisplayName))}",
-        $"SOFTWARE\\{Package.Publisher}\\{(baseTitle.Contains("MySQL") ? baseTitle : string.Concat("MySQL", " ", baseTitle))}",
-        $"SOFTWARE\\MySQL AB\\{(baseDisplayName.Contains("MySQL") ? baseDisplayName : string.Concat("MySQL", " ", baseDisplayName))}",
-        $"SOFTWARE\\MySQL AB\\{(baseTitle.Contains("MySQL") ? baseTitle : string.Concat("MySQL", " ", baseTitle))}",
-        $"SOFTWARE\\MySQL AB\\{string.Concat(Package.DisplayName, " ", Package.NormalizedVersion.Major, ".", Package.NormalizedVersion.Minor)}"
-      };
-
-      return myList;
-    }
-
     public bool HasChanges()
     {
       if (OldSettings == null)

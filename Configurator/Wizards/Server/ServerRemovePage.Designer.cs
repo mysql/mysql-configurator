@@ -119,7 +119,6 @@ namespace MySql.Configurator.Wizards.Server
       // 
       // ServerRemovePage
       // 
-      this.AccessibleName = "Server Remove Page";
       this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 23F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.Caption = "<>";

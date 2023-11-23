@@ -216,6 +216,29 @@ namespace MySql.Configurator.Core.Classes
       return string.IsNullOrEmpty(errorMessage);
     }
 
+
+    /// <summary>
+    /// Creates a configuration file in a temporary location.
+    /// </summary>
+    /// <param name="contents">The contents of the configuration file..</param>
+    /// <returns>The full file path of the copied configuration file.</returns>
+    public static string CreateTempConfigurationFile(string contents)
+    {
+      var tempDirectory = Path.GetTempPath();
+      var tempConfigFileName = $"{Guid.NewGuid().ToString("D")}.ini";
+      var tempConfigFilePath = Path.Combine(tempDirectory, tempConfigFileName);
+      try
+      {
+        File.WriteAllText(tempConfigFilePath, contents);
+      }
+      catch
+      {
+        return null;
+      }
+
+      return tempConfigFilePath;
+    }
+
     public static T DeepClone<T>(T obj)
     {
       using (var ms = new MemoryStream())
@@ -584,28 +607,6 @@ namespace MySql.Configurator.Core.Classes
     }
 
     /// <summary>
-    /// Creates a configuration file in a temporary location.
-    /// </summary>
-    /// <param name="contents">The contents of the configuration file..</param>
-    /// <returns>The full file path of the copied configuration file.</returns>
-    public static string CreateTempConfigurationFile(string contents)
-    {
-      var tempDirectory = Path.GetTempPath();
-      var tempConfigFileName = $"{Guid.NewGuid().ToString("D")}.ini";
-      var tempConfigFilePath = Path.Combine(tempDirectory, tempConfigFileName);
-      try
-      {
-        File.WriteAllText(tempConfigFilePath, contents);
-      }
-      catch
-      {
-        return null;
-      }
-
-      return tempConfigFilePath;
-    }
-
-    /// <summary>
     /// Executes the given query, establishing a connection using the given connection string and returning a <see cref="DataRow"/>.
     /// </summary>
     /// <param name="connectionString">A connection string to establish a DB connection.</param>
@@ -680,6 +681,48 @@ namespace MySql.Configurator.Core.Classes
       }
 
       return retValue;
+    }
+
+    /// <summary>
+    /// Searches for the product code of a MySQL Server installed through MSI.
+    /// </summary>
+    /// <param name="serverVersion">The version of the installed MySQL Server product.</param>
+    /// <param name="installDirPath">The installation path of MySQL Server.</param>
+    /// <returns>A product code as a string, or <c>null</c> if not found.</returns>
+    public static string FindInstalledServerProductCode(Version serverVersion, string installDirPath)
+    {
+      installDirPath = Path.GetFullPath(installDirPath);
+      var hives = new List<RegistryHive>() { RegistryHive.CurrentUser, RegistryHive.LocalMachine };
+      foreach (var hive in hives)
+      {
+        using (var uninstallKey = OpenRegistryKey(hive, UNINSTALL_REGISTRY_KEY_NAME))
+        {
+          if (uninstallKey == null)
+          {
+            continue;
+          }
+
+          foreach (var productCode in uninstallKey.GetSubKeyNames())
+          {
+            using (var productCodeKey = uninstallKey.OpenRegistrySubKey(productCode))
+            {
+              var displayVersion = productCodeKey.GetValue("DisplayVersion");
+              var displayName = productCodeKey.GetValue("DisplayName");
+              var installLocation = productCodeKey.GetValue("InstallLocation");
+              if (string.Equals(displayVersion?.ToString(), serverVersion.ToString())
+              && string.Equals(displayName?.ToString(), $"MySQL Server {serverVersion.ToString(2)}")
+              && installDirPath.Equals(installLocation?.ToString()))
+              {
+                // Validate the alledged product code is a GUID
+                Guid.Parse(productCode);
+                return productCode;
+              }
+            }
+          }
+        }
+      }
+
+      return null;
     }
 
     /// <summary>
@@ -1049,6 +1092,32 @@ namespace MySql.Configurator.Core.Classes
     }
 
     /// <summary>
+    /// Gets the server maturity based on the specified server version.
+    /// </summary>
+    /// <returns></returns>
+    public static ServerMaturity GetServerMaturity(Version version)
+    {
+      if (version.Major < 8
+          || (version.Major == 8
+              && version.Minor == 0))
+      {
+        return ServerMaturity.Older;
+      }
+
+      if ((version.Major == 8
+           && version.Minor == 4)
+          || ((version.Major == 9
+              || version.Major == 10
+              || version.Major == 11)
+             && version.Minor == 7))
+      {
+        return ServerMaturity.LTS;
+      }
+
+      return ServerMaturity.Innovation;
+    }
+
+    /// <summary>
     /// Computes a SHA1 hash for the specified file.
     /// </summary>
     /// <param name="pathName">The file for which the hash will be computed.</param>
@@ -1176,7 +1245,7 @@ namespace MySql.Configurator.Core.Classes
     /// <param name="connection">The <see cref="MySqlConnection"/> used to query the database.</param>
     /// <param name="sql">A query.</param>
     /// <returns>A <see cref="DataTable"/> filled with data using the given query.</returns>
-    private static DataTable GetTableFromQuery(MySqlConnection connection, string sql)
+    public static DataTable GetTableFromQuery(MySqlConnection connection, string sql)
     {
       if (connection == null || string.IsNullOrEmpty(sql))
       {
@@ -2602,9 +2671,10 @@ namespace MySql.Configurator.Core.Classes
     /// Validates that the provided path is valid.
     /// </summary>
     /// <param name="path">The path to validate.</param>
-    /// <returns>An empty strng if the path is valid; otherwise, an error message string.</returns>
+    /// <param name="validatePathIsEmpty">Flag to indicate if it should be validated that the path is empty.</param>
+    /// <returns>An empty string if the path is valid; otherwise, an error message string.</returns>
     /// <remarks>This method does not check that path exists, it only validates that the format is valid.</remarks>
-    public static string ValidateAbsoluteFilePath(string path)
+    public static string ValidateAbsoluteFilePath(string path, bool validatePathIsEmpty)
     {
       // Check if the path has the required minimum length.
       if (string.IsNullOrEmpty(path)
@@ -2655,6 +2725,14 @@ namespace MySql.Configurator.Core.Classes
       if (path[path.Length - 1] == '.')
       {
         return Resources.PathInvalidEndsInDotError;
+      }
+
+      if (validatePathIsEmpty
+          && Directory.Exists(path)
+          && (Directory.GetFiles(path).Length > 0
+              || Directory.GetDirectories(path).Length > 0))
+      {
+        return Resources.PathExistsAndIsNotEmpty;
       }
 
       return string.Empty;

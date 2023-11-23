@@ -53,15 +53,16 @@ namespace MySql.Configurator.Wizards.Common
       // 
       // subCaptionLabel
       // 
+      this.subCaptionLabel.Font = new System.Drawing.Font("Segoe UI", 6F);
       this.subCaptionLabel.Location = new System.Drawing.Point(23, 80);
       this.subCaptionLabel.Text = "";
       // 
       // captionLabel
       // 
       this.captionLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(20)))), ((int)(((byte)(20)))));
-      this.captionLabel.Location = new System.Drawing.Point(136, 29);
-      this.captionLabel.Size = new System.Drawing.Size(266, 25);
-      this.captionLabel.Text = "Welcome to the MySQL Server";
+      this.captionLabel.Location = new System.Drawing.Point(80, 29);
+      this.captionLabel.Size = new System.Drawing.Size(569, 38);
+      this.captionLabel.Text = "Welcome to the MySQL Server Configurator";
       this.captionLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
       // 
       // WelcomeWizardLabel
@@ -71,7 +72,7 @@ namespace MySql.Configurator.Wizards.Common
       this.WelcomeWizardLabel.AutoSize = true;
       this.WelcomeWizardLabel.Location = new System.Drawing.Point(59, 279);
       this.WelcomeWizardLabel.Name = "WelcomeWizardLabel";
-      this.WelcomeWizardLabel.Size = new System.Drawing.Size(447, 15);
+      this.WelcomeWizardLabel.Size = new System.Drawing.Size(672, 25);
       this.WelcomeWizardLabel.TabIndex = 2;
       this.WelcomeWizardLabel.Text = "With this wizard you will be able to configure your recent MySQL Server installat" +
     "ion.";
@@ -83,7 +84,7 @@ namespace MySql.Configurator.Wizards.Common
       this.ClickNextLabel.AutoSize = true;
       this.ClickNextLabel.Location = new System.Drawing.Point(59, 303);
       this.ClickNextLabel.Name = "ClickNextLabel";
-      this.ClickNextLabel.Size = new System.Drawing.Size(267, 15);
+      this.ClickNextLabel.Size = new System.Drawing.Size(401, 25);
       this.ClickNextLabel.TabIndex = 3;
       this.ClickNextLabel.Text = "Simply click Next when you are ready to proceed.";
       // 
@@ -104,7 +105,7 @@ namespace MySql.Configurator.Wizards.Common
       this.AccessibleDescription = "A wizard page serving as an introduction for the upgrade process";
       this.AccessibleName = "Welcome Back Page";
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
-      this.Caption = "Welcome to the MySQL Server";
+      this.Caption = "Welcome to the MySQL Server Configurator";
       this.Controls.Add(this.WelcomeBackPictureBox);
       this.Controls.Add(this.ClickNextLabel);
       this.Controls.Add(this.WelcomeWizardLabel);

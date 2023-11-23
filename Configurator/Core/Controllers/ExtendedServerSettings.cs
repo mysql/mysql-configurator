@@ -29,14 +29,6 @@ namespace MySql.Configurator.Core.Controllers
   [Serializable]
   public class ExtendedServerSettings
   {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ExtendedServerSettings"/> class.
-    /// </summary>
-    public ExtendedServerSettings()
-    {
-      SystemTablesUpgraded = SystemTablesUpgradedType.None;
-    }
-
     #region Properties
 
     /// <summary>
@@ -50,30 +42,9 @@ namespace MySql.Configurator.Core.Controllers
     public bool EnterpriseFirewallEnabled { get; set; }
 
     /// <summary>
-    /// Gets or sets the <see cref="ServerConfigurationType"/> used during a Server's configuration.
-    /// </summary>
-    [InnoDbCluster]
-    public ServerConfigurationType InnoDbClusterType { get; set; }
-
-    /// <summary>
     /// Gets or sets a value indicating whether an upgrade to system tables is pending to be performed.
     /// </summary>
     public bool PendingSystemTablesUpgrade { get; set; }
-
-    /// <summary>
-    /// Gets or sets the <see cref="ServerConfigurationType"/> used during a Server's configuration.
-    /// </summary>
-    public ServerConfigurationType ServerConfigurationType { get; set; }
-
-    /// <summary>
-    /// Gets the server version that is currently installed.
-    /// </summary>
-    public String ServerVersion { get; set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating if system tables were upgrades during the last server upgrade.
-    /// </summary>
-    public SystemTablesUpgradedType SystemTablesUpgraded { get; set; }
 
     #endregion Properties
 
@@ -104,16 +75,13 @@ namespace MySql.Configurator.Core.Controllers
     /// Serializes the <see cref="ExtendedServerSettings"/> class.
     /// </summary>
     /// <param name="filePath">The location where the serialized file will be output.</param>
-    /// <param name="useNonInnoDbClusterSerializer">Flag to indicate if the serializer that ignores InnoDB setitngs is used.</param>
     /// <returns><c>true</c> if the serialization was done successfully, <c>false</c> otherwise.</returns>
-    public bool Serialize(string filePath, bool useNonInnoDbClusterSerializer)
+    public bool Serialize(string filePath)
     {
       bool success = true;
       try
       {
-        var serializer = useNonInnoDbClusterSerializer
-          ? GetNonInnoDbClusterSerializer()
-          : new XmlSerializer(typeof(ExtendedServerSettings));
+        var serializer = new XmlSerializer(typeof(ExtendedServerSettings));
         using (var myWriter = new StreamWriter(filePath, false))
         {
           serializer.Serialize(myWriter, this);
@@ -127,29 +95,6 @@ namespace MySql.Configurator.Core.Controllers
       }
 
       return success;
-    }
-
-    /// <summary>
-    /// Gets a <see cref="XmlSerializer"/> that ignores properties flagged with the <see cref="InnoDbClusterAttribute"/>.
-    /// </summary>
-    /// <returns>A <see cref="XmlSerializer"/> that ignores properties flagged with the <see cref="InnoDbClusterAttribute"/>.</returns>
-    private XmlSerializer GetNonInnoDbClusterSerializer()
-    {
-      var xOver = new XmlAttributeOverrides();
-      var propertyInfos = typeof(ExtendedServerSettings).GetProperties();
-      foreach (var propertyInfo in propertyInfos)
-      {
-        var customAttributes = propertyInfo.GetCustomAttributes(false);
-        if (!customAttributes.Any(a => a is InnoDbClusterAttribute))
-        {
-          continue;
-        }
-
-        var attrs = new XmlAttributes { XmlIgnore = true };
-        xOver.Add(typeof(ExtendedServerSettings), propertyInfo.Name, attrs);
-      }
-
-      return new XmlSerializer(typeof(ExtendedServerSettings), xOver);
     }
   }
 }

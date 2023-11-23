@@ -26,6 +26,7 @@ using MySql.Configurator.Core.Controls;
 using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Properties;
 using MySql.Configurator.Wizards.Common;
+using MySql.Configurator.Wizards.Server;
 
 namespace MySql.Configurator.Wizards.ConfigWizard
 {
@@ -200,6 +201,29 @@ namespace MySql.Configurator.Wizards.ConfigWizard
           RetryButton.Visible = true;
           Wizard.BackButton.Enabled = true;
           Wizard.BackButton.Visible = true;
+
+          // Update step descriptions.
+          var serverController = CurrentController as ServerConfigurationController;
+          if (serverController != null)
+          {
+            var revertedSteps = serverController.RevertedSteps;
+            if (revertedSteps == null)
+            {
+              break;
+            }
+
+            foreach (var revertedStep in revertedSteps)
+            {
+              var control = ExecutionStepsTabPage.Controls.OfType<ConfigStepControl>().FirstOrDefault(configStepControl => configStepControl.Step.Description.Equals(revertedStep));
+              if (control == null)
+              {
+                continue;
+              }
+
+              control.Label = $"{control.Step.Description} (REVERTED)";
+            }
+          }
+
           break;
 
         case ConfigState.ConfigurationCancelled:

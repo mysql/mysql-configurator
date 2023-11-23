@@ -16,12 +16,15 @@
 using System;
 using System.ComponentModel;
 using System.IO;
+using System.Windows.Forms;
 using System.Xml.Serialization;
-using Microsoft.Win32;
 using MySql.Configurator.Core.Classes;
+using MySql.Configurator.Core.Classes.Forms;
 using MySql.Configurator.Core.Classes.Logging;
-using MySql.Configurator.Core.Enums;
+using MySql.Configurator.Core.Common;
+using MySql.Configurator.Core.IniFile;
 using MySql.Configurator.Properties;
+using static MySql.Configurator.Core.Classes.Forms.InfoDialog;
 
 namespace MySql.Configurator.Core.Controllers
 {
@@ -31,19 +34,19 @@ namespace MySql.Configurator.Core.Controllers
     #region Constants
 
     /// <summary>
-    /// The name of the Server's configuration file as used by the MySQL Configurator.
+    /// An alternate name of the Server's configuration file.
     /// </summary>
-    public const string CONFIG_FILE_NAME = "my.ini";
+    public const string ALTERNATE_CONFIG_FILE_NAME = "my.cnf";
+
+    /// <summary>
+    /// The default name of the Server's configuration file as used by the MySQL Configurator.
+    /// </summary>
+    public const string DEFAULT_CONFIG_FILE_NAME = "my.ini";
 
     /// <summary>
     /// The default MySQL Server port.
     /// </summary>
     public const int DEFAULT_PORT = 3306;
-
-    /// <summary>
-    /// The name of the extended Server's configuration file as used by the MySQL Configurator.
-    /// </summary>
-    public const string EXTENDED_CONFIG_FILE_NAME = "server_config.xml";
 
     #endregion Constants
 
@@ -55,16 +58,15 @@ namespace MySql.Configurator.Core.Controllers
     private string _defaultDataDir;
 
     /// <summary>
-    /// Extended server settings saved in an XML file.
+    /// The general server configuration settings.
     /// </summary>
-    private ExtendedServerSettings _extendedSettings;
+    private GeneralSettings _generalSettings;
 
     #endregion Fields
 
     public BaseServerSettings(Package.Package p) : base(p)
     {
-      _extendedSettings = null;
-      SystemTablesUpgraded = SystemTablesUpgradedType.None;
+      _generalSettings = null;
       _defaultDataDir = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
         $@"MySQL\MySQL Server {p.NormalizedVersion.Major}.{p.NormalizedVersion.Minor}\");
@@ -97,19 +99,19 @@ namespace MySql.Configurator.Core.Controllers
     public string ExistingRootPassword { get; set; }
 
     [XmlIgnore]
-    public string ExtendedSettingsFilePath => Path.Combine(IniDirectory, EXTENDED_CONFIG_FILE_NAME);
+    public string GeneralSettingsFilePath => Path.Combine(InstallDirectory, GeneralSettingsManager.CONFIGURATOR_SETTINGS_FILE_NAME);
 
     [XmlIgnore]
-    public bool ExtendedPropertiesChanged
+    public bool GeneralPropertiesChanged
     {
       get
       {
-        if (_extendedSettings == null)
+        if (_generalSettings == null)
         {
           return false;
         }
 
-        return !_extendedSettings.HasSamePropertyValues(this);
+        return !_generalSettings.HasSamePropertyValues(this);
       }
     }
 
@@ -117,8 +119,6 @@ namespace MySql.Configurator.Core.Controllers
     public string FullConfigFilePath => Path.Combine(IniDirectory, ConfigFile);
 
     public string IniDirectory { get; set; }
-
-    public ServerConfigurationType InnoDbClusterType { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether an upgrade to system tables is pending to be performed.
@@ -134,20 +134,11 @@ namespace MySql.Configurator.Core.Controllers
     [ControllerSetting("The password that will be assigned to the root user during a new installation or reconfiguration.", "password,pwd,root_password", "passwd,rootpasswd", false, "CheckPassword")]
     public string RootPassword { get; set; }
 
-    [ControllerSetting("Indicates how the local instance is configured (StandAlone is currently the only supported option).", "serverconfigurationtype", null, true)]
-    [DefaultValue(ServerConfigurationType.StandAlone)]
-    public ServerConfigurationType ServerConfigurationType { get; set; }
-
-    public string ServerVersion { get; set; }
-
-    [XmlIgnore]
-    public SystemTablesUpgradedType SystemTablesUpgraded { get; set; }
-
     /// <summary>
-    /// Gets the extended settings associated to this server installation.
+    /// Gets the general settings associated to this server installation.
     /// </summary>
     [XmlIgnore]
-    protected ExtendedServerSettings ExtendedSettings => _extendedSettings;
+    protected GeneralSettings GeneralSettings => _generalSettings;
 
     #endregion Properties
 
@@ -172,9 +163,9 @@ namespace MySql.Configurator.Core.Controllers
     /// <summary>
     /// Deletes the server configuration file and the extended configuration file created by MySQL Configurator.
     /// </summary>
-    /// <param name="removeExtendedSettingsFile">Indicates if the extended settings file should be deleted.</param>
+    /// <param name="removeGeneralSettingsFile">Indicates if the general settings file should be deleted.</param>
     /// <returns><c>true</c> if the operation completed successfully; otherwise, <c>false</c>.</returns>
-    public bool DeleteConfigFile(bool removeExtendedSettingsFile)
+    public bool DeleteConfigFile(bool removeGeneralSettingsFile)
     {
       if (string.IsNullOrEmpty(IniDirectory))
       {
@@ -198,18 +189,18 @@ namespace MySql.Configurator.Core.Controllers
         return false;
       }
 
-      if (!removeExtendedSettingsFile)
+      if (!removeGeneralSettingsFile)
       {
         return true;
       }
 
-      var extSettingsFilePath = Path.Combine(IniDirectory, EXTENDED_CONFIG_FILE_NAME);
+      var generalSettingsFilePath = Path.Combine(InstallDirectory, GeneralSettingsManager.CONFIGURATOR_SETTINGS_FILE_NAME);
       try
       {
-        if (File.Exists(extSettingsFilePath))
+        if (File.Exists(generalSettingsFilePath))
         {
-          File.SetAttributes(extSettingsFilePath, FileAttributes.Normal);
-          File.Delete(extSettingsFilePath);
+          File.SetAttributes(generalSettingsFilePath, FileAttributes.Normal);
+          File.Delete(generalSettingsFilePath);
         }
       }
       catch (Exception ex)
@@ -233,63 +224,94 @@ namespace MySql.Configurator.Core.Controllers
         return;
       }
 
-      if (ConfigFile == null)
+      var foundConfigFile = false;
+      string[] configFileNames = new string[2] { DEFAULT_CONFIG_FILE_NAME, ALTERNATE_CONFIG_FILE_NAME };
+      string[] possibleConfigFileLocations = new string[2] { DataDirectory, InstallDirectory };
+      foreach (var configFileName in configFileNames)
       {
-        ConfigFile = CONFIG_FILE_NAME;
+        foreach (var directory in possibleConfigFileLocations)
+        {
+          if (!File.Exists(Path.Combine(directory, configFileName)))
+          {
+            continue;
+          }
+
+          ConfigFile = configFileName;
+          IniDirectory = directory;
+          foundConfigFile = true;
+        }
+
+        if (foundConfigFile)
+        {
+          break;
+        }
       }
 
-      if (File.Exists(Path.Combine(DataDirectory, ConfigFile)))
+      if (!foundConfigFile)
       {
-        IniDirectory = DataDirectory.Clone() as string;
-      }
-      else if (File.Exists(Path.Combine(InstallDirectory, ConfigFile)))
-      {
-        IniDirectory = InstallDirectory.Clone() as string;
-      }
-      else
-      {
+        ConfigFile = BaseServerSettings.DEFAULT_CONFIG_FILE_NAME;
         IniDirectory = DataDirectory;
       }
     }
 
     /// <summary>
-    /// Loads Server configuration values not stored in the Server's configuration file.
+    /// Loads the general server configuration settings.
     /// </summary>
-    public virtual void LoadExtendedSettings()
+    public virtual void LoadGeneralSettings()
     {
-      if (string.IsNullOrEmpty(IniDirectory))
+      if (!File.Exists(GeneralSettingsFilePath))
       {
         return;
       }
 
-      if (!File.Exists(ExtendedSettingsFilePath))
+      _generalSettings = GeneralSettingsManager.ReadSettings(InstallDirectory);
+      if (_generalSettings == null)
       {
+        if (!GeneralSettingsManager.LoadWarningShown)
+        {
+          InfoDialog.ShowDialog(InfoDialogProperties.GetWarningDialogProperties(Resources.AppName,
+          string.Format(Resources.SettingsFileReadError, InstallDirectory, GeneralSettingsManager.CONFIGURATOR_SETTINGS_FILE_NAME),
+          Resources.ReferToLogMessage));
+          GeneralSettingsManager.LoadWarningShown = true;
+        }
+
         return;
       }
 
-      _extendedSettings = ExtendedServerSettings.Deserialize(ExtendedSettingsFilePath);
-      if (_extendedSettings == null)
+      if (!string.IsNullOrEmpty(_generalSettings.IniDirectory))
       {
-        return;
+        var iniFilePath = Path.Combine(_generalSettings.IniDirectory, BaseServerSettings.DEFAULT_CONFIG_FILE_NAME);
+        if (File.Exists(iniFilePath))
+        {
+          // Load and parse ini file to get the data dir path.
+          var iniFile = new IniFileEngine(iniFilePath).Load();
+          var dataDirectory = iniFile.FindValue("mysqld", "datadir", false);
+          if (!string.IsNullOrEmpty(dataDirectory)
+              && Directory.Exists(dataDirectory))
+          {
+            var parentDirectory = Directory.GetParent(dataDirectory);
+            DataDirectory = parentDirectory != null
+              ? parentDirectory.FullName
+              : dataDirectory;
+          }
+        }
       }
 
-      this.SetPropertyValuesFrom(_extendedSettings);
+      this.SetPropertyValuesFrom(_generalSettings);
     }
 
     /// <summary>
-    /// Saves Server configuration values not stored in the Server's configuration file.
+    /// Saves the general server configuration settings.
     /// </summary>
-    /// <param name="preserveInnoDbClusterSettings"><c>true</c> if the InnoDB settings should be preserved; otherwise, <c>false</c>.</param>
-    public virtual void SaveExtendedSettings(bool preserveInnoDbClusterSettings = false)
+    public virtual void SaveGeneralSettings()
     {
       if (string.IsNullOrEmpty(IniDirectory))
       {
         return;
       }
 
-      ServerVersion = Package.Version;
-      var extendedSettings = new ExtendedServerSettings();
-      extendedSettings.SetPropertyValuesFrom(this);
+      var generalSettings = new GeneralSettings();
+      generalSettings.SetPropertyValuesFrom(this);
       try
       {
         // Not all server versions create the ini directory by default during installation.
@@ -298,7 +320,7 @@ namespace MySql.Configurator.Core.Controllers
           Directory.CreateDirectory(IniDirectory);
         }
 
-        extendedSettings.Serialize(ExtendedSettingsFilePath, !preserveInnoDbClusterSettings);
+        GeneralSettingsManager.SaveSettings(GeneralSettingsFilePath, generalSettings);
       }
       catch (Exception ex)
       {
@@ -310,8 +332,6 @@ namespace MySql.Configurator.Core.Controllers
     {
       ConfigureAsService = true;
       string name = Package.Title.Replace('/', '.');
-      ServerVersion = null;
-      SystemTablesUpgraded = SystemTablesUpgradedType.None;
       PendingSystemTablesUpgrade = false;
       DataDirectory = $"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\\MySQL\\{name}";
       if (!StringEndsWithVersion(DataDirectory))
@@ -329,8 +349,6 @@ namespace MySql.Configurator.Core.Controllers
       var c = (ServerProductConfigurationController)Package.UpgradeTarget.Controller;
       DataDirectory = c.DataDirectory;
       InstallDirectory = c.InstallDirectory;
-      ServerVersion = null;
-      SystemTablesUpgraded = SystemTablesUpgradedType.None;
       PendingSystemTablesUpgrade = true;
     }
 

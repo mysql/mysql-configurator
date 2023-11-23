@@ -217,7 +217,7 @@ namespace MySql.Configurator.Wizards
       this.MySQLConfiguratorLabel.ForeColor = System.Drawing.Color.White;
       this.MySQLConfiguratorLabel.Location = new System.Drawing.Point(29, 55);
       this.MySQLConfiguratorLabel.Name = "MySQLConfiguratorLabel";
-      this.MySQLConfiguratorLabel.Size = new System.Drawing.Size(120, 15);
+      this.MySQLConfiguratorLabel.Size = new System.Drawing.Size(186, 25);
       this.MySQLConfiguratorLabel.TabIndex = 7;
       this.MySQLConfiguratorLabel.Text = "MySQL Configurator";
       // 

@@ -91,6 +91,8 @@ namespace MySql.Configurator.Core.MSI
     public static extern int MsiSetInternalUI(InstallUILevel uiLevel, IntPtr hwnd);
     [DllImport("msi.dll", CharSet = CharSet.Unicode)]
     internal static extern MsiEnumError MsiInstallProduct(string packagePath, string commandLine);
+    [DllImport("msi.dll", CharSet = CharSet.Unicode)]
+    public static extern MsiEnumError MsiConfigureProductEx(string productCode, InstallLevel installLevel, InstallState installState, string commandLine);
     [DllImport("msi.dll")]
     internal static extern InstallState MsiQueryProductState(string productCode);
     [DllImport("msi.dll")]

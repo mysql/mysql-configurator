@@ -18,7 +18,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
@@ -27,18 +29,20 @@ using System.Xml.Serialization;
 using Microsoft.Win32;
 using MySql.Data.MySqlClient;
 using MySql.Configurator.Core.Classes;
+using MySql.Configurator.Core.Classes.Logging;
+using MySql.Configurator.Core.Classes.MySql;
 using MySql.Configurator.Core.Controllers;
 using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Core.IniFile.Template;
 using MySql.Configurator.Core.Wizard;
+using MySql.Configurator.Properties;
 using MySql.Configurator.Wizards.Examples;
 using IniFile = MySql.Configurator.Core.IniFile.IniFile;
-using System.Reflection;
-using System.IO.Compression;
-using MySql.Configurator.Core.Classes.Logging;
-using MySql.Configurator.Core.Classes.MySql;
-using MySql.Configurator.Properties;
 using Shell32;
+using MySql.Configurator.Core.MSI;
+using System.Text.RegularExpressions;
+using System.CodeDom;
+using MySql.Configurator.Core.Common;
 
 namespace MySql.Configurator.Wizards.Server
 {
@@ -61,6 +65,11 @@ namespace MySql.Configurator.Wizards.Server
     /// </summary>
     private string _dataDirectory;
 
+    /// <summary>
+    /// Controller used to revert failed configuration steps.
+    /// </summary>
+    private ServerRevertController _revertController;
+
     #endregion
 
     #region Configuration Step Fields
@@ -70,13 +79,16 @@ namespace MySql.Configurator.Wizards.Server
     private ConfigurationStep _createRemoveExampleDatabasesStep;
     private ConfigurationStep _initializeServerConfigurationStep;
     //private ConfigurationStep _prepareAuthenticationPluginChangeStep;
+    private ConfigurationStep _removeExistingServerInstallationStep;
+    private ConfigurationStep _renameExistingDataDirectoryStep;
     private List<ConfigurationStep> _selfContainedUpgradeSteps;
-    private ConfigurationStep _setLocalInstanceAsWritableStep;
     private ConfigurationStep _startAndUpgradeServerConfigStep;
     private ConfigurationStep _startServerConfigurationStep;
+    private ConfigurationStep _stopExistingServerInstanceStep;
     private ConfigurationStep _stopServerConfigurationStep;
     private ConfigurationStep _updateAccessPermissions;
     private ConfigurationStep _updateEnterpriseFirewallPluginConfigStep;
+    private ConfigurationStep _resetPersistedVariablesStep;
     private ConfigurationStep _updateProcessStep;
     private ConfigurationStep _updateSecurityStep;
     private ConfigurationStep _updateStartMenuLinksStep;
@@ -138,7 +150,6 @@ namespace MySql.Configurator.Wizards.Server
       _upgradingInstance = null;
       _firewallRulesList = new List<string>();
       FullControlDictionary = new Dictionary<SecurityIdentifier, string>();
-      IsBackupDatabaseStepNeeded = false;
       UpdateDataDirectoryPermissions = true;
       RemoveDataDirectory = true;
       CurrentState = ConfigState.ConfigurationRequired;
@@ -151,6 +162,8 @@ namespace MySql.Configurator.Wizards.Server
 
       RolesDefined = null;
       TemporaryServerUser = null;
+      ExistingServerInstallationInstance = null;
+      PersistedVariablesToReset = new List<string>();
     }
 
     #region Properties
@@ -184,6 +197,11 @@ namespace MySql.Configurator.Wizards.Server
     /// Gets the path to the example databases scripts.
     /// </summary>
     public string ExampleDatabasesLocation { get; private set; }
+
+    /// <summary>
+    /// Gets or sets a MySQL Server instance corresponding to an existing server installation different to the one being configured.
+    /// </summary>
+    public LocalServerInstance ExistingServerInstallationInstance { get; set; }
 
     /// <summary>
     /// Gets the list of firewall rules on this computer.
@@ -241,6 +259,11 @@ namespace MySql.Configurator.Wizards.Server
                                                     && File.Exists(Path.Combine(DataDirectory, "data", Settings.ErrorLogFileName)));
 
     /// <summary>
+    /// Gets or sets a value indicating whether the data directory needs to be renamed to reflect the server series.
+    /// </summary>
+    public bool IsDataDirectoryRenameNeeded { get; set; }
+
+    /// <summary>
     /// Gets a value indicating whether the removal step that deletes the data directory needs to run.
     /// </summary>
     public bool IsDeleteDataDirectoryStepNeeded => IsThereServerDataFiles && RemoveDataDirectory;
@@ -256,10 +279,16 @@ namespace MySql.Configurator.Wizards.Server
     public bool IsRemoveFirewallRuleStepNeeded => FirewallRulesList.Any(rule => rule.Equals($"Port {Settings.MySqlXPort}", StringComparison.InvariantCultureIgnoreCase)
                                                                         || rule.Equals($"Port {Settings.Port}", StringComparison.InvariantCultureIgnoreCase));
 
+
     /// <summary>
-    /// Gets a value indicating whether the step for setting the local instance as writable should be executed.
+    /// Gets or sets a value indicating whether an existing MySQL Server installation is going to be removed at the end of the configuration.
     /// </summary>
-    public bool IsSetLocalInstanceAsWritableStepNeeded => Settings.InnoDbClusterType == ServerConfigurationType.AddToCluster;
+    public bool IsRemoveExistingServerInstallationStepNeeded { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the service name needs to be renamed to reflect the server series.
+    /// </summary>
+    public bool IsServiceRenameNeeded { get; set; }
 
     /// <summary>
     /// </summary>
@@ -270,12 +299,13 @@ namespace MySql.Configurator.Wizards.Server
     /// <summary>
     /// Gets a value indicating whether the configuration step that starts the server needs to run.
     /// </summary>
-    public bool IsStartServerConfigurationStepNeeded => ((IsThereServerDataFiles
+    public bool IsStartServerConfigurationStepNeeded => (((IsThereServerDataFiles
                                                           && !ServerVersion.ServerSupportsSelfContainedUpgrade())
-                                                         || IsWriteIniConfigurationFileNeeded)
+                                                         || (IsWriteIniConfigurationFileNeeded))
                                                         || (!IsThereServerDataFiles
                                                             && IsInitializeServerConfigurationStepNeeded(false)
-                                                            && ConfigurationType == ConfigurationType.Upgrade);
+                                                            && ConfigurationType == ConfigurationType.Upgrade))
+                                                        && ExistingServerInstallationInstance == null;
 
     /// <summary>
     /// Gets a value indicating whether the configuration step that stops the server needs to run.
@@ -285,17 +315,16 @@ namespace MySql.Configurator.Wizards.Server
       get
       {
         var serverInstanceInfo = new LocalServerInstance(this, ReportStatus);
-        return (ConfigurationType == ConfigurationType.Upgrade
-                && serverInstanceInfo.IsRunning)
-               || (IsStartServerConfigurationStepNeeded
-                   && (IsStartAndUpgradeConfigurationStepNeeded || serverInstanceInfo.IsRunning));
+        return (ConfigurationType != ConfigurationType.Upgrade
+                && IsStartServerConfigurationStepNeeded
+                && (IsStartAndUpgradeConfigurationStepNeeded || serverInstanceInfo.IsRunning));
       }
     }
 
     /// <summary>
     /// Gets a value indicating whether the extended XML configuration file exists.
     /// </summary>
-    public bool IsThereConfigXmlFile => File.Exists(Path.Combine(Settings.IniDirectory, BaseServerSettings.EXTENDED_CONFIG_FILE_NAME));
+    public bool IsThereConfigXmlFile => File.Exists(Path.Combine(Settings.IniDirectory, GeneralSettingsManager.CONFIGURATOR_SETTINGS_FILE_NAME));
 
     /// <summary>
     /// Gets a value indicating whether the configuration step that updates the access permissions to the data folder needs to run.
@@ -361,7 +390,7 @@ namespace MySql.Configurator.Wizards.Server
     /// </summary>
     public bool IsWriteExtendedConfigurationFileNeeded => !IsStartAndUpgradeConfigurationStepNeeded
                                                           && (!IsThereConfigXmlFile
-                                                              || Settings.ExtendedPropertiesChanged);
+                                                              || Settings.GeneralPropertiesChanged);
 
     /// <summary>
     /// Gets a value indicating whether the configuration step that writes the my.ini configuration file needs to run.
@@ -369,21 +398,39 @@ namespace MySql.Configurator.Wizards.Server
     public bool IsWriteIniConfigurationFileNeeded => (ConfigurationType != ConfigurationType.Upgrade
                                                       || DefaultAuthenticationPluginChanged
                                                       || (ConfigurationType == ConfigurationType.Upgrade
-                                                          && (!IsThereServerDataFiles)));
+                                                          && (!IsThereServerDataFiles
+                                                              || ExistingServerInstallationInstance != null)));
 
     public MySqlServerSettings OldSettings => Settings.OldSettings as MySqlServerSettings;
+
+    /// <summary>
+    /// Gets a list of server variables set with SET PERSIST that must be removed as part of the configuration.
+    /// </summary>
+    public List<string> PersistedVariablesToReset { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating if the data directory should be removed when uninstalling the product.
     /// </summary>
     public bool RemoveDataDirectory { get; set; }
 
+    /// <summary>
+    /// Gets the list of reverted steps after a failed configuration.
+    /// </summary>
+    public List<string> RevertedSteps { get; private set; }
+
     public RoleDefinitions RolesDefined { get; private set; }
 
-    public Version ServerVersion { get; private set; }
+    /// <summary>
+    /// Gets or sets the value of the password used for the root account.
+    /// </summary>
+    public string RootPassword { get; set; }
+
+    public Version ServerVersion { get; set; }
 
     public MySqlServiceControlManager ServiceManager { get; set; }
+
     public new MySqlServerSettings Settings => settings as MySqlServerSettings;
+
     public bool ShowAdvancedOptions { get; set; }
     /// <summary>
     /// Gets a value indicating whether the Server supports Enterprise Firewall configuration.
@@ -445,7 +492,7 @@ namespace MySql.Configurator.Wizards.Server
           && !_writeConfigurationFileStep.Execute)
       {
         Settings.PendingSystemTablesUpgrade = false;
-        Settings.SaveExtendedSettings();
+        Settings.SaveGeneralSettings();
       }
     }
 
@@ -456,6 +503,23 @@ namespace MySql.Configurator.Wizards.Server
     {
       base.CancelConfigure();
       MySqlServiceControlManager.Cancel();
+    }
+
+    /// <summary>
+    /// Executes the configuration steps defined by the controller.
+    /// </summary>
+    public override void Configure()
+    {
+      _revertController.Reset();
+      _revertController.ReportStatusDelegate = ReportStatus;
+      if (ExistingServerInstallationInstance != null)
+      {
+        ExistingServerInstallationInstance.ResetRunningProcess();
+        _revertController.ExistingServerInstallationInstance = ExistingServerInstallationInstance;
+        ExistingServerInstallationInstance.ReportStatusDelegate = ReportStatus;
+      }
+
+      base.Configure();
     }
 
     /// <summary>
@@ -569,28 +633,12 @@ namespace MySql.Configurator.Wizards.Server
       return builder;
     }
 
-    /// <summary>
-    /// Gets a <see cref="LocalServerInstance"/> objects containing information about the local Server instance.
-    /// </summary>
-    /// <returns>A <see cref="LocalServerInstance"/> object containing information about the installed Server instance.</returns>
-    public LocalServerInstance GetInstalledLocalServerInstance()
-    {
-      var standAloneExists = Settings.ServerConfigurationType == ServerConfigurationType.StandAlone
-                             && IsThereServerDataFiles;
-      if (standAloneExists)
-      {
-        return new LocalServerInstance(this, ReportStatus);
-      }
-
-      return null;
-    }
-
     public Folder GetShell32NameSpaceFolder(object folder)
     {
       var shellAppType = Type.GetTypeFromProgID("Shell.Application");
       var shell = Activator.CreateInstance(shellAppType);
       return (Folder)shellAppType.InvokeMember("NameSpace",
-      System.Reflection.BindingFlags.InvokeMethod, null, shell, new[] { folder });
+      BindingFlags.InvokeMethod, null, shell, new[] { folder });
     }
 
     public override void Init()
@@ -598,6 +646,7 @@ namespace MySql.Configurator.Wizards.Server
       CurrentState = ConfigState.ConfigurationRequired;
       ServerVersion = new Version(Package.Version);
       settings = new MySqlServerSettings(Package);
+      _revertController = new ServerRevertController();
       LoadConfigurationSteps();
       base.Init();
     }
@@ -627,7 +676,11 @@ namespace MySql.Configurator.Wizards.Server
           // Look for existing service.
           if (!string.IsNullOrEmpty(baseDirectory))
           {
-            Settings.ServiceName = ServiceManager.FindServiceName(baseDirectory);
+            var serviceNames = MySqlServiceControlManager.FindServiceNamesWithBaseDirectory(baseDirectory);
+            if (serviceNames.Length > 0)
+            {
+              Settings.ServiceName = serviceNames[0];
+            }
           }
 
           // If no existing service, use default.
@@ -749,6 +802,15 @@ namespace MySql.Configurator.Wizards.Server
     }
 
     /// <summary>
+    /// Identifies if user input is required prior to executing an uninstall operation.
+    /// </summary>
+    /// <returns><c>true</c> if user input is required to configure prior to uninstalling the product; otherwise, <c>false</c>.</returns>
+    public override bool RequiresUninstallConfiguration()
+    {
+      return IsThereServerDataFiles;
+    }
+
+    /// <summary>
     /// Restarts the server by stopping and starting it again.
     /// </summary>
     /// <param name="useOldSettings">Flag indicating whether the old settings must be used instead of the new settings to build the command line options.</param>
@@ -768,25 +830,8 @@ namespace MySql.Configurator.Wizards.Server
     public override void SetPages()
     {
       Pages.Clear();
-      if (ConfigurationType == ConfigurationType.Upgrade
-          && IsThereServerDataFiles)
-      {
-        Logger.LogInformation(Resources.SettingUpUpgrade);
-        if (ServerVersion.ServerSupportsCachingSha2Authentication()
-            && Settings != null
-            && Settings.DefaultAuthenticationPlugin != MySqlAuthenticationPluginType.CachingSha2Password)
-        {
-          //Pages.Add(new ServerConfigDefaultAuthenticationPage(this));
-          var configUsersPage = new ServerConfigUserAccountsPage(this) { PageVisible = false };
-          Pages.Add(configUsersPage);
-        }
 
-        Pages.Add(new ServerConfigUpgradePage(this));
-        var securityPage = new ServerConfigSecurityPage(this) { PageVisible = !ValidateServerFilesHaveRecommendedPermissions() };
-        Pages.Add(securityPage);
-        return;
-      }
-
+      // Remove pages.
       if (ConfigurationType == ConfigurationType.Remove)
       {
         if (RequiresUninstallConfiguration())
@@ -798,16 +843,37 @@ namespace MySql.Configurator.Wizards.Server
         return;
       }
 
-      Logger.LogInformation(ConfigurationType == ConfigurationType.Reconfiguration ? Resources.SettingUpReconfiguration : Resources.SettingUpNewInstallation);
+      Logger.LogInformation(ConfigurationType == ConfigurationType.Reconfiguration 
+        ? Resources.SettingUpReconfiguration 
+        : Resources.SettingUpNewInstallation);
+
+      // New configuration pages.
+      if (ConfigurationType == ConfigurationType.New)
+      {
+        var fullInstallDir = Path.GetFullPath(Settings.InstallDirectory).TrimEnd('\\');
+        var otherServersRunning = Core.Classes.Utilities.GetRunningProcessses("mysqld").Where(p => string.Compare(Path.GetDirectoryName(p.MainModule.FileName).TrimEnd('\\'),
+                                                                                                                  fullInstallDir,
+                                                                                                                  StringComparison.InvariantCultureIgnoreCase) != 0);
+
+        // If other instances are running, allow to perform an upgrade.
+        if (otherServersRunning.Count() > 0)
+        {
+          Pages.Add(new ServerConfigServerInstallationsPage(this));
+        }
+        // Otherwise, let user set the data directory path.
+        else
+        {
+          Pages.Add(new ServerConfigDataDirectoryPage(this) { PageVisible = ConfigurationType == ConfigurationType.New });
+        }
+      }
+
+      // Upgrade pages.
+      Pages.Add(new ServerConfigBackupPage(this) { PageVisible = false });
+
+      // New configuration and reconfiguration pages.
       Pages.Add(new ServerConfigLocalMachinePage(this));
       Pages.Add(new ServerConfigNamedPipesPage(this) { PageVisible = Settings != null
                                                        && Settings.EnableNamedPipe});
-      
-      //if (ServerVersion.ServerSupportsCachingSha2Authentication())
-      //{
-      //  Pages.Add(new ServerConfigDefaultAuthenticationPage(this));
-      //}
-
       Pages.Add(new ServerConfigUserAccountsPage(this));
       Pages.Add(new ServerConfigServicePage(this));
       Pages.Add(new ServerConfigSecurityPage(this) { PageVisible = !ValidateServerFilesHaveRecommendedPermissions() });
@@ -821,17 +887,6 @@ namespace MySql.Configurator.Wizards.Server
     }
 
     /// <summary>
-    /// Updates the <see cref="ServerProductConfigurationController.CurrentState"/> as required or unnecessary.
-    /// </summary>
-    /// <param name="required">Flag indicating whether the configuration is required or not.</param>
-    public void UpdateConfigurationState(bool required)
-    {
-      CurrentState = required
-        ? ConfigState.ConfigurationRequired
-        : ConfigState.ConfigurationUnnecessary;
-    }
-
-    /// <summary>
     /// Updates the configuration steps each time a configuration is run.
     /// </summary>
     public override void UpdateConfigurationSteps()
@@ -840,7 +895,6 @@ namespace MySql.Configurator.Wizards.Server
       foreach (var step in ConfigurationSteps)
       {
         if (step == _writeConfigurationFileStep) _writeConfigurationFileStep.Execute = IsWriteIniConfigurationFileNeeded || IsWriteExtendedConfigurationFileNeeded;
-        else if (step == _setLocalInstanceAsWritableStep) _setLocalInstanceAsWritableStep.Execute = IsSetLocalInstanceAsWritableStepNeeded;
         else if (step == _stopServerConfigurationStep) _stopServerConfigurationStep.Execute = IsStopServerConfigurationStepNeeded;
         else if (step == _startServerConfigurationStep) _startServerConfigurationStep.Execute = IsStartServerConfigurationStepNeeded;
         //else if (step == _prepareAuthenticationPluginChangeStep) _prepareAuthenticationPluginChangeStep.Execute = DefaultAuthenticationPluginChanged;
@@ -870,14 +924,13 @@ namespace MySql.Configurator.Wizards.Server
     public void UpdateUpgradeConfigSteps()
     {
       _backupDatabaseStep.Execute = IsBackupDatabaseStepNeeded;
-      _upgradeStandAloneServerStep.Execute = Settings.ServerConfigurationType == ServerConfigurationType.StandAlone
-                                             && IsThereServerDataFiles
+      _upgradeStandAloneServerStep.Execute = IsThereServerDataFiles
                                              && CurrentState == ConfigState.ConfigurationRequired;
+      _removeExistingServerInstallationStep.Execute = IsRemoveExistingServerInstallationStepNeeded;
+      _resetPersistedVariablesStep.Execute = PersistedVariablesToReset?.Count > 0;
+      _renameExistingDataDirectoryStep.Execute = IsDataDirectoryRenameNeeded;
       _updateAccessPermissions.Execute = IsUpdateServerFilesPermissionsStepNeeded;
       _startAndUpgradeServerConfigStep.Execute = IsStartAndUpgradeConfigurationStepNeeded;
-      _startAndUpgradeServerConfigStep.ChangeDescription(Settings.SystemTablesUpgraded == SystemTablesUpgradedType.Yes
-        ? Resources.ServerStartAndUpgradeProcessStep
-        : Resources.ServerStartMinimalUpgradeStep);
       ConfigurationSteps = StandAloneServerSteps;
     }
 
@@ -898,6 +951,80 @@ namespace MySql.Configurator.Wizards.Server
       
       // Make sure the base always runs after all steps are updated to execute or not.
       base.UpdateRemoveSteps();
+    }
+
+    /// <summary>
+    /// Validates if the permissions to the data directory are already set up as recommended.
+    /// </summary>
+    /// <returns><c>true</c> if the permissions are already set up as recommended; otherwise, <c>false</c>.</returns>
+    public bool ValidateServerFilesHaveRecommendedPermissions()
+    {
+      if (!IsThereServerDataFiles)
+      {
+        return false;
+      }
+
+      var dataDirectory = Path.Combine(DataDirectory, "Data");
+      if (DirectoryServicesWrapper.DirectoryPermissionsAreInherited(dataDirectory) == true)
+      {
+        return false;
+      }
+
+      var usersGroupSid = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
+      var administratorsGroupSid = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
+      SecurityIdentifier serviceAccountSid = null;
+      if (Settings.ConfigureAsService)
+      {
+        if (string.IsNullOrEmpty(Settings.ServiceAccountUsername))
+        {
+          return false;
+        }
+
+        var serviceAccountUsername = Settings.ServiceAccountUsername.StartsWith(".")
+                                       ? Settings.ServiceAccountUsername.Replace(".", Environment.MachineName)
+                                       : Settings.ServiceAccountUsername;
+        var account = new NTAccount(serviceAccountUsername);
+        if (account == null)
+        {
+          Logger.LogError(Resources.ServerConfigConvertToNTAccountFailed);
+          return false;
+        }
+
+        try
+        {
+          serviceAccountSid = account.Translate(typeof(SecurityIdentifier)) as SecurityIdentifier;
+        }
+        catch (Exception ex)
+        {
+          Logger.LogException(ex);
+        }
+
+        if (serviceAccountSid == null)
+        {
+          Logger.LogError(string.Format(Resources.ServerConfigCouldNotObtainSid, account.Value));
+          return false;
+        }
+      }
+
+      var serverFilesHaveRecommendedPermissions = !DirectoryServicesWrapper.HasAccessToDirectory(usersGroupSid, dataDirectory, null)
+                                                  && DirectoryServicesWrapper.HasAccessToDirectory(administratorsGroupSid, dataDirectory, FileSystemRights.FullControl)
+                                                  && Settings.ConfigureAsService
+                                                       ? DirectoryServicesWrapper.HasAccessToDirectory(serviceAccountSid, dataDirectory, FileSystemRights.FullControl)
+                                                       : OldSettings != null
+                                                         && OldSettings.ConfigureAsService
+                                                           ? !DirectoryServicesWrapper.HasAccessToDirectory(DirectoryServicesWrapper.GetSecurityIdentifier(OldSettings.ServiceAccountUsername), dataDirectory, FileSystemRights.FullControl)
+                                                           : true;
+      UpdateDataDirectoryPermissions = !serverFilesHaveRecommendedPermissions;
+      if (ConfigurationType == ConfigurationType.Upgrade)
+      {
+        UpdateUpgradeConfigSteps();
+      }
+      else
+      {
+        UpdateConfigurationSteps();
+      }
+
+      return serverFilesHaveRecommendedPermissions;
     }
 
     private bool AddUserToSpecialUsersRegistryKey()
@@ -928,61 +1055,55 @@ namespace MySql.Configurator.Wizards.Server
     /// </summary>
     private void BackupDatabase()
     {
-      CancellationToken.ThrowIfCancellationRequested();
-      _upgradingInstance = new LocalServerInstance(this, ReportStatus);
-      var success = _upgradingInstance.IsRunning;
-      if (!success)
+      if (ExistingServerInstallationInstance == null)
       {
-        // Step 1: Start Server (if not already running) in order to be able to run mysqldump tool
-        ReportStatus(Resources.ServerConfigMySqlUpgradeStartServer);
-        success = _upgradingInstance.StartInstanceAsProcess();
+        throw new Exception(Resources.ExistingServerInstanceNotSetError);
       }
 
+      if (!ExistingServerInstallationInstance.IsRunning)
+      {
+        throw new Exception(Resources.ExistingServerInstanceNotRunningError);
+      }
+
+      var success = false;
       string errorMessage = null;
       CancellationToken.ThrowIfCancellationRequested();
-      if (success)
+      // Run mysqldump tool
+      var backupFile = Settings.FullBackupFilePath;
+      if (!string.IsNullOrEmpty(backupFile))
       {
-        // Step 2: If Server started successfully, run mysqldump tool
-        var backupFile = Settings.FullBackupFilePath;
-        if (!string.IsNullOrEmpty(backupFile))
+        ReportStatus(string.Format(Resources.ServerConfigBackupDatabaseDumpRunning, backupFile));
+        var binDirectory = Path.Combine(ExistingServerInstallationInstance.BaseDir, BINARY_DIRECTORY_NAME);
+        var user = GetUserAccountToConnectBeforeUpdatingRootUser();
+        var connectionOptions = string.Empty;
+        bool sendingPasswordInCommandLine = false;
+        string tempConfigFileWithPassword = null;
+        if (!string.IsNullOrEmpty(user.Password))
         {
-          ReportStatus(string.Format(Resources.ServerConfigBackupDatabaseDumpRunning, backupFile));
-          var binDirectory = Path.Combine(InstallDirectory, BINARY_DIRECTORY_NAME);
-          var user = GetUserAccountToConnectBeforeUpdatingRootUser();
-          var connectionOptions = string.Empty;
-          bool sendingPasswordInCommandLine = false;
-          string tempConfigFileWithPassword = null;
-          if (!string.IsNullOrEmpty(user.Password))
-          {
-            tempConfigFileWithPassword = Core.Classes.Utilities.CreateTempConfigurationFile(IniFile.GetClientPasswordLines(user.Password));
-            sendingPasswordInCommandLine = tempConfigFileWithPassword == null;
-            connectionOptions = sendingPasswordInCommandLine
-              ? $"--password={user.Password} "
-              : $"--defaults-extra-file=\"{tempConfigFileWithPassword}\" ";
-          }
+          tempConfigFileWithPassword = Core.Classes.Utilities.CreateTempConfigurationFile(IniFile.GetClientPasswordLines(user.Password));
+          sendingPasswordInCommandLine = tempConfigFileWithPassword == null;
+          connectionOptions = sendingPasswordInCommandLine
+            ? $"--password={user.Password} "
+            : $"--defaults-extra-file=\"{tempConfigFileWithPassword}\" ";
+        }
 
-          connectionOptions += GetCommandLineConnectionOptions(user, false, true);
-          var arguments =
-            $" {connectionOptions} --default-character-set=utf8 --routines --events --single-transaction=TRUE --all-databases --result-file=\"{backupFile}\"";
-          var dumpToolProcessResult = Core.Classes.Utilities.RunProcess(
-            Path.Combine(binDirectory, DUMP_TOOL_EXECUTABLE_FILENAME),
-            arguments,
-            binDirectory,
-            ReportStatus,
-            ReportStatus,
-            true,
-            sendingPasswordInCommandLine);
-          Core.Classes.Utilities.DeleteFile(tempConfigFileWithPassword, 10, 500);
-          success = dumpToolProcessResult.ExitCode == 0;
-        }
-        else
-        {
-          errorMessage = Resources.ServerConfigBackupDatabaseBackupDirectoryError;
-        }
+        connectionOptions += GetCommandLineConnectionOptions(user, false, true);
+        var arguments =
+          $" {connectionOptions} --default-character-set=utf8 --routines --events --single-transaction=TRUE --all-databases --result-file=\"{backupFile}\"";
+        var dumpToolProcessResult = Core.Classes.Utilities.RunProcess(
+          Path.Combine(binDirectory, DUMP_TOOL_EXECUTABLE_FILENAME),
+          arguments,
+          binDirectory,
+          ReportStatus,
+          ReportStatus,
+          true,
+          sendingPasswordInCommandLine);
+        Core.Classes.Utilities.DeleteFile(tempConfigFileWithPassword, 10, 500);
+        success = dumpToolProcessResult.ExitCode == 0;
       }
       else
       {
-        errorMessage = Resources.ServerConfigBackupDatabaseServerStartError;
+        errorMessage = Resources.ServerConfigBackupDatabaseBackupDirectoryError;
       }
 
       ReportStatus(success
@@ -1474,6 +1595,8 @@ namespace MySql.Configurator.Wizards.Server
     private void DeleteConfigurationFileStep()
     {
       CancellationToken.ThrowIfCancellationRequested();
+      ReportStatus(Resources.RemovingGeneralSettingsFileText);
+      GeneralSettingsManager.DeleteGeneralSettingsFile(InstallDirectory);
       ReportStatus(Resources.RemovingConfigurationFileText);
       CurrentStep.Status = Settings.DeleteConfigFile(RemoveDataDirectory)
         ? ConfigurationStepStatus.Finished
@@ -1751,24 +1874,27 @@ namespace MySql.Configurator.Wizards.Server
     {
       // Initialize configuration steps.
       _backupDatabaseStep = new ConfigurationStep(Resources.ServerConfigBackupDatabaseStep, 60, BackupDatabase, true, ConfigurationType.Upgrade);
-      _createRemoveExampleDatabasesStep = new ConfigurationStep("Updating example databases", 10, CreateRemoveExampleDatabases, false, ConfigurationType.New | ConfigurationType.Reconfiguration);
+      _createRemoveExampleDatabasesStep = new ConfigurationStep(Resources.ServerUpdateExampleDatabasesText, 10, CreateRemoveExampleDatabases, false, ConfigurationType.New | ConfigurationType.Reconfiguration);
       _initializeServerConfigurationStep = new ConfigurationStep(Resources.ServerInitializeDatabaseStep, 900, InitializeServer, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
       //_prepareAuthenticationPluginChangeStep = new ConfigurationStep(Resources.ServerPrepareAuthenticationPluginChangeStep, 20, PrepareAuthenticationPluginChange, true, ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
-      _setLocalInstanceAsWritableStep = new ConfigurationStep(Resources.SetLocalInstanceAsWritableStep, 10, SetLocalInstanceAsWritableStep);
+      _removeExistingServerInstallationStep = new ConfigurationStep(Resources.ServerRemoveOldInstallationStep, 60, RemoveExistingServerInstallationStep, false, ConfigurationType.Upgrade);
+      _renameExistingDataDirectoryStep = new ConfigurationStep(Resources.RenameExistingDataDirectoryStep, 10, RenameExistingDataDirectoryStep, false, ConfigurationType.Upgrade);
+      _resetPersistedVariablesStep = new ConfigurationStep(Resources.ServerResetPersistedVariablesStep, 20, ResetPersistedVariablesStep, false, ConfigurationType.Upgrade);
+      _startAndUpgradeServerConfigStep = new ConfigurationStep(Resources.ServerStartAndUpgradeProcessStep, 3600, StartAndUpgradeServerStep, true, ConfigurationType.Upgrade);
       _startServerConfigurationStep = new ConfigurationStep(Resources.ServerStartProcessStep, 90, StartServerStep);
+      _stopExistingServerInstanceStep = new ConfigurationStep(Resources.StoppingExistingServerInstanceStep, 40, StopExistingServerInstance, true, ConfigurationType.Upgrade);
       _stopServerConfigurationStep = new ConfigurationStep(Resources.ServerStopProcessStep, 40, StopServerSafe);
+      _updateAccessPermissions = new ConfigurationStep(Resources.ServerUpdateServerFilePermissions, 10, UpdateServerFilesPermissions, false, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
       _updateEnterpriseFirewallPluginConfigStep = new ConfigurationStep(Resources.ServerEnableEnterpriseFirewallStep, 45, InstallEnterpriseFirewallPlugin, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
+      _updateProcessStep = new ConfigurationStep(Resources.ServerAdjustProcessStep, 10, UpdateProcessSettings, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
       _updateStartMenuLinksStep = new ConfigurationStep(Resources.ServerUpdateStartMenuLinkStep, 20, UpdateStartMenuLink, false, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
       _updateSecurityStep = new ConfigurationStep(Resources.ServerApplySecurityStep, 20, UpdateSecurity, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
-      _updateAccessPermissions = new ConfigurationStep(Resources.ServerUpdateServerFilePermissions, 10, UpdateServerFilesPermissions, false, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
       _updateUsersStep = new ConfigurationStep(Resources.ServerCreateUsersStep, 20, UpdateUsers, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
       _updateWindowsFirewallRulesStep = new ConfigurationStep(Resources.ServerUpdateWindowsFirewallStep, 40, UpdateWindowsFirewall, false, ConfigurationType.New | ConfigurationType.Reconfiguration);
-      _updateWindowsServiceStep = new ConfigurationStep(Resources.ServerAdjustServiceStep, 25, UpdateServiceSettings, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
-      _updateProcessStep = new ConfigurationStep(Resources.ServerAdjustProcessStep, 10, UpdateProcessSettings, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
+      _updateWindowsServiceStep = new ConfigurationStep(Resources.ServerAdjustServiceStep, 25, UpdateServiceSettings, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade); ;
       _upgradeStandAloneServerStep = new ConfigurationStep(Resources.ServerUpgradeStep, 3600, UpgradeServer, true, ConfigurationType.Upgrade);
       _writeConfigurationFileStep = new ConfigurationStep(Resources.ServerWriteConfigFileStep, 20, WriteConfigurationFile);
-      _startAndUpgradeServerConfigStep = new ConfigurationStep(Resources.ServerStartAndUpgradeProcessStep, 3600, StartAndUpgradeServerStep, true, ConfigurationType.Upgrade);
-
+      
       LoadServerConfigurationSteps();
       LoadSelfContainedUpgradeSteps();
 
@@ -1789,12 +1915,10 @@ namespace MySql.Configurator.Wizards.Server
         _updateWindowsFirewallRulesStep,
         _updateWindowsServiceStep,
         _updateProcessStep,
-        _backupDatabaseStep,
         _upgradeStandAloneServerStep,
         _initializeServerConfigurationStep,
         _updateAccessPermissions,
         _startServerConfigurationStep,
-        _setLocalInstanceAsWritableStep,
         _updateSecurityStep,
         _updateUsersStep,
         _updateEnterpriseFirewallPluginConfigStep,
@@ -1810,17 +1934,21 @@ namespace MySql.Configurator.Wizards.Server
     {
       _selfContainedUpgradeSteps = new List<ConfigurationStep>
       {
+        _resetPersistedVariablesStep,
+        _backupDatabaseStep,
+        _stopExistingServerInstanceStep,
+        _renameExistingDataDirectoryStep,
+        _writeConfigurationFileStep,
         _stopServerConfigurationStep,
         _updateAccessPermissions,
         _updateWindowsServiceStep,
         _startAndUpgradeServerConfigStep,
-        _setLocalInstanceAsWritableStep,
         //_prepareAuthenticationPluginChangeStep,
         _stopServerConfigurationStep,
-        _writeConfigurationFileStep,
         _startServerConfigurationStep,
         _updateSecurityStep,
-        _updateStartMenuLinksStep
+        _updateStartMenuLinksStep,
+        _removeExistingServerInstallationStep
       };
     }
 
@@ -1887,7 +2015,14 @@ namespace MySql.Configurator.Wizards.Server
         templateFile = string.Format(templateBase, $"-{version.Major}.{version.Minor}");
       }
 
-      return new IniTemplate(InstallDirectory, DataDirectory, templateFile, Settings.IniDirectory, BaseServerSettings.CONFIG_FILE_NAME, version, Settings.ServerInstallType);
+      return new IniTemplate(InstallDirectory,
+                             DataDirectory,
+                             templateFile,
+                             Settings.IniDirectory,
+                             !string.IsNullOrEmpty(Settings.ConfigFile) ? Settings.ConfigFile : BaseServerSettings.DEFAULT_CONFIG_FILE_NAME,
+                             version,
+                             Settings.ServerInstallType,
+                             _revertController);
     }
 
     private char NextNonWhitespaceChar(string arguments, ref int index)
@@ -2028,6 +2163,80 @@ namespace MySql.Configurator.Wizards.Server
         : ConfigurationStepStatus.Error;
     }
 
+    /// <summary>
+    /// Configuration step that removes an existing MySQL Server installation being replaced with the one being configured.
+    /// </summary>
+    private void RemoveExistingServerInstallationStep()
+    {
+      if (ExistingServerInstallationInstance == null)
+      {
+        throw new Exception(Resources.ExistingServerInstanceNotSetError);
+      }
+
+      ReportStatus(Resources.ServerConfigRemovingExistingInstance);
+      // Determine if the server to remove was installed using MSI
+      var serverProductCode = Core.Classes.Utilities.FindInstalledServerProductCode(ExistingServerInstallationInstance.ServerVersion,
+                                                                                    ExistingServerInstallationInstance.BaseDir);
+      if (!string.IsNullOrEmpty(serverProductCode))
+      {
+        // Uninstall the MSI
+        MsiInterop.MsiSetInternalUI(InstallUILevel.None, IntPtr.Zero);
+        var returnCode = MsiInterop.MsiConfigureProductEx(serverProductCode, InstallLevel.Default, InstallState.Default, $"REMOVE=ALL REBOOT=ReallySuppress MYSQL_INSTALLER=\"YES\"");
+        if (returnCode == MsiEnumError.SuccessRebootRequired
+            || returnCode == MsiEnumError.Success)
+        {
+          var restartRequiredText = returnCode == MsiEnumError.SuccessRebootRequired ? " but the computer requires a restart." : string.Empty;
+          ReportStatus($"MySQL Server {ExistingServerInstallationInstance.ServerVersion} was successfully uninstalled{restartRequiredText}.");
+          CurrentStep.Status = ConfigurationStepStatus.Finished;
+        }
+        else
+        {
+          throw new Exception($"Failed to uninstall MySQL Server {ExistingServerInstallationInstance.ServerVersion}.");
+        }
+      }
+      else
+      {
+        // The existing server instance was not installed through MSI, so delete the directory.
+        if (Core.Classes.Utilities.DeleteDirectory(ExistingServerInstallationInstance.BaseDir, 3, 1000, 100, out var errorMessage))
+        {
+          ReportStatus($"The MySQL Server {ExistingServerInstallationInstance.ServerVersion} installation directory was successfully deleted.");
+          CurrentStep.Status = ConfigurationStepStatus.Finished;
+        }
+        else
+        {
+          throw new Exception($"Failed to delete MySQL Server {ExistingServerInstallationInstance.ServerVersion} installation directory: {errorMessage}");
+        }
+      }
+    }
+
+    /// <summary>
+    /// Renames an existing data directory to the default one that reflects the MySQL Server version being configured.
+    /// </summary>
+    private void RenameExistingDataDirectoryStep()
+    {
+      var newDataDir = Regex.Replace(DataDirectory, MySqlServerInstance.DEFAULT_DATADIR_NAME_REGEX, $"MySQL Server {ServerVersion.ToString(2)}", RegexOptions.IgnoreCase);
+      ReportStatus(string.Format(Resources.ServerConfigRenamingDataDirectory, DataDirectory, newDataDir));
+      try
+      {
+        _revertController.OldDataDirPath = DataDirectory;
+        _revertController.NewDataDirPath = newDataDir;
+        Directory.Move(DataDirectory, newDataDir);
+        ReportStatus(string.Format(Resources.ServerConfigDataDirectoryRenamed, DataDirectory, newDataDir));
+        Settings.DataDirectory = newDataDir;
+        Settings.IniDirectory = Settings.DataDirectory;
+        Settings.SecureFilePrivFolder = Path.Combine(Settings.IniDirectory, MySqlServerSettings.SECURE_FILE_PRIV_DIRECTORY);
+        _revertController.DataDirRenamed = true;
+        CurrentStep.Status = ConfigurationStepStatus.Finished;
+      }
+      catch (Exception ex)
+      {
+        ReportError(string.Format(Resources.RenamingDataDirectoryError, newDataDir));
+        Logger.LogException(ex);
+        RevertedSteps = _revertController.Rollback(Settings);
+        CurrentStep.Status = ConfigurationStepStatus.Error;
+      }
+    }
+
     private void ReportErrLogLine(string line)
     {
       var errorLogLine = ServerErrorLogLine.Parse(line);
@@ -2035,93 +2244,41 @@ namespace MySql.Configurator.Wizards.Server
     }
 
     /// <summary>
-    /// Identifies if user input is required prior to executing an uninstall operation.
+    /// Configuration step that removes deprecated server variables set using SET PERSIST.
     /// </summary>
-    /// <returns><c>true</c> if user input is required to configure prior to uninstalling the product; otherwise, <c>false</c>.</returns>
-    public override bool RequiresUninstallConfiguration()
+    private void ResetPersistedVariablesStep()
     {
-      return IsThereServerDataFiles;
-    }
-
-    /// <summary>
-    /// Validates if the permissions to the data directory are already set up as recommended.
-    /// </summary>
-    /// <returns><c>true</c> if the permissions are already set up as recommended; otherwise, <c>false</c>.</returns>
-    public bool ValidateServerFilesHaveRecommendedPermissions()
-    {
-      if (!IsThereServerDataFiles)
+      if (PersistedVariablesToReset.Count == 0)
       {
-        return false;
+        return;
+      }
+      
+      ReportStatus(string.Format(Resources.RemovingPersistedServerVariables,
+                                 PersistedVariablesToReset.Count.ToString(),
+                                 string.Join(", ", PersistedVariablesToReset)));
+      var removeVariablesScript = new StringBuilder();
+      foreach (var deprecatedVariable in PersistedVariablesToReset)
+      {
+        removeVariablesScript.AppendLine($"RESET PERSIST IF EXISTS {deprecatedVariable};");
       }
 
-      var dataDirectory = Path.Combine(DataDirectory, "Data");
-      if (DirectoryServicesWrapper.DirectoryPermissionsAreInherited(dataDirectory) == true)
+      if (ExistingServerInstallationInstance.ExecuteScripts(true, removeVariablesScript.ToString()) == 1)
       {
-        return false;
-      }
-
-      var usersGroupSid = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
-      var administratorsGroupSid = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
-      SecurityIdentifier serviceAccountSid = null;
-      if (Settings.ConfigureAsService)
-      {
-        if (string.IsNullOrEmpty(Settings.ServiceAccountUsername))
-        {
-          return false;
-        }
-
-        var serviceAccountUsername = Settings.ServiceAccountUsername.StartsWith(".")
-                                       ? Settings.ServiceAccountUsername.Replace(".", Environment.MachineName)
-                                       : Settings.ServiceAccountUsername;
-        var account = new NTAccount(serviceAccountUsername);
-        if (account == null)
-        {
-          Logger.LogError(Resources.ServerConfigConvertToNTAccountFailed);
-          return false;
-        }
-
-        try
-        {
-          serviceAccountSid = account.Translate(typeof(SecurityIdentifier)) as SecurityIdentifier;
-        }
-        catch (Exception ex)
-        {
-          Logger.LogException(ex);
-        }
-        
-        if (serviceAccountSid == null)
-        {
-          Logger.LogError(string.Format(Resources.ServerConfigCouldNotObtainSid, account.Value));
-          return false;
-        }
-      }
-
-      var serverFilesHaveRecommendedPermissions = !DirectoryServicesWrapper.HasAccessToDirectory(usersGroupSid, dataDirectory, null)
-                                                  && DirectoryServicesWrapper.HasAccessToDirectory(administratorsGroupSid, dataDirectory, FileSystemRights.FullControl)
-                                                  && Settings.ConfigureAsService
-                                                       ? DirectoryServicesWrapper.HasAccessToDirectory(serviceAccountSid, dataDirectory, FileSystemRights.FullControl)
-                                                       : OldSettings != null
-                                                         && OldSettings.ConfigureAsService
-                                                           ? !DirectoryServicesWrapper.HasAccessToDirectory(DirectoryServicesWrapper.GetSecurityIdentifier(OldSettings.ServiceAccountUsername), dataDirectory, FileSystemRights.FullControl)
-                                                           : true;
-      UpdateDataDirectoryPermissions = !serverFilesHaveRecommendedPermissions;
-      if (ConfigurationType == ConfigurationType.Upgrade)
-      {
-        UpdateUpgradeConfigSteps();
+        PersistedVariablesToReset.Clear();
+        CurrentStep.Status = ConfigurationStepStatus.Finished;
       }
       else
       {
-        UpdateConfigurationSteps();
+        ReportError(Resources.RemovingPersistedServerVariablesError);
+        CurrentStep.Status = ConfigurationStepStatus.Error;
       }
-
-      return serverFilesHaveRecommendedPermissions;
     }
 
     private void SetDefaultDataDir()
     {
       _dataDirectory = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-        $@"MySQL\MySQL Server {ServerVersion.Major}.{ServerVersion.Minor}\");
+        $@"MySQL\MySQL Server {ServerVersion.ToString(2)}\");
     }
 
     /// <summary>
@@ -2185,36 +2342,35 @@ namespace MySql.Configurator.Wizards.Server
     private void StartAndUpgradeServerStep()
     {
       CancellationToken.ThrowIfCancellationRequested();
-      var upgradingSystemTables = Settings.SystemTablesUpgraded == SystemTablesUpgradedType.Yes;
-      if (!upgradingSystemTables)
+      try
       {
-        ReportStatus(string.Format(Resources.ServerStartingWithMinimalUpgradeWarning, Settings.ConfigureAsService ? "Windows service" : "command line"));
+        var startStatus = StartServer(true, false, "--upgrade=FORCE");
+        if (startStatus.UpgradeStatus.UpgradeFailed
+            || !startStatus.UpgradeStatus.UpgradeFinished)
+        {
+          Settings.PendingSystemTablesUpgrade = true;
+          Settings.SaveGeneralSettings();
+          throw new Exception(Resources.ServerConfigStartUpgradeFailed);
+        }
+
+        Settings.PendingSystemTablesUpgrade = false;
+        Settings.SaveGeneralSettings();
+        if (!startStatus.AcceptingConnections)
+        {
+          throw new Exception(Resources.ServerConfigStartUpgradeNotAcceptingConnections);
+        }
+
+        CurrentStep.Status = ConfigurationStepStatus.Finished;
+
+        // Save the SystemTablesUpgraded back to the extended settings file
+        Settings.SaveGeneralSettings();
       }
-      var startStatus = upgradingSystemTables
-        ? StartServer(true, false, "--upgrade=FORCE")
-        : StartServer(true, false, "--upgrade=MINIMAL");
-      if (upgradingSystemTables
-          && (startStatus.UpgradeStatus.UpgradeFailed
-              || !startStatus.UpgradeStatus.UpgradeFinished))
+      catch (Exception ex)
       {
-        Settings.PendingSystemTablesUpgrade = true;
-        Settings.SystemTablesUpgraded = OldSettings.SystemTablesUpgraded;
-        Settings.SaveExtendedSettings(true);
-        throw new Exception(Resources.ServerConfigStartUpgradeFailed);
+        RevertedSteps = _revertController.Rollback(Settings);
+        CurrentStep.Status = ConfigurationStepStatus.Error;
+        throw ex;
       }
-
-      Settings.PendingSystemTablesUpgrade = false;
-      Settings.SaveExtendedSettings();
-
-      if (!startStatus.AcceptingConnections)
-      {
-        throw new Exception(Resources.ServerConfigStartUpgradeNotAcceptingConnections);
-      }
-
-      CurrentStep.Status = ConfigurationStepStatus.Finished;
-
-      // Save the SystemTablesUpgraded back to the extended settings file
-      Settings.SaveExtendedSettings();
     }
 
     private ServerStartStatus StartServer(bool waitUntilAcceptingConnections = true, bool setStepStatus = true, string additionalOptions = null)
@@ -2225,6 +2381,7 @@ namespace MySql.Configurator.Wizards.Server
         UserAccount = GetUserAccountToConnectBeforeUpdatingRootUser(),
         WaitUntilAcceptingConnections = waitUntilAcceptingConnections
       };
+
       var startedStatus = serverInstance.StartInstance(additionalOptions);
       var startedSuccessfully = startedStatus.Started
                                 && (waitUntilAcceptingConnections && startedStatus.AcceptingConnections ||
@@ -2246,7 +2403,49 @@ namespace MySql.Configurator.Wizards.Server
 
     private void StartServerStep()
     {
+      // If configuration file was updated and server is running we need to restart it first to load the new configurations.
+      // E.g. when the port is changed during a reconfiguration.
+      if (IsWriteIniConfigurationFileNeeded
+          && Settings.ConfigureAsService
+          && MySqlServiceControlManager.GetServiceStatus(Settings.ServiceName) == System.ServiceProcess.ServiceControllerStatus.Running)
+      {
+        StopServerSafe();
+      }
+
       StartServer();
+    }
+
+    /// <summary>
+    /// Stops an existing MySQL Server instance that will be replaced with the server being configured.
+    /// </summary>
+    private void StopExistingServerInstance()
+    {
+      if (ExistingServerInstallationInstance == null)
+      {
+        throw new Exception(Resources.ExistingServerInstanceNotSetError);
+      }
+
+      // Try to find a running Windows service, otherwise shutdown instance.
+      if (ExistingServerInstallationInstance.IsRunning)
+      {
+        ReportStatus(Resources.ServerConfigStoppingExistingInstance);
+        CancellationToken.ThrowIfCancellationRequested();
+        if (!ExistingServerInstallationInstance.ShutdownInstance())
+        {
+          ReportStatus(Resources.ServerConfigShutdownExistingInstanceError);
+          RevertedSteps = _revertController.Rollback(Settings);
+          CurrentStep.Status = ConfigurationStepStatus.Error;
+        }
+
+        ReportStatus(Resources.ServerConfigExistingInstanceStopped);
+      }
+      else
+      {
+        ReportStatus(Resources.ServerConfigExistingInstanceNotRunning);
+      }
+
+      _revertController.InstanceStopped = true;
+      CurrentStep.Status = ConfigurationStepStatus.Finished;
     }
 
     /// <summary>
@@ -2416,80 +2615,95 @@ namespace MySql.Configurator.Wizards.Server
         : ConfigurationStepStatus.Error;
     }
 
-    private void UpdateConfigFile()
+    private bool UpdateConfigFile()
     {
       CancellationToken.ThrowIfCancellationRequested();
-      ReportStatus(string.Format(Resources.SavingConfigurationFile, BaseServerSettings.CONFIG_FILE_NAME));
-      if (!Directory.Exists(Settings.IniDirectory))
+      ReportStatus(string.Format(Resources.SavingConfigurationFile, Settings.ConfigFile));
+      try
       {
-        Directory.CreateDirectory(Settings.IniDirectory);
-      }
-
-      IniTemplate t = null;
-
-      // If this is an upgrade, we want to load the existing ini template, this to ensure that the values
-      // already configured by the user persist in the new ini file.
-      if (ConfigurationType == ConfigurationType.Upgrade)
-      {
-        t = Settings.GetExistingIniFileTemplate();
-
-        // Verify that the Windows service does exist
-        if (Settings.ConfigureAsService
-            && !MySqlServiceControlManager.ServiceExists(Settings.ServiceName)
-            && IsThereServerDataFiles)
+        if (!Directory.Exists(Settings.IniDirectory))
         {
-          Settings.ConfigureAsService = false;
+          Directory.CreateDirectory(Settings.IniDirectory);
         }
-      }
 
-      CancellationToken.ThrowIfCancellationRequested();
-      if (t == null)
-      {
-        t = LoadTemplate();
-      }
+        IniTemplate t = null;
 
-      //Set the Query Cache settings if Enterprise Firewall is enabled.
-      if (Settings.Plugins.IsEnabled("mysql_firewall"))
-      {
-        Settings.EnableQueryCacheType = false;
-        Settings.EnableQueryCacheSize = false;
-      }
+        // If this is an upgrade, we want to load the existing ini template, this to ensure that the values
+        // already configured by the user persist in the new ini file.
+        if (ConfigurationType == ConfigurationType.Upgrade)
+        {
+          t = Settings.GetExistingIniFileTemplate();
 
-      if (!Directory.Exists(Settings.SecureFilePrivFolder))
-      {
-        Directory.CreateDirectory(Settings.SecureFilePrivFolder);
-      }
+          // Verify that the Windows service does exist
+          if (Settings.ConfigureAsService
+              && !MySqlServiceControlManager.ServiceExists(
+                ExistingServerInstallationInstance == null
+                 ? Settings.ServiceName
+                 : ExistingServerInstallationInstance.ServiceName)
+              && IsThereServerDataFiles
+              && (ConfigurationType != ConfigurationType.Upgrade
+                 || !IsServiceRenameNeeded))
+          {
+            Settings.ConfigureAsService = false;
+          }
+        }
 
-      CancellationToken.ThrowIfCancellationRequested();
-      Settings.Save(t);
-
-      // If this is an upgrade, we need to run a second pass at updating the ini file but this time comparing
-      // it against the corresponding template. This to determine if there are new sections, deprecated or new
-      // variables that need to be added. During this second pass we ignore updating existing values since we
-      // don't want to override the values defined by the user.
-      if (ConfigurationType == ConfigurationType.Upgrade)
-      {
-        t = LoadTemplate();
-        Settings.Save(t, true);
-      }
-
-      ReportStatus(string.Format(Resources.SavedConfigurationFile, BaseServerSettings.CONFIG_FILE_NAME));
-      if (!ServerVersion.ServerSupportsRegeneratingRedoLogFiles())
-      {
-        return;
-      }
-
-      //we need to delete
-      for (int i = 0; i < 2; i++)
-      {
         CancellationToken.ThrowIfCancellationRequested();
-        string datetime = DateTime.Now.GetDateTimeFormats('s')[0].Replace(':', '-');
-        string logFile = Path.Combine(DataDirectory, "data", string.Format("ib_logfile{0}", i));
-        string backupLogFile = Path.Combine(DataDirectory, string.Format("ib_logfile{0}_{1}", i, datetime));
-        if (File.Exists(logFile))
+        if (t == null)
         {
-          File.Move(logFile, backupLogFile);
+          t = LoadTemplate();
         }
+
+        //Set the Query Cache settings if Enterprise Firewall is enabled.
+        if (Settings.Plugins.IsEnabled("mysql_firewall"))
+        {
+          Settings.EnableQueryCacheType = false;
+          Settings.EnableQueryCacheSize = false;
+        }
+
+        if (!Directory.Exists(Settings.SecureFilePrivFolder))
+        {
+          Directory.CreateDirectory(Settings.SecureFilePrivFolder);
+        }
+
+        CancellationToken.ThrowIfCancellationRequested();
+        Settings.Save(t);
+
+        // If this is an upgrade, we need to run a second pass at updating the ini file but this time comparing
+        // it against the corresponding template. This to determine if there are new sections, deprecated or new
+        // variables that need to be added. During this second pass we ignore updating existing values since we
+        // don't want to override the values defined by the user.
+        if (ConfigurationType == ConfigurationType.Upgrade)
+        {
+          t = LoadTemplate();
+          Settings.Save(t);
+        }
+
+        ReportStatus(string.Format(Resources.SavedConfigurationFile, Settings.ConfigFile));
+        if (!ServerVersion.ServerSupportsRegeneratingRedoLogFiles())
+        {
+          return true;
+        }
+
+        //we need to delete
+        for (int i = 0; i < 2; i++)
+        {
+          CancellationToken.ThrowIfCancellationRequested();
+          string datetime = DateTime.Now.GetDateTimeFormats('s')[0].Replace(':', '-');
+          string logFile = Path.Combine(DataDirectory, "data", string.Format("ib_logfile{0}", i));
+          string backupLogFile = Path.Combine(DataDirectory, string.Format("ib_logfile{0}_{1}", i, datetime));
+          if (File.Exists(logFile))
+          {
+            File.Move(logFile, backupLogFile);
+          }
+        }
+
+        return true;
+      }
+      catch (Exception ex)
+      {
+        Logger.LogException(ex);
+        return false;
       }
     }
 
@@ -2575,11 +2789,14 @@ namespace MySql.Configurator.Wizards.Server
       CancellationToken.ThrowIfCancellationRequested();
 
       // If server was previously configured as a service but now it will run as a process.
-      bool existingService = OldSettings != null
-                             && OldSettings.ServiceExists();
+      bool existingService = (OldSettings != null
+                              && OldSettings.ServiceExists())
+                              || (ExistingServerInstallationInstance != null
+                                 && ExistingServerInstallationInstance.ServiceExists);
       bool isNew = ConfigurationType == ConfigurationType.New;
       if (existingService
           && !isNew
+          && ExistingServerInstallationInstance == null
           && (!Settings.ConfigureAsService
               || OldSettings.ServiceName != Settings.ServiceName))
       {
@@ -2605,11 +2822,50 @@ namespace MySql.Configurator.Wizards.Server
       if (Settings.ConfigureAsService)
       {
         CheckServicePermissions();
-        string cmd = $"\"{Path.Combine(InstallDirectory, BINARY_DIRECTORY_NAME, SERVER_EXECUTABLE_FILENAME)}\" --defaults-file=\"{Path.Combine(Settings.IniDirectory, Settings.ConfigFile)}\" {Settings.ServiceName}";
-        if (existingService && !isNew)
+        var cmd = $"\"{Path.Combine(InstallDirectory, BINARY_DIRECTORY_NAME, SERVER_EXECUTABLE_FILENAME)}\" --defaults-file=\"{Path.Combine(Settings.IniDirectory, Settings.ConfigFile)}\" {Settings.ServiceName}";
+        if (existingService 
+          && !isNew)
         {
+          var newServiceName = ConfigurationType == ConfigurationType.Upgrade
+            && IsServiceRenameNeeded
+              ? Settings.GetDefaultServiceName()
+              : Settings.ServiceName;
           ReportStatus(Resources.ServerConfigUpdatingExistingService);
-          MySqlServiceControlManager.Update(OldSettings.ServiceName, Settings.ServiceName, Settings.ServiceName, cmd, Settings.ServiceAccountUsername, Settings.ServiceAccountPassword, Settings.ServiceStartAtStartup);
+          if (!newServiceName.Equals(Settings.ServiceName))
+          {
+            _revertController.OldServiceName = ExistingServerInstallationInstance.ServiceName;
+            _revertController.NewServiceName = newServiceName;
+            _revertController.ServiceCommand = Regex.Replace(cmd, newServiceName, ExistingServerInstallationInstance.ServiceName, RegexOptions.IgnoreCase);
+            _revertController.ServiceCommand = _revertController.ServiceCommand.Replace(ServerVersion.ToString(2), ExistingServerInstallationInstance.ServerVersion.ToString(2));
+            _revertController.ServiceRenamed = true;
+            ReportStatus(string.Format(Resources.ServerConfigUpdatingExistingServiceWithNewName, ExistingServerInstallationInstance.ServiceName, newServiceName));
+            cmd = $"\"{Path.Combine(InstallDirectory, BINARY_DIRECTORY_NAME, SERVER_EXECUTABLE_FILENAME)}\" --defaults-file=\"{Path.Combine(Settings.IniDirectory, Settings.ConfigFile)}\" {newServiceName}";
+            MySqlServiceControlManager.Delete(ExistingServerInstallationInstance.ServiceName);
+            MySqlServiceControlManager.Add(newServiceName, newServiceName, cmd, Settings.ServiceAccountUsername, Settings.ServiceAccountPassword, Settings.ServiceStartAtStartup);
+            Settings.ServiceName = newServiceName;
+
+            // If new service does not exist fail step.
+            if (!Settings.ServiceExists())
+            {
+              RevertedSteps = _revertController.Rollback(Settings);
+              CurrentStep.Status = ConfigurationStepStatus.Error;
+            }
+
+            return;
+          }
+          else
+          {
+            MySqlServiceControlManager.Update(ExistingServerInstallationInstance != null
+            ? Settings.ServiceName
+            : OldSettings.ServiceName,
+            Settings.ServiceName,
+            Settings.ServiceName,
+            cmd,
+            Settings.ServiceAccountUsername,
+            Settings.ServiceAccountPassword,
+            Settings.ServiceStartAtStartup);
+          }
+          
           ReportStatus(Resources.ServerConfigServiceUpdated);
         }
         else
@@ -2793,7 +3049,7 @@ namespace MySql.Configurator.Wizards.Server
       }
 
       Settings.PendingSystemTablesUpgrade = !success;
-      Settings.SaveExtendedSettings(!success);
+      Settings.SaveGeneralSettings();
       CurrentStep.Status = success
         ? ConfigurationStepStatus.Finished
         : ConfigurationStepStatus.Error;
@@ -2814,18 +3070,28 @@ namespace MySql.Configurator.Wizards.Server
         Settings.PendingSystemTablesUpgrade = false;
       }
 
+      // Create the my.ini configuration file.
       if (IsWriteIniConfigurationFileNeeded)
       {
-        UpdateConfigFile();
+        var fileUpdated = UpdateConfigFile();
+        CurrentStep.Status = fileUpdated
+          ? ConfigurationStepStatus.Finished
+          : ConfigurationStepStatus.Error;
+
+        if (!fileUpdated)
+        {
+          RevertedSteps = _revertController.Rollback(Settings);
+        }
+
+        return;
       }
       else
       {
-        ReportStatus(string.Format(Resources.SavingConfigurationFile, BaseServerSettings.EXTENDED_CONFIG_FILE_NAME));
-        Settings.SaveExtendedSettings();
-        ReportStatus(string.Format(Resources.SavedConfigurationFile, BaseServerSettings.EXTENDED_CONFIG_FILE_NAME));
+        ReportStatus(string.Format(Resources.SavingConfigurationFile, GeneralSettingsManager.CONFIGURATOR_SETTINGS_FILE_NAME));
+        Settings.SaveGeneralSettings();
+        ReportStatus(string.Format(Resources.SavedConfigurationFile, GeneralSettingsManager.CONFIGURATOR_SETTINGS_FILE_NAME));
+        CurrentStep.Status = ConfigurationStepStatus.Finished;
       }
-
-      CurrentStep.Status = ConfigurationStepStatus.Finished;
     }
   }
 }
