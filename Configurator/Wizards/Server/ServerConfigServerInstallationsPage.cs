@@ -118,6 +118,7 @@ namespace MySql.Configurator.Wizards.Server
         _controller.ExistingServerInstallationInstance = _existingServerInstallationInstance;
         _controller.Settings.ExistingRootPassword = RootPasswordTextBox.Text;
         _controller.IsRemoveExistingServerInstallationStepNeeded = true;
+        //_controller.IsRemoveExistingServerInstallationStepNeeded = Core.Classes.Utilities.ExecutionIsFromMSI(_existingServerInstallationInstance.ServerVersion);
 
         // Find if existing instance is configured as service.
         var serviceNames = MySqlServiceControlManager.FindServiceNamesWithBaseDirectory(_existingServerInstallationInstance.BaseDir);
@@ -189,7 +190,6 @@ namespace MySql.Configurator.Wizards.Server
         ErrorProviderControl.Text = ErrorProviderControl.Text.Trim();
         switch (ErrorProviderControl.Name)
         {
-          case nameof(SideBySideInstallationRadioButton):
           case nameof(NewDataDirectoryTextBox):
             if (SideBySideInstallationRadioButton.Checked)
             {
@@ -541,7 +541,12 @@ namespace MySql.Configurator.Wizards.Server
       SideBySideInstallationControlsPanel.Enabled = SideBySideInstallationRadioButton.Checked;
       SideBySideInstallationControlsPanel.Visible = SideBySideInstallationRadioButton.Checked;
 
+      ValidationsErrorProvider.Clear();
       ValidatedHandler(sender, e);
+      if (SideBySideInstallationRadioButton.Checked)
+      {
+        ValidatedHandler(NewDataDirectoryTextBox, e);
+      }
     }
 
     private void NewDataDirectoryBrowseButton_Click(object sender, EventArgs e)

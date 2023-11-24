@@ -1746,4 +1746,19 @@ the upgrade may result in an upgrade failure, proceed at your own risk.</value>
   <data name="SettingsFileReadError" xml:space="preserve">
     <value>Failed to read file at '{0}\\{1}'. Configurator will run in new configuration mode.</value>
   </data>
+  <data name="ServerConfigGeneralSettingsFileNotFound" xml:space="preserve">
+    <value>General settings file not found.</value>
+  </data>
+  <data name="ServerConfigReadGeneralSettingsFile" xml:space="preserve">
+    <value>Loaded general settings file.</value>
+  </data>
+  <data name="ServerConfigReadingGeneralSettingsFile" xml:space="preserve">
+    <value>Reading general settings file from '{0}'...</value>
+  </data>
+  <data name="ServerConfigSavedGeneralSettingsFile" xml:space="preserve">
+    <value>Saved general settings file.</value>
+  </data>
+  <data name="ServerConfigSavingGeneralSettingsFile" xml:space="preserve">
+    <value>Saving general settings file to '{0}'...</value>
+  </data>
 </root>

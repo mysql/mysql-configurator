@@ -3141,6 +3141,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to General settings file not found..
+        /// </summary>
+        public static string ServerConfigGeneralSettingsFileNotFound {
+            get {
+                return ResourceManager.GetString("ServerConfigGeneralSettingsFileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to retrieve the value of the super_read_only variable..
         /// </summary>
         public static string ServerConfigGetSuperReadOnlyVariableValueFailed {
@@ -3438,6 +3447,24 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Loaded general settings file..
+        /// </summary>
+        public static string ServerConfigReadGeneralSettingsFile {
+            get {
+                return ResourceManager.GetString("ServerConfigReadGeneralSettingsFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reading general settings file from &apos;{0}&apos;....
+        /// </summary>
+        public static string ServerConfigReadingGeneralSettingsFile {
+            get {
+                return ResourceManager.GetString("ServerConfigReadingGeneralSettingsFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to remove access to the data directory for the {0} {1}..
         /// </summary>
         public static string ServerConfigRemovedAccessFailed {
@@ -3533,6 +3560,24 @@ namespace MySql.Configurator.Properties {
         public static string ServerConfigRollbackStarted {
             get {
                 return ResourceManager.GetString("ServerConfigRollbackStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saved general settings file..
+        /// </summary>
+        public static string ServerConfigSavedGeneralSettingsFile {
+            get {
+                return ResourceManager.GetString("ServerConfigSavedGeneralSettingsFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saving general settings file to &apos;{0}&apos;....
+        /// </summary>
+        public static string ServerConfigSavingGeneralSettingsFile {
+            get {
+                return ResourceManager.GetString("ServerConfigSavingGeneralSettingsFile", resourceCulture);
             }
         }
         

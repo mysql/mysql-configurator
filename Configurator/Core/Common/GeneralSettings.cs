@@ -13,13 +13,11 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
 
-using Microsoft.Win32;
-using MySql.Configurator.Core.Classes;
 using MySql.Configurator.Core.Classes.Logging;
+using MySql.Configurator.Properties;
 using System;
 using System.IO;
-using System.Linq;
-using System.Text.Json;
+using System.Xml.Serialization;
 
 namespace MySql.Configurator.Core.Common
 {
@@ -54,7 +52,7 @@ namespace MySql.Configurator.Core.Common
     /// <summary>
     /// The name of the configurator general settings file.
     /// </summary>
-    public const string CONFIGURATOR_SETTINGS_FILE_NAME = "configurator_settings.json";
+    public const string CONFIGURATOR_SETTINGS_FILE_NAME = "configurator_settings.xml";
 
     /// <summary>
     /// Gets or sets a flag to indicate if a warning has been shown to the user related to not being able to load the settings file.
@@ -97,8 +95,15 @@ namespace MySql.Configurator.Core.Common
 
       try
       {
-        var jsonString = JsonSerializer.Serialize(settings);
-        File.WriteAllText(path, jsonString);
+        Logger.LogInformation(string.Format(Resources.ServerConfigSavingGeneralSettingsFile, path));
+        var serializer = new XmlSerializer(typeof(GeneralSettings));
+        using (var writer = new StreamWriter(path, false))
+        {
+          serializer.Serialize(writer, settings);
+          writer.Close();
+        }
+
+        Logger.LogInformation(Resources.ServerConfigSavedGeneralSettingsFile);
         return true;
       }
       catch (Exception ex)
@@ -125,11 +130,18 @@ namespace MySql.Configurator.Core.Common
         var settingsFileName = Path.Combine(path, CONFIGURATOR_SETTINGS_FILE_NAME);
         if (!File.Exists(settingsFileName))
         {
+          Logger.LogInformation(Resources.ServerConfigGeneralSettingsFileNotFound);
           return null;
         }
 
-        var settingsContents = File.ReadAllText(settingsFileName);
-        var settings = JsonSerializer.Deserialize<GeneralSettings>(settingsContents);
+        Logger.LogInformation(string.Format(Resources.ServerConfigReadingGeneralSettingsFile, path));
+        GeneralSettings settings;
+        var serializer = new XmlSerializer(typeof(GeneralSettings));
+        using (var stream = new FileStream(settingsFileName, FileMode.Open))
+        {
+          settings = (GeneralSettings)serializer.Deserialize(stream);
+        }
+        Logger.LogInformation(Resources.ServerConfigReadGeneralSettingsFile);
         return settings;
       }
       catch (Exception ex)
