@@ -79,7 +79,7 @@ namespace MySql.Configurator.Dialogs
       this.CopyrightLabel.Name = "CopyrightLabel";
       this.CopyrightLabel.Size = new System.Drawing.Size(241, 13);
       this.CopyrightLabel.TabIndex = 1;
-      this.CopyrightLabel.Text = "Copyright (c) 2023, Oracle and/or its affiliates.";
+      this.CopyrightLabel.Text = "Copyright (c) 2023, 2024, Oracle and/or its affiliates.";
       this.CopyrightLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
       // 
       // RegisteredTrademarkLabel

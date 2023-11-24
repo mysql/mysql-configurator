@@ -24,7 +24,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Oracle Corporation")]
 [assembly: AssemblyProduct("MySQL Configurator")]
-[assembly: AssemblyCopyright("Copyright (c) 2023, Oracle and/or its affiliates.")]
+[assembly: AssemblyCopyright("Copyright (c) 2023, 2024, Oracle and/or its affiliates.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
