@@ -54,6 +54,8 @@ namespace MySql.Configurator.Dialogs
       // 
       // StatusStrip
       // 
+      this.StatusStrip.AccessibleDescription = "A status bar used to show the current operation";
+      this.StatusStrip.AccessibleName = "Status";
       this.StatusStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
       this.StatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ConfigurationTypeLabel,
@@ -66,6 +68,8 @@ namespace MySql.Configurator.Dialogs
       // 
       // ConfigurationTypeLabel
       // 
+      this.ConfigurationTypeLabel.AccessibleDescription = "A label containing the current configuration type";
+      this.ConfigurationTypeLabel.AccessibleName = "Configuration Type";
       this.ConfigurationTypeLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.ConfigurationTypeLabel.Margin = new System.Windows.Forms.Padding(28, 4, 10, 3);
       this.ConfigurationTypeLabel.Name = "ConfigurationTypeLabel";
@@ -73,6 +77,8 @@ namespace MySql.Configurator.Dialogs
       // 
       // VersionLabel
       // 
+      this.VersionLabel.AccessibleDescription = "A label containing the version of the server being configured";
+      this.VersionLabel.AccessibleName = "Version";
       this.VersionLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.VersionLabel.Margin = new System.Windows.Forms.Padding(10, 4, 10, 3);
       this.VersionLabel.Name = "VersionLabel";
@@ -80,6 +86,8 @@ namespace MySql.Configurator.Dialogs
       // 
       // DataDirectoryLabel
       // 
+      this.DataDirectoryLabel.AccessibleDescription = "A label containing the path to the current data directory";
+      this.DataDirectoryLabel.AccessibleName = "Data Directory";
       this.DataDirectoryLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.DataDirectoryLabel.Margin = new System.Windows.Forms.Padding(10, 4, 10, 3);
       this.DataDirectoryLabel.Name = "DataDirectoryLabel";
