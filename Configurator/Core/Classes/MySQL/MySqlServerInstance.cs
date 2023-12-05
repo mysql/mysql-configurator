@@ -352,6 +352,8 @@ namespace MySql.Configurator.Core.Classes.MySql
 
         return _dataDir;
       }
+
+      set { _dataDir = value; }
     }
 
     /// <summary>

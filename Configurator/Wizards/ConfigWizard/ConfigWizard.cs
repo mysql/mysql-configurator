@@ -66,7 +66,7 @@ namespace MySql.Configurator.Wizards.ConfigWizard
           && configurationController.GetType().IsSameOrSubclass(typeof(ServerProductConfigurationController)))
         {
           var serverController = (ServerProductConfigurationController)configurationController;
-          if (serverController.Settings.ConfigurationFileExists == false)
+          if (!serverController.Settings.GeneralSettingsFileExists)
           {
             configurationType = ConfigurationType.New;
             AddPage(new WelcomePage() { AlternateTabTitle = "Welcome" });

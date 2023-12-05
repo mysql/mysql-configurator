@@ -315,7 +315,8 @@ namespace MySql.Configurator.Wizards.Server
       get
       {
         var serverInstanceInfo = new LocalServerInstance(this, ReportStatus);
-        return (ConfigurationType != ConfigurationType.Upgrade
+        serverInstanceInfo.UseOldSettings = ConfigurationType == ConfigurationType.Reconfiguration;
+        return (ConfigurationType == ConfigurationType.Reconfiguration
                 && IsStartServerConfigurationStepNeeded
                 && (IsStartAndUpgradeConfigurationStepNeeded || serverInstanceInfo.IsRunning));
       }
@@ -1087,7 +1088,7 @@ namespace MySql.Configurator.Wizards.Server
             : $"--defaults-extra-file=\"{tempConfigFileWithPassword}\" ";
         }
 
-        connectionOptions += GetCommandLineConnectionOptions(user, false, true);
+        connectionOptions += GetCommandLineConnectionOptions(user, false, ExistingServerInstallationInstance == null);
         var arguments =
           $" {connectionOptions} --default-character-set=utf8 --routines --events --single-transaction=TRUE --all-databases --result-file=\"{backupFile}\"";
         var dumpToolProcessResult = Core.Classes.Utilities.RunProcess(
@@ -2464,6 +2465,12 @@ namespace MySql.Configurator.Wizards.Server
     {
       CancellationToken.ThrowIfCancellationRequested();
       var serverInstanceInfo = new LocalServerInstance(this, ReportStatus);
+      serverInstanceInfo.UseOldSettings = useOldSettings;
+      if (ConfigurationType == ConfigurationType.Remove)
+      {
+        serverInstanceInfo.DataDir = DataDirectory;
+      }
+
       var serverStopped = serverInstanceInfo.ShutdownInstance(useOldSettings);
 
       //CurrentStep does not exist for Remove

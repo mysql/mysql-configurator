@@ -502,10 +502,11 @@ namespace MySql.Configurator.Core.Classes
       {
         // Get installation reg key.
         key = Registry.LocalMachine.OpenSubKey(keyName);
-        if (key == null
-            && Win32.Is64BitOs)
+        if (key == null)
         {
-          key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(keyName);
+          key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, Win32.Is64BitOs 
+            ? RegistryView.Registry64 
+            : RegistryView.Registry32).OpenSubKey(keyName);
         }
 
         if (key == null)
