@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2023, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -46,5 +46,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("8.3.0.0")]
-[assembly: AssemblyFileVersion("8.3.0.0")]
+[assembly: AssemblyVersion("8.4.0.0")]
+[assembly: AssemblyFileVersion("8.4.0.0")]
