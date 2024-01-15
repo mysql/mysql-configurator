@@ -62,11 +62,17 @@ namespace MySql.Configurator.Core.Controllers
     /// </summary>
     private GeneralSettings _generalSettings;
 
+    /// <summary>
+    /// A flag indicating if the general settings file could be loaded.
+    /// </summary>
+    private bool _generalSettingsFileLoaded;
+
     #endregion Fields
 
     public BaseServerSettings(Package.Package p) : base(p)
     {
       _generalSettings = null;
+      _generalSettingsFileLoaded = false;
       _defaultDataDir = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
         $@"MySQL\MySQL Server {p.NormalizedVersion.Major}.{p.NormalizedVersion.Minor}\");
@@ -100,6 +106,12 @@ namespace MySql.Configurator.Core.Controllers
 
     [XmlIgnore]
     public string GeneralSettingsFilePath => Path.Combine(InstallDirectory, GeneralSettingsManager.CONFIGURATOR_SETTINGS_FILE_NAME);
+
+    /// <summary>
+    /// Gets a value indicating if the general settings file exists.
+    /// </summary>
+    public bool GeneralSettingsFileExists => File.Exists(GeneralSettingsFilePath)
+      && _generalSettingsFileLoaded;
 
     [XmlIgnore]
     public bool GeneralPropertiesChanged
@@ -180,6 +192,8 @@ namespace MySql.Configurator.Core.Controllers
           File.SetAttributes(configFilePath, FileAttributes.Normal);
           File.Delete(configFilePath);
         }
+
+        _generalSettingsFileLoaded = false;
       }
       catch (Exception ex)
       {
@@ -265,7 +279,8 @@ namespace MySql.Configurator.Core.Controllers
       }
 
       _generalSettings = GeneralSettingsManager.ReadSettings(InstallDirectory);
-      if (_generalSettings == null)
+      _generalSettingsFileLoaded = _generalSettings != null;
+      if (!_generalSettingsFileLoaded)
       {
         if (!GeneralSettingsManager.LoadWarningShown)
         {

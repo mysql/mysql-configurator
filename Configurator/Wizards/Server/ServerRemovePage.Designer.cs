@@ -119,6 +119,9 @@ namespace MySql.Configurator.Wizards.Server
       // 
       // ServerRemovePage
       // 
+      this.AccessibleDescription = "A configuration wizard page used to select if the data directory should be remove" +
+    "d";
+      this.AccessibleName = "Server Remove Page";
       this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 23F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.Caption = "<>";

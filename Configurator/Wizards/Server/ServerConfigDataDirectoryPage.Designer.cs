@@ -109,6 +109,8 @@
       // 
       // ServerConfigDataDirectoryPage
       // 
+      this.AccessibleDescription = "A configuration wizard page used to set the path to the data directory";
+      this.AccessibleName = "Data Directory Page";
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.Caption = "Data Directory";

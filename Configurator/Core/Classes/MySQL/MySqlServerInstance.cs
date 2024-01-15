@@ -352,6 +352,8 @@ namespace MySql.Configurator.Core.Classes.MySql
 
         return _dataDir;
       }
+
+      set { _dataDir = value; }
     }
 
     /// <summary>
@@ -1233,7 +1235,6 @@ namespace MySql.Configurator.Core.Classes.MySql
     /// <summary>
     /// Attempts to connect to the Server instance and do a graceful shutdown before stopping it.
     /// </summary>
-    /// <param name="useOldSettings">Flag indicating whether the old settings must be used instead of the new settings to build the command line options.</param>
     /// <returns><c>true</c> if the Server is stopped (gracefully or not), <c>false</c> otherwise.</returns>
     public bool ShutdownInstance()
     {

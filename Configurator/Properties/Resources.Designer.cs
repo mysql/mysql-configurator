@@ -4014,7 +4014,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MySQL Server instance is still running. Retrying count {0}....
+        ///   Looks up a localized string similar to MySQL Server instance may still be running. Retrying count {0}....
         /// </summary>
         public static string ServerInstanceStillRunningRetryText {
             get {

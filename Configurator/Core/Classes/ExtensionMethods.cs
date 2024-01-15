@@ -1155,6 +1155,19 @@ namespace MySql.Configurator.Core.Classes
                   && newVersionMaturiy == ServerMaturity.LTS
                   && newVersion.Major == 8
                   && newVersion.Minor == 4)
+              // Upgrade from innovation to next innovation. 8.X.0 to 8.Y.0 innovation. Y = X + 1
+              // E.g. 8.2.0 to 8.3.0
+              || (oldVersionMaturity == ServerMaturity.Innovation
+                  && newVersionMaturiy == ServerMaturity.Innovation
+                  && oldVersion.Major == newVersion.Major
+                  && oldVersion.Minor + 1 == newVersion.Minor
+                  && oldVersion.Build == 0
+                  && newVersion.Build == 0)
+              // Upgrade from last innovation release to next LTS. E.g. 8.3.0 Innovation to 8.4.0 LTS
+              || (oldVersionMaturity == ServerMaturity.Innovation
+                  && newVersionMaturiy == ServerMaturity.LTS
+                  && oldVersion.Minor + 1 == newVersion.Minor
+                  && newVersion.Build == 0)
               // Upgrade within same LTS. E.g 8.4.X LTS to 8.4.Y LTS
               || (oldVersionMaturity == ServerMaturity.LTS
                   && newVersionMaturiy == ServerMaturity.LTS

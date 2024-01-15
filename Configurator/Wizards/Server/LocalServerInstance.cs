@@ -478,7 +478,10 @@ namespace MySql.Configurator.Wizards.Server
         _controller.Settings.ExistingRootPassword = string.Empty;
       }
 
-      if (!string.IsNullOrEmpty(_controller.Settings.ExistingRootPassword))
+      if ((_controller.OldSettings == null
+           || !_controller.OldSettings.ConfigureAsService)
+          &&
+          !string.IsNullOrEmpty(_controller.Settings.ExistingRootPassword))
       {
         var tempConfigFileWithPassword = Core.Classes.Utilities.CreateTempConfigurationFile(IniFile.GetClientPasswordLines(_controller.Settings.ExistingRootPassword));
         var sendingPasswordInCommandLine = tempConfigFileWithPassword == null;
