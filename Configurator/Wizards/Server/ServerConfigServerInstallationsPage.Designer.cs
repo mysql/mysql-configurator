@@ -263,7 +263,7 @@
       // InstallDirectoryTextBox
       // 
       this.InstallDirectoryTextBox.AccessibleDescription = "The data directory path of the existing MySQL Server installation to replace.";
-      this.InstallDirectoryTextBox.AccessibleName = "Existing data directory path";
+      this.InstallDirectoryTextBox.AccessibleName = "Existing installation directory path";
       this.InstallDirectoryTextBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.InstallDirectoryTextBox.Location = new System.Drawing.Point(201, 257);
       this.InstallDirectoryTextBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -344,7 +344,7 @@
       // 
       this.PipeOrSharedMemoryNameTextBox.AccessibleDescription = "A text box to input the named pipe or shared memory name of the existing MySQL Se" +
     "rver instance.";
-      this.PipeOrSharedMemoryNameTextBox.AccessibleName = "Existing MySQL Server named pipe or shared memory name";
+      this.PipeOrSharedMemoryNameTextBox.AccessibleName = "Pipe shared memory name";
       this.PipeOrSharedMemoryNameTextBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.PipeOrSharedMemoryNameTextBox.Location = new System.Drawing.Point(479, 46);
       this.PipeOrSharedMemoryNameTextBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -462,7 +462,7 @@
       // ConnectButton
       // 
       this.ConnectButton.AccessibleDescription = "A button to connect to the existing MySQL Server instance.";
-      this.ConnectButton.AccessibleName = "Connect button";
+      this.ConnectButton.AccessibleName = "Connect";
       this.ConnectButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.ConnectButton.Location = new System.Drawing.Point(413, 97);
       this.ConnectButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -477,7 +477,7 @@
       // RootPasswordTextBox
       // 
       this.RootPasswordTextBox.AccessibleDescription = "A field to input the root user\'s password.";
-      this.RootPasswordTextBox.AccessibleName = "Root password field";
+      this.RootPasswordTextBox.AccessibleName = "Root password";
       this.RootPasswordTextBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.RootPasswordTextBox.Location = new System.Drawing.Point(195, 97);
       this.RootPasswordTextBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -487,6 +487,8 @@
       this.RootPasswordTextBox.TabIndex = 8;
       this.ToolTip.SetToolTip(this.RootPasswordTextBox, "The password of the root account of the MySQL Server installation to replace.");
       this.RootPasswordTextBox.UseSystemPasswordChar = true;
+      this.RootPasswordTextBox.TextChanged += new System.EventHandler(this.TextChangedHandler);
+      this.RootPasswordTextBox.Validated += new System.EventHandler(this.ValidatedHandler);
       // 
       // ExistingServerConnectionLabel
       // 
@@ -626,6 +628,8 @@
       // 
       // ServerConfigServerInstallationsPage
       // 
+      this.AccessibleDescription = "A configuration wizard page used to select the type of server installation";
+      this.AccessibleName = "MySQL Server Installations Page";
       this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 23F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.Caption = "MySQL Server Installations";

@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2023, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 using System;
 using System.IO;
 using System.Windows.Forms;
+using MySql.Configurator.Core.Classes.Logging;
 using MySql.Configurator.Core.Wizard;
 using MySql.Configurator.Dialogs;
 
@@ -56,6 +57,7 @@ namespace MySql.Configurator.Wizards.Server
       if (mainForm != null)
       {
         mainForm.DataDirectoryLabel.Text = $"Data Directory: {_controller.Settings.DataDirectory}";
+        Logger.LogInformation($"Status: {mainForm.ConfigurationTypeLabel.Text};{mainForm.VersionLabel.Text};{mainForm.DataDirectoryLabel.Text}");
         mainForm.StatusStrip.Refresh();
       }
 

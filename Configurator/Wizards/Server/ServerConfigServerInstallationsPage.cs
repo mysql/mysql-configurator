@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2023, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -163,6 +163,7 @@ namespace MySql.Configurator.Wizards.Server
           : $"MySQL Server {_controller.Package.Version}";
         mainForm.ConfigurationTypeLabel.Text = $"{_controller.ConfigurationType}{(_controller.ConfigurationType == ConfigurationType.New ? " configuration" : string.Empty)}";
         mainForm.StatusStrip.Refresh();
+        Logger.LogInformation($"Status: {mainForm.ConfigurationTypeLabel.Text};{mainForm.VersionLabel.Text};{mainForm.DataDirectoryLabel.Text}");
       }
 
       _controller.UpdateConfigurationSteps();
@@ -428,6 +429,11 @@ namespace MySql.Configurator.Wizards.Server
     /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
     protected override void TextChangedHandler(object sender, EventArgs e)
     {
+      if (_rootPasswordOk)
+      {
+        ResetConnectionTest();
+      }
+
       // Looks like we could get rid of this empty override, but it is necessary to avoid an error of:
       // The method 'xxx' cannot be the method for an event because a class this class derives from already defines the method
       base.TextChangedHandler(sender, e);
