@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2023, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -1107,7 +1107,7 @@ namespace MySql.Configurator.Core.Classes
     }
 
     /// <summary>
-    /// Validates if the specified server version supports an inplace upgrade based on the rules outlined by the new versioning scheme.
+    /// Validates if the specified server version supports an in-place upgrade based on the rules outlined by the new versioning scheme.
     /// </summary>
     /// <param name="newVersion">The version to which the upgrade will be made to.</param>
     /// <param name="oldVersion">The version of the existing server instance.</param>

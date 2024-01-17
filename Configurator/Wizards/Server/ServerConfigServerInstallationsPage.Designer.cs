@@ -150,7 +150,7 @@
       this.ReplaceServerInstallationRadioButton.Size = new System.Drawing.Size(802, 29);
       this.ReplaceServerInstallationRadioButton.TabIndex = 4;
       this.ReplaceServerInstallationRadioButton.TabStop = true;
-      this.ReplaceServerInstallationRadioButton.Text = "Perform an inplace upgrade of the existing MySQL Server installation (it must be " +
+      this.ReplaceServerInstallationRadioButton.Text = "Perform an in-place upgrade of the existing MySQL Server installation (it must be " +
     "running)";
       this.ReplaceServerInstallationRadioButton.UseVisualStyleBackColor = true;
       this.ReplaceServerInstallationRadioButton.CheckedChanged += new System.EventHandler(this.InstallationRadioButtonsCheckedChanged);
