@@ -19,14 +19,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MySQL Configurator")]
-[assembly: AssemblyDescription("The MySQL Configurator is designed to allow the configuration of the MySQL Server product.")]
-[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyTitle("The MySQL Configurator is designed to allow the configuration and/or upgrade of the MySQL Server product.")]
 [assembly: AssemblyCompany("Oracle Corporation")]
 [assembly: AssemblyProduct("MySQL Configurator")]
 [assembly: AssemblyCopyright("Copyright (c) 2023, 2024, Oracle and/or its affiliates.")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+[assembly: AssemblyTrademark("Oracle®, Java, MySQL, and NetSuite are registered trademarks of Oracle and/or its affiliates.")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
