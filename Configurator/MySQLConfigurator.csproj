@@ -297,6 +297,7 @@
     <Compile Include="Core\Enums\StepType.cs" />
     <Compile Include="Core\Enums\SystemTablesUpgradedType.cs" />
     <Compile Include="Core\Enums\UpgradeType.cs" />
+    <Compile Include="Core\Enums\UpgradeViability.cs" />
     <Compile Include="Core\Enums\UserCrudOperationType.cs" />
     <Compile Include="Core\Enums\UserRoleType.cs" />
     <Compile Include="Core\Enums\ValidHostNameType.cs" />

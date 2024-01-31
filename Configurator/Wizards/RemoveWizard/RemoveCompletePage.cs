@@ -78,7 +78,7 @@ namespace MySql.Configurator.Wizards.RemoveWizard
         item.Name = p.NameWithVersion;
         item.Tag = p;
         item.SubItems.Add(new MyListViewSubItem(item, p.NameWithVersion, p.Product.SmallIcon, false, true));
-        item.SubItems.Add(p.Version);
+        item.SubItems.Add(p.VersionString);
         removeProductsWizard.RebootRequired |= p.Controller.RebootRequired;
       }
 

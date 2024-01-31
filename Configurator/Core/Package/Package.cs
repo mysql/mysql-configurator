@@ -97,7 +97,7 @@ namespace MySql.Configurator.Core.Package
     {
       get
       {
-        string version = Version;
+        string version = VersionString;
         if (Maturity != PackageMaturity.GA && Maturity != PackageMaturity.Unknown)
         {
           version += " " + Maturity;
@@ -208,10 +208,10 @@ namespace MySql.Configurator.Core.Package
     public PackageMaturity Maturity { get; set; }
 
     [XmlIgnore]
-    public string NameWithVersion => $"{Title.TrimEnd('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ' ', '-')} {Version}";
+    public string NameWithVersion => $"{Title.TrimEnd('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ' ', '-')} {VersionString}";
 
     [XmlIgnore]
-    public Version NormalizedVersion { get; set; }
+    public Version Version { get; set; }
 
     [XmlIgnore]
     public int OrderNumber
@@ -282,7 +282,7 @@ namespace MySql.Configurator.Core.Package
       {
         if (!string.IsNullOrEmpty(value))
         {
-          ServerMax = Utilities.NormalVersion(value);
+          ServerMax = new Version (value);
         }
       }
     }
@@ -298,7 +298,7 @@ namespace MySql.Configurator.Core.Package
       {
         if (!string.IsNullOrEmpty(value))
         {
-          ServerMin = Utilities.NormalVersion(value);
+          ServerMin = new Version(value);
         }
       }
     }
@@ -325,7 +325,7 @@ namespace MySql.Configurator.Core.Package
           myTitle = Product.BaseTitle;
         }
 
-        return myTitle.Replace("[version]", Version);
+        return myTitle.Replace("[version]", VersionString);
       }
     }
 
@@ -354,7 +354,7 @@ namespace MySql.Configurator.Core.Package
     /// Gets or sets the package version from manifest
     /// </summary>
     [XmlAttribute("version")]
-    public string Version { get; set; }
+    public string VersionString { get; set; }
 
     #endregion
 
@@ -379,11 +379,11 @@ namespace MySql.Configurator.Core.Package
       var package = new Package
       {
         Id = installedId,
-        Version = MsiInterop.GetProperty(productCode, "VersionString"),
+        VersionString = MsiInterop.GetProperty(productCode, "VersionString"),
         Publisher = MsiInterop.GetProperty(productCode, "Publisher"),
         DisplayName = MsiInterop.GetProperty(productCode, "ProductName")
       };
-      package.NormalizedVersion = Utilities.NormalVersion(package.Version);
+      package.Version = new Version(package.VersionString);
       return package;
     }
 
@@ -422,15 +422,15 @@ namespace MySql.Configurator.Core.Package
 
     public bool CanUpgradeTo(Package otherPackage)
     {
-      return otherPackage.NormalizedVersion > NormalizedVersion
-             || otherPackage.NormalizedVersion.Major > NormalizedVersion.Major
-             || otherPackage.NormalizedVersion.Minor > NormalizedVersion.Minor;
+      return otherPackage.Version > Version
+             || otherPackage.Version.Major > Version.Major
+             || otherPackage.Version.Minor > Version.Minor;
     }
 
     public int CompareTo(object obj)
     {
       var package = obj as Package;
-      return package?.NormalizedVersion.CompareTo(NormalizedVersion) ?? -1;
+      return package?.Version.CompareTo(Version) ?? -1;
     }
 
     public List<PackageFeature> GetFeatures(string feature, bool matchTitle = false)
@@ -480,9 +480,9 @@ namespace MySql.Configurator.Core.Package
     {
       if (serverPackage == null) return false;
       if (ServerMin == null) return true;
-      if (serverPackage.NormalizedVersion < ServerMin) return false;
+      if (serverPackage.Version < ServerMin) return false;
       if (ServerMax == null) return true;
-      return serverPackage.NormalizedVersion <= ServerMax;
+      return serverPackage.Version <= ServerMax;
     }
 
     public void SetFeatureStates()
@@ -501,7 +501,7 @@ namespace MySql.Configurator.Core.Package
 
     private void CreateKey()
     {
-      string name = $"{Product.Name}-{Version}-{Architecture.ToString()}{(License == LicenseType.Community ? "" : "-com")}";
+      string name = $"{Product.Name}-{VersionString}-{Architecture.ToString()}{(License == LicenseType.Community ? "" : "-com")}";
       _key = name.ToLowerInvariant();
     }
 

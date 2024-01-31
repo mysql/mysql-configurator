@@ -65,7 +65,7 @@ namespace MySql.Configurator.Wizards.Server
       : base(p)
     {
       NewServerUsers = new List<ServerUser>();
-      Plugins = new PluginsList(p.NormalizedVersion);
+      Plugins = new PluginsList(p.Version);
     }
 
     #region Properties
@@ -278,13 +278,13 @@ namespace MySql.Configurator.Wizards.Server
       Logger.LogInformation("Server Settings - Load Ini Defaults - setting initial ini values");
       FindConfigFile();
 
-      ServiceName = $"MySQL{Package.NormalizedVersion.Major}{Package.NormalizedVersion.Minor}";
+      ServiceName = $"MySQL{Package.Version.Major}{Package.Version.Minor}";
 
       LoadLogsDefault();
       ServerId = 1;
       LowerCaseTableNames = LowerCaseTableNamesTypes.LowerCaseStoredInsensitiveComparison;
 
-      DefaultAuthenticationPlugin = Package.NormalizedVersion.GetDefaultServerAuthenticationPlugin();
+      DefaultAuthenticationPlugin = Package.Version.GetDefaultServerAuthenticationPlugin();
       OpenFirewall = true;
       OpenFirewallForXProtocol = false;
       EnableTcpIp = true;
@@ -397,7 +397,7 @@ namespace MySql.Configurator.Wizards.Server
     /// <returns>A string representing the default service name.</returns>
     public string GetDefaultServiceName()
     {
-      string baseName = $"MYSQL{Package.NormalizedVersion.Major}{Package.NormalizedVersion.Minor}";
+      string baseName = $"MYSQL{Package.Version.Major}{Package.Version.Minor}";
       int i = 1;
       string name = baseName;
       while (MySqlServiceControlManager.ServiceExists(name))
@@ -420,7 +420,7 @@ namespace MySql.Configurator.Wizards.Server
 
       if (configFileExists.HasValue && configFileExists.Value)
       {
-        t = new IniTemplate(InstallDirectory, DataDirectory, FullConfigFilePath, Package.NormalizedVersion, ServerInstallType, null);
+        t = new IniTemplate(InstallDirectory, DataDirectory, FullConfigFilePath, Package.Version, ServerInstallType, null);
       }
       else
       {
@@ -475,7 +475,7 @@ namespace MySql.Configurator.Wizards.Server
         var iniFile = new IniFileEngine(fullIniPath).Load();
 
         Logger.LogInformation("Server Settings - Load Ini Settings - IniTemplate Parsing");
-        var t = new IniTemplate(Package.NormalizedVersion, ServerInstallType);
+        var t = new IniTemplate(Package.Version, ServerInstallType);
         t.ParseConfigurationFile(fullIniPath);
 
         Logger.LogInformation("Server Settings - Load Ini Settings - getting settings from IniTemplate");
@@ -524,7 +524,7 @@ namespace MySql.Configurator.Wizards.Server
                                && queryCacheTypeConfigTuple.Item1 == ConfigurationKeyType.NotCommented;
 
         string authenticationPluginText = string.Empty;
-        if (Package.NormalizedVersion.ServerSupportsDefaultAuthenticationPluginVariable())
+        if (Package.Version.ServerSupportsDefaultAuthenticationPluginVariable())
         {
           authenticationPluginText = iniFile.FindValue("mysqld", "default_authentication_plugin", false);
         }
@@ -541,7 +541,7 @@ namespace MySql.Configurator.Wizards.Server
         DefaultAuthenticationPlugin = ExtensionMethods.TryParseFromDescription(DefaultAuthenticationPlugin, authenticationPluginText, false, out var authenticationPlugin)
                                       && authenticationPlugin != MySqlAuthenticationPluginType.None
             ? authenticationPlugin
-            : Package.NormalizedVersion.GetDefaultServerAuthenticationPlugin();
+            : Package.Version.GetDefaultServerAuthenticationPlugin();
 
         SecureFilePrivFolder = iniFile.FindValue("mysqld", "secure-file-priv", false);
 
@@ -577,7 +577,7 @@ namespace MySql.Configurator.Wizards.Server
       GeneralQueryLogFileName = GeneralQueryLogDefaultFileName;
       EnableSlowQueryLog = true;
       SlowQueryLogFileName = SlowQueryLogDefaultFileName;
-      EnableBinLog = Package.NormalizedVersion.ServerHasBinaryLogEnabledByDefault();
+      EnableBinLog = Package.Version.ServerHasBinaryLogEnabledByDefault();
       BinLogFileNameBase = BinaryLogDefaultFileName;
       InnoDbLog0FileName = InnoDbLog0DefaultFileName;
       InnoDbLog1FileName = InnoDbLog1DefaultFileName;

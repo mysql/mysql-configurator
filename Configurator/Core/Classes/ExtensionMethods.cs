@@ -1121,13 +1121,21 @@ namespace MySql.Configurator.Core.Classes
     /// <param name="oldVersion">The version of the existing server instance.</param>
     /// <param name="newVersionMaturiy">The maturity of the version to which the upgrade will be made to.</param>
     /// <param name="oldVersionMaturity">The maturity of the version of the existing server instance.</param>
-    /// <returns>An null string if the upgrade is supported; otherwise, an error message describing the cause of the upgrade not being supported.</returns>
-    public static string ServerSupportsInPlaceUpgrades(this Version newVersion,
+    /// <returns>An enumeration indicating the viability to proceed with the upgrade scenario.</returns>
+    public static UpgradeViability ServerSupportsInPlaceUpgrades(this Version newVersion,
       Version oldVersion,
       ServerMaturity newVersionMaturiy = ServerMaturity.Unknown,
       ServerMaturity oldVersionMaturity = ServerMaturity.Unknown)
     {
-      string errorMessage = null;
+      if (newVersion == null)
+      {
+        throw new ArgumentNullException(nameof(oldVersion));
+      }
+
+      if (oldVersion == null)
+      {
+        throw new ArgumentNullException(nameof(oldVersion));
+      }
 
       // Assign maturities if they have not been set.
       if (oldVersionMaturity == ServerMaturity.Unknown)
@@ -1140,15 +1148,11 @@ namespace MySql.Configurator.Core.Classes
         newVersionMaturiy = Utilities.GetServerMaturity(newVersion);
       }
 
-      if (oldVersion > newVersion)
+      if (oldVersion > newVersion
+          || (oldVersion.Major < 8)
+          || (oldVersion == newVersion))
       {
-        errorMessage = Resources.UpgradeHigherVersionError;
-      }
-      else if (oldVersion.Major == newVersion.Major
-               && oldVersion.Minor == newVersion.Minor
-               && oldVersion.Build == newVersion.Build)
-      {
-        errorMessage = Resources.SameVersionError;
+        return UpgradeViability.Unsupported;
       }
       else if (
               // If 8.0.X to 8.Y Innovation. X>=35, Y=1
@@ -1190,14 +1194,12 @@ namespace MySql.Configurator.Core.Classes
                   && newVersionMaturiy == ServerMaturity.LTS
                   && oldVersion.Major + 1 == newVersion.Major))
       {
-        errorMessage = string.Empty;
+        return UpgradeViability.Supported;
       }
       else
       {
-        errorMessage = string.Format(Resources.UpgradeNotSupportedError, oldVersion, newVersion);
+        return UpgradeViability.UnsupportedWithWarning;
       }
-
-      return errorMessage;
     }
 
     /// <summary>

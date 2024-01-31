@@ -81,7 +81,7 @@ namespace MySql.Configurator.Core.Controllers
       InstallDirectory = $"{programFiles}\\MySQL\\{name}";
       if (!StringEndsWithVersion(InstallDirectory))
       {
-        InstallDirectory = $"{InstallDirectory} {Package.NormalizedVersion.Major}.{Package.NormalizedVersion.Minor}";
+        InstallDirectory = $"{InstallDirectory} {Package.Version.Major}.{Package.Version.Minor}";
       }
 
       DefaultInstallDirectory = InstallDirectory;
@@ -470,7 +470,7 @@ namespace MySql.Configurator.Core.Controllers
 
     protected bool StringEndsWithVersion(string text)
     {
-      string ver = $"{Package.NormalizedVersion.Major}.{Package.NormalizedVersion.Minor}";
+      string ver = $"{Package.Version.Major}.{Package.Version.Minor}";
       return text.EndsWith(ver);
     }
 

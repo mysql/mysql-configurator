@@ -89,7 +89,7 @@ namespace MySql.Configurator.Core.Package
     {
       var display = includeName
         ? package.NameWithVersion
-        : package.Version;
+        : package.VersionString;
       if (package.Architecture != PackageArchitecture.Any
           && package.Architecture != PackageArchitecture.Unknown)
       {

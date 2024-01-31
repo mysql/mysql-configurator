@@ -89,7 +89,7 @@ namespace MySql.Configurator.Wizards.Server
       _settings.DefaultAuthenticationPlugin = UseSha256AuthenticationRadioButton.Checked
         ? MySqlAuthenticationPluginType.CachingSha2Password
         : MySqlAuthenticationPluginType.MysqlNativePassword;
-      if (!_controller.Package.NormalizedVersion.ServerSupportsDefaultAuthenticationPluginVariable()
+      if (!_controller.Package.Version.ServerSupportsDefaultAuthenticationPluginVariable()
           && _controller.DefaultAuthenticationPluginChanged
           && !string.IsNullOrEmpty(_settings.AuthenticationPolicy))
       {

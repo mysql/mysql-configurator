@@ -1733,7 +1733,7 @@ Please close MySQL Workbench and restart {0} to perform the merge.</value>
   <data name="UpgradeHigherVersionError" xml:space="preserve">
     <value>The selected server instance is of a higher version.</value>
   </data>
-  <data name="UpgradeNotSupportedError" xml:space="preserve">
+  <data name="UpgradeNotSupportedWithWarningError" xml:space="preserve">
     <value>Upgrading from '{0}' to '{1}' is not officially supported. Continuing with
 the upgrade may result in an upgrade failure, proceed at your own risk.</value>
   </data>
@@ -1760,5 +1760,11 @@ the upgrade may result in an upgrade failure, proceed at your own risk.</value>
   </data>
   <data name="ServerConfigSavingGeneralSettingsFile" xml:space="preserve">
     <value>Saving general settings file to '{0}'...</value>
+  </data>
+  <data name="UpgradeNotSupportedError" xml:space="preserve">
+    <value>Upgrading from '{0}' to '{1}' is not supported.</value>
+  </data>
+  <data name="UpgradeOldServerNotSupportedError" xml:space="preserve">
+    <value>Upgrading from a version before 8.0 is not supported.</value>
   </data>
 </root>

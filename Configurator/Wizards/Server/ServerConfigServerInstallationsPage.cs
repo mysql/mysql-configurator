@@ -167,8 +167,8 @@ namespace MySql.Configurator.Wizards.Server
           ? $"Data Directory: {_controller.Settings.DataDirectory} -> {$"MySQL Server {_controller.ServerVersion.ToString(2)}"}"
           : $"Data Directory: {_controller.Settings.DataDirectory}";
         mainForm.VersionLabel.Text = _controller.ConfigurationType == ConfigurationType.Upgrade
-          ? $"MySQL Server {VersionTextBox.Text} -> {_controller.Package.Version}"
-          : $"MySQL Server {_controller.Package.Version}";
+          ? $"MySQL Server {VersionTextBox.Text} -> {_controller.Package.VersionString}"
+          : $"MySQL Server {_controller.Package.VersionString}";
         mainForm.ConfigurationTypeLabel.Text = $"{_controller.ConfigurationType}{(_controller.ConfigurationType == ConfigurationType.New ? " configuration" : string.Empty)}";
         mainForm.StatusStrip.Refresh();
         Logger.LogInformation($"Status: {mainForm.ConfigurationTypeLabel.Text};{mainForm.VersionLabel.Text};{mainForm.DataDirectoryLabel.Text}");
@@ -343,18 +343,47 @@ namespace MySql.Configurator.Wizards.Server
       }
 
       VersionTextBox.Text = serverInstance?.ServerVersion?.ToString();
-      var versionErrorMessage = serverInstance != null ?
-        _controller.Package.NormalizedVersion.ServerSupportsInPlaceUpgrades(serverInstance.ServerVersion) 
-        : null;
+      string versionErrorMessage = null;
+      var newVersion = _controller.Package.Version;
+      var oldVersion = serverInstance?.ServerVersion;
+      var upgradeViability = UpgradeViability.Unsupported;
+      if (serverInstance != null)
+      {
+        upgradeViability = newVersion.ServerSupportsInPlaceUpgrades(oldVersion);
+        switch (upgradeViability)
+        {
+          case UpgradeViability.UnsupportedWithWarning:
+            versionErrorMessage = Resources.UpgradeNotSupportedWithWarningError;
+            break;
+          case UpgradeViability.Unsupported:
+            if (oldVersion.Major < 8)
+            {
+              versionErrorMessage = Resources.UpgradeOldServerNotSupportedError;
+            }
+            else if (oldVersion == newVersion)
+            {
+              versionErrorMessage = Resources.SameVersionError;
+            }
+            else
+            {
+              versionErrorMessage = string.Format(Resources.UpgradeNotSupportedError, oldVersion, newVersion);
+            }
+
+            break;
+        }
+      }
+
       var errorInVersionTextbox = serverInstance != null && serverInstance.ServerVersion == null;
       ValidationsErrorProvider.SetProperties(VersionTextBox, new ErrorProviderProperties(errorInVersionTextbox 
           ? Resources.ServerInstanceGetServerVersionError 
           : string.Empty));
-      if (!errorInVersionTextbox
+      if (serverInstance != null
+          && !errorInVersionTextbox
           && !string.IsNullOrEmpty(versionErrorMessage))
       {
-        if (!versionErrorMessage.Equals(Resources.UpgradeHigherVersionError, StringComparison.InvariantCultureIgnoreCase)
-              && !versionErrorMessage.Equals(Resources.SameVersionError, StringComparison.InvariantCultureIgnoreCase))
+        if (upgradeViability != UpgradeViability.Unsupported
+            && !versionErrorMessage.Equals(Resources.UpgradeHigherVersionError, StringComparison.InvariantCultureIgnoreCase)
+            && !versionErrorMessage.Equals(Resources.SameVersionError, StringComparison.InvariantCultureIgnoreCase))
         {
           VersionWarningProvider.SetProperties(VersionTextBox, new ErrorProviderProperties(versionErrorMessage, Resources.warning_sign_icon));
           VersionErrorProvider.Clear();
@@ -408,7 +437,7 @@ namespace MySql.Configurator.Wizards.Server
         if (!errorInVersionTextbox)
         {
           controller.ServerVersion = serverInstance.ServerVersion;
-          controller.Package.Version = controller.ServerVersion.ToString();
+          controller.Package.VersionString = controller.ServerVersion.ToString();
         }
 
         if (!string.IsNullOrEmpty(serverInstance.BaseDir))

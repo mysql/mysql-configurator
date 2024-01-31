@@ -71,12 +71,12 @@ namespace MySql.Configurator.Core.Product
     {
       var package = new Package.Package
       {
-        Version = version,
+        VersionString = version,
         Publisher = "MySQL AB",
         DisplayName = "MySQL Server",
       };
 
-      package.NormalizedVersion = Utilities.NormalVersion(package.Version);
+      package.Version = new Version(package.VersionString);
       package.Initialize(installDir);
       package.Architecture = PackageArchitecture.X64;
       package.License = AppConfiguration.License;
@@ -92,12 +92,12 @@ namespace MySql.Configurator.Core.Product
     {
       var package = new Package.Package
       {
-        Version = "8.0.0",
+        VersionString = "8.0.0",
         Publisher = "MySQL AB",
         DisplayName = "MySQL Server",
       };
 
-      package.NormalizedVersion = Utilities.NormalVersion(package.Version);
+      package.Version = new Version(package.VersionString);
       package.Architecture = PackageArchitecture.X64;
       package.License = AppConfiguration.License;
 

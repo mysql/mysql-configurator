@@ -188,7 +188,7 @@ namespace MySql.Configurator.Wizards.Server
       }
 
       // Windows Authentication was introduced in server version 5.5.15
-      _showWinAuthOption = _controller.Package.NormalizedVersion.ServerSupportsWindowsAuthentication()
+      _showWinAuthOption = _controller.Package.Version.ServerSupportsWindowsAuthentication()
                           && _controller.Package.License == LicenseType.Commercial;
 
       // Assign to variable to avoid firing getter more than once

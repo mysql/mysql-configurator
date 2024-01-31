@@ -368,7 +368,7 @@ namespace MySql.Configurator.Wizards.Server
     /// </summary>
     public bool IsUpdateStartMenuLinksConfigurationStepNeeded => (ConfigurationType != ConfigurationType.Reconfiguration
                                                                  || IsThereServerDataFiles)
-                                                                 && Core.Classes.Utilities.ExecutionIsFromMSI(Package.NormalizedVersion);
+                                                                 && Core.Classes.Utilities.ExecutionIsFromMSI(Package.Version);
 
     /// <summary>
     /// Gets a value indicating whether the configuration step that updates user accounts needs to run.
@@ -653,7 +653,7 @@ namespace MySql.Configurator.Wizards.Server
     public override void Init()
     {
       CurrentState = ConfigState.ConfigurationRequired;
-      ServerVersion = new Version(Package.Version);
+      ServerVersion = new Version(Package.VersionString);
       settings = new MySqlServerSettings(Package);
       _revertController = new ServerRevertController();
       LoadConfigurationSteps();
@@ -676,7 +676,7 @@ namespace MySql.Configurator.Wizards.Server
           baseDirectory = InstallDirectory; // Owner.GetInstalledProductRegistryKey("Location");
           _dataDirectory = DataDirectory; // Owner.GetInstalledProductRegistryKey("DataLocation");
 
-          string versionString = Package.Version;
+          string versionString = Package.VersionString;
           if (!string.IsNullOrEmpty(versionString))
           {
             ServerVersion = new Version(versionString);
@@ -700,7 +700,7 @@ namespace MySql.Configurator.Wizards.Server
         }
         else
         {
-          ServerVersion = new Version(Package.Version);
+          ServerVersion = new Version(Package.VersionString);
 
           //not suppose to occur anymore
           if (string.IsNullOrEmpty(_dataDirectory))
@@ -2012,7 +2012,7 @@ namespace MySql.Configurator.Wizards.Server
     private IniTemplate LoadTemplate()
     {
       string templateBase = "my-template{0}.ini";
-      var version = Package.NormalizedVersion;
+      var version = Package.Version;
       string templateFile = null;
       if (version.Major >= 8
           && version.Minor > 0)
@@ -2756,7 +2756,7 @@ namespace MySql.Configurator.Wizards.Server
       ReportStatus(Resources.ServerConfigEventSecuritySettingsInfo);
       try
       {
-        var sql = Package.NormalizedVersion.ServerSupportsIdentifyClause()
+        var sql = Package.Version.ServerSupportsIdentifyClause()
                 ? RolesDefined.GetCreateOrAlterUserSql(UserCrudOperationType.AlterUser, ServerUser.GetLocalRootUser(Settings.RootPassword.Sanitize(), Settings.DefaultAuthenticationPlugin))
                 : $"UPDATE mysql.user SET Password=Password('{Settings.RootPassword.Sanitize()}') WHERE User='{MySqlServerUser.ROOT_USERNAME}'";
         string connectionString = GetConnectionString(adminUser, usingTemporaryUser, "mysql");
@@ -2901,7 +2901,7 @@ namespace MySql.Configurator.Wizards.Server
 
       try
       {
-        string mysqlStartMenu = $"{((Folder2)GetShell32NameSpaceFolder(ShellSpecialFolderConstants.ssfCOMMONSTARTMENU)).Self.Path}\\Programs\\MySQL\\MySQL Server {Package.NormalizedVersion.ToString(2)}\\";
+        string mysqlStartMenu = $"{((Folder2)GetShell32NameSpaceFolder(ShellSpecialFolderConstants.ssfCOMMONSTARTMENU)).Self.Path}\\Programs\\MySQL\\MySQL Server {Package.Version.ToString(2)}\\";
         var folder = GetShell32NameSpaceFolder(mysqlStartMenu);
         if (folder == null)
         {

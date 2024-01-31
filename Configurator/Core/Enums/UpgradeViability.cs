@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2024, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -21,43 +21,24 @@
   along with this program; if not, write to the Free Software Foundation, Inc., 
   51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
-using System;
-using System.Collections.Generic;
-using MySql.Configurator.Core.Controllers;
-using MySql.Configurator.Core.Enums;
-using MySql.Configurator.Core.Package;
-
-namespace MySql.Configurator.Core.Interfaces
+namespace MySql.Configurator.Core.Enums
 {
-  public interface IPackage
+  /// <summary>
+  /// Defines the viability of proceeding with an upgrade scenario.
+  /// </summary>
+  public enum UpgradeViability
   {
-    PackageArchitecture Architecture { get; }
-    ProductConfigurationController Controller { get; }
-
     /// <summary>
-    /// Gets or sets a flag indicating if the features for this package should be loaded.
+    /// Upgrade scenario is supported.
     /// </summary>
-    bool EnableFeaturesLoad { get; set; }
-
-    int FeatureCount { get; }
-
+    Supported,
     /// <summary>
-    /// Gets or sets the list of features assigned to this package.
+    /// Upgrade scenario is not officially supported but operation is allowed to proceed.
     /// </summary>
-    List<PackageFeature> Features { get; set; }
-
-    string FullPath { get; }
-    Guid Id { get; }
-    bool InCache { get; }
-    LicenseType License { get; }
-    string NameWithVersion { get; }
-    bool PerMachine { get; }
-    Product.Product Product { get; }
-    string TempFileName { get; }
-    string VersionString { get; }
-    Guid UpgradeCode { get; }
-    Package.Package UpgradeTarget { get; set; }
-
-    void SetProposedInstall(bool shouldInstall);
+    UnsupportedWithWarning,
+    /// <summary>
+    /// Upgrade scenario is not supported and operation is not allowed to proceed.
+    /// </summary>
+    Unsupported
   }
 }

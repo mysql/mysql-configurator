@@ -83,7 +83,7 @@ namespace MySql.Configurator.Core.Controllers
       _generalSettingsFileLoaded = false;
       _defaultDataDir = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-        $@"MySQL\MySQL Server {p.NormalizedVersion.Major}.{p.NormalizedVersion.Minor}\");
+        $@"MySQL\MySQL Server {p.Version.Major}.{p.Version.Minor}\");
     }
 
     #region Properties
@@ -359,7 +359,7 @@ namespace MySql.Configurator.Core.Controllers
       DataDirectory = $"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\\MySQL\\{name}";
       if (!StringEndsWithVersion(DataDirectory))
       {
-        DataDirectory = $"{DataDirectory} {Package.NormalizedVersion.Major}.{Package.NormalizedVersion.Minor}";
+        DataDirectory = $"{DataDirectory} {Package.Version.Major}.{Package.Version.Minor}";
       }
 
       DefaultDataDirectory = DataDirectory;

@@ -108,7 +108,7 @@ namespace MySql.Configurator.Core.MSI
 
         case PackageAction.Remove:
           CommandLine = $"REMOVE=ALL {REBOOT_OPTION}";
-          Version.TryParse(Package.Version, out var serverVersion);
+          Version.TryParse(Package.VersionString, out var serverVersion);
           CommandLine += " MYSQL_INSTALLER=\"YES\"";
           Path = Package.Id.ToString("B");
           UseProductCode = true;

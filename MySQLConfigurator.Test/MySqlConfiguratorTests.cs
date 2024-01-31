@@ -26,6 +26,8 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using MySql.Configurator.Core.Classes;
+using MySql.Configurator.Core.Enums;
 
 namespace MySQLConfigurator.Test
 {
@@ -33,12 +35,46 @@ namespace MySQLConfigurator.Test
   public class MySQLConfiguratorTests
   {
     [TestMethod]
+    public void ValidateSupportedUpgradeScenarios()
+    {
+      Assembly assembly = Assembly.GetExecutingAssembly();
+      FileVersionInfo currentFileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+      var currentVersion = new Version(currentFileVersionInfo.FileVersion);
+
+      // Unsupported scenarios.
+      Assert.AreEqual(UpgradeViability.Unsupported, currentVersion.ServerSupportsInPlaceUpgrades(new Version(5, 6, 0)));
+      Assert.AreEqual(UpgradeViability.Unsupported, currentVersion.ServerSupportsInPlaceUpgrades(new Version(5, 7, 0)));
+      Assert.AreEqual(UpgradeViability.Unsupported, currentVersion.ServerSupportsInPlaceUpgrades(currentVersion));
+      Assert.AreEqual(UpgradeViability.Unsupported, currentVersion.ServerSupportsInPlaceUpgrades(currentVersion));
+      
+      // Unsupported with warning scenarios.
+      Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, currentVersion.ServerSupportsInPlaceUpgrades(new Version(8, 0, 0)));
+      Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, currentVersion.ServerSupportsInPlaceUpgrades(new Version(8, 0, 34)));
+      Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(8, 4, 0).ServerSupportsInPlaceUpgrades(new Version(8, 2, 0)));
+      Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(8, 5, 0).ServerSupportsInPlaceUpgrades(new Version(8, 3, 0)));
+      Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(9, 0, 0).ServerSupportsInPlaceUpgrades(new Version(8, 3, 0)));
+      Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(8, 3, 1).ServerSupportsInPlaceUpgrades(new Version(8, 3, 0)));
+      Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(9, 1, 0).ServerSupportsInPlaceUpgrades(new Version(8, 4, 1)));
+      Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(8, 2, 0).ServerSupportsInPlaceUpgrades(new Version(8, 0, 35)));
+
+      // Supported scenarios.
+      Assert.AreEqual(UpgradeViability.Supported, new Version(8, 4, 0).ServerSupportsInPlaceUpgrades(new Version(8, 0, 35)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(8, 1, 0).ServerSupportsInPlaceUpgrades(new Version(8, 0, 35)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(8, 1, 0).ServerSupportsInPlaceUpgrades(new Version(8, 0, 35)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(8, 3, 0).ServerSupportsInPlaceUpgrades(new Version(8, 2, 0)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(8, 4, 0).ServerSupportsInPlaceUpgrades(new Version(8, 3, 0)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(8, 4, 1).ServerSupportsInPlaceUpgrades(new Version(8, 4, 0)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(8, 4, 3).ServerSupportsInPlaceUpgrades(new Version(8, 4, 1)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(9, 0, 0).ServerSupportsInPlaceUpgrades(new Version(8, 4, 1)));
+    }
+
+    [TestMethod]
     public void ValidateVersionInfoData()
     {
       var configuratorExeName = "mysql_configurator.exe";
       var configurationType = "Debug";
 #if !DEBUG
-      var configurationType = "Release";
+      configurationType = "Release";
 #endif
       var configuratorExePath = $"..\\..\\..\\Configurator\\bin\\{configurationType}\\{configuratorExeName}";
       var configuratorExeFileInfo = new FileInfo(configuratorExePath);
