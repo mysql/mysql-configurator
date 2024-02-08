@@ -28,6 +28,8 @@ using System.IO;
 using System.Reflection;
 using MySql.Configurator.Core.Classes;
 using MySql.Configurator.Core.Enums;
+using MySql.Configurator.Wizards.Server;
+using MySql.Configurator.Core.Package;
 
 namespace MySQLConfigurator.Test
 {
@@ -105,6 +107,30 @@ namespace MySQLConfigurator.Test
 
       // Validate legal trademarks.
       Assert.AreEqual("Oracle®, Java, MySQL, and NetSuite are registered trademarks of Oracle and/or its affiliates.", versionInfo.LegalTrademarks);
+    }
+
+    [TestMethod]
+    public void ValidateAuthenticationPolicyServerVariableParsing()
+    {
+      var package = new Package
+      {
+        VersionString = "8.0.4",
+        Publisher = "MySQL AB",
+        DisplayName = "MySQL Server",
+      };
+      package.Version = new Version(package.VersionString);
+      var settings = new MySqlServerSettings(package);
+      var privateObject = new PrivateObject(settings);
+      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { null }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { string.Empty }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { "" }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { "caching_sha2_password,," }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { "*,," }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { "* , , " }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { "*:caching_sha2_password,," }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { "*:invalid,," }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.MysqlNativePassword, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { "*:mysql_native_password,," }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.Sha256Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { "*:sha256_password,," }));
     }
   }
 }

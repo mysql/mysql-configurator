@@ -128,7 +128,6 @@ namespace MySql.Configurator.Core.IniFile.Template
 
     #region Properties
 
-    public string AuthenticationPolicy { get; set; }
     public string BaseDir { get; set; }
     public string ConfigurationFile { get; set; }
     public string DataDir { get; set; }
@@ -177,7 +176,6 @@ namespace MySql.Configurator.Core.IniFile.Template
     public uint Port { get; set; }
     public string ReportHost { get; set; }
     public string SecureFilePriv { get; set; }
-    public MySqlAuthenticationPluginType DefaultAuthenticationPlugin { get; set; }
     public uint? ServerId { get; set; }
 
     public Version ServerVersion { get; }
@@ -373,15 +371,6 @@ namespace MySql.Configurator.Core.IniFile.Template
 
                   switch (variableName)
                   {
-                    case "SERVER_DEFAULT_AUTHENTICATION_PLUGIN":
-                      MySqlAuthenticationPluginType defaultAuthenticationPlugin;
-                      if (!string.IsNullOrEmpty(itv.DefaultValue)
-                          && Enum.TryParse(itv.DefaultValue, out defaultAuthenticationPlugin))
-                      {
-                        DefaultAuthenticationPlugin = defaultAuthenticationPlugin;
-                      }
-                      break;
-
                     case "SERVER_PORT":
                       if (itv.DefaultValue != null)
                       {
@@ -462,14 +451,12 @@ namespace MySql.Configurator.Core.IniFile.Template
       _formulaEngine.AssignFormulaVariable("port", Port.ToString());
       _formulaEngine.AssignFormulaVariable("socket", PipeName);
       _formulaEngine.AssignFormulaVariable("shared_memory_base_name", MemoryName);
-
       _formulaEngine.AssignFormulaVariable("default_storage_engine", DefaultStorageEngine);
       _formulaEngine.AssignFormulaVariable("default_character_set", DefaultCharacterSet);
       _formulaEngine.AssignFormulaVariable("myisam_percentage", MyisamUsage.ToString(CultureInfo.CurrentCulture));
       _formulaEngine.AssignFormulaVariable("innodb_buffer_pool_size_percentage", InnoDBBPSUsage.ToString(CultureInfo.CurrentCulture));
       _formulaEngine.AssignFormulaVariable("active_connections", NumberConnections.ToString(CultureInfo.CurrentCulture));
       _formulaEngine.AssignFormulaVariable("query_cache_pct", UseQueryCache.ToString(CultureInfo.CurrentCulture));
-
       _formulaEngine.AssignFormulaVariable("log_out", LogOutput);
       _formulaEngine.AssignFormulaVariable("gen_query", GeneralLog);
       _formulaEngine.AssignFormulaVariable("gen_query_file", GeneralLogFile);
@@ -478,7 +465,6 @@ namespace MySql.Configurator.Core.IniFile.Template
       _formulaEngine.AssignFormulaVariable("long_query_time", LongQueryTime);
       _formulaEngine.AssignFormulaVariable("log_bin", LogBin);
       _formulaEngine.AssignFormulaVariable("log_error", LogError);
-
       _formulaEngine.AssignFormulaVariable("server_id", ServerId.HasValue ? ServerId.ToString() : string.Empty);
       _formulaEngine.AssignFormulaVariable("lower_case_table_names", ((int)LowerCaseTableNames).ToString());
       _formulaEngine.AssignFormulaVariable("bitedness", Win32.Is64BitOs ? "0" : "1");
@@ -486,15 +472,7 @@ namespace MySql.Configurator.Core.IniFile.Template
       _formulaEngine.AssignFormulaVariable("plugin_load", PluginLoad);
       _formulaEngine.AssignFormulaVariable("loose_mysqlx_port", LooseMySqlXPort.ToString());
       _formulaEngine.AssignFormulaVariable("named_pipe_full_access_group", NamedPipeFullAccessGroup);
-      if (ServerVersion.ServerSupportsDefaultAuthenticationPluginVariable())
-      {
-        _formulaEngine.AssignFormulaVariable("default_authentication_plugin", DefaultAuthenticationPlugin.GetDescription());
-      }
-      else
-      {
-        _formulaEngine.AssignFormulaVariable("authentication_policy", AuthenticationPolicy);
-      }
-
+      
       // In this case we don't want the existing file to be replaced.
       if (!writeTemplate)
       {
@@ -1117,9 +1095,6 @@ namespace MySql.Configurator.Core.IniFile.Template
       NumberConnections = 20.0;
       UseQueryCache = 0.0;
       InnoDBBPSUsage = 0.50;
-
-      // There is no way to get a proper default by Server version at this level since the version is not accessible here
-      DefaultAuthenticationPlugin = MySqlAuthenticationPluginType.CachingSha2Password;
     }
 
     /// <summary>
@@ -1129,6 +1104,7 @@ namespace MySql.Configurator.Core.IniFile.Template
     {
       _deprecatedServerVariables = new List<DeprecatedServerVariable>
       {
+        new DeprecatedServerVariable("default_authentication_plugin", new Version(8,0,27)),
         new DeprecatedServerVariable("innodb_additional_mem_pool_size", ServerSeriesType.S57),
         new DeprecatedServerVariable("loose_keyring_file_data", ServerSeriesType.S57),
         new DeprecatedServerVariable("table_cache", ServerSeriesType.All),
@@ -1141,9 +1117,8 @@ namespace MySql.Configurator.Core.IniFile.Template
         new DeprecatedServerVariable("innodbclusteruri", ServerSeriesType.S57 | ServerSeriesType.S80),
         new DeprecatedServerVariable("innodbclusterport", ServerSeriesType.S57 | ServerSeriesType.S80),
         new DeprecatedServerVariable("innodbclustertypeselection", ServerSeriesType.S57 | ServerSeriesType.S80),
-        new DeprecatedServerVariable("sync_master_info", ServerSeriesType.S80, new Version(8,0,26)),
-        new DeprecatedServerVariable("default_authentication_plugin", ServerSeriesType.S80, new Version(8,0,27)),
-        new DeprecatedServerVariable("sync_relay_log_info=", ServerSeriesType.S80 | ServerSeriesType.S8x, new Version(8,0,34))
+        new DeprecatedServerVariable("sync_master_info", new Version(8,0,26)),
+        new DeprecatedServerVariable("sync_relay_log_info=", new Version(8,0,34))
       };
     }
   }

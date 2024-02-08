@@ -521,18 +521,6 @@ namespace MySql.Configurator.Core.Classes
     }
 
     /// <summary>
-    /// Returns a proper <see cref="MySqlAuthenticationPluginType"/> value depending on the given Server version.
-    /// </summary>
-    /// <param name="serverVersion">The Server version.</param>
-    /// <returns>A proper <see cref="MySqlAuthenticationPluginType"/> value depending on the given Server version.</returns>
-    public static MySqlAuthenticationPluginType GetDefaultServerAuthenticationPlugin(this Version serverVersion)
-    {
-      return serverVersion.ServerSupportsCachingSha2Authentication()
-        ? MySqlAuthenticationPluginType.CachingSha2Password
-        : MySqlAuthenticationPluginType.MysqlNativePassword;
-    }
-
-    /// <summary>
     /// Builds the host identifier describing where the MySQL server instance can be reached at.
     /// </summary>
     /// <param name="stringBuilder">A <see cref="MySqlConnectionStringBuilder"/> instance.</param>

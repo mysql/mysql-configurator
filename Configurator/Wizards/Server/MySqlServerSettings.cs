@@ -86,6 +86,11 @@ namespace MySql.Configurator.Wizards.Server
     public static string ErrorLogDefaultFileName => $"{Environment.MachineName}.err";
 
     /// <summary>
+    /// Gets the default authentication plugin for the current server version.
+    /// </summary>
+    public static MySqlAuthenticationPluginType DefaultServerAuthenticationPlugin => MySqlAuthenticationPluginType.CachingSha2Password;
+
+    /// <summary>
     /// Gets the default file name for the General Query Log.
     /// </summary>
     public static string GeneralQueryLogDefaultFileName => $"{Environment.MachineName}.log";
@@ -284,7 +289,7 @@ namespace MySql.Configurator.Wizards.Server
       ServerId = 1;
       LowerCaseTableNames = LowerCaseTableNamesTypes.LowerCaseStoredInsensitiveComparison;
 
-      DefaultAuthenticationPlugin = Package.Version.GetDefaultServerAuthenticationPlugin();
+      DefaultAuthenticationPlugin = DefaultServerAuthenticationPlugin;
       OpenFirewall = true;
       OpenFirewallForXProtocol = false;
       EnableTcpIp = true;
@@ -324,13 +329,6 @@ namespace MySql.Configurator.Wizards.Server
       template.MemoryName = SharedMemoryName;
       template.EnableQueryType = EnableQueryCacheType;
       template.EnableQueryCache = EnableQueryCacheSize;
-      template.DefaultAuthenticationPlugin = DefaultAuthenticationPlugin;
-      template.AuthenticationPolicy = string.IsNullOrEmpty(AuthenticationPolicy) 
-        ? DefaultAuthenticationPlugin != MySqlAuthenticationPluginType.None
-          && DefaultAuthenticationPlugin != MySqlAuthenticationPluginType.CachingSha2Password
-          ? $"{DefaultAuthenticationPlugin.GetDescription()},,"
-          : DEFAULT_AUTHENTICATION_POLICY
-        : AuthenticationPolicy;
       template.LogError = string.IsNullOrEmpty(ErrorLogFileName) ? string.Empty : $"\"{ErrorLogFileName.Replace('\\', '/')}\"";
       template.BaseDir = template.BaseDir.Replace('\\', '/');
       template.DataDir = template.DataDir.Replace('\\', '/');
@@ -481,7 +479,7 @@ namespace MySql.Configurator.Wizards.Server
         Logger.LogInformation("Server Settings - Load Ini Settings - getting settings from IniTemplate");
         EnableTcpIp = t.EnableNetworking;
         Port = t.Port;
-        DefaultAuthenticationPlugin = t.DefaultAuthenticationPlugin;
+        DefaultAuthenticationPlugin = DefaultServerAuthenticationPlugin;
         EnableNamedPipe = t.EnableNamedPipe;
         PipeName = t.PipeName;
         EnableSharedMemory = t.EnableSharedMemory;
@@ -523,26 +521,8 @@ namespace MySql.Configurator.Wizards.Server
         EnableQueryCacheType = queryCacheTypeConfigTuple.Item1 != ConfigurationKeyType.NotPresent
                                && queryCacheTypeConfigTuple.Item1 == ConfigurationKeyType.NotCommented;
 
-        string authenticationPluginText = string.Empty;
-        if (Package.Version.ServerSupportsDefaultAuthenticationPluginVariable())
-        {
-          authenticationPluginText = iniFile.FindValue("mysqld", "default_authentication_plugin", false);
-        }
-        else
-        {
-          AuthenticationPolicy = iniFile.FindValue("mysqld", "authentication_policy", false);
-          var firstFactorPlugin = AuthenticationPolicy.Split(',')[0];
-          authenticationPluginText = string.IsNullOrEmpty(AuthenticationPolicy)
-                                     || firstFactorPlugin.Equals("*", StringComparison.InvariantCulture)
-                                       ? "caching_sha2_password"
-                                       : firstFactorPlugin;
-        }
-
-        DefaultAuthenticationPlugin = ExtensionMethods.TryParseFromDescription(DefaultAuthenticationPlugin, authenticationPluginText, false, out var authenticationPlugin)
-                                      && authenticationPlugin != MySqlAuthenticationPluginType.None
-            ? authenticationPlugin
-            : Package.Version.GetDefaultServerAuthenticationPlugin();
-
+        AuthenticationPolicy = iniFile.FindValue("mysqld", "authentication_policy", false);
+        DefaultAuthenticationPlugin = ParseFirstFactorAuthentication(AuthenticationPolicy);
         SecureFilePrivFolder = iniFile.FindValue("mysqld", "secure-file-priv", false);
 
         // Ensure that if the current ini file doesn't have a value set, then use the default
@@ -600,6 +580,43 @@ namespace MySql.Configurator.Wizards.Server
       Service s = MySqlServiceControlManager.GetServiceDetails(ServiceName);
       ServiceAccountUsername = s.StartName;
       ServiceStartAtStartup = s.StartMode == "Auto";
+    }
+
+    /// <summary>
+    /// Obtains the default authentication plugin based on value of the authentication_policy server variable.
+    /// </summary>
+    /// <param name="authenticationPolicy">The value of the authentication_policy server variable.</param>
+    /// <returns>An instance of the <see cref="MySqlAuthenticationPluginType"/> identifying the default authentication plugin.</returns>
+    private MySqlAuthenticationPluginType ParseFirstFactorAuthentication(string authenticationPolicy)
+    {
+      string authenticationPluginText = string.Empty;
+      string firstFactor = null;
+      if (string.IsNullOrEmpty(authenticationPolicy))
+      {
+        return DefaultServerAuthenticationPlugin;
+      }
+
+      firstFactor = authenticationPolicy.Trim().Split(',')[0].Trim();
+      if (firstFactor.IndexOf(':') != -1)
+      {
+        var elements = firstFactor.Split(':');
+        firstFactor = elements.Length > 1
+          ? elements[1]
+          : firstFactor;
+      }
+
+      authenticationPluginText = firstFactor != null
+                                 && firstFactor.Equals("*", StringComparison.InvariantCulture)
+                                   ? DefaultServerAuthenticationPlugin.GetDescription()
+                                   : firstFactor;
+      ExtensionMethods.TryParseFromDescription(DefaultAuthenticationPlugin, authenticationPluginText, false, out var authenticationPlugin);
+      if (authenticationPlugin == MySqlAuthenticationPluginType.None)
+      {
+        Logger.LogWarning(string.Format(Resources.AuthenticationPolicyParseError, firstFactor));
+        return DefaultServerAuthenticationPlugin;
+      }
+
+      return authenticationPlugin;
     }
 
     private void VerifySecureFilePrivFolder()

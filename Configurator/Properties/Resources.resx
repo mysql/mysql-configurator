@@ -1767,4 +1767,7 @@ the upgrade may result in an upgrade failure, proceed at your own risk.</value>
   <data name="UpgradeOldServerNotSupportedError" xml:space="preserve">
     <value>Upgrading from a version before 8.0 is not supported.</value>
   </data>
+  <data name="AuthenticationPolicyParseError" xml:space="preserve">
+    <value>Failed to obtain the default authentication plugin from '{0}'. The default authentication plugin will be used.</value>
+  </data>
 </root>

@@ -51,9 +51,8 @@ namespace MySql.Configurator.Core.Classes
     /// Initializes a new instance of the <see cref="DeprecatedServerVariable"/> class.
     /// </summary>
     /// <param name="name">The name of the deprecated Server variable.</param>
-    /// <param name="series">The Server series where the variable has been deprecated.</param>
     /// <param name="version">The Server version where the variable has been deprecated</param>
-    public DeprecatedServerVariable(string name, ServerSeriesType series, Version version)
+    public DeprecatedServerVariable(string name, Version version)
     {
       if (string.IsNullOrEmpty(name))
       {
@@ -61,7 +60,6 @@ namespace MySql.Configurator.Core.Classes
       }
 
       Name = name;
-      Series = series;
       Version = version;
     }
 

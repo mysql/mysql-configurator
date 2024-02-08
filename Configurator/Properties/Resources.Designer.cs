@@ -202,6 +202,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to obtain the default authentication plugin from &apos;{0}&apos;. The default authentication plugin will be used..
+        /// </summary>
+        public static string AuthenticationPolicyParseError {
+            get {
+                return ResourceManager.GetString("AuthenticationPolicyParseError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to retrieve the authorization rules for file &apos;{0}&apos;..
         /// </summary>
         public static string AuthorizationRulesRetrievalFailed {
