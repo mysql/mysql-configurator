@@ -249,7 +249,8 @@ namespace MySql.Configurator.Wizards.Server
       }
 
       if (InstanceStopped
-          || !ExistingServerInstallationInstance.IsRunning)
+          || (ExistingServerInstallationInstance != null
+              && !ExistingServerInstallationInstance.IsRunning))
       {
         StartExistingInstance();
       }

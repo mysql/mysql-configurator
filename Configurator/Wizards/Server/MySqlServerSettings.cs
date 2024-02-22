@@ -55,8 +55,6 @@ namespace MySql.Configurator.Wizards.Server
     public const string ENTERPRISE_FIREWALL_ENABLE_SCRIPT = @"share\win_install_firewall.sql";
     public const string INNODB_LOG_FILE_NAME_PREFIX = @"ib_logfile";
     public const int X_PROTOCOL_DEFAULT_PORT = 33060;
-    private const string DATABASE_BACKUP_DIRECTORY = @"Backup";
-    private const string DATABASE_BACKUP_BASE_FILE_NAME = @"mysql_dump";
     public const string SECURE_FILE_PRIV_DIRECTORY = @"Uploads";
 
     #endregion Constants
@@ -69,11 +67,6 @@ namespace MySql.Configurator.Wizards.Server
     }
 
     #region Properties
-
-    /// <summary>
-    /// Gets the file name for a backup of the database.
-    /// </summary>
-    public static string BackupFileName => $"{DATABASE_BACKUP_BASE_FILE_NAME}-{DateTime.Now.ToString("s").Replace(":", ".")}.sql";
 
     /// <summary>
     /// Gets the default file name for the Binary Log.
@@ -116,34 +109,6 @@ namespace MySql.Configurator.Wizards.Server
     /// Gets the default file name for the Slow Query Log.
     /// </summary>
     public static string SlowQueryLogDefaultFileName => $"{Environment.MachineName}-slow.log";
-
-    /// <summary>
-    /// Gets the full path to a file for a backup of the database.
-    /// </summary>
-    [XmlIgnore]
-    public string FullBackupFilePath
-    {
-      get
-      {
-        var backupDirectoryPath = Path.Combine(ConfigurationFileExists.HasValue ? IniDirectory : Path.Combine(AppConfiguration.HomeDir, DATABASE_BACKUP_DIRECTORY));
-        var success = true;
-        if (!Directory.Exists(backupDirectoryPath))
-        {
-          try
-          {
-            Directory.CreateDirectory(backupDirectoryPath);
-          }
-          catch
-          {
-            success = false;
-          }
-        }
-
-        return success
-          ? Path.Combine(backupDirectoryPath, BackupFileName)
-          : null;
-      }
-    }
 
     /// <summary>
     /// Administers multifactor authentication (MFA) capabilities. It applies to the authentication factor-related clauses of CREATE USER and ALTER USER statements

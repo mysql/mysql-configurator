@@ -113,6 +113,11 @@ namespace MySql.Configurator.Wizards.Server
     public string ConfigurationRootPassword => _controller.Settings.ExistingRootPassword;
 
     /// <summary>
+    /// Gets the controller associated to this server instance.
+    /// </summary>
+    public ServerConfigurationController Controller => _controller;
+
+    /// <summary>
     /// Gets or sets the maximum number of retries to perform with the connection.
     /// </summary>
     public int MaxConnectionRetries { get; set; }

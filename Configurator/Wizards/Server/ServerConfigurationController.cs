@@ -49,7 +49,6 @@ using IniFile = MySql.Configurator.Core.IniFile.IniFile;
 using Shell32;
 using MySql.Configurator.Core.MSI;
 using System.Text.RegularExpressions;
-using System.CodeDom;
 using MySql.Configurator.Core.Common;
 
 namespace MySql.Configurator.Wizards.Server
@@ -58,6 +57,21 @@ namespace MySql.Configurator.Wizards.Server
   public class ServerConfigurationController : ServerProductConfigurationController
   {
     #region Constants
+
+    /// <summary>
+    /// The base name to use for backup files.
+    /// </summary>
+    private const string DATABASE_BACKUP_BASE_FILE_NAME = @"mysql_dump";
+
+    /// <summary>
+    /// Gets the file name for a backup of the database.
+    /// </summary>
+    public static string BackupFileName => $"{DATABASE_BACKUP_BASE_FILE_NAME}-{DateTime.Now.ToString("s").Replace(":", ".")}.sql";
+
+    /// <summary>
+    /// The name of the directory used to save the database/s backups.
+    /// </summary>
+    private const string DATABASE_BACKUP_DIRECTORY = @"Backup";
 
     /// <summary>
     /// The value used to indicate that all users should have full access to a named pipe.
@@ -313,7 +327,7 @@ namespace MySql.Configurator.Wizards.Server
                                                         || (!IsThereServerDataFiles
                                                             && IsInitializeServerConfigurationStepNeeded(false)
                                                             && ConfigurationType == ConfigurationType.Upgrade))
-                                                        && ExistingServerInstallationInstance == null;
+                                                        && ConfigurationType != ConfigurationType.Upgrade;
 
     /// <summary>
     /// Gets a value indicating whether the configuration step that stops the server needs to run.
@@ -521,7 +535,8 @@ namespace MySql.Configurator.Wizards.Server
     {
       _revertController.Reset();
       _revertController.ReportStatusDelegate = ReportStatus;
-      if (ExistingServerInstallationInstance != null)
+      if (ConfigurationType == ConfigurationType.Upgrade
+          && ExistingServerInstallationInstance != null)
       {
         ExistingServerInstallationInstance.ResetRunningProcess();
         _revertController.ExistingServerInstallationInstance = ExistingServerInstallationInstance;
@@ -1078,7 +1093,17 @@ namespace MySql.Configurator.Wizards.Server
       string errorMessage = null;
       CancellationToken.ThrowIfCancellationRequested();
       // Run mysqldump tool
-      var backupFile = Settings.FullBackupFilePath;
+
+      var iniDirectory = OldSettings.IniDirectory;
+      var backupDirectoryPath = Path.Combine(Settings.ConfigurationFileExists.HasValue 
+        ? iniDirectory 
+        : Path.Combine(AppConfiguration.HomeDir, DATABASE_BACKUP_DIRECTORY));
+      if (!Directory.Exists(backupDirectoryPath))
+      {
+        Directory.CreateDirectory(backupDirectoryPath);
+      }
+
+      var backupFile = Path.Combine(backupDirectoryPath, BackupFileName);
       if (!string.IsNullOrEmpty(backupFile))
       {
         ReportStatus(string.Format(Resources.ServerConfigBackupDatabaseDumpRunning, backupFile));
@@ -1096,7 +1121,7 @@ namespace MySql.Configurator.Wizards.Server
             : $"--defaults-extra-file=\"{tempConfigFileWithPassword}\" ";
         }
 
-        connectionOptions += GetCommandLineConnectionOptions(user, false, ExistingServerInstallationInstance == null);
+        connectionOptions += GetCommandLineConnectionOptions(user, false, ConfigurationType == ConfigurationType.Upgrade);
         var arguments =
           $" {connectionOptions} --default-character-set=utf8 --routines --events --single-transaction=TRUE --all-databases --result-file=\"{backupFile}\"";
         var dumpToolProcessResult = Core.Classes.Utilities.RunProcess(
@@ -2177,7 +2202,7 @@ namespace MySql.Configurator.Wizards.Server
     /// </summary>
     private void RemoveExistingServerInstallationStep()
     {
-      if (ExistingServerInstallationInstance == null)
+      if (ConfigurationType != ConfigurationType.Upgrade)
       {
         throw new Exception(Resources.ExistingServerInstanceNotSetError);
       }
@@ -2241,7 +2266,7 @@ namespace MySql.Configurator.Wizards.Server
       {
         ReportError(string.Format(Resources.RenamingDataDirectoryError, newDataDir));
         Logger.LogException(ex);
-        RevertedSteps = _revertController.Rollback(Settings);
+        RevertedSteps = _revertController.Rollback(OldSettings);
         CurrentStep.Status = ConfigurationStepStatus.Error;
       }
     }
@@ -2376,7 +2401,7 @@ namespace MySql.Configurator.Wizards.Server
       }
       catch (Exception ex)
       {
-        RevertedSteps = _revertController.Rollback(Settings);
+        RevertedSteps = _revertController.Rollback(OldSettings);
         CurrentStep.Status = ConfigurationStepStatus.Error;
         throw ex;
       }
@@ -2429,7 +2454,7 @@ namespace MySql.Configurator.Wizards.Server
     /// </summary>
     private void StopExistingServerInstance()
     {
-      if (ExistingServerInstallationInstance == null)
+      if (ConfigurationType != ConfigurationType.Upgrade)
       {
         throw new Exception(Resources.ExistingServerInstanceNotSetError);
       }
@@ -2442,7 +2467,7 @@ namespace MySql.Configurator.Wizards.Server
         if (!ExistingServerInstallationInstance.ShutdownInstance())
         {
           ReportStatus(Resources.ServerConfigShutdownExistingInstanceError);
-          RevertedSteps = _revertController.Rollback(Settings);
+          RevertedSteps = _revertController.Rollback(OldSettings);
           CurrentStep.Status = ConfigurationStepStatus.Error;
         }
 
@@ -2650,14 +2675,10 @@ namespace MySql.Configurator.Wizards.Server
           t = Settings.GetExistingIniFileTemplate();
 
           // Verify that the Windows service does exist
-          if (Settings.ConfigureAsService
-              && !MySqlServiceControlManager.ServiceExists(
-                ExistingServerInstallationInstance == null
-                 ? Settings.ServiceName
-                 : ExistingServerInstallationInstance.ServiceName)
+          if (OldSettings.ConfigureAsService
+              && !MySqlServiceControlManager.ServiceExists(ExistingServerInstallationInstance.ServiceName)
               && IsThereServerDataFiles
-              && (ConfigurationType != ConfigurationType.Upgrade
-                 || !IsServiceRenameNeeded))
+              && !IsServiceRenameNeeded)
           {
             Settings.ConfigureAsService = false;
           }
@@ -2669,20 +2690,29 @@ namespace MySql.Configurator.Wizards.Server
           t = LoadTemplate();
         }
 
-        //Set the Query Cache settings if Enterprise Firewall is enabled.
-        if (Settings.Plugins.IsEnabled("mysql_firewall"))
-        {
-          Settings.EnableQueryCacheType = false;
-          Settings.EnableQueryCacheSize = false;
-        }
-
         if (!Directory.Exists(Settings.SecureFilePrivFolder))
         {
           Directory.CreateDirectory(Settings.SecureFilePrivFolder);
         }
 
+        //Set the Query Cache settings if Enterprise Firewall is enabled.
+        var settings = ConfigurationType == ConfigurationType.Upgrade
+          ? OldSettings
+          : Settings;
+        if (ConfigurationType == ConfigurationType.Upgrade
+            && IsDataDirectoryRenameNeeded)
+        {
+          settings.SecureFilePrivFolder = Settings.SecureFilePrivFolder;
+        }
+
+        if (settings.Plugins.IsEnabled("mysql_firewall"))
+        {
+          settings.EnableQueryCacheType = false;
+          settings.EnableQueryCacheSize = false;
+        }
+
         CancellationToken.ThrowIfCancellationRequested();
-        Settings.Save(t);
+        settings.Save(t);
 
         // If this is an upgrade, we need to run a second pass at updating the ini file but this time comparing
         // it against the corresponding template. This to determine if there are new sections, deprecated or new
@@ -2691,10 +2721,10 @@ namespace MySql.Configurator.Wizards.Server
         if (ConfigurationType == ConfigurationType.Upgrade)
         {
           t = LoadTemplate();
-          Settings.Save(t);
+          settings.Save(t);
         }
 
-        ReportStatus(string.Format(Resources.SavedConfigurationFile, Settings.ConfigFile));
+        ReportStatus(string.Format(Resources.SavedConfigurationFile, settings.ConfigFile));
         if (!ServerVersion.ServerSupportsRegeneratingRedoLogFiles())
         {
           return true;
@@ -2805,13 +2835,11 @@ namespace MySql.Configurator.Wizards.Server
 
       // If server was previously configured as a service but now it will run as a process.
       bool existingService = (OldSettings != null
-                              && OldSettings.ServiceExists())
-                              || (ExistingServerInstallationInstance != null
-                                 && ExistingServerInstallationInstance.ServiceExists);
+                              && OldSettings.ServiceExists());
       bool isNew = ConfigurationType == ConfigurationType.New;
       if (existingService
           && !isNew
-          && ExistingServerInstallationInstance == null
+          && ConfigurationType != ConfigurationType.Upgrade
           && (!Settings.ConfigureAsService
               || OldSettings.ServiceName != Settings.ServiceName))
       {
@@ -2862,7 +2890,7 @@ namespace MySql.Configurator.Wizards.Server
             // If new service does not exist fail step.
             if (!Settings.ServiceExists())
             {
-              RevertedSteps = _revertController.Rollback(Settings);
+              RevertedSteps = _revertController.Rollback(OldSettings);
               CurrentStep.Status = ConfigurationStepStatus.Error;
             }
 
@@ -2870,7 +2898,7 @@ namespace MySql.Configurator.Wizards.Server
           }
           else
           {
-            MySqlServiceControlManager.Update(ExistingServerInstallationInstance != null
+            MySqlServiceControlManager.Update(ConfigurationType != ConfigurationType.Upgrade
             ? Settings.ServiceName
             : OldSettings.ServiceName,
             Settings.ServiceName,
@@ -3095,7 +3123,7 @@ namespace MySql.Configurator.Wizards.Server
 
         if (!fileUpdated)
         {
-          RevertedSteps = _revertController.Rollback(Settings);
+          RevertedSteps = _revertController.Rollback(OldSettings);
         }
 
         return;

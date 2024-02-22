@@ -99,7 +99,7 @@ namespace MySql.Configurator.Core.Controllers
     [ControllerSetting("Overrides the default directory where data files are stored.", "data_directory,data_dir,datadir")]
     public string DataDirectory { get; set; }
 
-    public string DefaultDataDirectory { get; set; }
+    public string DefaultDataDirectory => _defaultDataDir;
 
     [ControllerSetting("Allow Client/Server connections using the TCP/IP protocol. This argument is used along with a port number.", "tcp_ip", "enable_tcpip")]
     [DefaultValue(true)]
@@ -362,7 +362,6 @@ namespace MySql.Configurator.Core.Controllers
         DataDirectory = $"{DataDirectory} {Package.Version.Major}.{Package.Version.Minor}";
       }
 
-      DefaultDataDirectory = DataDirectory;
       base.LoadDefaultsForInstall();
     }
 

@@ -31,10 +31,12 @@ using MySql.Configurator.Core.Classes.MySql;
 using MySql.Configurator.Core.Controllers;
 using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Core.IniFile;
+using MySql.Configurator.Core.Package;
 using MySql.Configurator.Core.Product;
 using MySql.Configurator.Core.Wizard;
 using MySql.Configurator.Dialogs;
 using MySql.Configurator.Properties;
+using MySql.Data.MySqlClient;
 
 namespace MySql.Configurator.Wizards.Server
 {
@@ -61,6 +63,11 @@ namespace MySql.Configurator.Wizards.Server
     private Dictionary<ConfigWizardPage, bool> _originalPagesVisibility;
 
     /// <summary>
+    /// The original package object assigned to when this configuration page was instantiated.  
+    /// </summary>
+    private Package _package;
+
+    /// <summary>
     /// A flag indicating whether the root password has been validated.
     /// </summary>
     private bool _rootPasswordOk;
@@ -75,6 +82,7 @@ namespace MySql.Configurator.Wizards.Server
     {
       InitializeComponent();
       _controller = controller;
+      _package = _controller.Package;
       _rootPasswordOk = false;
       _originalPagesVisibility = new Dictionary<ConfigWizardPage, bool>();
       PortTextBox.Text = BaseServerSettings.DEFAULT_PORT.ToString();
@@ -110,8 +118,11 @@ namespace MySql.Configurator.Wizards.Server
 
     public override void Activate()
     {
-      NewDataDirectoryTextBox.Text = _controller.DataDirectory;
-      UpdateExistingServerInstallationInstance(_controller.ExistingServerInstallationInstance, _controller, true);
+      if (_controller.ExistingServerInstallationInstance == null)
+      {
+        ProtocolComboBox.SelectedIndex = 0;
+      }
+
       FireAllValidations();
       base.Activate();
     }
@@ -120,40 +131,42 @@ namespace MySql.Configurator.Wizards.Server
     {
       if (ReplaceServerInstallationRadioButton.Checked)
       {
+        var existingPackage = ProductManager.LoadPackage(_existingServerInstallationInstance.ServerVersion.ToString(), _existingServerInstallationInstance.BaseDir);
+        var oldController = (ServerConfigurationController) existingPackage.Controller;
+        oldController.LoadState();
+        _controller.Settings.OldSettings = oldController.Settings;
         _controller.ConfigurationType = ConfigurationType.Upgrade;
         var dataDirectory = new DirectoryInfo(ExistingDataDirectoryTextBox.Text);
         _controller.Settings.DataDirectory = dataDirectory.Parent.FullName;
-        _controller.ExistingServerInstallationInstance = _existingServerInstallationInstance;
         _controller.Settings.ExistingRootPassword = RootPasswordTextBox.Text;
         _controller.IsRemoveExistingServerInstallationStepNeeded = true;
-        //_controller.IsRemoveExistingServerInstallationStepNeeded = Core.Classes.Utilities.ExecutionIsFromMSI(_existingServerInstallationInstance.ServerVersion);
-
+        _controller.IsDataDirectoryRenameNeeded = DataDirectoryRenameWarningProvider.HasErrors();
+        _controller.ExistingServerInstallationInstance = _existingServerInstallationInstance;
+        
         // Find if existing instance is configured as service.
         var serviceNames = MySqlServiceControlManager.FindServiceNamesWithBaseDirectory(_existingServerInstallationInstance.BaseDir);
         if (serviceNames.Length > 0)
         {
           _existingServerInstallationInstance.ServiceName = serviceNames[0];
-          _controller.Settings.ServiceName = _existingServerInstallationInstance.ServiceName;
-          _controller.Settings.ConfigureAsService = true;
         }
 
         _controller.IsServiceRenameNeeded = _existingServerInstallationInstance.IsServiceNameDefault(
           _existingServerInstallationInstance.ServiceName,
           _existingServerInstallationInstance.ServerVersion);
-        _controller.IsDataDirectoryRenameNeeded = DataDirectoryRenameWarningProvider.HasErrors();
         DetermineExistingServerPersistedVariablesToReset();
       }
       else
       {
+        _controller.Package = _package;
+        _controller.LoadState();
         _controller.ConfigurationType = ConfigurationType.New;
         _controller.Settings.DataDirectory = NewDataDirectoryTextBox.Text;
         _controller.ExistingServerInstallationInstance = null;
         _controller.IsDataDirectoryRenameNeeded = false;
         _controller.IsRemoveExistingServerInstallationStepNeeded = false;
+        _controller.PrepareForConfigure();
       }
 
-      _controller.Settings.IniDirectory = _controller.Settings.DataDirectory;
-      _controller.Settings.SecureFilePrivFolder = Path.Combine(_controller.Settings.IniDirectory, MySqlServerSettings.SECURE_FILE_PRIV_DIRECTORY);
       if (Wizard is ConfigWizard.ConfigWizard configWizard)
       {
         configWizard.ConfigurationType = _controller.ConfigurationType;
@@ -163,9 +176,12 @@ namespace MySql.Configurator.Wizards.Server
       var mainForm = FindForm() as MainForm;
       if (mainForm != null)
       {
+        var dataDirectory = _controller.ConfigurationType == ConfigurationType.Upgrade
+          ? _controller.OldSettings.DataDirectory
+          : _controller.Settings.DataDirectory;
         mainForm.DataDirectoryLabel.Text = _controller.IsDataDirectoryRenameNeeded
-          ? $"Data Directory: {_controller.Settings.DataDirectory} -> {$"MySQL Server {_controller.ServerVersion.ToString(2)}"}"
-          : $"Data Directory: {_controller.Settings.DataDirectory}";
+          ? $"Data Directory: {dataDirectory} -> {$"MySQL Server {_controller.ServerVersion.ToString(2)}"}"
+          : $"Data Directory: {dataDirectory}";
         mainForm.VersionLabel.Text = _controller.ConfigurationType == ConfigurationType.Upgrade
           ? $"MySQL Server {VersionTextBox.Text} -> {_controller.Package.VersionString}"
           : $"MySQL Server {_controller.Package.VersionString}";
@@ -318,67 +334,67 @@ namespace MySql.Configurator.Wizards.Server
     private void ResetConnectionTest()
     {
       ConnectionErrorProvider.Clear();
+      DataDirectoryRenameWarningProvider.Clear();
+      ValidationsErrorProvider.Clear();
+      VersionErrorProvider.Clear();
+      VersionTextBox.Text = string.Empty;
+      RootPasswordTextBox.Text = string.Empty;
+      InstallDirectoryTextBox.Text = string.Empty;
+      NewDataDirectoryTextBox.Text = string.Empty;
+      ExistingDataDirectoryTextBox.Text = string.Empty;
+      ExistingConfigFilePathTextBox.Text = string.Empty;
+      _existingServerInstallationInstance = null;
       _rootPasswordOk = false;
-      UpdateExistingServerInstallationInstance(null, null);
       ConnectButton.Enabled = ConnectEnabled;
     }
 
     /// <summary>
     /// Updates the existing MySQL Server installation instance and the corresponding controls with related values.
     /// </summary>
-    /// <param name="serverInstance">A <see cref="MySqlServerInstance"/> instance.</param>
-    /// <param name="updateConnectionValues">Flag indicating whether controls that show connection values are updated or not.</param>
-    private void UpdateExistingServerInstallationInstance(MySqlServerInstance serverInstance, ServerConfigurationController controller, bool updateConnectionValues = false)
+    private void UpdateExistingServerInstallationInstance()
     {
-      if (updateConnectionValues)
+      if (_existingServerInstallationInstance == null)
       {
-        var connectionProtocolValue = serverInstance != null ? (int)serverInstance.ConnectionProtocol : 1;
-        ProtocolComboBox.SelectedIndex = connectionProtocolValue == 2 ? 1 : connectionProtocolValue == 4 ? 2 : 0;
-        if (serverInstance != null)
-        {
-          PortTextBox.Text = serverInstance?.Port.ToString();
-          PipeOrSharedMemoryNameTextBox.Text = serverInstance?.PipeOrSharedMemoryName;
-          RootPasswordTextBox.Text = serverInstance?.UserAccount?.Password;
-        }
+        throw new ArgumentNullException(nameof(_existingServerInstallationInstance));
       }
 
-      VersionTextBox.Text = serverInstance?.ServerVersion?.ToString();
+      if (_existingServerInstallationInstance.Controller == null)
+      {
+        throw new ArgumentNullException(nameof(_existingServerInstallationInstance.Controller));
+      }
+
+      VersionTextBox.Text = _existingServerInstallationInstance.ServerVersion?.ToString();
       string versionErrorMessage = null;
       var newVersion = _controller.Package.Version;
-      var oldVersion = serverInstance?.ServerVersion;
-      var upgradeViability = UpgradeViability.Unsupported;
-      if (serverInstance != null)
+      var oldVersion = _existingServerInstallationInstance.ServerVersion;
+      var upgradeViability = newVersion.ServerSupportsInPlaceUpgrades(oldVersion);
+      switch (upgradeViability)
       {
-        upgradeViability = newVersion.ServerSupportsInPlaceUpgrades(oldVersion);
-        switch (upgradeViability)
-        {
-          case UpgradeViability.UnsupportedWithWarning:
-            versionErrorMessage = Resources.UpgradeNotSupportedWithWarningError;
-            break;
-          case UpgradeViability.Unsupported:
-            if (oldVersion.Major < 8)
-            {
-              versionErrorMessage = Resources.UpgradeOldServerNotSupportedError;
-            }
-            else if (oldVersion == newVersion)
-            {
-              versionErrorMessage = Resources.SameVersionError;
-            }
-            else
-            {
-              versionErrorMessage = string.Format(Resources.UpgradeNotSupportedError, oldVersion, newVersion);
-            }
+        case UpgradeViability.UnsupportedWithWarning:
+          versionErrorMessage = Resources.UpgradeNotSupportedWithWarningError;
+          break;
+        case UpgradeViability.Unsupported:
+          if (oldVersion.Major < 8)
+          {
+            versionErrorMessage = Resources.UpgradeOldServerNotSupportedError;
+          }
+          else if (oldVersion == newVersion)
+          {
+            versionErrorMessage = Resources.SameVersionError;
+          }
+          else
+          {
+            versionErrorMessage = string.Format(Resources.UpgradeNotSupportedError, oldVersion, newVersion);
+          }
 
-            break;
-        }
+          break;
       }
 
-      var errorInVersionTextbox = serverInstance != null && serverInstance.ServerVersion == null;
+      var errorInVersionTextbox = _existingServerInstallationInstance.ServerVersion == null;
       ValidationsErrorProvider.SetProperties(VersionTextBox, new ErrorProviderProperties(errorInVersionTextbox 
           ? Resources.ServerInstanceGetServerVersionError 
           : string.Empty));
-      if (serverInstance != null
-          && !errorInVersionTextbox
+      if (!errorInVersionTextbox
           && !string.IsNullOrEmpty(versionErrorMessage))
       {
         if (upgradeViability != UpgradeViability.Unsupported
@@ -400,24 +416,24 @@ namespace MySql.Configurator.Wizards.Server
         VersionWarningProvider.Clear();
       }
 
-      InstallDirectoryTextBox.Text = serverInstance?.BaseDir;
-      ValidationsErrorProvider.SetProperties(InstallDirectoryTextBox, new ErrorProviderProperties(serverInstance != null &&  string.IsNullOrEmpty(serverInstance.BaseDir) ? Resources.ServerInstanceFailedToRetrieveBaseDir : string.Empty));
-      ExistingDataDirectoryTextBox.Text = serverInstance?.DataDir;
-      DataDirectoryRenameWarningProvider.SetProperties(ExistingDataDirectoryTextBox, new ErrorProviderProperties(serverInstance != null 
-        && serverInstance.IsDataDirNameDefault(_controller.ServerVersion)
-          ? string.Format(Resources.ExistingDataDirectoryIsDefaultAndWillBeRenamed, $"MySQL Server {_controller.ServerVersion.ToString(2)}") 
-          : string.Empty, Resources.warning_sign_icon));
-      ValidationsErrorProvider.SetProperties(ExistingDataDirectoryTextBox, new ErrorProviderProperties(serverInstance != null &&  string.IsNullOrEmpty(serverInstance.DataDir) ? Resources.ServerInstanceFailedToRetrieveDataDir : string.Empty));
+      InstallDirectoryTextBox.Text = _existingServerInstallationInstance.BaseDir;
+      ExistingDataDirectoryTextBox.Text = _existingServerInstallationInstance.DataDir;
+      DataDirectoryRenameWarningProvider.SetProperties(ExistingDataDirectoryTextBox, new ErrorProviderProperties(_existingServerInstallationInstance.IsDataDirNameDefault(_controller.ServerVersion)
+        ? string.Format(Resources.ExistingDataDirectoryIsDefaultAndWillBeRenamed, $"MySQL Server {_controller.ServerVersion.ToString(2)}") 
+        : string.Empty, Resources.warning_sign_icon));
+      ValidationsErrorProvider.SetProperties(ExistingDataDirectoryTextBox, new ErrorProviderProperties(string.IsNullOrEmpty(_existingServerInstallationInstance.DataDir)
+        ? Resources.ServerInstanceFailedToRetrieveDataDir :
+        string.Empty));
       
-      if (!string.IsNullOrEmpty(serverInstance?.DataDir))
+      if (!string.IsNullOrEmpty(_existingServerInstallationInstance.DataDir))
       {
         string dataDirectory = null;
-        if (!Directory.Exists(serverInstance?.DataDir))
+        if (!Directory.Exists(_existingServerInstallationInstance.DataDir))
         {
           return;
         }
 
-        dataDirectory = new DirectoryInfo(serverInstance?.DataDir).Parent.FullName;
+        dataDirectory = new DirectoryInfo(_existingServerInstallationInstance.DataDir).Parent.FullName;
         var defaultConfigFile = Path.Combine(dataDirectory, BaseServerSettings.DEFAULT_CONFIG_FILE_NAME);
         var alternateConfigFile = Path.Combine(dataDirectory, BaseServerSettings.ALTERNATE_CONFIG_FILE_NAME);
         ExistingConfigFilePathTextBox.Text = File.Exists(defaultConfigFile)
@@ -432,28 +448,25 @@ namespace MySql.Configurator.Wizards.Server
       }
 
       // Set existing instance relevant properties for rollback.
-      if (serverInstance != null)
+      if (!errorInVersionTextbox)
       {
-        if (!errorInVersionTextbox)
-        {
-          controller.ServerVersion = serverInstance.ServerVersion;
-          controller.Package.VersionString = controller.ServerVersion.ToString();
-        }
+        _existingServerInstallationInstance.Controller.ServerVersion = _existingServerInstallationInstance.ServerVersion;
+        _existingServerInstallationInstance.Controller.Package.VersionString = _existingServerInstallationInstance.Controller.ServerVersion.ToString();
+      }
 
-        if (!string.IsNullOrEmpty(serverInstance.BaseDir))
+      if (!string.IsNullOrEmpty(_existingServerInstallationInstance.BaseDir))
+      {
+        var serviceNames = MySqlServiceControlManager.FindServiceNamesWithBaseDirectory(_existingServerInstallationInstance.BaseDir);
+        if (serviceNames.Length > 0)
         {
-          var serviceNames = MySqlServiceControlManager.FindServiceNamesWithBaseDirectory(_existingServerInstallationInstance.BaseDir);
-          if (serviceNames.Length > 0)
-          {
-            controller.Settings.ServiceName = serviceNames[0];
-            controller.Settings.ConfigureAsService = true;
-          }
+          _existingServerInstallationInstance.Controller.Settings.ServiceName = serviceNames[0];
+          _existingServerInstallationInstance.Controller.Settings.ConfigureAsService = true;
         }
 
         // Load ini template and set data dir and error log paths.
         var iniFile = new IniFileEngine(ExistingConfigFilePathTextBox.Text).Load();
-        controller.Settings.DataDirectory = new DirectoryInfo(iniFile.FindValue("mysqld", "datadir", false)).Parent.FullName;
-        controller.Settings.ErrorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
+        _existingServerInstallationInstance.Controller.Settings.DataDirectory = new DirectoryInfo(iniFile.FindValue("mysqld", "datadir", false)).Parent.FullName;
+        _existingServerInstallationInstance.Controller.Settings.ErrorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
       }
     }
 
@@ -505,37 +518,33 @@ namespace MySql.Configurator.Wizards.Server
         var controller = new ServerConfigurationController();
         controller.Package = ProductManager.LoadGenericPackage();
         controller.Init();
+        controller.PrepareForConfigure();
         switch (ProtocolComboBox.SelectedIndex)
         {
           case 0:
             controller.Settings.Port = port;
-            _controller.Settings.Port = controller.Settings.Port;
             controller.Settings.EnableTcpIp = true;
-            _controller.Settings.EnableTcpIp = controller.Settings.EnableTcpIp;
             break;
 
           case 1:
             controller.Settings.PipeName = PipeOrSharedMemoryNameTextBox.Text.Trim();
-            _controller.Settings.PipeName = controller.Settings.PipeName;
             controller.Settings.EnableNamedPipe = true;
-            _controller.Settings.EnableNamedPipe = controller.Settings.EnableNamedPipe;
             break;
 
           case 2:
             controller.Settings.SharedMemoryName = PipeOrSharedMemoryNameTextBox.Text.Trim();
-            _controller.Settings.SharedMemoryName = controller.Settings.SharedMemoryName;
             controller.Settings.EnableSharedMemory = true;
-            _controller.Settings.EnableSharedMemory = controller.Settings.EnableSharedMemory;
             break;
         }
 
         _existingServerInstallationInstance = new LocalServerInstance(controller, null, port);
         _existingServerInstallationInstance.UserAccount.Password = RootPasswordTextBox.Text;
+        _existingServerInstallationInstance.Controller.Settings.ExistingRootPassword = _existingServerInstallationInstance.UserAccount.Password;
         _existingServerInstallationInstance.ConnectionProtocol = ProtocolComboBox.SelectedIndex == 0
-                                                                 ? Data.MySqlClient.MySqlConnectionProtocol.Tcp
+                                                                 ? MySqlConnectionProtocol.Tcp
                                                                  : (ProtocolComboBox.SelectedIndex == 1
-                                                                    ? Data.MySqlClient.MySqlConnectionProtocol.NamedPipe
-                                                                    : Data.MySqlClient.MySqlConnectionProtocol.SharedMemory);
+                                                                    ? MySqlConnectionProtocol.NamedPipe
+                                                                    : MySqlConnectionProtocol.SharedMemory);
         _existingServerInstallationInstance.PipeOrSharedMemoryName = ProtocolComboBox.SelectedIndex > 0
                                                                      ? PipeOrSharedMemoryNameTextBox.Text.Trim()
                                                                      : null;
@@ -543,7 +552,11 @@ namespace MySql.Configurator.Wizards.Server
         var connectionResult = _existingServerInstallationInstance.CanConnectWithoutDedicatedProcess();
         _rootPasswordOk = connectionResult == ConnectionResultType.ConnectionSuccess;
         ExistingConfigFileBrowseButton.Enabled = _rootPasswordOk;
-        UpdateExistingServerInstallationInstance(_rootPasswordOk ? _existingServerInstallationInstance : null, controller);
+        if (_rootPasswordOk)
+        {
+          UpdateExistingServerInstallationInstance();
+        }
+
         providerProperties.ErrorMessage = connectionResult.GetDescription();
       }
       catch (Exception ex)
@@ -588,6 +601,11 @@ namespace MySql.Configurator.Wizards.Server
       ValidatedHandler(sender, e);
       if (SideBySideInstallationRadioButton.Checked)
       {
+        if (string.IsNullOrEmpty(NewDataDirectoryTextBox.Text))
+        {
+          NewDataDirectoryTextBox.Text = _controller.Settings.DefaultDataDirectory;
+        }
+
         ValidatedHandler(NewDataDirectoryTextBox, e);
       }
     }
