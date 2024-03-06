@@ -286,6 +286,12 @@ namespace MySql.Configurator.Wizards.Server
     public bool IsDataDirectoryRenameNeeded { get; set; }
 
     /// <summary>
+    /// Gets a value indicating if there are configuration files that need to be deleted.
+    /// </summary>
+    public bool IsDeleteConfigurationFileStepNeeded => File.Exists(Path.Combine(InstallDirectory, GeneralSettingsManager.CONFIGURATOR_SETTINGS_FILE_NAME))
+      || File.Exists(Settings.FullConfigFilePath);
+
+    /// <summary>
     /// Gets a value indicating whether the removal step that deletes the data directory needs to run.
     /// </summary>
     public bool IsDeleteDataDirectoryStepNeeded => IsThereServerDataFiles && RemoveDataDirectory;
@@ -294,6 +300,15 @@ namespace MySql.Configurator.Wizards.Server
     /// Gets a value indicating whether the removal step that deletes the Windows Service needs to run.
     /// </summary>
     public bool IsDeleteServiceStepNeeded => MySqlServiceControlManager.ServiceExists(Settings?.ServiceName);
+
+    /// <summary>
+    /// Gets a value indicating if there are steps that require to be executed for a server removal.
+    /// </summary>
+    public bool IsRemovalExecutionNeeded => IsDeleteDataDirectoryStepNeeded
+      || IsDeleteConfigurationFileStepNeeded
+      || IsDeleteServiceStepNeeded
+      || IsRemoveFirewallRuleStepNeeded
+      || IsStopServerConfigurationStepNeeded;
 
     /// <summary>
     /// Gets a value indicating whether the removal step that deletes the firewall rules needs to run.
@@ -970,6 +985,7 @@ namespace MySql.Configurator.Wizards.Server
 
       LoadRemovalConfigurationSteps();
       _deleteServiceStep.Execute = IsDeleteServiceStepNeeded;
+      _deleteConfigurationFileStep.Execute = IsDeleteConfigurationFileStepNeeded;
       _deleteDataDirectoryStep.Execute = IsDeleteDataDirectoryStepNeeded;
       _removeFirewallRuleStep.Execute = IsRemoveFirewallRuleStepNeeded;
       

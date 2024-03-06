@@ -252,9 +252,6 @@ You can start the configure process again by clicking Retry.</value>
   <data name="ActionCurrent" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ActionCurrent.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="BadLaunchWrongArguments" xml:space="preserve">
-    <value>MySQL Configurator was not launched properly. Try re-installing an installer bundle.</value>
-  </data>
   <data name="UnhandledException" xml:space="preserve">
     <value>Internal error. ({0}) The Configurator will now close.</value>
   </data>
@@ -1769,5 +1766,11 @@ the upgrade may result in an upgrade failure, proceed at your own risk.</value>
   </data>
   <data name="AuthenticationPolicyParseError" xml:space="preserve">
     <value>Failed to obtain the default authentication plugin from '{0}'. The default authentication plugin will be used.</value>
+  </data>
+  <data name="RemoveWithNoUIWarningMessage" xml:space="preserve">
+    <value>Nothing to remove. Ommiting showing an UI because MySQL Configurator was executed with disabled warning messages. </value>
+  </data>
+  <data name="RunWithDefaultExecutionMode" xml:space="preserve">
+    <value>Invalid action provided. Running in configuration mode.</value>
   </data>
 </root>

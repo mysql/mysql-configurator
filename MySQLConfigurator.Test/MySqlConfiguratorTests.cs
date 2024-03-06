@@ -30,6 +30,11 @@ using MySql.Configurator.Core.Classes;
 using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Wizards.Server;
 using MySql.Configurator.Core.Package;
+using MySql.Configurator;
+using System.Runtime;
+using MySql.Configurator.Core.Common;
+using System.Configuration;
+using System.Runtime.InteropServices;
 
 namespace MySQLConfigurator.Test
 {
@@ -121,16 +126,75 @@ namespace MySQLConfigurator.Test
       package.Version = new Version(package.VersionString);
       var settings = new MySqlServerSettings(package);
       var privateObject = new PrivateObject(settings);
-      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { null }));
-      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { string.Empty }));
-      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { "" }));
-      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { "caching_sha2_password,," }));
-      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { "*,," }));
-      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { "* , , " }));
-      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { "*:caching_sha2_password,," }));
-      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { "*:invalid,," }));
-      Assert.AreEqual(MySqlAuthenticationPluginType.MysqlNativePassword, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { "*:mysql_native_password,," }));
-      Assert.AreEqual(MySqlAuthenticationPluginType.Sha256Password, privateObject.Invoke("ParseFirstFactorAuthentication", new object[] { "*:sha256_password,," }));
+      var methodName = "ParseFirstFactorAuthentication";
+      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke(methodName, new object[] { null }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke(methodName, new object[] { string.Empty }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke(methodName, new object[] { "" }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke(methodName, new object[] { "caching_sha2_password,," }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke(methodName, new object[] { "*,," }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke(methodName, new object[] { "* , , " }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke(methodName, new object[] { "*:caching_sha2_password,," }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke(methodName, new object[] { "*:invalid,," }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.MysqlNativePassword, privateObject.Invoke(methodName, new object[] { "*:mysql_native_password,," }));
+      Assert.AreEqual(MySqlAuthenticationPluginType.Sha256Password, privateObject.Invoke(methodName, new object[] { "*:sha256_password,," }));
+    }
+
+    /// <summary>
+    /// Validates that the provided command line options are parsed correctly. 
+    /// </summary>
+    [TestMethod]
+    public void ValidateCommandLineParsing()
+    {
+      var program = new Program();
+      var privateObject = new PrivateObject(program);
+      var configuratorExeName = "mysql_configurator.exe";
+      var methodName = "ProcessCommandLineArguments";
+      var bindingFlags = BindingFlags.NonPublic | BindingFlags.Static;
+      Assert.ThrowsException<ArgumentNullException>(() => privateObject.Invoke(methodName, bindingFlags, new object[] { null }));
+      Assert.ThrowsException<ConfiguratorException>(() => privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "configure" } }));
+      Assert.ThrowsException<ConfiguratorException>(() => privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--upgrade" } }));
+      Assert.AreEqual(ExecutionMode.Configure, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName } }));
+      Assert.AreEqual(ExecutionMode.Configure, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--configure" } }));
+      Assert.AreEqual(ExecutionMode.Configure, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--CONFIGURE" } }));
+      Assert.AreEqual(ExecutionMode.Configure, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--CONfigure" } }));
+      Assert.ThrowsException<ConfiguratorException>(() => privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--configure", "--other" } }));
+      Assert.AreEqual(ExecutionMode.Remove, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--remove" } }));
+      Assert.AreEqual(ExecutionMode.RemoveNoShow, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--removenoshow" } }));
+      try
+      {
+        privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "configure" } });
+      }
+      catch(ConfiguratorException exception)
+      {
+        Assert.AreEqual(ConfiguratorError.InvalidOptionStart, exception.ErrorCode);
+      }
+
+      try
+      {
+        privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--upgrade" } });
+      }
+      catch (ConfiguratorException exception)
+      {
+        Assert.AreEqual(ConfiguratorError.InvalidOption, exception.ErrorCode);
+      }
+
+      try
+      {
+        privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--configure", "--other" } });
+      }
+      catch (ConfiguratorException exception)
+      {
+        Assert.AreEqual(ConfiguratorError.InvalidOption, exception.ErrorCode);
+      }
+
+      try
+      {
+        privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--configure,", "--show-remove-warning" } });
+      }
+      catch (ConfiguratorException exception)
+      {
+        Assert.AreEqual(ConfiguratorError.InvalidOption, exception.ErrorCode);
+      }
     }
   }
 }

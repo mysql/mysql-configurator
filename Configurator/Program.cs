@@ -39,8 +39,11 @@ using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Core.Forms;
 using MySql.Configurator.Core.IniFile;
 using MySql.Configurator.Core.IniFile.Template;
+using MySql.Configurator.Core.Package;
+using MySql.Configurator.Core.Product;
 using MySql.Configurator.Dialogs;
 using MySql.Configurator.Properties;
+using MySql.Configurator.Wizards.Server;
 using Utilities = MySql.Configurator.Core.Classes.Utilities;
 
 namespace MySql.Configurator
@@ -49,11 +52,19 @@ namespace MySql.Configurator
   {
     #region Fields
 
-    private static string _version;
-
+    /// <summary>
+    /// The installation directory path of the current installation.
+    /// </summary>
     private static string _installDirPath;
 
-    private static string _action;
+    /// <summary>
+    /// The version number of the current installation.
+    /// </summary>
+    private static string _version;
+
+    #endregion
+
+    #region Properties
 
     #endregion
 
@@ -111,11 +122,37 @@ namespace MySql.Configurator
 
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
-        ProcessCommandLineArguments();
-        
+        var executionMode = ProcessCommandLineArguments(Environment.GetCommandLineArgs());
+
+        // Do not show form if running in removal mode and option --show-removal-warning was not provided.
+        Package package = null;
+        try
+        {
+          package = ProductManager.LoadPackage(_version, _installDirPath);
+        }
+        catch (ConfiguratorException ex)
+        {
+          Logger.LogException(ex);
+        }
+
+        if (executionMode == ExecutionMode.RemoveNoShow)
+        {
+          var controller = package.Controller as ServerConfigurationController;
+          if (controller == null)
+          {
+            throw new ArgumentNullException(nameof(controller));
+          }
+
+          if (!controller.IsRemovalExecutionNeeded)
+          {
+            Logger.LogWarning(string.Format(Resources.RemoveWithNoUIWarningMessage));
+            return;
+          }
+        }
+
         // Uncomment the following line to print to the debug output console messages indicating what control got focus.
         //Application.AddMessageFilter(new LastFocusedControlFilter(true));
-        Application.Run(new MainForm(_version, _installDirPath, _action));
+        Application.Run(new MainForm(package, executionMode));
       }
       catch (ConfiguratorException ex)
       {
@@ -158,28 +195,33 @@ namespace MySql.Configurator
     /// <summary>
     /// Processes the command line arguments provided when executing the application.
     /// </summary>
-    private static void ProcessCommandLineArguments()
+    /// <param name="arguments">The command line options provided by the user.</param>
+    /// <returns>An enumeration value representing the execution mode.</returns>
+    private static ExecutionMode ProcessCommandLineArguments(string[] arguments)
     {
-      string[] arguments = Environment.GetCommandLineArgs();
-      // Process arguments.
-      arguments = arguments.Skip(1).ToArray();
-      foreach (var argument in arguments)
+      var executionMode = ExecutionMode.Configure;
+      if (arguments == null)
       {
-        var items = argument.Split('=');
-        var option = items[0].Substring(2).ToLowerInvariant();
-        var value = items.Length > 1
-          ? items[1]
-          : null;
+        throw new ArgumentNullException(nameof(arguments));
+      }
 
-        switch (option)
+      if (arguments.Length > 1)
+      {
+        arguments = arguments.Skip(1).ToArray();
+        foreach (var argument in arguments)
         {
-          case "configure":
-          case "remove":
-            _action = option;
-            break;
+          var option = argument.StartsWith("--")
+            ? argument.Substring(2).ToLowerInvariant()
+            : null;
+          if (option == null)
+          {
+            throw new ConfiguratorException(ConfiguratorError.InvalidOptionStart, argument);
+          }
 
-          default:
+          if (!Enum.TryParse<ExecutionMode>(option, true, out executionMode))
+          {
             throw new ConfiguratorException(ConfiguratorError.InvalidOption, option);
+          }
         }
       }
 
@@ -194,7 +236,6 @@ namespace MySql.Configurator
         var installDirPath = assemblyFileInfo.Directory.Parent.FullName;
         _installDirPath = installDirPath;
 #endif
-
 
         // Validate install dir.
         var pathToMySqld = Path.Combine(_installDirPath, "bin\\mysqld.exe");
@@ -226,45 +267,7 @@ namespace MySql.Configurator
       }
 
 
-      // Set default action.
-      if (string.IsNullOrEmpty(_action))
-      {
-        _action = "configure";
-      }
-    }
-
-    /// <summary>
-    /// Processes the argument found in the key-value pair.
-    /// </summary>
-    /// <param name="keyValuePair">Contains the type of argument to process and the value being assigned to that argument.</param>
-    private static void ProcessArgument(KeyValuePair<string, string> keyValuePair)
-    {
-      if (string.IsNullOrEmpty(keyValuePair.Key))
-      {
-        return;
-      }
-
-      switch (keyValuePair.Key.ToLowerInvariant())
-      {
-        case "version":
-          Version v;
-          if (!Version.TryParse(keyValuePair.Value, out v))
-          {
-            throw new Exception(string.Format(Resources.InvalidCommandLineArguments, $"{keyValuePair.Key}={keyValuePair.Value}"));
-          }
-
-          break;
-        default:
-          throw new Exception(string.Format(Resources.InvalidCommandLineArguments, keyValuePair.Key));
-      }
-    }
-
-    /// <summary>
-    /// Cancels the processing of arguments and sends an error message.
-    /// </summary>
-    private static void CancelArgumentProcessing()
-    {
-      InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties("Error", Resources.BadLaunchWrongArguments));
+      return executionMode;
     }
 
     static void ReportUnhandledException(Exception ex)

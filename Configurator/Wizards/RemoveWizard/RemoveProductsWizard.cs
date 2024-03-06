@@ -21,6 +21,7 @@
   along with this program; if not, write to the Free Software Foundation, Inc., 
   51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -88,30 +89,19 @@ namespace MySql.Configurator.Wizards.RemoveWizard
     {
       WizardSideBar.ShowConfigPanel(package.NameWithVersion);
       ClearPages();
-      //if (package.License != AppConfiguration.License)
-      //{
-      //  return;
-      //}
-
       package.Controller.ConfigurationType = ConfigurationType.Remove;
       package.Controller.UpdateRemoveSteps();
       package.Controller.SetPages();
       var serverController = package.Controller as ServerConfigurationController;
-      if (serverController != null)
+      if (serverController == null)
       {
-        if (!serverController.IsDeleteServiceStepNeeded
-            && !serverController.IsRemoveFirewallRuleStepNeeded)
-        {
-          AddPage(new RemoveErrorPage());
-          base.ShowWizard(parentMainForm);
-          return;
-        }
+        throw new ArgumentNullException(nameof(serverController));
       }
 
-      if (!serverController.IsDeleteServiceStepNeeded
-          && !serverController.IsRemoveFirewallRuleStepNeeded
-          && !serverController.IsDeleteDataDirectoryStepNeeded)
+      if (!serverController.IsRemovalExecutionNeeded)
       {
+        AddPage(new RemoveErrorPage());
+        base.ShowWizard(parentMainForm);
         return;
       }
 

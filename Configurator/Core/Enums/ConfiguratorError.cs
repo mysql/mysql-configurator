@@ -88,6 +88,18 @@ namespace MySql.Configurator.Core.Enums
     /// Invalid option.
     /// </summary>
     [Description("Invalid option '{0}'.")]
-    InvalidOption = 7,
+    InvalidOption = 9,
+
+    /// <summary>
+    /// Invalid option start.
+    /// </summary>
+    [Description("Option '{0}' must start with '--'.")]
+    InvalidOptionStart = 10,
+
+    /// <summary>
+    /// Invalid execution mode.
+    /// </summary>
+    [Description("An invalid exeuction mode was provided.")]
+    InvalidExecutionMode = 11,
   }
 }

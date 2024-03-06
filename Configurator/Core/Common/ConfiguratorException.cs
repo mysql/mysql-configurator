@@ -32,7 +32,7 @@ namespace MySql.Configurator.Core.Common
     /// <summary>
     /// The Configurator error code associated to this exception.
     /// </summary>
-    public ConfiguratorError InstallerErrorCode { get; private set; }
+    public ConfiguratorError ErrorCode { get; private set; }
 
     /// <summary>
     /// Initializes an Configurator exception using a general installer error code.
@@ -40,15 +40,7 @@ namespace MySql.Configurator.Core.Common
     /// <param name="errorCode">The Installer error code.</param>
     public ConfiguratorException(ConfiguratorError errorCode) : this(errorCode.GetDescription())
     {
-      InstallerErrorCode = errorCode;
-    }
-
-    /// <summary>
-    /// Initializes an Configurator exception using an MSI error code.
-    /// </summary>
-    /// <param name="errorCode">The MSI error code.</param>
-    public ConfiguratorException(MsiEnumError errorCode) : this(errorCode.GetDescription())
-    {
+      ErrorCode = errorCode;
     }
 
     /// <summary>
@@ -66,6 +58,7 @@ namespace MySql.Configurator.Core.Common
     /// <param name="formatString">A string to replace in the error message.</param>
     public ConfiguratorException(ConfiguratorError errorCode, string formatString) : base(string.Format(errorCode.GetDescription(), formatString))
     {
+      ErrorCode = errorCode;
     }
   }
 }
