@@ -130,7 +130,7 @@ namespace MySql.Configurator.Wizards.Server
       this.ServerInstallationsTitleLabel.Size = new System.Drawing.Size(804, 53);
       this.ServerInstallationsTitleLabel.TabIndex = 1;
       this.ServerInstallationsTitleLabel.Text = "An existing MySQL Server installation was found on your system.\r\nYou can either u" +
-    "pgrade in place or install side-by-side.";
+    "pgrade in-place or install side-by-side.";
       // 
       // ConnectionErrorProvider
       // 

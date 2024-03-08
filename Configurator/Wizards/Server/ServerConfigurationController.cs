@@ -2223,6 +2223,9 @@ namespace MySql.Configurator.Wizards.Server
         throw new Exception(Resources.ExistingServerInstanceNotSetError);
       }
 
+      // Remove settings file.
+      GeneralSettingsManager.DeleteGeneralSettingsFile(ExistingServerInstallationInstance.BaseDir);
+
       ReportStatus(Resources.ServerConfigRemovingExistingInstance);
       // Determine if the server to remove was installed using MSI
       var serverProductCode = Core.Classes.Utilities.FindInstalledServerProductCode(ExistingServerInstallationInstance.ServerVersion,
@@ -2711,7 +2714,6 @@ namespace MySql.Configurator.Wizards.Server
           Directory.CreateDirectory(Settings.SecureFilePrivFolder);
         }
 
-        //Set the Query Cache settings if Enterprise Firewall is enabled.
         var settings = ConfigurationType == ConfigurationType.Upgrade
           ? OldSettings
           : Settings;
@@ -2719,8 +2721,11 @@ namespace MySql.Configurator.Wizards.Server
             && IsDataDirectoryRenameNeeded)
         {
           settings.SecureFilePrivFolder = Settings.SecureFilePrivFolder;
+          settings.IniDirectory = Settings.IniDirectory;
+          settings.InstallDirectory = Settings.InstallDirectory;
         }
 
+        //Set the Query Cache settings if Enterprise Firewall is enabled.
         if (settings.Plugins.IsEnabled("mysql_firewall"))
         {
           settings.EnableQueryCacheType = false;
