@@ -33,6 +33,7 @@ using MySql.Configurator.Core.Common;
 using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Core.Package;
 using MySql.Configurator.Core.Product;
+using MySql.Configurator.Properties;
 using MySql.Configurator.Wizards;
 using MySql.Configurator.Wizards.ConfigWizard;
 using MySql.Configurator.Wizards.RemoveWizard;
@@ -45,20 +46,23 @@ namespace MySql.Configurator.Dialogs
   {
     #region Fields
 
-    private string _action;
+    /// <summary>
+    /// The application execution mode.
+    /// </summary>
+    private ExecutionMode _executionMode;
 
-    private string _version;
-
-    private string _installDirPath;
+    /// <summary>
+    /// The server package associated to the current installation.
+    /// </summary>
+    private Package _package;
 
     #endregion
 
-    public MainForm(string version, string installDirPath, string action)
+    public MainForm(Package package, ExecutionMode executionMode)
     {
       InitializeComponent();
-      _action = action;
-      _version = version;
-      _installDirPath = installDirPath;
+      _executionMode = executionMode;
+      _package = package;
       SetWindowPosition();
     }
 
@@ -118,47 +122,35 @@ namespace MySql.Configurator.Dialogs
 
     private void TryToLaunchWizard(bool launchedFromMainIcon)
     {
-      // Attempt to load package.
-      Package package = null;
-      try
-      {
-        package = ProductManager.LoadPackage(_version, _installDirPath);
-      }
-      catch (ConfiguratorException ex)
-      {
-        InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties($"MySQL Server {_version} not found", ex.Message));
-        Close();
-      }
-
       ConfigurationType configurationType;
-      switch (_action)
+      switch (_executionMode)
       {
-        case "configure":
+        case ExecutionMode.Configure:
           configurationType = ConfigurationType.Reconfiguration;
           var configWizard = new ConfigWizard();
           Controls.Add(configWizard);
           configWizard.WizardCanceled += WizardClosed;
           configWizard.WizardClosed += WizardClosed;
-          configWizard.ShowWizard(package, this, configurationType);
+          configWizard.ShowWizard(_package, this, configurationType);
           break;
 
-        case "remove":
+        case ExecutionMode.Remove:
+        case ExecutionMode.RemoveNoShow:
           configurationType = ConfigurationType.Remove;
           var removeWizard = new RemoveProductsWizard();
           Controls.Add(removeWizard);
           removeWizard.WizardCanceled += WizardClosed;
           removeWizard.WizardClosed += WizardClosed;
-          removeWizard.ShowWizard(package, this);
+          removeWizard.ShowWizard(_package, this);
           break;
 
         default:
-          configurationType = ConfigurationType.New;
-          break;
+          throw new ConfiguratorException(ConfiguratorError.InvalidExecutionMode);
       }
 
       StatusStrip.Visible = true;
-      VersionLabel.Text = $"MySQL Server {_version}";
-      var controllerConfigurationType = package.Controller.ConfigurationType;
+      VersionLabel.Text = $"MySQL Server {_package.VersionString}";
+      var controllerConfigurationType = _package.Controller.ConfigurationType;
       var stringConfigurationType = string.Empty;
       switch (controllerConfigurationType)
       {
@@ -175,7 +167,7 @@ namespace MySql.Configurator.Dialogs
       if (controllerConfigurationType == ConfigurationType.Reconfiguration
           || controllerConfigurationType == ConfigurationType.Remove)
       {
-        var serverController = package.Controller as ServerConfigurationController;
+        var serverController = _package.Controller as ServerConfigurationController;
         DataDirectoryLabel.Text = $"Data Directory: {serverController.DataDirectory}";
       }
 

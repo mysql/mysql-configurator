@@ -261,15 +261,6 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MySQL Configurator was not launched properly. Try re-installing an installer bundle..
-        /// </summary>
-        public static string BadLaunchWrongArguments {
-            get {
-                return ResourceManager.GetString("BadLaunchWrongArguments", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap BigWarning {
@@ -2258,6 +2249,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Nothing to remove. Ommiting showing an UI because MySQL Configurator was executed with disabled warning messages. .
+        /// </summary>
+        public static string RemoveWithNoUIWarningMessage {
+            get {
+                return ResourceManager.GetString("RemoveWithNoUIWarningMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Removing the server configuration file..
         /// </summary>
         public static string RemovingConfigurationFileText {
@@ -2508,6 +2508,15 @@ namespace MySql.Configurator.Properties {
         public static string RootRoleDescription {
             get {
                 return ResourceManager.GetString("RootRoleDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid action provided. Running in configuration mode..
+        /// </summary>
+        public static string RunWithDefaultExecutionMode {
+            get {
+                return ResourceManager.GetString("RunWithDefaultExecutionMode", resourceCulture);
             }
         }
         

@@ -259,6 +259,7 @@
     <Compile Include="Core\Enums\ConfiguratorError.cs" />
     <Compile Include="Core\Enums\ConnectionResultType.cs" />
     <Compile Include="Core\Enums\DeviceCap.cs" />
+    <Compile Include="Core\Enums\ExecutionMode.cs" />
     <Compile Include="Core\Enums\FormulaTokenType.cs" />
     <Compile Include="Core\Enums\GroupReplicationMemberRoleType.cs" />
     <Compile Include="Core\Enums\IniLineType.cs" />
@@ -351,7 +352,6 @@
     <Compile Include="Core\Interfaces\IProgressObserver.cs" />
     <Compile Include="Core\Interfaces\IWizard.cs" />
     <Compile Include="Core\MSI\ChainedInstallerEventArgs.cs" />
-    <Compile Include="Core\MSI\Installer.cs" />
     <Compile Include="Core\MSI\MsiInterop.cs" />
     <Compile Include="Core\MSI\MsiQuery.cs" />
     <Compile Include="Core\MSI\PackageParameters.cs" />
