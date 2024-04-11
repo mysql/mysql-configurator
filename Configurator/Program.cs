@@ -64,10 +64,6 @@ namespace MySql.Configurator
 
     #endregion
 
-    #region Properties
-
-    #endregion
-
     /// <summary>
     /// Customizes the looks of common dialogs.
     /// </summary>
@@ -126,15 +122,7 @@ namespace MySql.Configurator
 
         // Do not show form if running in removal mode and option --show-removal-warning was not provided.
         Package package = null;
-        try
-        {
-          package = ProductManager.LoadPackage(_version, _installDirPath);
-        }
-        catch (ConfiguratorException ex)
-        {
-          Logger.LogException(ex);
-        }
-
+        package = ProductManager.LoadPackage(_version, _installDirPath);
         if (executionMode == ExecutionMode.RemoveNoShow)
         {
           var controller = package.Controller as ServerConfigurationController;
@@ -237,29 +225,35 @@ namespace MySql.Configurator
         _installDirPath = installDirPath;
 #endif
 
+        if (string.IsNullOrEmpty(_installDirPath))
+        {
+          throw new ArgumentNullException(_installDirPath);
+        }
+
         // Validate install dir.
         var pathToMySqld = Path.Combine(_installDirPath, "bin\\mysqld.exe");
         if (!Directory.Exists(_installDirPath)
             || !File.Exists(pathToMySqld))
         {
-          _installDirPath = null;
+          throw new ConfiguratorException(ConfiguratorError.MysqldExeNotFound, _installDirPath);
         }
 
         // Set version.
-        FileVersionInfo versionInfo = null;
-        Version versionItem = null;
-        if (!string.IsNullOrEmpty(_installDirPath))
+        var versionInfo = FileVersionInfo.GetVersionInfo(pathToMySqld);
+        var mysqldExeVersion = new Version(versionInfo.FileVersion);
+        var assemblyVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+        var configuratorVersion = new Version(versionInfo.FileVersion);
+        if (mysqldExeVersion != configuratorVersion)
         {
-          versionInfo = FileVersionInfo.GetVersionInfo(pathToMySqld);
-          versionItem = new Version(versionInfo.FileVersion);
-        }
-        else
-        {
-          versionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
-          versionItem = new Version(versionInfo.FileVersion);
+          throw new ConfiguratorException(ConfiguratorError.VersionMismatch);
         }
 
-        _version = $"{versionItem.Major}.{versionItem.Minor}.{versionItem.Build}";
+        _version = $"{mysqldExeVersion.Major}.{mysqldExeVersion.Minor}.{mysqldExeVersion.Build}";
+      }
+      catch (ConfiguratorException ex)
+      {
+        Logger.LogException(ex);
+        throw ex;
       }
       catch (Exception ex)
       {

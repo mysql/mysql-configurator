@@ -43,9 +43,9 @@ namespace MySql.Configurator.Core.Enums
     VersionNotFound = 1,
 
     /// <summary>
-    /// Version not found.
+    /// Version mismatch.
     /// </summary>
-    [Description("The version provided does not match with the one installed.")]
+    [Description("Version for the mysql.exe and mysql_configurator.exe do not match.")]
     VersionMismatch = 2,
 
     /// <summary>
@@ -99,7 +99,25 @@ namespace MySql.Configurator.Core.Enums
     /// <summary>
     /// Invalid execution mode.
     /// </summary>
-    [Description("An invalid exeuction mode was provided.")]
+    [Description("An invalid execution mode was provided.")]
     InvalidExecutionMode = 11,
+
+    /// <summary>
+    /// Upgrade history elements not found in the server's upgrade history file.
+    /// </summary>
+    [Description("No upgrade history elements found in the mysql_upgrade_history file.")]
+    UpgradeHistoryElementsNotFound = 12,
+
+    /// <summary>
+    /// The mysqld.exe was not found in the same directory as mysql_configurator.exe.
+    /// </summary>
+    [Description("mysqld.exe not found at: '{0}'.")]
+    MysqldExeNotFound = 13,
+
+    /// <summary>
+    /// The server configuration file was not found.
+    /// </summary>
+    [Description("Configuration file not found at: '{0}'")]
+    ConfigurationFileNotFound = 14
   }
 }

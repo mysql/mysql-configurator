@@ -919,11 +919,8 @@ Provide a more complex password for stronger security.</value>
   <data name="SetLocalInstanceAsWritableStep" xml:space="preserve">
     <value>Setting the instance as writable</value>
   </data>
-  <data name="SettingUpNewInstallation" xml:space="preserve">
-    <value>Setting up product configuration controller for new installation.</value>
-  </data>
-  <data name="SettingUpReconfiguration" xml:space="preserve">
-    <value>Setting up product configuration controller for reconfiguration.</value>
+  <data name="SettingUpControllerMessage" xml:space="preserve">
+    <value>Product configuration controller set to '{0}' configuration type.</value>
   </data>
   <data name="SettingUpUpgrade" xml:space="preserve">
     <value>Setting up product configuration controller for upgrade.</value>
@@ -1772,5 +1769,17 @@ the upgrade may result in an upgrade failure, proceed at your own risk.</value>
   </data>
   <data name="RunWithDefaultExecutionMode" xml:space="preserve">
     <value>Invalid action provided. Running in configuration mode.</value>
+  </data>
+  <data name="ExecutionModeSwitch" xml:space="preserve">
+    <value>MySQL Server needs to be upgraded. Switching to 'upgrade' mode.</value>
+  </data>
+  <data name="ConfigurationFileNotFound" xml:space="preserve">
+    <value>A my.ini or my.cnf configuration file was not found at the specified location.</value>
+  </data>
+  <data name="ServerConfigConfigurationFileNotFound" xml:space="preserve">
+    <value>A my.ini or my.cnf server configuration file was not found in the location as the data directory. Provide a path for the server configuration file.</value>
+  </data>
+  <data name="ServerConfigConfigurationFileNotValid" xml:space="preserve">
+    <value>The specified ini file could not be read. Select a valid server configuration file or select a different file to continue.</value>
   </data>
 </root>
