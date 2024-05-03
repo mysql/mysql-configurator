@@ -62,8 +62,13 @@ namespace MySql.Configurator.Core.Enums
     S8x = S80 << 1,
 
     /// <summary>
+    /// Server 9.x
+    /// </summary>
+    S9x = S8x << 1,
+
+    /// <summary>
     /// All supported series
     /// </summary>
-    All = S51 | S55 | S56 | S57 | S80 | S8x
+    All = S51 | S55 | S56 | S57 | S80 | S8x | S9x
   }
 }

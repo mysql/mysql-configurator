@@ -808,6 +808,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\example_databases.zip" />
     <EmbeddedResource Include="Resources\my-template-8.x.ini" />
+    <EmbeddedResource Include="Resources\my-template-9.x.ini" />
     <None Include="Resources\WizardSelection.png" />
   </ItemGroup>
   <ItemGroup>

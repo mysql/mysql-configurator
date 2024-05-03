@@ -37,6 +37,8 @@ using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Properties;
 using MySql.Configurator.Wizards.Server;
 using MySql.Data.MySqlClient;
+using MySql.Data.MySqlClient.Authentication;
+using MySql.Configurator.Core.Common;
 
 namespace MySql.Configurator.Core.Classes.MySql
 {
@@ -1151,6 +1153,43 @@ namespace MySql.Configurator.Core.Classes.MySql
     }
 
     /// <summary>
+    /// Gets the authentication plugin associated to the specified user.
+    /// </summary>
+    /// <param name="userName">The MySQL user name.</param>
+    /// <returns></returns>
+    public MySqlAuthenticationPluginType GetUserAuthenticationPlugin(string userName)
+    {
+      if (string.IsNullOrEmpty(userName))
+      {
+        throw new ArgumentNullException(nameof(userName));
+      }
+
+      using (var connection = new MySqlConnection(GetConnectionStringBuilder().ConnectionString))
+      {
+        try
+        {
+          connection.Open();
+          var reader = MySqlHelper.ExecuteReader(connection, $"SELECT plugin FROM mysql.user WHERE User='{userName}'");
+          reader.Read();
+          var result = reader["plugin"].ToString();
+          if (!string.IsNullOrEmpty(result))
+          {
+            var plugin = MySqlAuthenticationPluginType.None;
+            plugin.TryParseFromDescription(result, true, out plugin);
+            return plugin;
+          }
+
+          return MySqlAuthenticationPluginType.None;
+        }
+        catch (Exception ex)
+        {
+          Logger.LogException(ex);
+          return MySqlAuthenticationPluginType.None;
+        }
+      }
+    }
+
+    /// <summary>
     /// Kills this MySQL Server instance's related process.
     /// </summary>
     public void KillInstanceProcess()
@@ -1313,6 +1352,41 @@ namespace MySql.Configurator.Core.Classes.MySql
       catch (Exception ex)
       {
         ReportStatus(string.Format(Resources.StoppingServerInstanceErrorText, ex.Message));
+      }
+    }
+
+    /// <summary>
+    /// Updates the authentication plugin of the specified user. 
+    /// </summary>
+    /// <param name="userName">The MySQL user name.</param>
+    /// <param name="password">The password of the MySQL user.</param>
+    /// <param name="authenticationPlugin">The authentication plugin currently assigned to the MySQL user.</param>
+    public void UpdateUserAuthenticationPlugin(string userName, string password, MySqlAuthenticationPluginType authenticationPlugin)
+    {
+      if (string.IsNullOrEmpty(userName))
+      {
+        throw new ArgumentNullException(nameof(userName));
+      }
+
+      if (string.IsNullOrEmpty(password))
+      {
+        throw new ArgumentNullException(nameof(password));
+      }
+
+      var result = -1;
+      var connectionString = GetConnectionStringBuilder().ConnectionString;
+      using (var connection = new MySqlConnection(connectionString))
+      {
+        connection.Open();
+        var sql = $"ALTER USER '{userName}'@'localhost' IDENTIFIED WITH {authenticationPlugin.GetDescription()} BY '{password}'";
+        var cmd = new MySqlCommand(sql, connection);
+        result = cmd.ExecuteNonQuery();
+        cmd.FlushPrivileges();
+      }
+      
+      if (result == -1)
+      {
+        throw new ConfiguratorException(ConfiguratorError.AuthenticationPluginUpdateFailed);
       }
     }
 

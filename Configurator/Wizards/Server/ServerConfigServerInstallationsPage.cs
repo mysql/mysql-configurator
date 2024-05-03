@@ -365,6 +365,7 @@ namespace MySql.Configurator.Wizards.Server
         throw new ArgumentNullException(nameof(_existingServerInstallationInstance.Controller));
       }
 
+      // Determine if the upgrade is supported.
       VersionTextBox.Text = _existingServerInstallationInstance.ServerVersion?.ToString();
       string versionErrorMessage = null;
       var newVersion = _controller.Package.Version;
@@ -418,6 +419,7 @@ namespace MySql.Configurator.Wizards.Server
         VersionWarningProvider.Clear();
       }
 
+      // Populate server details.
       InstallDirectoryTextBox.Text = _existingServerInstallationInstance.BaseDir;
       ExistingDataDirectoryTextBox.Text = _existingServerInstallationInstance.DataDir;
       DataDirectoryRenameWarningProvider.SetProperties(ExistingDataDirectoryTextBox, new ErrorProviderProperties(_existingServerInstallationInstance.IsDataDirNameDefault(_controller.ServerVersion)
@@ -458,6 +460,13 @@ namespace MySql.Configurator.Wizards.Server
       else
       {
         ExistingConfigFilePathTextBox.Text = string.Empty;
+      }
+
+      // Get authentication plugin.
+      _controller.RootUserAuthenticationPlugin = _existingServerInstallationInstance.GetUserAuthenticationPlugin(MySqlServerUser.ROOT_USERNAME);
+      if (_controller.RootUserAuthenticationPlugin == MySqlAuthenticationPluginType.MysqlNativePassword)
+      {
+        ValidationsErrorProvider.SetProperties(RootPasswordTextBox, new ErrorProviderProperties(Resources.ServerConfigInvalidAuthenticationPlugin));
       }
 
       // Set existing instance relevant properties for rollback.
@@ -502,14 +511,14 @@ namespace MySql.Configurator.Wizards.Server
         throw new ArgumentNullException(nameof(serverConfigurationFilePath));
       }
 
-      if (File.Exists(serverConfigurationFilePath))
+      if (!File.Exists(serverConfigurationFilePath))
       {
         throw new FileNotFoundException(serverConfigurationFilePath);
       }
 
       var template = new IniTemplate(_existingServerInstallationInstance.BaseDir,
         _existingServerInstallationInstance.DataDir,
-        ExistingConfigFilePathTextBox.Text,
+        serverConfigurationFilePath,
         _existingServerInstallationInstance.Controller.ServerVersion,
         _existingServerInstallationInstance.Controller.Settings.ServerInstallType,
         null);

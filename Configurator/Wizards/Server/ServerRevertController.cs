@@ -21,9 +21,9 @@
   along with this program; if not, write to the Free Software Foundation, Inc., 
   51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
-using MySql.Configurator.Core.Classes.Logging;
+using MySql.Configurator.Core.Classes.MySql;
 using MySql.Configurator.Core.Common;
-using MySql.Configurator.Core.Package;
+using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Properties;
 using System;
 using System.Collections.Generic;
@@ -46,6 +46,11 @@ namespace MySql.Configurator.Wizards.Server
     #endregion
 
     #region Properties
+
+    /// <summary>
+    /// Flag indicating if the authentication plugin for the root user was updated.
+    /// </summary>
+    public bool AuthenticationPluginUpdated { get; set; }
 
     /// <summary>
     /// Flag indicating if the data dir was renamed.
@@ -88,12 +93,22 @@ namespace MySql.Configurator.Wizards.Server
     public string OldIniFileName { get; set; }
 
     /// <summary>
+    /// Gets or sets the authentication plugin previously assigned to the root user.
+    /// </summary>
+    public MySqlAuthenticationPluginType OldRootUserAuthenticationPlugin { get; set; }
+
+    /// <summary>
     /// Gets or sets the old service name.
     /// </summary>
     public string OldServiceName { get; set; }
 
     /// <summary>
-    /// Delegate used to reports status back to the UI.
+    /// Delegate used to report errors back to the UI.
+    /// </summary>
+    public Action<string> ReportErrorDelegate { get; set; }
+
+    /// <summary>
+    /// Delegate used to report status back to the UI.
     /// </summary>
     public Action<string> ReportStatusDelegate { get; set; }
 
@@ -101,12 +116,6 @@ namespace MySql.Configurator.Wizards.Server
     /// Gets or sets the command assigned to the Windows service.
     /// </summary>
     public string ServiceCommand { get; set; }
-
-    /// <summary>
-    /// Gets or sets a flag indicating if the existing instance service was removed or just updated.
-    /// </summary>
-    public bool ServiceRemoved { get; set; }
-
 
     /// <summary>
     /// Gets or sets a flag indicating if the existing instance serve was renamed.
@@ -130,11 +139,26 @@ namespace MySql.Configurator.Wizards.Server
     }
 
     /// <summary>
+    /// Reports the specified error message to the assigned delegate.
+    /// </summary>
+    /// <param name="message">The error message to report.</param>
+    protected void ReportError(string message)
+    {
+      if (string.IsNullOrEmpty(message))
+      {
+        return;
+      }
+
+      ReportErrorDelegate(message);
+    }
+
+    /// <summary>
     /// Resets the controller.
     /// </summary>
     public void Reset()
     {
       _revertedSteps = new List<string>();
+      AuthenticationPluginUpdated = false;
       DataDirRenamed = false;
       ExistingServerInstallationInstance = null;
       IniFileUpdated = false;
@@ -145,8 +169,31 @@ namespace MySql.Configurator.Wizards.Server
       OldIniFileName = null;
       OldServiceName = null;
       ServiceCommand = null;
-      ServiceRemoved = false;
       ServiceRenamed = false;
+    }
+
+    /// <summary>
+    /// Reverts the change of the authentication plugin for the root user.
+    /// </summary>
+    /// <param name="settings">The controller settings.</param>
+    public void RevertAuthenticationPluginChange(MySqlServerSettings settings)
+    {
+      ReportStatus(Resources.ServerConfigRevertingAuthenticationPluginChanged);
+      var rootUser = MySqlServerUser.GetLocalRootUser(ExistingServerInstallationInstance.ConfigurationRootPassword,
+        settings.DefaultAuthenticationPlugin);
+      var serverInstance = new MySqlServerInstance(settings.Port, rootUser, ReportStatus);
+      try
+      {
+        serverInstance.UpdateUserAuthenticationPlugin(MySqlServerUser.ROOT_USERNAME,
+          rootUser.Password,
+          OldRootUserAuthenticationPlugin);
+        ReportStatus(Resources.ServerConfigRevertedAuthenticationPluginChange);
+        AuthenticationPluginUpdated = false;
+      }
+      catch (Exception ex)
+      {
+        ReportError(string.Format(Resources.ServerConfigFailedToRevertAuthenticationPluginChange, ex.Message));
+      }
     }
 
     /// <summary>
@@ -163,11 +210,11 @@ namespace MySql.Configurator.Wizards.Server
         settings.IniDirectory = settings.DataDirectory;
         settings.SecureFilePrivFolder = Path.Combine(settings.IniDirectory, MySqlServerSettings.SECURE_FILE_PRIV_DIRECTORY);
         _revertedSteps.Add(Resources.RenameExistingDataDirectoryStep);
+        DataDirRenamed = false;
       }
       catch (Exception ex)
       {
-        ReportStatus(string.Format(Resources.ServerConfigRevertDataDirRenameError, ex.Message));
-        Logger.LogException(ex);
+        ReportError(string.Format(Resources.ServerConfigRevertDataDirRenameError, ex.Message));
       }
 
       ReportStatus(Resources.ServerConfigRevertedDataDirRename);
@@ -191,11 +238,12 @@ namespace MySql.Configurator.Wizards.Server
         
         ReportStatus(Resources.ServerConfigSettingsFilesReverted);
         _revertedSteps.Add(Resources.ServerWriteConfigFileStep);
+
+        IniFileUpdated = false;
       }
       catch (Exception ex)
       {
-        Logger.LogException(ex);
-        ReportStatus(string.Format(Resources.ServerConfigSettingsFilesReverFailed, ex.Message));
+        ReportError(string.Format(Resources.ServerConfigSettingsFilesReverFailed, ex.Message));
       }
     }
 
@@ -218,11 +266,11 @@ namespace MySql.Configurator.Wizards.Server
         settings.ServiceName = OldServiceName;
         ReportStatus(string.Format(Resources.ServerConfigServiceRenameReverted, OldServiceName));
         _revertedSteps.Add(Resources.ServerAdjustServiceStep);
+        ServiceRenamed = false;
       }
       catch (Exception ex)
       {
-        ReportStatus(string.Format(Resources.ServerConfigServiceRenameRevertFailed, ex.Message));
-        Logger.LogException(ex);
+        ReportError(string.Format(Resources.ServerConfigServiceRenameRevertFailed, ex.Message));
       }
     }
 
@@ -253,6 +301,11 @@ namespace MySql.Configurator.Wizards.Server
               && !ExistingServerInstallationInstance.IsRunning))
       {
         StartExistingInstance();
+      }
+
+      if (AuthenticationPluginUpdated)
+      {
+        RevertAuthenticationPluginChange(settings);
       }
 
       var revertedSteps = _revertedSteps;

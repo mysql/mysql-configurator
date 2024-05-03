@@ -118,6 +118,9 @@ namespace MySql.Configurator.Core.Enums
     /// The server configuration file was not found.
     /// </summary>
     [Description("Configuration file not found at: '{0}'")]
-    ConfigurationFileNotFound = 14
+    ConfigurationFileNotFound = 14,
+
+    [Description("Failed to update the authentication plugin of the root user.")]
+    AuthenticationPluginUpdateFailed = 15
   }
 }

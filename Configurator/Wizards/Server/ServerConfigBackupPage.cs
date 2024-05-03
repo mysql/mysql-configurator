@@ -59,7 +59,6 @@ namespace MySql.Configurator.Wizards.Server
       InitializeComponent();
       _connectionResult = ConnectionResultType.None;
       _controller = controller;
-      CredentialsPanel.Visible = !_controller.RootUserCredentialsSet;
     }
 
     #region Properties
@@ -86,6 +85,7 @@ namespace MySql.Configurator.Wizards.Server
     /// </summary>
     public override void Activate()
     {
+      CredentialsPanel.Visible = !_controller.RootUserCredentialsSet;
       base.Activate();
     }
 

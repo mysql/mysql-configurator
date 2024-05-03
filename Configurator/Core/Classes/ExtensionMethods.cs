@@ -565,7 +565,22 @@ namespace MySql.Configurator.Core.Classes
     /// <returns>The corresponding <see cref="ServerSeriesType"/> of a given MySQL Server version.</returns>
     public static ServerSeriesType GetServerSeries(this Version serverVersion)
     {
-      if (serverVersion.Major == 5)
+      if (serverVersion.Major == 9)
+      {
+        return ServerSeriesType.S9x;
+      }
+      else if (serverVersion.Major == 8)
+      {
+        switch (serverVersion.Minor)
+        {
+          case 0:
+            return ServerSeriesType.S80;
+
+          default:
+            return ServerSeriesType.S8x;
+        }
+      }
+      else if (serverVersion.Major == 5)
       {
         switch (serverVersion.Minor)
         {
@@ -583,18 +598,6 @@ namespace MySql.Configurator.Core.Classes
         }
       }
 
-      if (serverVersion.Major == 8)
-      {
-        switch (serverVersion.Minor)
-        {
-          case 0:
-            return ServerSeriesType.S80;
-
-          default:
-            return ServerSeriesType.S8x;
-        }
-      }
-      
       throw new Exception("Series not supported");
     }
 
@@ -1198,6 +1201,17 @@ namespace MySql.Configurator.Core.Classes
     public static bool ServerSupportsMemberRoleColumn(this Version serverVersion)
     {
       return serverVersion >= new Version("8.0.2");
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the MySQL Server supports the mysql_native_password 
+    /// authentication plugin.
+    /// </summary>
+    /// <param name="serverVersion">The MySQL Server version.</param>
+    /// <returns><c>true</c> if the MySQL Server supports the mysql_native_password authenticaiton plugin; otherwise, <c>false</c>.</returns>
+    public static bool ServerSupportsMySqlNativePasswordAuthPlugin(this Version serverVersion)
+    {
+      return serverVersion < new Version("9.0.0");
     }
 
     /// <summary>

@@ -2717,7 +2717,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The specified ini file could not be read. Select a valid server configuration file or select a different file to continue..
+        ///   Looks up a localized string similar to The specified ini file could not be read. Provide a valid server configuration file or select a different file to continue..
         /// </summary>
         public static string ServerConfigConfigurationFileNotValid {
             get {
@@ -3195,6 +3195,24 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to revert the authentication plugin change for the root user with message: {0}..
+        /// </summary>
+        public static string ServerConfigFailedToRevertAuthenticationPluginChange {
+            get {
+                return ResourceManager.GetString("ServerConfigFailedToRevertAuthenticationPluginChange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to update the authentication plugin of the root user..
+        /// </summary>
+        public static string ServerConfigFailedToUpdateRootUserAuthPlugin {
+            get {
+                return ResourceManager.GetString("ServerConfigFailedToUpdateRootUserAuthPlugin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to General settings file not found..
         /// </summary>
         public static string ServerConfigGeneralSettingsFileNotFound {
@@ -3317,6 +3335,16 @@ namespace MySql.Configurator.Properties {
         public static string ServerConfigInstanceRunning {
             get {
                 return ResourceManager.GetString("ServerConfigInstanceRunning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;root&apos; user is configured to use the &apos;mysql_native_password&apos; authentication plugin.
+        ///Proceeding with the upgrade will update the plugin to &apos;caching_sha2_password&apos;..
+        /// </summary>
+        public static string ServerConfigInvalidAuthenticationPlugin {
+            get {
+                return ResourceManager.GetString("ServerConfigInvalidAuthenticationPlugin", resourceCulture);
             }
         }
         
@@ -3573,11 +3601,29 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reverted the authentication plugin change for the root user..
+        /// </summary>
+        public static string ServerConfigRevertedAuthenticationPluginChange {
+            get {
+                return ResourceManager.GetString("ServerConfigRevertedAuthenticationPluginChange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reverted the data directory renaming..
         /// </summary>
         public static string ServerConfigRevertedDataDirRename {
             get {
                 return ResourceManager.GetString("ServerConfigRevertedDataDirRename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reverting the authentication plugin change for the root user....
+        /// </summary>
+        public static string ServerConfigRevertingAuthenticationPluginChanged {
+            get {
+                return ResourceManager.GetString("ServerConfigRevertingAuthenticationPluginChanged", resourceCulture);
             }
         }
         
@@ -3861,6 +3907,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Updated authentication plugin of the root user..
+        /// </summary>
+        public static string ServerConfigUpdatedRootUserAuthPlugin {
+            get {
+                return ResourceManager.GetString("ServerConfigUpdatedRootUserAuthPlugin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Updating existing service....
         /// </summary>
         public static string ServerConfigUpdatingExistingService {
@@ -3875,6 +3930,15 @@ namespace MySql.Configurator.Properties {
         public static string ServerConfigUpdatingExistingServiceWithNewName {
             get {
                 return ResourceManager.GetString("ServerConfigUpdatingExistingServiceWithNewName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating the authentication plugin of the root user to: {0}..
+        /// </summary>
+        public static string ServerConfigUpdatingRootUserAuthPlugin {
+            get {
+                return ResourceManager.GetString("ServerConfigUpdatingRootUserAuthPlugin", resourceCulture);
             }
         }
         
@@ -4262,6 +4326,15 @@ namespace MySql.Configurator.Properties {
         public static string ServerStopProcessStep {
             get {
                 return ResourceManager.GetString("ServerStopProcessStep", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating authentication plugin for the root user.
+        /// </summary>
+        public static string ServerUpdateAuthenticationPluginStep {
+            get {
+                return ResourceManager.GetString("ServerUpdateAuthenticationPluginStep", resourceCulture);
             }
         }
         

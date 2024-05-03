@@ -109,6 +109,7 @@ namespace MySql.Configurator.Wizards.Server
     private ConfigurationStep _stopExistingServerInstanceStep;
     private ConfigurationStep _stopServerConfigurationStep;
     private ConfigurationStep _updateAccessPermissions;
+    private ConfigurationStep _updateAuthenticationPluginStep;
     private ConfigurationStep _updateEnterpriseFirewallPluginConfigStep;
     private ConfigurationStep _resetPersistedVariablesStep;
     private ConfigurationStep _updateProcessStep;
@@ -371,6 +372,13 @@ namespace MySql.Configurator.Wizards.Server
     public bool IsThereConfigXmlFile => File.Exists(Path.Combine(Settings.IniDirectory, GeneralSettingsManager.CONFIGURATOR_SETTINGS_FILE_NAME));
 
     /// <summary>
+    /// Gets a value indicating if the authentication plugin should be updated for the root user.
+    /// </summary>
+    public bool IsUpdateAuthenticationPluginStepNeeded => ConfigurationType == ConfigurationType.Upgrade
+                                                          && RootUserAuthenticationPlugin == MySqlAuthenticationPluginType.MysqlNativePassword
+                                                          && !ServerVersion.ServerSupportsMySqlNativePasswordAuthPlugin();
+
+    /// <summary>
     /// Gets a value indicating whether the configuration step that updates the access permissions to the data folder needs to run.
     /// </summary>
     public bool IsUpdateServerFilesPermissionsStepNeeded => UpdateDataDirectoryPermissions
@@ -471,6 +479,11 @@ namespace MySql.Configurator.Wizards.Server
     public bool RootUserCredentialsSet => !string.IsNullOrEmpty(Settings.ExistingRootPassword);
 
     /// <summary>
+    /// Gets or sets the authentication plugin assigned to the root user.
+    /// </summary>
+    public MySqlAuthenticationPluginType RootUserAuthenticationPlugin { get; set; }
+
+    /// <summary>
     /// Gets or sets the value of the password used for the root account.
     /// </summary>
     public string RootPassword { get; set; }
@@ -562,6 +575,7 @@ namespace MySql.Configurator.Wizards.Server
     {
       _revertController.Reset();
       _revertController.ReportStatusDelegate = ReportStatus;
+      _revertController.ReportErrorDelegate = ReportError;
       if (ConfigurationType == ConfigurationType.Upgrade
           && ExistingServerInstallationInstance != null)
       {
@@ -987,6 +1001,7 @@ namespace MySql.Configurator.Wizards.Server
       _stopServerConfigurationStep.Execute = IsSameDirectoryUpgrade;
       _stopExistingServerInstanceStep.Execute = !IsSameDirectoryUpgrade;
       _updateAccessPermissions.Execute = IsUpdateServerFilesPermissionsStepNeeded;
+      _updateAuthenticationPluginStep.Execute = IsUpdateAuthenticationPluginStepNeeded;
       ConfigurationSteps = StandAloneServerSteps;
     }
 
@@ -1816,9 +1831,16 @@ namespace MySql.Configurator.Wizards.Server
     /// <returns>A <see cref="ServerUser"/> that can connect to the server before the root user account is updated.</returns>
     private ServerUser GetUserAccountToConnectBeforeUpdatingRootUser()
     {
-      return DefaultAuthenticationPluginChanged && TemporaryServerUser != null
-        ? TemporaryServerUser
-        : ServerUser.GetLocalRootUser(Settings.ExistingRootPassword, Settings.DefaultAuthenticationPlugin);
+      return DefaultAuthenticationPluginChanged
+        && TemporaryServerUser != null
+          ? TemporaryServerUser
+          : ServerUser.GetLocalRootUser(
+            IsUpdateAuthenticationPluginStepNeeded
+              ? ExistingServerInstallationInstance.ConfigurationRootPassword
+              : Settings.ExistingRootPassword,
+            IsUpdateAuthenticationPluginStepNeeded
+              ? RootUserAuthenticationPlugin
+              : Settings.DefaultAuthenticationPlugin);
     }
 
     private void InitializeServer()
@@ -1957,6 +1979,7 @@ namespace MySql.Configurator.Wizards.Server
       _stopExistingServerInstanceStep = new ConfigurationStep(Resources.StoppingExistingServerInstanceStep, 40, StopExistingServerInstance, true, ConfigurationType.Upgrade);
       _stopServerConfigurationStep = new ConfigurationStep(Resources.ServerStopProcessStep, 40, StopServerSafe);
       _updateAccessPermissions = new ConfigurationStep(Resources.ServerUpdateServerFilePermissions, 10, UpdateServerFilesPermissions, false, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
+      _updateAuthenticationPluginStep = new ConfigurationStep(Resources.ServerUpdateAuthenticationPluginStep, 10, UpdateAuthenticationPlugin, true, ConfigurationType.Upgrade);
       _updateEnterpriseFirewallPluginConfigStep = new ConfigurationStep(Resources.ServerEnableEnterpriseFirewallStep, 45, InstallEnterpriseFirewallPlugin, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
       _updateProcessStep = new ConfigurationStep(Resources.ServerAdjustProcessStep, 10, UpdateProcessSettings, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
       _updateStartMenuLinksStep = new ConfigurationStep(Resources.ServerUpdateStartMenuLinkStep, 20, UpdateStartMenuLink, false, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
@@ -2008,6 +2031,7 @@ namespace MySql.Configurator.Wizards.Server
       {
         _resetPersistedVariablesStep,
         _backupDatabaseStep,
+        _updateAuthenticationPluginStep,
         _stopExistingServerInstanceStep,
         _renameExistingDataDirectoryStep,
         _writeConfigurationFileStep,
@@ -2074,8 +2098,9 @@ namespace MySql.Configurator.Wizards.Server
       string templateBase = "my-template{0}.ini";
       var version = Package.Version;
       string templateFile = null;
-      if (version.Major >= 8
+      if ((version.Major >= 8
           && version.Minor > 0)
+          || version.Major == 9)
       {
         templateFile = string.Format(templateBase, $"-{version.Major}.x");
       }
@@ -2557,6 +2582,38 @@ namespace MySql.Configurator.Wizards.Server
         CurrentStep.Status = serverStopped
           ? ConfigurationStepStatus.Finished
           : ConfigurationStepStatus.Error;
+      }
+    }
+
+    /// <summary>
+    /// Updates the authentication plugin of the root user to the default authentication plugin.
+    /// </summary>
+    private void UpdateAuthenticationPlugin()
+    {
+      CancellationToken.ThrowIfCancellationRequested();
+      ReportStatus(string.Format(Resources.ServerConfigUpdatingRootUserAuthPlugin, Settings.DefaultAuthenticationPlugin.GetDescription()));
+      try
+      {
+        _revertController.OldRootUserAuthenticationPlugin = RootUserAuthenticationPlugin;
+        var rootUser = MySqlServerUser.GetLocalRootUser(IsSameDirectoryUpgrade
+          ? Settings.ExistingRootPassword
+          : ExistingServerInstallationInstance.ConfigurationRootPassword,
+          RootUserAuthenticationPlugin);
+        var serverInstance = new MySqlServerInstance(Settings.Port, rootUser, ReportStatus);
+        serverInstance.UpdateUserAuthenticationPlugin(
+          MySqlServerUser.ROOT_USERNAME,
+          rootUser.Password,
+          Settings.DefaultAuthenticationPlugin);
+        ReportStatus(Resources.ServerConfigUpdatedRootUserAuthPlugin);
+        _revertController.AuthenticationPluginUpdated = true;
+        CurrentStep.Status = ConfigurationStepStatus.Finished;
+      }
+      catch(Exception ex) 
+      {
+        ReportError(Resources.ServerConfigFailedToUpdateRootUserAuthPlugin);
+        ReportError(ex.Message);
+        RevertedSteps = _revertController.Rollback(OldSettings);
+        CurrentStep.Status = ConfigurationStepStatus.Error;
       }
     }
 
