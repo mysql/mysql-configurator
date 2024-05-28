@@ -2246,7 +2246,8 @@ namespace MySql.Configurator.Wizards.Server
       ReportStatus(string.Format(Resources.RemovingFirewallRuleText, Settings.Port));
 
       var removedXProtocolFirewallRule = true;
-      if (Settings.OpenFirewallForXProtocol)
+      if (Settings.OpenFirewallForXProtocol
+          && Settings.MySqlXPort != 0)
       {
         removedXProtocolFirewallRule = RemoveFirewallRule(Settings.MySqlXPort);
       }
@@ -3149,7 +3150,8 @@ namespace MySql.Configurator.Wizards.Server
       if ((ConfigurationType == ConfigurationType.Reconfiguration
            || isDataDirectoryConfigured)
           && OldSettings != null
-          && OldSettings.OpenFirewall)
+          && OldSettings.OpenFirewallForXProtocol
+          && OldSettings.MySqlXPort != 0)
       {
         RemoveFirewallRule(OldSettings.Port);
       }
@@ -3175,7 +3177,8 @@ namespace MySql.Configurator.Wizards.Server
       }
 
       CancellationToken.ThrowIfCancellationRequested();
-      if (Settings.OpenFirewallForXProtocol)
+      if (Settings.OpenFirewallForXProtocol
+          && Settings.MySqlXPort != 0)
       {
         CreateFirewallRule(Settings.MySqlXPort);
       }
