@@ -63,7 +63,7 @@ namespace MySql.Configurator.Core.IniFile.Template
       SetDefaults();
       InitializeDeprecatedServerVariables();
       ServerVersion = serverVersion;
-      ServerType = iniServerType;
+      ServerInstallationType = iniServerType;
     }
 
     /// <summary>
@@ -180,7 +180,7 @@ namespace MySql.Configurator.Core.IniFile.Template
 
     public Version ServerVersion { get; }
 
-    public ServerInstallationType ServerType
+    public ServerInstallationType ServerInstallationType
     {
       get
       {
@@ -1086,7 +1086,7 @@ namespace MySql.Configurator.Core.IniFile.Template
       SkipInnodb = false;
       IsValid = false;
       OutputExists = false;
-      ServerType = ServerInstallationType.Developer;
+      ServerInstallationType = ServerInstallationType.Developer;
       LongQueryTime = "10";
       NamedPipeFullAccessGroup = string.Empty;
 
@@ -1120,6 +1120,7 @@ namespace MySql.Configurator.Core.IniFile.Template
         new DeprecatedServerVariable("sync_master_info", new Version(8,0,26)),
         new DeprecatedServerVariable("sync_relay_log_info=", new Version(8,0,34)),
         new DeprecatedServerVariable("loose_mysqlx_port", ServerSeriesType.All),
+        new DeprecatedServerVariable("server_type", ServerSeriesType.All)
       };
     }
   }

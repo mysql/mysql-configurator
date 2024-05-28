@@ -54,6 +54,11 @@ namespace MySql.Configurator.Core.Controllers
     /// </summary>
     public bool PendingSystemTablesUpgrade { get; set; }
 
+    /// <summary>
+    /// Gets or sets the server installation type selected during a Server's configuration
+    /// </summary>
+    public ServerInstallationType ServerInstallationType { get; set; }
+
     #endregion Properties
 
     /// <summary>
