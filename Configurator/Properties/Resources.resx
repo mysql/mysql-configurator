@@ -1807,4 +1807,13 @@ Proceeding with the upgrade will update the plugin to 'caching_sha2_password'.</
   <data name="ServerConfigRevertingAuthenticationPluginChanged" xml:space="preserve">
     <value>Reverting the authentication plugin change for the root user...</value>
   </data>
+  <data name="MainFormOnGoingOperationDescription" xml:space="preserve">
+    <value>There is an ongoing operation and closing MySQL Configurator may result in a corrupt setup.</value>
+  </data>
+  <data name="MainFormOnGoingOperationDetail" xml:space="preserve">
+    <value>Do you still want to close MySQL Configurator?</value>
+  </data>
+  <data name="MainFormOnGoingOperationTitle" xml:space="preserve">
+    <value>An operation is currently running</value>
+  </data>
 </root>
