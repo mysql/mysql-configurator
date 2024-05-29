@@ -310,7 +310,7 @@ namespace MySql.Configurator.Wizards.Server
       template.LowerCaseTableNames = LowerCaseTableNames;
       template.SecureFilePriv = string.IsNullOrEmpty(SecureFilePrivFolder) ? string.Empty : $"\"{SecureFilePrivFolder.Replace('\\', '/')}\"";
       template.PluginLoad = string.IsNullOrEmpty(Plugins.ToString()) ? string.Empty : $"\"{Plugins}\"";
-      template.LooseMySqlXPort = MySqlXPort == 0 ? X_PROTOCOL_DEFAULT_PORT : MySqlXPort;
+      template.MySqlXPort = MySqlXPort == 0 ? X_PROTOCOL_DEFAULT_PORT : MySqlXPort;
       template.NamedPipeFullAccessGroup = NamedPipeFullAccessGroup;
       template.ProcessTemplate(false, true, skipExistingValues);
       SaveGeneralSettings();
