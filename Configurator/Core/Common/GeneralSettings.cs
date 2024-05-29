@@ -22,6 +22,7 @@
   51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 using MySql.Configurator.Core.Classes.Logging;
+using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Properties;
 using System;
 using System.IO;
@@ -51,6 +52,11 @@ namespace MySql.Configurator.Core.Common
     /// Gets or sets the path to the server configuration file.
     /// </summary>
     public string IniDirectory { get; set; }
+
+    /// <summary>
+    /// Gets or sets the server installation type selected during a Server's configuration
+    /// </summary>
+    public ServerInstallationType ServerInstallationType { get; set; }
 
     #endregion
   }
