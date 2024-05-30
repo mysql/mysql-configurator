@@ -311,11 +311,12 @@ namespace MySql.Configurator.Wizards.Server
     /// <summary>
     /// Gets a value indicating if there are steps that require to be executed for a server removal.
     /// </summary>
-    public bool IsRemovalExecutionNeeded => IsDeleteDataDirectoryStepNeeded
-      || IsDeleteConfigurationFileStepNeeded
-      || IsDeleteServiceStepNeeded
-      || IsRemoveFirewallRuleStepNeeded
-      || IsStopServerConfigurationStepNeeded;
+    public bool IsRemovalExecutionNeeded => IsDataDirectoryConfigured
+      && (IsDeleteDataDirectoryStepNeeded
+          || IsDeleteConfigurationFileStepNeeded
+          || IsDeleteServiceStepNeeded
+          || IsRemoveFirewallRuleStepNeeded
+          || IsStopServerConfigurationStepNeeded);
 
     /// <summary>
     /// Gets a value indicating whether the removal step that deletes the firewall rules needs to run.

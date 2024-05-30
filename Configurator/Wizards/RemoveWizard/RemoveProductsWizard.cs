@@ -90,8 +90,6 @@ namespace MySql.Configurator.Wizards.RemoveWizard
       WizardSideBar.ShowConfigPanel(package.NameWithVersion);
       ClearPages();
       package.Controller.ConfigurationType = ConfigurationType.Remove;
-      package.Controller.UpdateRemoveSteps();
-      package.Controller.SetPages();
       var serverController = package.Controller as ServerConfigurationController;
       if (serverController == null)
       {
@@ -105,6 +103,8 @@ namespace MySql.Configurator.Wizards.RemoveWizard
         return;
       }
 
+      package.Controller.UpdateRemoveSteps();
+      package.Controller.SetPages();
       ProductsToRemove.Add(package);
       foreach (var page in package.Controller.Pages.Where(page => page.ValidForType(package.Controller.ConfigurationType)))
       {
