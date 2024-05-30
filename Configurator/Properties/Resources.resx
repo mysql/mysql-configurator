@@ -1777,7 +1777,8 @@ the upgrade may result in an upgrade failure, proceed at your own risk.</value>
     <value>A my.ini or my.cnf configuration file was not found at the specified location.</value>
   </data>
   <data name="ServerConfigConfigurationFileNotFound" xml:space="preserve">
-    <value>A my.ini or my.cnf server configuration file was not found in the location as the data directory. Provide a path for the server configuration file.</value>
+    <value>A my.ini or my.cnf server configuration file was not found in the location as the data directory.
+Provide a path for the server configuration file.</value>
   </data>
   <data name="ServerConfigConfigurationFileNotValid" xml:space="preserve">
     <value>The specified ini file could not be read. Provide a valid server configuration file or select a different file to continue.</value>

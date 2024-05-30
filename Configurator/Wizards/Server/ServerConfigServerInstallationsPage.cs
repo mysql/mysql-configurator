@@ -140,6 +140,7 @@ namespace MySql.Configurator.Wizards.Server
         var dataDirectory = new DirectoryInfo(ExistingDataDirectoryTextBox.Text);
         _controller.Settings.DataDirectory = dataDirectory.Parent.FullName;
         _controller.Settings.ExistingRootPassword = RootPasswordTextBox.Text;
+        _controller.Settings.IniDirectory = new FileInfo(ExistingConfigFilePathTextBox.Text).DirectoryName;
         _controller.IsRemoveExistingServerInstallationStepNeeded = true;
         _controller.IsDataDirectoryRenameNeeded = DataDirectoryRenameWarningProvider.HasErrors();
         _controller.ExistingServerInstallationInstance = _existingServerInstallationInstance;
@@ -162,7 +163,7 @@ namespace MySql.Configurator.Wizards.Server
         _controller.LoadState();
         _controller.ConfigurationType = ConfigurationType.New;
         _controller.Settings.DataDirectory = NewDataDirectoryTextBox.Text;
-        _controller.Settings.IniDirectory = new FileInfo(ExistingConfigFilePathTextBox.Text).DirectoryName;
+        _controller.Settings.IniDirectory = _controller.Settings.DataDirectory;
         _controller.ExistingServerInstallationInstance = null;
         _controller.IsDataDirectoryRenameNeeded = false;
         _controller.IsRemoveExistingServerInstallationStepNeeded = false;
@@ -642,13 +643,17 @@ namespace MySql.Configurator.Wizards.Server
       
       if (ConfigFileDialog.ShowDialog() == DialogResult.OK)
       {
-        var valid = ValidateExistingServerInstallationInstanceConfigurationFile(ExistingConfigFilePathTextBox.Text);
+        var valid = ValidateExistingServerInstallationInstanceConfigurationFile(ConfigFileDialog.FileName);
         if (!valid)
         {
           ValidationsErrorProvider.SetProperties(ExistingConfigFileBrowseButton, new ErrorProviderProperties(Resources.ServerConfigConfigurationFileNotValid));
         }
+        else
+        {
+          ValidatedHandler(sender, e);
+        }
 
-        ExistingConfigFilePathTextBox.Text = !valid
+        ExistingConfigFilePathTextBox.Text = valid
           ? ConfigFileDialog.FileName
           : string.Empty;
       }

@@ -98,7 +98,11 @@ namespace MySql.Configurator.Wizards.Server
     {
       _controller.IsBackupDatabaseStepNeeded = RunBackupRadioButton.Checked;
       _controller.UpdateUpgradeConfigSteps();
-      _controller.Settings.ExistingRootPassword = PasswordTextBox.Text;
+      if (!_controller.RootUserCredentialsSet)
+      {
+        _controller.Settings.ExistingRootPassword = PasswordTextBox.Text;
+      }
+
       return base.Next();
     }
 

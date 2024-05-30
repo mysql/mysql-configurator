@@ -2735,7 +2735,8 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A my.ini or my.cnf server configuration file was not found in the location as the data directory. Provide a path for the server configuration file..
+        ///   Looks up a localized string similar to A my.ini or my.cnf server configuration file was not found in the location as the data directory.
+        ///Provide a path for the server configuration file..
         /// </summary>
         public static string ServerConfigConfigurationFileNotFound {
             get {
