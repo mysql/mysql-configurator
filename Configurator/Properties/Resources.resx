@@ -919,11 +919,8 @@ Provide a more complex password for stronger security.</value>
   <data name="SetLocalInstanceAsWritableStep" xml:space="preserve">
     <value>Setting the instance as writable</value>
   </data>
-  <data name="SettingUpNewInstallation" xml:space="preserve">
-    <value>Setting up product configuration controller for new installation.</value>
-  </data>
-  <data name="SettingUpReconfiguration" xml:space="preserve">
-    <value>Setting up product configuration controller for reconfiguration.</value>
+  <data name="SettingUpControllerMessage" xml:space="preserve">
+    <value>Product configuration controller set to '{0}' configuration type.</value>
   </data>
   <data name="SettingUpUpgrade" xml:space="preserve">
     <value>Setting up product configuration controller for upgrade.</value>
@@ -1772,5 +1769,52 @@ the upgrade may result in an upgrade failure, proceed at your own risk.</value>
   </data>
   <data name="RunWithDefaultExecutionMode" xml:space="preserve">
     <value>Invalid action provided. Running in configuration mode.</value>
+  </data>
+  <data name="ExecutionModeSwitch" xml:space="preserve">
+    <value>MySQL Server needs to be upgraded. Switching to 'upgrade' mode.</value>
+  </data>
+  <data name="ConfigurationFileNotFound" xml:space="preserve">
+    <value>A my.ini or my.cnf configuration file was not found at the specified location.</value>
+  </data>
+  <data name="ServerConfigConfigurationFileNotFound" xml:space="preserve">
+    <value>A my.ini or my.cnf server configuration file was not found in the location as the data directory.
+Provide a path for the server configuration file.</value>
+  </data>
+  <data name="ServerConfigConfigurationFileNotValid" xml:space="preserve">
+    <value>The specified ini file could not be read. Provide a valid server configuration file or select a different file to continue.</value>
+  </data>
+  <data name="ServerConfigFailedToUpdateRootUserAuthPlugin" xml:space="preserve">
+    <value>Failed to update the authentication plugin of the root user.</value>
+  </data>
+  <data name="ServerConfigInvalidAuthenticationPlugin" xml:space="preserve">
+    <value>The 'root' user is configured to use the 'mysql_native_password' authentication plugin.
+Proceeding with the upgrade will update the plugin to 'caching_sha2_password'.</value>
+  </data>
+  <data name="ServerConfigUpdatedRootUserAuthPlugin" xml:space="preserve">
+    <value>Updated authentication plugin of the root user.</value>
+  </data>
+  <data name="ServerConfigUpdatingRootUserAuthPlugin" xml:space="preserve">
+    <value>Updating the authentication plugin of the root user to: {0}.</value>
+  </data>
+  <data name="ServerUpdateAuthenticationPluginStep" xml:space="preserve">
+    <value>Updating authentication plugin for the root user</value>
+  </data>
+  <data name="ServerConfigFailedToRevertAuthenticationPluginChange" xml:space="preserve">
+    <value>Failed to revert the authentication plugin change for the root user with message: {0}.</value>
+  </data>
+  <data name="ServerConfigRevertedAuthenticationPluginChange" xml:space="preserve">
+    <value>Reverted the authentication plugin change for the root user.</value>
+  </data>
+  <data name="ServerConfigRevertingAuthenticationPluginChanged" xml:space="preserve">
+    <value>Reverting the authentication plugin change for the root user...</value>
+  </data>
+  <data name="MainFormOnGoingOperationDescription" xml:space="preserve">
+    <value>There is an ongoing operation and closing MySQL Configurator may result in a corrupt setup.</value>
+  </data>
+  <data name="MainFormOnGoingOperationDetail" xml:space="preserve">
+    <value>Do you still want to close MySQL Configurator?</value>
+  </data>
+  <data name="MainFormOnGoingOperationTitle" xml:space="preserve">
+    <value>An operation is currently running</value>
   </data>
 </root>

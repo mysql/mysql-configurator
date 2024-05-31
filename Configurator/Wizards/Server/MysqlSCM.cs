@@ -414,7 +414,7 @@ namespace MySql.Configurator.Wizards.Server
     public static bool ServiceExists(string serviceName)
     {
       var services = ServiceController.GetServices();
-      var service = services.FirstOrDefault(s => s.ServiceName == serviceName);
+      var service = services.FirstOrDefault(s => s.ServiceName.Equals(serviceName, StringComparison.InvariantCultureIgnoreCase));
       return service != null;
     }
 

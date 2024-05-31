@@ -30,7 +30,10 @@ using MySql.Configurator.Core.Classes;
 using MySql.Configurator.Core.Classes.Forms;
 using MySql.Configurator.Core.Classes.Logging;
 using MySql.Configurator.Core.Common;
+using MySql.Configurator.Core.Dialogs;
+using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Core.IniFile;
+using MySql.Configurator.Dialogs;
 using MySql.Configurator.Properties;
 using static MySql.Configurator.Core.Classes.Forms.InfoDialog;
 
@@ -136,7 +139,9 @@ namespace MySql.Configurator.Core.Controllers
     }
 
     [XmlIgnore]
-    public string FullConfigFilePath => Path.Combine(IniDirectory, ConfigFile);
+    public string FullConfigFilePath => !string.IsNullOrEmpty(IniDirectory)
+                                         ? Path.Combine(IniDirectory, ConfigFile)
+                                         : null;
 
     public string IniDirectory { get; set; }
 
@@ -248,11 +253,16 @@ namespace MySql.Configurator.Core.Controllers
 
       var foundConfigFile = false;
       string[] configFileNames = new string[2] { DEFAULT_CONFIG_FILE_NAME, ALTERNATE_CONFIG_FILE_NAME };
-      string[] possibleConfigFileLocations = new string[2] { DataDirectory, InstallDirectory };
+      string[] possibleConfigFileLocations = new string[3] { DataDirectory, InstallDirectory, IniDirectory };
       foreach (var configFileName in configFileNames)
       {
         foreach (var directory in possibleConfigFileLocations)
         {
+          if (string.IsNullOrEmpty(directory))
+          {
+            continue;
+          }
+
           if (!File.Exists(Path.Combine(directory, configFileName)))
           {
             continue;
@@ -261,6 +271,7 @@ namespace MySql.Configurator.Core.Controllers
           ConfigFile = configFileName;
           IniDirectory = directory;
           foundConfigFile = true;
+          break;
         }
 
         if (foundConfigFile)
@@ -304,19 +315,38 @@ namespace MySql.Configurator.Core.Controllers
       if (!string.IsNullOrEmpty(_generalSettings.IniDirectory))
       {
         var iniFilePath = Path.Combine(_generalSettings.IniDirectory, BaseServerSettings.DEFAULT_CONFIG_FILE_NAME);
-        if (File.Exists(iniFilePath))
+        var alternateIniFilePath = Path.Combine(_generalSettings.IniDirectory, BaseServerSettings.ALTERNATE_CONFIG_FILE_NAME);
+        var iniFileExists = File.Exists(iniFilePath);
+        var alternateIniFileExists = File.Exists(alternateIniFilePath);
+        if (!iniFileExists
+            && !alternateIniFileExists)
         {
-          // Load and parse ini file to get the data dir path.
-          var iniFile = new IniFileEngine(iniFilePath).Load();
-          var dataDirectory = iniFile.FindValue("mysqld", "datadir", false);
-          if (!string.IsNullOrEmpty(dataDirectory)
-              && Directory.Exists(dataDirectory))
+          using (var configurationFileDialog = new ConfigurationFileDialog())
           {
-            var parentDirectory = Directory.GetParent(dataDirectory);
-            DataDirectory = parentDirectory != null
-              ? parentDirectory.FullName
-              : dataDirectory;
+            if (configurationFileDialog.ShowDialog() == DialogResult.OK)
+            {
+              _generalSettings.IniDirectory = configurationFileDialog.ConfigurationFilePath;
+            }
+            else
+            {
+              throw new ConfiguratorException(ConfiguratorError.ConfigurationFileNotFound, _generalSettings.IniDirectory);
+            }
           }
+        }
+
+        // Load and parse ini file to get the data dir path.
+        var path = iniFileExists
+          ? iniFilePath
+          : alternateIniFilePath;
+        var iniFile = new IniFileEngine(path).Load();
+        var dataDirectory = iniFile.FindValue("mysqld", "datadir", false);
+        if (!string.IsNullOrEmpty(dataDirectory)
+            && Directory.Exists(dataDirectory))
+        {
+          var parentDirectory = Directory.GetParent(dataDirectory);
+          DataDirectory = parentDirectory != null
+            ? parentDirectory.FullName
+            : dataDirectory;
         }
       }
 

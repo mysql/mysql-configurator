@@ -131,7 +131,8 @@ namespace MySql.Configurator.Wizards.Server
           AddItemToListView(FullControlListView, _controller.Settings.ServiceAccountUsername, false, true);
         }
 
-        if (!_controller.Settings.ServiceAccountUsername.Equals(_currentServiceAccountUsername, StringComparison.InvariantCultureIgnoreCase))
+        if (!string.IsNullOrEmpty(_controller.Settings.ServiceAccountUsername)
+            && !_controller.Settings.ServiceAccountUsername.Equals(_currentServiceAccountUsername, StringComparison.InvariantCultureIgnoreCase))
         {
           FullControlListView.Items.RemoveByKey(_currentServiceAccountUsername);
         }
@@ -173,7 +174,8 @@ namespace MySql.Configurator.Wizards.Server
         var fullControlDictionary = new Dictionary<SecurityIdentifier, string>();
         if (YesRadioButton.Checked)
         {
-          if (_controller.Settings.ConfigureAsService)
+          if (_controller.Settings.ConfigureAsService
+              && !string.IsNullOrEmpty(_controller.Settings.ServiceAccountUsername))
           {
             var serviceAccountUsername = _controller.Settings.ServiceAccountUsername.StartsWith(".")
                                        ? _controller.Settings.ServiceAccountUsername.Replace(".", Environment.MachineName)

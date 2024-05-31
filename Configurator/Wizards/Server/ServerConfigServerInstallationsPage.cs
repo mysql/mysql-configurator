@@ -31,6 +31,7 @@ using MySql.Configurator.Core.Classes.MySql;
 using MySql.Configurator.Core.Controllers;
 using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Core.IniFile;
+using MySql.Configurator.Core.IniFile.Template;
 using MySql.Configurator.Core.Package;
 using MySql.Configurator.Core.Product;
 using MySql.Configurator.Core.Wizard;
@@ -139,6 +140,7 @@ namespace MySql.Configurator.Wizards.Server
         var dataDirectory = new DirectoryInfo(ExistingDataDirectoryTextBox.Text);
         _controller.Settings.DataDirectory = dataDirectory.Parent.FullName;
         _controller.Settings.ExistingRootPassword = RootPasswordTextBox.Text;
+        _controller.Settings.IniDirectory = new FileInfo(ExistingConfigFilePathTextBox.Text).DirectoryName;
         _controller.IsRemoveExistingServerInstallationStepNeeded = true;
         _controller.IsDataDirectoryRenameNeeded = DataDirectoryRenameWarningProvider.HasErrors();
         _controller.ExistingServerInstallationInstance = _existingServerInstallationInstance;
@@ -161,6 +163,7 @@ namespace MySql.Configurator.Wizards.Server
         _controller.LoadState();
         _controller.ConfigurationType = ConfigurationType.New;
         _controller.Settings.DataDirectory = NewDataDirectoryTextBox.Text;
+        _controller.Settings.IniDirectory = _controller.Settings.DataDirectory;
         _controller.ExistingServerInstallationInstance = null;
         _controller.IsDataDirectoryRenameNeeded = false;
         _controller.IsRemoveExistingServerInstallationStepNeeded = false;
@@ -363,6 +366,7 @@ namespace MySql.Configurator.Wizards.Server
         throw new ArgumentNullException(nameof(_existingServerInstallationInstance.Controller));
       }
 
+      // Determine if the upgrade is supported.
       VersionTextBox.Text = _existingServerInstallationInstance.ServerVersion?.ToString();
       string versionErrorMessage = null;
       var newVersion = _controller.Package.Version;
@@ -416,6 +420,7 @@ namespace MySql.Configurator.Wizards.Server
         VersionWarningProvider.Clear();
       }
 
+      // Populate server details.
       InstallDirectoryTextBox.Text = _existingServerInstallationInstance.BaseDir;
       ExistingDataDirectoryTextBox.Text = _existingServerInstallationInstance.DataDir;
       DataDirectoryRenameWarningProvider.SetProperties(ExistingDataDirectoryTextBox, new ErrorProviderProperties(_existingServerInstallationInstance.IsDataDirNameDefault(_controller.ServerVersion)
@@ -424,7 +429,8 @@ namespace MySql.Configurator.Wizards.Server
       ValidationsErrorProvider.SetProperties(ExistingDataDirectoryTextBox, new ErrorProviderProperties(string.IsNullOrEmpty(_existingServerInstallationInstance.DataDir)
         ? Resources.ServerInstanceFailedToRetrieveDataDir :
         string.Empty));
-      
+
+      var configFileIsValid = false;
       if (!string.IsNullOrEmpty(_existingServerInstallationInstance.DataDir))
       {
         string dataDirectory = null;
@@ -436,11 +442,21 @@ namespace MySql.Configurator.Wizards.Server
         dataDirectory = new DirectoryInfo(_existingServerInstallationInstance.DataDir).Parent.FullName;
         var defaultConfigFile = Path.Combine(dataDirectory, BaseServerSettings.DEFAULT_CONFIG_FILE_NAME);
         var alternateConfigFile = Path.Combine(dataDirectory, BaseServerSettings.ALTERNATE_CONFIG_FILE_NAME);
-        ExistingConfigFilePathTextBox.Text = File.Exists(defaultConfigFile)
+
+        var configFile = File.Exists(defaultConfigFile)
           ? defaultConfigFile
           : File.Exists(alternateConfigFile)
             ? alternateConfigFile
             : null;
+        configFileIsValid = configFile != null
+          ? ValidateExistingServerInstallationInstanceConfigurationFile(configFile)
+          : false;
+        if (!configFileIsValid)
+        {
+          ValidationsErrorProvider.SetProperties(ExistingConfigFileBrowseButton, new ErrorProviderProperties(Resources.ServerConfigConfigurationFileNotValid));
+        }
+
+        ExistingConfigFilePathTextBox.Text = configFile;
       }
       else
       {
@@ -463,11 +479,45 @@ namespace MySql.Configurator.Wizards.Server
           _existingServerInstallationInstance.Controller.Settings.ConfigureAsService = true;
         }
 
-        // Load ini template and set data dir and error log paths.
-        var iniFile = new IniFileEngine(ExistingConfigFilePathTextBox.Text).Load();
-        _existingServerInstallationInstance.Controller.Settings.DataDirectory = new DirectoryInfo(iniFile.FindValue("mysqld", "datadir", false)).Parent.FullName;
-        _existingServerInstallationInstance.Controller.Settings.ErrorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
+        if (!string.IsNullOrEmpty(ExistingConfigFilePathTextBox.Text)
+            && configFileIsValid)
+        {
+          var iniFile = new IniFileEngine(ExistingConfigFilePathTextBox.Text).Load();
+          _existingServerInstallationInstance.Controller.Settings.DataDirectory = new DirectoryInfo(iniFile.FindValue("mysqld", "datadir", false)).Parent.FullName;
+          _existingServerInstallationInstance.Controller.Settings.ErrorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
+        }
+        else
+        {
+          ValidationsErrorProvider.SetProperties(ExistingConfigFileBrowseButton, new ErrorProviderProperties(Resources.ServerConfigConfigurationFileNotFound));
+        }
       }
+    }
+
+    /// <summary>
+    /// Checks that the server configuration file can be successfully parsed.
+    /// </summary>
+    /// <param name="serverConfigurationFilePath"></param>
+    /// <returns><c>true</c> if the provided server configuration file is valid; otherwise, <c>false</c>.</returns>
+    private bool ValidateExistingServerInstallationInstanceConfigurationFile(string serverConfigurationFilePath)
+    {
+      if (string.IsNullOrEmpty(serverConfigurationFilePath))
+      {
+        throw new ArgumentNullException(nameof(serverConfigurationFilePath));
+      }
+
+      if (!File.Exists(serverConfigurationFilePath))
+      {
+        throw new FileNotFoundException(serverConfigurationFilePath);
+      }
+
+      var template = new IniTemplate(_existingServerInstallationInstance.BaseDir,
+        _existingServerInstallationInstance.DataDir,
+        serverConfigurationFilePath,
+        _existingServerInstallationInstance.Controller.ServerVersion,
+        _existingServerInstallationInstance.Controller.Settings.ServerInstallType,
+        null);
+
+      return template.IsValid;
     }
 
     #region Event Handlers
@@ -586,7 +636,19 @@ namespace MySql.Configurator.Wizards.Server
       
       if (ConfigFileDialog.ShowDialog() == DialogResult.OK)
       {
-        ExistingConfigFilePathTextBox.Text = ConfigFileDialog.FileName;
+        var valid = ValidateExistingServerInstallationInstanceConfigurationFile(ConfigFileDialog.FileName);
+        if (!valid)
+        {
+          ValidationsErrorProvider.SetProperties(ExistingConfigFileBrowseButton, new ErrorProviderProperties(Resources.ServerConfigConfigurationFileNotValid));
+        }
+        else
+        {
+          ValidatedHandler(sender, e);
+        }
+
+        ExistingConfigFilePathTextBox.Text = valid
+          ? ConfigFileDialog.FileName
+          : string.Empty;
       }
     }
 
