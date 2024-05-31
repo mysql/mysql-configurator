@@ -5,7 +5,7 @@ It performs the initial configuration, a reconfiguration, and also functions as 
 
 ## Licensing
 
-Please refer to the license files, available in this repository, and [Legal Notices in documentation](https://dev.mysql.com/doc/refman/8.1/en/preface.html) for further details.
+Please refer to the license files, available in this repository, and [Legal Notices in documentation](https://dev.mysql.com/doc/refman/8.4/en/preface.html) for further details.
 
 ## Download and build
 
