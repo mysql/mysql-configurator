@@ -1106,9 +1106,7 @@ namespace MySql.Configurator.Core.Classes
     /// <returns></returns>
     public static ServerMaturity GetServerMaturity(Version version)
     {
-      if (version.Major < 8
-          || (version.Major == 8
-              && version.Minor == 0))
+      if (version.Major < 8)
       {
         return ServerMaturity.Older;
       }
