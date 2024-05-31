@@ -1334,6 +1334,33 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There is an ongoing operation and closing MySQL Configurator may result in a corrupt setup..
+        /// </summary>
+        public static string MainFormOnGoingOperationDescription {
+            get {
+                return ResourceManager.GetString("MainFormOnGoingOperationDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you still want to close MySQL Configurator?.
+        /// </summary>
+        public static string MainFormOnGoingOperationDetail {
+            get {
+                return ResourceManager.GetString("MainFormOnGoingOperationDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An operation is currently running.
+        /// </summary>
+        public static string MainFormOnGoingOperationTitle {
+            get {
+                return ResourceManager.GetString("MainFormOnGoingOperationTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap MainLogo {
@@ -2708,7 +2735,8 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A my.ini or my.cnf server configuration file was not found in the location as the data directory. Provide a path for the server configuration file..
+        ///   Looks up a localized string similar to A my.ini or my.cnf server configuration file was not found in the location as the data directory.
+        ///Provide a path for the server configuration file..
         /// </summary>
         public static string ServerConfigConfigurationFileNotFound {
             get {

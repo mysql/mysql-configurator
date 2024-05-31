@@ -35,6 +35,7 @@ using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Properties;
 using MySql.Configurator.Wizards.Common;
 using MySql.Configurator.Wizards.Server;
+using Action = System.Action;
 
 namespace MySql.Configurator.Wizards.ConfigWizard
 {
@@ -62,9 +63,9 @@ namespace MySql.Configurator.Wizards.ConfigWizard
     public override bool NextOk {
       get
       {
-        Wizard.FinishButton.Visible = false;
-        return !Executing
-               && !Wizard.ExecuteButton.Enabled;
+        Wizard.FinishButton.Visible = !Wizard.ExecuteButton.Visible;
+        Wizard.BackButton.Visible = Wizard.ExecuteButton.Visible;
+        return !OperationExecuting;
       }
     }
 
@@ -154,44 +155,74 @@ namespace MySql.Configurator.Wizards.ConfigWizard
 
     public override void Execute()
     {
-      if (_callActivateOnExecute)
+      Action action;
+      action = delegate
       {
-        Activate();
+        if (_callActivateOnExecute)
+        {
+          Activate();
+        }
+
+        LogContentsTextBox.Clear();
+        Wizard.ExecuteButton.Enabled = false;
+        Wizard.CancelButton.Visible = true;
+        ConfigurationResultLabel.Text = string.Empty;
+        RetryButton.Visible = false;
+
+        foreach (var configStepControl in ExecutionStepsTabPage.Controls.OfType<ConfigStepControl>())
+        {
+          configStepControl.SetStatus(ConfigStepControl.OPEN);
+        }
+
+        subCaptionLabel.Text = Resources.ConfigStepsAreExecuting;
+        DetachEvents();
+        CurrentController.ConfigurationEnded += ConfigurationEnded;
+        CurrentController.ConfigureTimedOut += ConfigureTimedOut;
+        CurrentController.ConfigurationStatusChanged += controller_ConfigurationStatusChanged;
+        if (Wizard is ConfigWizard configWizard)
+        {
+          CurrentController.ConfigurationType = configWizard.ConfigurationType;
+        }
+
+        UpdateButtons();
+        Wizard.BackButton.Visible = false;
+        Wizard.ExecuteButton.Enabled = false;
+        Wizard.CancelButton.Visible = true;
+        CurrentController.Configure();
+      };
+
+      ExecuteLongRunningOperation(action, false, false);
+    }
+
+    /// <summary>
+    /// Subscribes custom events relavant to this wizard page.
+    /// </summary>
+    public override void SubscribeEvents()
+    {
+      base.SubscribeEvents();
+      if (CurrentController == null)
+      {
+        throw new ArgumentNullException(nameof(CurrentController));
       }
 
-      LogContentsTextBox.Clear();
-      Executing = true;
-      Wizard.ExecuteButton.Enabled = false;
-      Wizard.CancelButton.Visible = true;
-      ConfigurationResultLabel.Text = string.Empty;
-      RetryButton.Visible = false;
-
-      foreach (var configStepControl in ExecutionStepsTabPage.Controls.OfType<ConfigStepControl>())
-      {
-        configStepControl.SetStatus(ConfigStepControl.OPEN);
-      }
-
-      subCaptionLabel.Text = Resources.ConfigStepsAreExecuting;
-      DetachEvents();
+      CurrentController.ConfigurationStarted += ConfigurationStarted;
       CurrentController.ConfigurationEnded += ConfigurationEnded;
       CurrentController.ConfigureTimedOut += ConfigureTimedOut;
       CurrentController.ConfigurationStatusChanged += controller_ConfigurationStatusChanged;
-      if (Wizard is ConfigWizard configWizard)
-      {
-        CurrentController.ConfigurationType = configWizard.ConfigurationType;
-      }
-
-      UpdateButtons();
-
-      Wizard.BackButton.Visible = false;
-      Wizard.ExecuteButton.Enabled = false;
-      Wizard.CancelButton.Visible = true;
-
-      CurrentController.Configure();
     }
 
-    protected override void DetachEvents()
+    /// <summary>
+    /// Unsubscribes custom events relavant to this wizard page.
+    /// </summary>
+    public override void UnsubscribeEvents()
     {
+      base.UnsubscribeEvents();
+      if (CurrentController == null)
+      {
+        throw new ArgumentNullException(nameof(CurrentController));
+      }
+
+      CurrentController.ConfigurationStarted -= ConfigurationStarted;
       CurrentController.ConfigurationEnded -= ConfigurationEnded;
       CurrentController.ConfigureTimedOut -= ConfigureTimedOut;
       CurrentController.ConfigurationStatusChanged -= controller_ConfigurationStatusChanged;
@@ -199,67 +230,82 @@ namespace MySql.Configurator.Wizards.ConfigWizard
 
     private void ConfigurationEnded(object sender, EventArgs e)
     {
-      Executing = false;
-      subCaptionLabel.Text = Resources.ConfigStepsFinished;
-      switch (CurrentController.CurrentState)
+      try
       {
-        case ConfigState.ConfigurationError:
-          _callActivateOnExecute = true;
-          ConfigurationResultLabel.Text = string.Format(Resources.ConfigureFailed, CurrentController.Package.NameWithVersion);
-          RetryButton.Visible = true;
-          Wizard.BackButton.Enabled = true;
-          Wizard.BackButton.Visible = true;
+        subCaptionLabel.Text = Resources.ConfigStepsFinished;
+        switch (CurrentController.CurrentState)
+        {
+          case ConfigState.ConfigurationError:
+            _callActivateOnExecute = true;
+            ConfigurationResultLabel.Text = string.Format(Resources.ConfigureFailed, CurrentController.Package.NameWithVersion);
+            RetryButton.Visible = true;
+            Wizard.BackButton.Enabled = true;
+            Wizard.BackButton.Visible = true;
 
-          // Update step descriptions.
-          var serverController = CurrentController as ServerConfigurationController;
-          if (serverController != null)
-          {
-            var revertedSteps = serverController.RevertedSteps;
-            if (revertedSteps == null)
+            // Update step descriptions.
+            var serverController = CurrentController as ServerConfigurationController;
+            if (serverController != null)
             {
-              break;
-            }
-
-            foreach (var revertedStep in revertedSteps)
-            {
-              var control = ExecutionStepsTabPage.Controls.OfType<ConfigStepControl>().FirstOrDefault(configStepControl => configStepControl.Step.Description.Equals(revertedStep));
-              if (control == null)
+              var revertedSteps = serverController.RevertedSteps;
+              if (revertedSteps == null)
               {
-                continue;
+                break;
               }
 
-              control.Label = $"{control.Step.Description} (REVERTED)";
+              foreach (var revertedStep in revertedSteps)
+              {
+                var control = ExecutionStepsTabPage.Controls.OfType<ConfigStepControl>().FirstOrDefault(configStepControl => configStepControl.Step.Description.Equals(revertedStep));
+                if (control == null)
+                {
+                  continue;
+                }
+
+                control.Label = $"{control.Step.Description} (REVERTED)";
+              }
             }
-          }
 
-          break;
+            break;
 
-        case ConfigState.ConfigurationCancelled:
-          _callActivateOnExecute = true;
-          ConfigurationResultLabel.Text = string.Format(Resources.ConfigureCancelled, CurrentController.Package.NameWithVersion);
-          RetryButton.Visible = true;
-          break;
+          case ConfigState.ConfigurationCancelled:
+            _callActivateOnExecute = true;
+            ConfigurationResultLabel.Text = string.Format(Resources.ConfigureCancelled, CurrentController.Package.NameWithVersion);
+            RetryButton.Visible = true;
+            break;
 
-        default:
-          _callActivateOnExecute = false;
-          ConfigurationResultLabel.Text = string.Format(Resources.ConfigureSuccess, CurrentController.Package.NameWithVersion);
-          ShowConfigurationSummaryTab();
-          Wizard.ExecuteButton.Visible = false;
-          Wizard.CancelButton.Visible = false;
-          Wizard.BackButton.Visible = false;
-          break;
+          default:
+            _callActivateOnExecute = false;
+            ConfigurationResultLabel.Text = string.Format(Resources.ConfigureSuccess, CurrentController.Package.NameWithVersion);
+            ShowConfigurationSummaryTab();
+            Wizard.ExecuteButton.Visible = false;
+            Wizard.CancelButton.Visible = false;
+            Wizard.BackButton.Visible = false;
+            break;
+        }
+
+        if (CurrentController.ConfigurationType == ConfigurationType.Reconfiguration
+            && CurrentController.RebootRequired)
+        {
+          ExecutionTabControl.Height -= RebootWhenDonePanel.Height;
+          RebootWhenDonePanel.Visible = true;
+          RebootWhenDoneCheckBox.Checked = true;
+        }
       }
-
-      if (CurrentController.ConfigurationType == ConfigurationType.Reconfiguration
-          && CurrentController.RebootRequired)
+      finally
       {
-        ExecutionTabControl.Height -= RebootWhenDonePanel.Height;
-        RebootWhenDonePanel.Visible = true;
-        RebootWhenDoneCheckBox.Checked = true;
+        EndLongRunningOperation();
+        UpdateButtons();
+        Wizard.FinishButton.Visible = false;
       }
+    }
 
-      UpdateButtons();
-      Wizard.FinishButton.Visible = false;
+    /// <summary>
+    /// Event method triggered when the configuration operation starts.
+    /// </summary>
+    /// <param name="sender">The sender object.</param>
+    /// <param name="e">The evenet arugments.</param>
+    private void ConfigurationStarted(object sender, EventArgs e)
+    {
+      BeginLongRunningOperation();
     }
 
     private void ConfigureTimedOut(object sender, EventArgs e)

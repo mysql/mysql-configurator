@@ -147,12 +147,14 @@ namespace MySql.Configurator.Wizards
       Controls.Add(page);
       page.Location = new System.Drawing.Point(220, 0);
       page.Wizard = this;
+      page.SubscribeEvents();
       AddSideBarTabForPage(page);
     }
 
     public void ClearPages()
     {
       WizardSideBar.Tabs.Clear();
+      Pages.ForEach(p => p.UnsubscribeEvents());
       Pages.ForEach(p => p.Dispose());
       Pages.Clear();
     }

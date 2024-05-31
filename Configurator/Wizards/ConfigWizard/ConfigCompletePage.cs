@@ -62,7 +62,6 @@ namespace MySql.Configurator.Wizards.ConfigWizard
     public override void Activate()
     {
       base.Activate();
-      WorkDone = true; // This is the last page, no need to ask for confirmation to close.
       if (!(Wizard is ConfigWizard configWizard))
       {
         return;

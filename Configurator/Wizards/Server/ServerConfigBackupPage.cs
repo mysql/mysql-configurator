@@ -27,6 +27,7 @@ using MySql.Configurator.Core.Enums;
 using System.Windows.Forms;
 using MySql.Configurator.Core.Wizard;
 using MySql.Configurator.Properties;
+using Action = System.Action;
 
 namespace MySql.Configurator.Wizards.Server
 {
@@ -97,7 +98,11 @@ namespace MySql.Configurator.Wizards.Server
     {
       _controller.IsBackupDatabaseStepNeeded = RunBackupRadioButton.Checked;
       _controller.UpdateUpgradeConfigSteps();
-      _controller.Settings.ExistingRootPassword = PasswordTextBox.Text;
+      if (!_controller.RootUserCredentialsSet)
+      {
+        _controller.Settings.ExistingRootPassword = PasswordTextBox.Text;
+      }
+
       return base.Next();
     }
 
@@ -120,21 +125,25 @@ namespace MySql.Configurator.Wizards.Server
     /// <param name="e">The event arguments.</param>
     private void ConnectButton_Click(object sender, EventArgs e)
     {
-      Cursor = Cursors.WaitCursor;
-      ResultLabel.Text = Resources.StartingServerAndTestingConnection;
-      var providerProperties = new ErrorProviderProperties(Resources.StartingServerAndTestingConnection, Resources.Config_InProgressIcon, true);
-      ConnectionErrorProvider.SetProperties(ConnectButton, providerProperties);
-      _connectionResult = LocalServerInstance.CanConnect(_controller, out string errorMessage, PasswordTextBox.Text, true, true);
-      providerProperties.ErrorMessage = string.IsNullOrEmpty(errorMessage)
-        ? _connectionResult.GetDescription()
-        : errorMessage;
-      providerProperties.ErrorIcon = _connectionResult == ConnectionResultType.ConnectionSuccess
-        ? Resources.Config_DoneIcon
-        : Resources.Config_ErrorIcon;
-      ConnectionErrorProvider.SetProperties(ConnectButton, providerProperties);
-      ResultLabel.Text = providerProperties.ErrorMessage;
-      UpdateButtons();
-      Cursor = Cursors.Default;
+      Action action;
+      action = delegate
+      {
+        ResultLabel.Text = Resources.StartingServerAndTestingConnection;
+        var providerProperties = new ErrorProviderProperties(Resources.StartingServerAndTestingConnection, Resources.Config_InProgressIcon, true);
+        ConnectionErrorProvider.SetProperties(ConnectButton, providerProperties);
+        _connectionResult = LocalServerInstance.CanConnect(_controller, out string errorMessage, PasswordTextBox.Text, true, true);
+        providerProperties.ErrorMessage = string.IsNullOrEmpty(errorMessage)
+          ? _connectionResult.GetDescription()
+          : errorMessage;
+        providerProperties.ErrorIcon = _connectionResult == ConnectionResultType.ConnectionSuccess
+          ? Resources.Config_DoneIcon
+          : Resources.Config_ErrorIcon;
+        ConnectionErrorProvider.SetProperties(ConnectButton, providerProperties);
+        ResultLabel.Text = providerProperties.ErrorMessage;
+        UpdateButtons();
+      };
+
+      ExecuteLongRunningOperation(action);
     }
 
     /// <summary>

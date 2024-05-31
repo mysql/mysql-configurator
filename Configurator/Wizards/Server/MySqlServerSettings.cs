@@ -217,7 +217,7 @@ namespace MySql.Configurator.Wizards.Server
 
     [ControllerSetting("Optimizes settings depending on the intended use of the server instance.", "server_type", "servertype")]
     [DefaultValue(ServerInstallationType.Developer)]
-    public ServerInstallationType ServerInstallType { get; set; }
+    public ServerInstallationType ServerInstallationType { get; set; }
 
     [ControllerSetting("The password of the Windows User Account used to run the Windows Service. Ignored if " +
       "as_windows_service is false or if windows_service_user is not present.", "windows_service_password,win_service_pwd", "sapass")]
@@ -285,7 +285,7 @@ namespace MySql.Configurator.Wizards.Server
         throw new Exception(Resources.InvalidServerTemplate);
       }
 
-      template.ServerType = ServerInstallType;
+      template.ServerInstallationType = ServerInstallationType;
       template.EnableNetworking = EnableTcpIp;
       template.Port = Port;
       template.EnableNamedPipe = EnableNamedPipe;
@@ -310,7 +310,7 @@ namespace MySql.Configurator.Wizards.Server
       template.LowerCaseTableNames = LowerCaseTableNames;
       template.SecureFilePriv = string.IsNullOrEmpty(SecureFilePrivFolder) ? string.Empty : $"\"{SecureFilePrivFolder.Replace('\\', '/')}\"";
       template.PluginLoad = string.IsNullOrEmpty(Plugins.ToString()) ? string.Empty : $"\"{Plugins}\"";
-      template.LooseMySqlXPort = MySqlXPort == 0 ? X_PROTOCOL_DEFAULT_PORT : MySqlXPort;
+      template.MySqlXPort = MySqlXPort == 0 ? X_PROTOCOL_DEFAULT_PORT : MySqlXPort;
       template.NamedPipeFullAccessGroup = NamedPipeFullAccessGroup;
       template.ProcessTemplate(false, true, skipExistingValues);
       SaveGeneralSettings();
@@ -383,7 +383,7 @@ namespace MySql.Configurator.Wizards.Server
 
       if (configFileExists.HasValue && configFileExists.Value)
       {
-        t = new IniTemplate(InstallDirectory, DataDirectory, FullConfigFilePath, Package.Version, ServerInstallType, null);
+        t = new IniTemplate(InstallDirectory, DataDirectory, FullConfigFilePath, Package.Version, ServerInstallationType, null);
       }
       else
       {
@@ -438,7 +438,7 @@ namespace MySql.Configurator.Wizards.Server
         var iniFile = new IniFileEngine(fullIniPath).Load();
 
         Logger.LogInformation("Server Settings - Load Ini Settings - IniTemplate Parsing");
-        var t = new IniTemplate(Package.Version, ServerInstallType);
+        var t = new IniTemplate(Package.Version, ServerInstallationType);
         t.ParseConfigurationFile(fullIniPath);
 
         Logger.LogInformation("Server Settings - Load Ini Settings - getting settings from IniTemplate");
@@ -453,8 +453,14 @@ namespace MySql.Configurator.Wizards.Server
         NamedPipeFullAccessGroup = t.NamedPipeFullAccessGroup;
 
         Logger.LogInformation("Server Settings - Load Ini Settings - getting settings from IniFileEngine");
+
+
+        // Attempt to read the server installation type from the ini file for old configurations.
+        // Value is ignored if the extended settings file already contains an entry for the server installation type.
         var serverType = iniFile.FindValue<int>("mysql", "server_type", true);
-        ServerInstallType = serverType == 1
+        if (serverType != 0)
+        {
+          ServerInstallationType = serverType == 1
           ? ServerInstallationType.Dedicated
           : serverType == 2
             ? ServerInstallationType.Server
@@ -463,8 +469,9 @@ namespace MySql.Configurator.Wizards.Server
               : serverType == 4
                 ? ServerInstallationType.Manual
                 : ServerInstallationType.Developer;
-        OpenFirewall = EnableTcpIp && IsRuleEnabled(Port.ToString());
+        }
 
+        OpenFirewall = EnableTcpIp && IsRuleEnabled(Port.ToString());
         ErrorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
         EnableGeneralLog = iniFile.FindValue<bool>("mysqld", "general-log", false);
         GeneralQueryLogFileName = iniFile.FindValue("mysqld", "general_log_file", false);

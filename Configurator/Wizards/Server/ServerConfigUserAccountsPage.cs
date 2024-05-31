@@ -31,6 +31,7 @@ using MySql.Configurator.Core.Classes.MySql;
 using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Core.Wizard;
 using MySql.Configurator.Properties;
+using Action = System.Action;
 
 namespace MySql.Configurator.Wizards.Server
 {
@@ -126,19 +127,24 @@ namespace MySql.Configurator.Wizards.Server
 
     private void PasswordCheckButton_Click(object sender, EventArgs e)
     {
-      Cursor = Cursors.WaitCursor;
-      _rootPasswordOk = false;
-      var providerProperties = new ErrorProviderProperties(Resources.ConnectionTestingText, Resources.Config_InProgressIcon, true);
-      ConnectionErrorProvider.SetProperties(PasswordCheckButton, providerProperties);
-      var connectionResult = LocalServerInstance.CanConnect(_controller, CurrentRootPasswordTextBox.Text, _controller.ConfigurationType == ConfigurationType.Reconfiguration);
-      _rootPasswordOk = connectionResult == ConnectionResultType.ConnectionSuccess;
-      providerProperties.ErrorIcon = _rootPasswordOk
-        ? Resources.Config_DoneIcon
-        : Resources.Config_ErrorIcon;
-      providerProperties.ErrorMessage = connectionResult.GetDescription();
-      ConnectionErrorProvider.SetProperties(PasswordCheckButton, providerProperties);
-      Cursor = Cursors.Default;
-      UpdateButtons();
+      Action action;
+      action = delegate
+      {
+        _rootPasswordOk = false;
+        var providerProperties = new ErrorProviderProperties(Resources.ConnectionTestingText, Resources.Config_InProgressIcon, true);
+        ConnectionErrorProvider.SetProperties(PasswordCheckButton, providerProperties);
+        var connectionResult = LocalServerInstance.CanConnect(_controller, CurrentRootPasswordTextBox.Text, _controller.ConfigurationType == ConfigurationType.Reconfiguration);
+        _rootPasswordOk = connectionResult == ConnectionResultType.ConnectionSuccess;
+        providerProperties.ErrorIcon = _rootPasswordOk
+          ? Resources.Config_DoneIcon
+          : Resources.Config_ErrorIcon;
+        providerProperties.ErrorMessage = connectionResult.GetDescription();
+        ConnectionErrorProvider.SetProperties(PasswordCheckButton, providerProperties);
+        Cursor = Cursors.Default;
+        UpdateButtons();
+      };
+
+      ExecuteLongRunningOperation(action);
     }
 
     private string CheckPasswords()

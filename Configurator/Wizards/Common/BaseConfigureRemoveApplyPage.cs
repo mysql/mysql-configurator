@@ -39,7 +39,6 @@ namespace MySql.Configurator.Wizards.Common
     #region Fields
 
     protected ProductConfigurationController CurrentController;
-    protected bool Executing;
     protected Stopwatch StopWatch;
 
     #endregion Fields
@@ -48,7 +47,6 @@ namespace MySql.Configurator.Wizards.Common
     {
       InitializeComponent();
       StopWatch = new Stopwatch();
-      Executing = false;
     }
 
     public BaseConfigureRemoveApplyPage(ProductConfigurationController controller)
@@ -144,7 +142,7 @@ namespace MySql.Configurator.Wizards.Common
       {
         SetControlVisibleStatus(Wizard.FinishButton, !Wizard.ExecuteButton.Visible);
         SetControlVisibleStatus(Wizard.BackButton, Wizard.ExecuteButton.Visible);
-        return !Executing;
+        return !OperationExecuting;
       }
     }
 

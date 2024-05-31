@@ -43,6 +43,7 @@ namespace MySql.Configurator.Wizards
         components.Dispose();
       }
 
+      Pages.ForEach(p => p.UnsubscribeEvents());
       base.Dispose(disposing);
     }
 
