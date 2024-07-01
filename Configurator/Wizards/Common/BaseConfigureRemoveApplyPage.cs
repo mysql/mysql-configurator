@@ -77,16 +77,9 @@ namespace MySql.Configurator.Wizards.Common
       {
         string msg = string.Format(Resources.ConfirmFinishWithFailingConfig, CurrentController.Package.NameWithVersion);
         result = InfoDialog.ShowDialog(InfoDialogProperties.GetYesNoDialogProperties(InfoDialog.InfoType.Warning, Resources.AppName, msg)).DialogResult;
-        bool shouldClose = result == DialogResult.Yes;
-        if (shouldClose)
-        {
-          DetachEvents();
-        }
-
-        return shouldClose;
+        return result == DialogResult.Yes;
       }
 
-      DetachEvents();
       if (!RebootWhenDoneCheckBox.Checked)
       {
         return base.Finish();
@@ -147,10 +140,6 @@ namespace MySql.Configurator.Wizards.Common
     }
 
     #endregion Properties
-
-    protected virtual void DetachEvents()
-    {
-    }
     
     protected void RebootWhenDoneCheckBox_CheckedChanged_1(object sender, EventArgs e)
     {

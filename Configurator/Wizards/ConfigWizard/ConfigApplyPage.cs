@@ -63,9 +63,9 @@ namespace MySql.Configurator.Wizards.ConfigWizard
     public override bool NextOk {
       get
       {
-        Wizard.FinishButton.Visible = !Wizard.ExecuteButton.Visible;
-        Wizard.BackButton.Visible = Wizard.ExecuteButton.Visible;
-        return !OperationExecuting;
+        Wizard.FinishButton.Visible = false;
+        return !OperationExecuting
+               && !Wizard.ExecuteButton.Enabled;
       }
     }
 
@@ -118,17 +118,10 @@ namespace MySql.Configurator.Wizards.ConfigWizard
       {
         string msg = string.Format(Resources.ConfirmFinishWithFailingConfig, CurrentController.Package.NameWithVersion);
         result = InfoDialog.ShowDialog(InfoDialogProperties.GetYesNoDialogProperties(InfoDialog.InfoType.Warning, Resources.AppName, msg)).DialogResult;
-        bool shouldClose = result == DialogResult.Yes;
-        if (shouldClose)
-        {
-          DetachEvents();
-        }
-
-        return shouldClose;
+        return result == DialogResult.Yes;
       }
 
       Wizard.Log = LogContentsTextBox.Text;
-      DetachEvents();
       if (!RebootWhenDoneCheckBox.Checked)
       {
         return base.Finish();
@@ -175,19 +168,11 @@ namespace MySql.Configurator.Wizards.ConfigWizard
         }
 
         subCaptionLabel.Text = Resources.ConfigStepsAreExecuting;
-        DetachEvents();
-        CurrentController.ConfigurationEnded += ConfigurationEnded;
-        CurrentController.ConfigureTimedOut += ConfigureTimedOut;
-        CurrentController.ConfigurationStatusChanged += controller_ConfigurationStatusChanged;
         if (Wizard is ConfigWizard configWizard)
         {
           CurrentController.ConfigurationType = configWizard.ConfigurationType;
         }
 
-        UpdateButtons();
-        Wizard.BackButton.Visible = false;
-        Wizard.ExecuteButton.Enabled = false;
-        Wizard.CancelButton.Visible = true;
         CurrentController.Configure();
       };
 
@@ -306,6 +291,10 @@ namespace MySql.Configurator.Wizards.ConfigWizard
     private void ConfigurationStarted(object sender, EventArgs e)
     {
       BeginLongRunningOperation();
+      UpdateButtons();
+      Wizard.BackButton.Visible = false;
+      Wizard.ExecuteButton.Enabled = false;
+      Wizard.CancelButton.Visible = true;
     }
 
     private void ConfigureTimedOut(object sender, EventArgs e)
