@@ -24,6 +24,7 @@
 using System;
 using System.Configuration;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using MySql.Configurator.Core.Classes;
@@ -122,6 +123,68 @@ namespace MySql.Configurator.Dialogs
 
     private void TryToLaunchWizard(bool launchedFromMainIcon)
     {
+      // Update execution mode if current configuration needs to be upgraded.
+      var controller = _package.Controller as ServerConfigurationController;
+      if (controller == null)
+      {
+        throw new ArgumentNullException(nameof(controller));
+      }
+
+      var upgradeHistoryFileExists = false;
+      Version existingServerVersion = new Version();
+      if (_executionMode == ExecutionMode.Configure)
+      {
+        var path = Path.Combine(controller.DataDirectory, "Data", MySqlUpgradeHistoryManager.UPGRADE_HISTORY_FILE_NAME);
+        upgradeHistoryFileExists = File.Exists(path);
+
+        // TODO: Enable upgrade history file regeneration when server bug is fixed.
+        /*
+        // If upgrade history file does not exist, stop and start server to regenerate it.
+        if (!upgradeHistoryFileExists
+            && controller.IsThereServerDataFiles
+            && _package.Version.Major >= 8
+            && _package.Version.Minor >= 4)
+        {
+          var serverInstance = new LocalServerInstance(controller);
+          serverInstance.DataDir = controller.DataDirectory;
+          if (serverInstance.IsRunning)
+          {
+            serverInstance.StopInstance();
+          }
+
+          serverInstance.StartInstanceAsProcess("--upgrade=MINIMAL");
+          upgradeHistoryFileExists = File.Exists(path);
+        }
+        */
+
+        if (controller.IsThereServerDataFiles
+            && upgradeHistoryFileExists)
+        {
+          (Version, bool) result = MySqlUpgradeHistoryManager.GetUpgradeHistoryLatestVersion(controller.DataDirectory);
+          existingServerVersion = result.Item1;
+          bool hasMetadata = result.Item2;
+          
+          // If the version is lower or if version is the same but we have metadata it means that this is
+          // an updated version of the current package and needs to be upgraded.
+          if (existingServerVersion != null
+              && (existingServerVersion < _package.Version)
+                  || (existingServerVersion == _package.Version
+                      && hasMetadata))
+          {
+            var validUpgrade = _package.Version.ServerSupportsInPlaceUpgrades(existingServerVersion);
+            if (validUpgrade == UpgradeViability.Supported
+                && _package.Version.Major == existingServerVersion.Major
+                && _package.Version.Minor == existingServerVersion.Minor)
+            {
+              Logger.LogInformation(Resources.ExecutionModeSwitch);
+              _executionMode = ExecutionMode.Upgrade;
+              controller.IsSameDirectoryUpgrade = true;
+            }
+          }
+        }
+      }
+      
+      // Show wizard matching the selected execution mode.
       ConfigurationType configurationType;
       switch (_executionMode)
       {
@@ -144,13 +207,25 @@ namespace MySql.Configurator.Dialogs
           removeWizard.ShowWizard(_package, this);
           break;
 
+        case ExecutionMode.Upgrade:
+          configurationType = ConfigurationType.Upgrade;
+          configWizard = new ConfigWizard();
+          Controls.Add(configWizard);
+          configWizard.WizardCanceled += WizardClosed;
+          configWizard.WizardClosed += WizardClosed;
+          configWizard.ShowWizard(_package, this, configurationType);
+          break;
+
         default:
           throw new ConfiguratorException(ConfiguratorError.InvalidExecutionMode);
       }
 
+      // Update status bar.
       StatusStrip.Visible = true;
-      VersionLabel.Text = $"MySQL Server {_package.VersionString}";
       var controllerConfigurationType = _package.Controller.ConfigurationType;
+      VersionLabel.Text = controllerConfigurationType != ConfigurationType.Upgrade
+        ? $"MySQL Server {_package.VersionString}"
+        : $"MySQL Server {(upgradeHistoryFileExists ? existingServerVersion.ToString() : "Unknown")} -> {_package.VersionString}";
       var stringConfigurationType = string.Empty;
       switch (controllerConfigurationType)
       {
@@ -165,7 +240,8 @@ namespace MySql.Configurator.Dialogs
       
       ConfigurationTypeLabel.Text = stringConfigurationType;
       if (controllerConfigurationType == ConfigurationType.Reconfiguration
-          || controllerConfigurationType == ConfigurationType.Remove)
+          || controllerConfigurationType == ConfigurationType.Remove
+          || controllerConfigurationType == ConfigurationType.Upgrade)
       {
         var serverController = _package.Controller as ServerConfigurationController;
         DataDirectoryLabel.Text = $"Data Directory: {serverController.DataDirectory}";

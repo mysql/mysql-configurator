@@ -22,7 +22,12 @@
   51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 using System;
+using MySql.Configurator.Core.Classes;
+using MySql.Configurator.Core.Enums;
+using System.Windows.Forms;
 using MySql.Configurator.Core.Wizard;
+using MySql.Configurator.Properties;
+using Action = System.Action;
 
 namespace MySql.Configurator.Wizards.Server
 {
@@ -32,6 +37,11 @@ namespace MySql.Configurator.Wizards.Server
   public partial class ServerConfigBackupPage : ConfigWizardPage
   {
     #region Fields
+
+    /// <summary>
+    /// The connection result obtained when pressing the Connect button.
+    /// </summary>
+    private ConnectionResultType _connectionResult;
 
     /// <summary>
     /// The <seealso cref="ServerConfigurationController"/> used to perform actions.
@@ -48,6 +58,7 @@ namespace MySql.Configurator.Wizards.Server
     {
       BackupDatabase = true;
       InitializeComponent();
+      _connectionResult = ConnectionResultType.None;
       _controller = controller;
     }
 
@@ -58,6 +69,16 @@ namespace MySql.Configurator.Wizards.Server
     /// </summary>
     public bool BackupDatabase { get; private set; }
 
+    /// <summary>
+    /// Gets a value indicating if it is allowed to go to the next configuration page.
+    /// </summary>
+    public override bool NextOk => ((_controller.IsSameDirectoryUpgrade
+                                     && ((RunBackupRadioButton.Checked
+                                          && _connectionResult == ConnectionResultType.ConnectionSuccess)
+                                         || SkipBackupRadioButton.Checked))
+                                    || !_controller.IsSameDirectoryUpgrade)
+                                   && base.NextOk;
+
     #endregion Properties
 
     /// <summary>
@@ -65,6 +86,7 @@ namespace MySql.Configurator.Wizards.Server
     /// </summary>
     public override void Activate()
     {
+      CredentialsPanel.Visible = !_controller.RootUserCredentialsSet;
       base.Activate();
     }
 
@@ -76,17 +98,90 @@ namespace MySql.Configurator.Wizards.Server
     {
       _controller.IsBackupDatabaseStepNeeded = RunBackupRadioButton.Checked;
       _controller.UpdateUpgradeConfigSteps();
+      if (!_controller.RootUserCredentialsSet)
+      {
+        _controller.Settings.ExistingRootPassword = PasswordTextBox.Text;
+      }
+
       return base.Next();
     }
 
     /// <summary>
     /// Event delegate method fired when the <see cref="BackupDatabaseCheckBox"/> checked property changes.
     /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
+    /// <param name="sender">The sender object.</param>
+    /// <param name="e">The event arguments.</param>
     private void BackupDatabaseCheckBox_CheckedChanged(object sender, EventArgs e)
     {
       BackupDatabase = RunBackupRadioButton.Checked;
+      ValidationsErrorProvider.Clear();
+      ValidatedHandler(sender, e);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the Connect button is clicked.
+    /// </summary>
+    /// <param name="sender">The sender object.</param>
+    /// <param name="e">The event arguments.</param>
+    private void ConnectButton_Click(object sender, EventArgs e)
+    {
+      ResultLabel.Text = Resources.StartingServerAndTestingConnection;
+      var providerProperties = new ErrorProviderProperties(Resources.StartingServerAndTestingConnection, Resources.Config_InProgressIcon, true);
+      ConnectionErrorProvider.SetProperties(ConnectButton, providerProperties);
+      _connectionResult = LocalServerInstance.CanConnect(_controller, out string errorMessage, PasswordTextBox.Text, true, true);
+      providerProperties.ErrorMessage = string.IsNullOrEmpty(errorMessage)
+        ? _connectionResult.GetDescription()
+        : errorMessage;
+      providerProperties.ErrorIcon = _connectionResult == ConnectionResultType.ConnectionSuccess
+        ? Resources.Config_DoneIcon
+        : Resources.Config_ErrorIcon;
+      ConnectionErrorProvider.SetProperties(ConnectButton, providerProperties);
+      ResultLabel.Text = providerProperties.ErrorMessage;
+      UpdateButtons();
+    }
+
+    /// <summary>
+    /// Handles the TextChanged event.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+    protected override void TextChangedHandler(object sender, EventArgs e)
+    {
+      // Looks like we could get rid of this empty override, but it is necessary to avoid an error of:
+      // The method 'xxx' cannot be the method for an event because a class this class derives from already defines the method
+      base.TextChangedHandler(sender, e);
+    }
+
+    /// <summary>
+    /// Handles the TextValidated event.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+    /// <remarks>This event method is meant to be used with the <see cref="Control.Validated"/> event.</remarks>
+    protected override void ValidatedHandler(object sender, EventArgs e)
+    {
+      // Looks like we could get rid of this empty override, but it is necessary to avoid an error of:
+      // The method 'xxx' cannot be the method for an event because a class this class derives from already defines the method
+      base.ValidatedHandler(sender, e);
+    }
+
+    /// <summary>
+    /// Contains calls to methods that validate the given control's value.
+    /// </summary>
+    /// <returns>An error message or <c>null</c> / <see cref="string.Empty"/> if everything is valid.</returns>
+    protected override string ValidateFields()
+    {
+      string errorMessage = base.ValidateFields();
+      switch (ErrorProviderControl.Name)
+      {
+        case nameof(PasswordTextBox):
+          _connectionResult = ConnectionResultType.None;
+          ConnectionErrorProvider.Clear();
+          ResultLabel.Text = string.Empty;
+          break;
+      }
+
+      return errorMessage;
     }
   }
 }

@@ -288,8 +288,9 @@ namespace MySql.Configurator.Wizards.Server
     /// <summary>
     /// Gets a value indicating if there are configuration files that need to be deleted.
     /// </summary>
-    public bool IsDeleteConfigurationFileStepNeeded => File.Exists(Path.Combine(InstallDirectory, GeneralSettingsManager.CONFIGURATOR_SETTINGS_FILE_NAME))
-      || File.Exists(Settings.FullConfigFilePath);
+    public bool IsDeleteConfigurationFileStepNeeded => (!string.IsNullOrEmpty(InstallDirectory) 
+                                                        && File.Exists(Path.Combine(InstallDirectory, GeneralSettingsManager.CONFIGURATOR_SETTINGS_FILE_NAME)))
+                                                       || File.Exists(Settings.FullConfigFilePath);
 
     /// <summary>
     /// Gets a value indicating whether the removal step that deletes the data directory needs to run.
@@ -301,6 +302,11 @@ namespace MySql.Configurator.Wizards.Server
     /// </summary>
     public bool IsDeleteServiceStepNeeded => MySqlServiceControlManager.ServiceExists(Settings?.ServiceName);
 
+    /// <summary>
+    /// Gets or sets a value indicating if the upgrade is reusing the existing installation and data directories.
+    /// </summary>
+    public bool IsSameDirectoryUpgrade { get; set; }
+    
     /// <summary>
     /// Gets a value indicating if there are steps that require to be executed for a server removal.
     /// </summary>
@@ -412,7 +418,8 @@ namespace MySql.Configurator.Wizards.Server
                                                                   && ConfigurationType != ConfigurationType.New
                                                                   && (!Settings.ConfigureAsService
                                                                       || OldSettings.ServiceName != Settings.ServiceName))
-                                                                 || Settings.ConfigureAsService;
+                                                                 || Settings.ConfigureAsService
+                                                                    && ConfigurationType != ConfigurationType.Upgrade;
 
     /// <summary>
     /// Gets a value indicating wheter the configuration step to update settings for the MySQL process needs to run.
@@ -457,6 +464,11 @@ namespace MySql.Configurator.Wizards.Server
     public List<string> RevertedSteps { get; private set; }
 
     public RoleDefinitions RolesDefined { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating if the credentials of the root user have been provided and validated.
+    /// </summary>
+    public bool RootUserCredentialsSet => !string.IsNullOrEmpty(Settings.ExistingRootPassword);
 
     /// <summary>
     /// Gets or sets the value of the password used for the root account.
@@ -882,9 +894,7 @@ namespace MySql.Configurator.Wizards.Server
         return;
       }
 
-      Logger.LogInformation(ConfigurationType == ConfigurationType.Reconfiguration 
-        ? Resources.SettingUpReconfiguration 
-        : Resources.SettingUpNewInstallation);
+      Logger.LogInformation(string.Format(Resources.SettingUpControllerMessage, ConfigurationType.GetDescription()));
 
       // New configuration pages.
       if (ConfigurationType == ConfigurationType.New)
@@ -907,7 +917,12 @@ namespace MySql.Configurator.Wizards.Server
       }
 
       // Upgrade pages.
-      Pages.Add(new ServerConfigBackupPage(this) { PageVisible = false });
+      Pages.Add(new ServerConfigBackupPage(this) { PageVisible = ConfigurationType == ConfigurationType.Upgrade });
+      if (ConfigurationType == ConfigurationType.Upgrade)
+      {
+        Pages.Add(new ServerConfigSecurityPage(this) { PageVisible = !ValidateServerFilesHaveRecommendedPermissions() });
+        return;
+      }
 
       // New configuration and reconfiguration pages.
       Pages.Add(new ServerConfigLocalMachinePage(this));
@@ -968,8 +983,10 @@ namespace MySql.Configurator.Wizards.Server
       _removeExistingServerInstallationStep.Execute = IsRemoveExistingServerInstallationStepNeeded;
       _resetPersistedVariablesStep.Execute = PersistedVariablesToReset?.Count > 0;
       _renameExistingDataDirectoryStep.Execute = IsDataDirectoryRenameNeeded;
-      _updateAccessPermissions.Execute = IsUpdateServerFilesPermissionsStepNeeded;
       _startAndUpgradeServerConfigStep.Execute = IsStartAndUpgradeConfigurationStepNeeded;
+      _stopServerConfigurationStep.Execute = IsSameDirectoryUpgrade;
+      _stopExistingServerInstanceStep.Execute = !IsSameDirectoryUpgrade;
+      _updateAccessPermissions.Execute = IsUpdateServerFilesPermissionsStepNeeded;
       ConfigurationSteps = StandAloneServerSteps;
     }
 
@@ -1095,14 +1112,17 @@ namespace MySql.Configurator.Wizards.Server
     /// </summary>
     private void BackupDatabase()
     {
-      if (ExistingServerInstallationInstance == null)
+      if (!IsSameDirectoryUpgrade)
       {
-        throw new Exception(Resources.ExistingServerInstanceNotSetError);
-      }
+        if (ExistingServerInstallationInstance == null)
+        {
+          throw new Exception(Resources.ExistingServerInstanceNotSetError);
+        }
 
-      if (!ExistingServerInstallationInstance.IsRunning)
-      {
-        throw new Exception(Resources.ExistingServerInstanceNotRunningError);
+        if (!ExistingServerInstallationInstance.IsRunning)
+        {
+          throw new Exception(Resources.ExistingServerInstanceNotRunningError);
+        }
       }
 
       var success = false;
@@ -1123,7 +1143,9 @@ namespace MySql.Configurator.Wizards.Server
       if (!string.IsNullOrEmpty(backupFile))
       {
         ReportStatus(string.Format(Resources.ServerConfigBackupDatabaseDumpRunning, backupFile));
-        var binDirectory = Path.Combine(ExistingServerInstallationInstance.BaseDir, BINARY_DIRECTORY_NAME);
+        var binDirectory = Path.Combine(IsSameDirectoryUpgrade 
+          ? InstallDirectory
+          : ExistingServerInstallationInstance.BaseDir, BINARY_DIRECTORY_NAME);
         var user = GetUserAccountToConnectBeforeUpdatingRootUser();
         var connectionOptions = string.Empty;
         bool sendingPasswordInCommandLine = false;
@@ -1993,9 +2015,6 @@ namespace MySql.Configurator.Wizards.Server
         _updateAccessPermissions,
         _updateWindowsServiceStep,
         _startAndUpgradeServerConfigStep,
-        //_prepareAuthenticationPluginChangeStep,
-        _stopServerConfigurationStep,
-        _startServerConfigurationStep,
         _updateSecurityStep,
         _updateStartMenuLinksStep,
         _removeExistingServerInstallationStep
@@ -2055,8 +2074,8 @@ namespace MySql.Configurator.Wizards.Server
       string templateBase = "my-template{0}.ini";
       var version = Package.Version;
       string templateFile = null;
-      if (version.Major >= 8
-          && version.Minor > 0)
+      if ((version.Major >= 8
+          && version.Minor > 0))
       {
         templateFile = string.Format(templateBase, $"-{version.Major}.x");
       }
@@ -2518,7 +2537,14 @@ namespace MySql.Configurator.Wizards.Server
       CancellationToken.ThrowIfCancellationRequested();
       var serverInstanceInfo = new LocalServerInstance(this, ReportStatus);
       serverInstanceInfo.UseOldSettings = useOldSettings;
-      if (ConfigurationType == ConfigurationType.Remove)
+
+      // Set the data directory to allow the call to the ShutdownInstance method to correctly validate
+      // if the server is actually running before attempting to stop it.
+      // Other scenarios do not need this property to be set because the server is expected to be running
+      // allowing the DataDir property getter to query the database for that value.
+      if (ConfigurationType == ConfigurationType.Remove
+          || (ConfigurationType == ConfigurationType.Upgrade
+              && IsSameDirectoryUpgrade))
       {
         serverInstanceInfo.DataDir = DataDirectory;
       }
@@ -3066,7 +3092,8 @@ namespace MySql.Configurator.Wizards.Server
       if ((ConfigurationType == ConfigurationType.Reconfiguration
            || isDataDirectoryConfigured)
           && OldSettings != null
-          && OldSettings.OpenFirewall)
+          && OldSettings.OpenFirewallForXProtocol
+          && OldSettings.MySqlXPort != 0)
       {
         RemoveFirewallRule(OldSettings.Port);
       }
@@ -3092,7 +3119,8 @@ namespace MySql.Configurator.Wizards.Server
       }
 
       CancellationToken.ThrowIfCancellationRequested();
-      if (Settings.OpenFirewallForXProtocol)
+      if (Settings.OpenFirewallForXProtocol
+          && Settings.MySqlXPort != 0)
       {
         CreateFirewallRule(Settings.MySqlXPort);
       }

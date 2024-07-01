@@ -1103,6 +1103,207 @@ namespace MySql.Configurator.Core.Classes
     }
 
     /// <summary>
+    /// Checks if the LTS versions are consecutive.
+    /// </summary>
+    /// <param name="newVersion">The version to which the upgrade will be made to.</param>
+    /// <param name="oldVersion">The version of the existing server instance.</param>
+    /// <param name="newVersionMaturiy">The maturity of the version to which the upgrade will be made to.</param>
+    /// <param name="oldVersionMaturity">The maturity of the version of the existing server instance.</param>
+    /// <returns><c>true</c> if the validation has been met; otherwise, <c>false</c>.</returns>
+    public static bool IsFromLtsToNextLts(this Version newVersion, Version oldVersion, ServerMaturity newVersionMaturity, ServerMaturity oldVersionMaturity)
+    {
+      if (newVersion == null)
+      {
+        throw new ArgumentNullException(nameof(oldVersion));
+      }
+
+      if (oldVersion == null)
+      {
+        throw new ArgumentNullException(nameof(oldVersion));
+      }
+
+      if (newVersionMaturity != ServerMaturity.LTS
+          || oldVersionMaturity != ServerMaturity.LTS)
+      {
+        return false;
+      }
+
+      if ((oldVersion.Major == 8
+           && oldVersion.Minor == 0
+           && oldVersion.Build >=35
+           && newVersion.Major == 8
+           && newVersion.Minor == 4)
+          || (oldVersion.Major == 8
+              && oldVersion.Minor == 4
+              && newVersion.Major == 9
+              && newVersion.Minor == 7))
+      {
+        return true;
+      }
+
+      return false;
+    }
+
+    /// <summary>
+    /// Checks if an LTS version is being upgraded to an innovation release that comes before
+    /// the next LTS.
+    /// </summary>
+    /// <param name="newVersion">The version to which the upgrade will be made to.</param>
+    /// <param name="oldVersion">The version of the existing server instance.</param>
+    /// <param name="newVersionMaturiy">The maturity of the version to which the upgrade will be made to.</param>
+    /// <param name="oldVersionMaturity">The maturity of the version of the existing server instance.</param>
+    /// <returns><c>true</c> if the validation has been met; otherwise, <c>false</c>.</returns>
+    public static bool IsFromLtsToInnovationBeforeNextLts(this Version newVersion, Version oldVersion, ServerMaturity newVersionMaturity, ServerMaturity oldVersionMaturity)
+    {
+      if (newVersion == null)
+      {
+        throw new ArgumentNullException(nameof(oldVersion));
+      }
+
+      if (oldVersion == null)
+      {
+        throw new ArgumentNullException(nameof(oldVersion));
+      }
+
+      if (newVersionMaturity != ServerMaturity.Innovation
+          || oldVersionMaturity != ServerMaturity.LTS)
+      {
+        return false;
+      }
+
+      if ((oldVersion.Major == 8
+           && oldVersion.Minor == 0
+           && oldVersion.Build >= 35
+           && newVersion.Major == 8
+           && newVersion.Minor < 4)
+          ||(oldVersion.Major == 8
+             && oldVersion.Minor == 4
+             && newVersion.Major == 9
+             && newVersion.Minor < 7))
+      {
+        return true;
+      }
+
+      return false;
+    }
+
+    /// <summary>
+    /// Checks if an innovation release is being upgaded to the next LTS.
+    /// </summary>
+    /// <param name="newVersion">The version to which the upgrade will be made to.</param>
+    /// <param name="oldVersion">The version of the existing server instance.</param>
+    /// <param name="newVersionMaturiy">The maturity of the version to which the upgrade will be made to.</param>
+    /// <param name="oldVersionMaturity">The maturity of the version of the existing server instance.</param>
+    /// <returns><c>true</c> if the validation has been met; otherwise, <c>false</c>.</returns>
+    public static bool IsFromInnovationToNextLts(this Version newVersion, Version oldVersion, ServerMaturity newVersionMaturity, ServerMaturity oldVersionMaturity)
+    {
+      if (newVersion == null)
+      {
+        throw new ArgumentNullException(nameof(oldVersion));
+      }
+
+      if (oldVersion == null)
+      {
+        throw new ArgumentNullException(nameof(oldVersion));
+      }
+
+      if (newVersionMaturity != ServerMaturity.LTS
+          || oldVersionMaturity != ServerMaturity.Innovation)
+      {
+        return false;
+      }
+
+      if ((oldVersion.Major == 8
+           && oldVersion.Minor <= 3
+           && newVersion.Major == 8
+           && newVersion.Minor == 4)
+          || (((oldVersion.Major == 8
+                && oldVersion.Minor > 4)
+               || (oldVersion.Major == 9
+                   && oldVersion.Minor < 7))
+              && newVersion.Major == 9
+              && newVersion.Minor == 7))
+      {
+        return true;
+      }
+
+      return false;
+    }
+
+    /// <summary>
+    /// Checks if both versions are within the same innovation release series.
+    /// </summary>
+    /// <param name="newVersion">The version to which the upgrade will be made to.</param>
+    /// <param name="oldVersion">The version of the existing server instance.</param>
+    /// <param name="newVersionMaturiy">The maturity of the version to which the upgrade will be made to.</param>
+    /// <param name="oldVersionMaturity">The maturity of the version of the existing server instance.</param>
+    /// <returns><c>true</c> if the validation has been met; otherwise, <c>false</c>.</returns>
+    public static bool IsWithinSameInnovationSeries(this Version newVersion, Version oldVersion, ServerMaturity newVersionMaturity, ServerMaturity oldVersionMaturity)
+    {
+      if (newVersion == null)
+      {
+        throw new ArgumentNullException(nameof(oldVersion));
+      }
+
+      if (oldVersion == null)
+      {
+        throw new ArgumentNullException(nameof(oldVersion));
+      }
+
+      if (newVersionMaturity != ServerMaturity.Innovation
+          || oldVersionMaturity != ServerMaturity.Innovation)
+      {
+        return false;
+      }
+
+      if (oldVersion.Major == newVersion.Major
+          && ((oldVersion.Major == 8
+               && oldVersion.Minor < 4)
+              || (oldVersion.Major == 9
+                  && oldVersion.Minor < 7)))
+      {
+        return true;
+      }
+
+      return false;
+    }
+
+    /// <summary>
+    /// Checks if both versions are within the same LTS.
+    /// </summary>
+    /// <param name="newVersion">The version to which the upgrade will be made to.</param>
+    /// <param name="oldVersion">The version of the existing server instance.</param>
+    /// <param name="newVersionMaturiy">The maturity of the version to which the upgrade will be made to.</param>
+    /// <param name="oldVersionMaturity">The maturity of the version of the existing server instance.</param>
+    /// <returns><c>true</c> if the validation has been met; otherwise, <c>false</c>.</returns>
+    public static bool IsWithinSameLts(this Version newVersion, Version oldVersion, ServerMaturity newVersionMaturity, ServerMaturity oldVersionMaturity)
+    {
+      if (newVersion == null)
+      {
+        throw new ArgumentNullException(nameof(oldVersion));
+      }
+
+      if (oldVersion == null)
+      {
+        throw new ArgumentNullException(nameof(oldVersion));
+      }
+
+      if (newVersionMaturity != ServerMaturity.LTS
+          || oldVersionMaturity != ServerMaturity.LTS)
+      {
+        return false;
+      }
+
+      if (oldVersion.Major == newVersion.Major
+          && oldVersion.Minor == newVersion.Minor)
+      {
+        return true;
+      }
+
+      return false;
+    }
+
+    /// <summary>
     /// Validates if the specified server version supports an in-place upgrade based on the rules outlined by the new versioning scheme.
     /// </summary>
     /// <param name="newVersion">The version to which the upgrade will be made to.</param>
@@ -1143,44 +1344,16 @@ namespace MySql.Configurator.Core.Classes
         return UpgradeViability.Unsupported;
       }
       else if (
-              // If 8.0.X to 8.Y Innovation. X>=35, Y=1
-              (oldVersionMaturity == ServerMaturity.Older
-               && oldVersion >= new Version(8, 0, 35)
-               && newVersionMaturiy == ServerMaturity.Innovation
-               && newVersion.Major == 8
-               && newVersion.Minor == 1)
-              // If 8.0.X to 8.4 LTS. X>=35
-              || (oldVersionMaturity == ServerMaturity.Older
-                  && oldVersion >= new Version(8, 0, 35)
-                  && newVersionMaturiy == ServerMaturity.LTS
-                  && newVersion.Major == 8
-                  && newVersion.Minor == 4)
-              // Upgrade from innovation to next innovation. 8.X.0 to 8.Y.0 innovation. Y = X + 1
-              // E.g. 8.2.0 to 8.3.0
-              || (oldVersionMaturity == ServerMaturity.Innovation
-                  && newVersionMaturiy == ServerMaturity.Innovation
-                  && oldVersion.Major == newVersion.Major
-                  && oldVersion.Minor + 1 == newVersion.Minor
-                  && oldVersion.Build == 0
-                  && newVersion.Build == 0)
-              // Upgrade from last innovation release to next LTS. E.g. 8.3.0 Innovation to 8.4.0 LTS
-              || (oldVersionMaturity == ServerMaturity.Innovation
-                  && newVersionMaturiy == ServerMaturity.LTS
-                  && oldVersion.Minor + 1 == newVersion.Minor
-                  && newVersion.Build == 0)
-              // Upgrade within same LTS. E.g 8.4.X LTS to 8.4.Y LTS
-              || (oldVersionMaturity == ServerMaturity.LTS
-                  && newVersionMaturiy == ServerMaturity.LTS
-                  && oldVersion.Major == newVersion.Major
-                  && oldVersion.Minor == newVersion.Minor)
-              // Upgrade from one LTS to the next innovation release. E.g. 8.4.X LTS to 9.0.0 Innovation
-              || (oldVersionMaturity == ServerMaturity.LTS
-                  && newVersionMaturiy == ServerMaturity.Innovation
-                  && newVersion == new Version(oldVersion.Major + 1, 0, 0))
-              // Upgrade from one LTS to the next LTS. E.g. 8.4.X LTS to 9.7.Y LTS
-              || (oldVersionMaturity == ServerMaturity.LTS
-                  && newVersionMaturiy == ServerMaturity.LTS
-                  && oldVersion.Major + 1 == newVersion.Major))
+              // Within an LTS. E.g 8.4.X LTS to 8.4.Y LTS.
+              IsWithinSameLts(newVersion, oldVersion, newVersionMaturiy, oldVersionMaturity)
+              // From an LTS to the next LTS series.
+              || IsFromLtsToNextLts(newVersion, oldVersion, newVersionMaturiy, oldVersionMaturity)
+              // From an LTS to an innovation release before the next LTS series.
+              || IsFromLtsToInnovationBeforeNextLts(newVersion, oldVersion, newVersionMaturiy, oldVersionMaturity)
+              // From an innovation series to the next LTS series.
+              || IsFromInnovationToNextLts(newVersion, oldVersion, newVersionMaturiy, oldVersionMaturity)
+              // From within an innovation series.
+              || IsWithinSameInnovationSeries(newVersion, oldVersion, newVersionMaturiy, oldVersionMaturity))
       {
         return UpgradeViability.Supported;
       }

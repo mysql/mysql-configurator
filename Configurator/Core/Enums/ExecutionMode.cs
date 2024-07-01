@@ -29,8 +29,8 @@ namespace MySql.Configurator.Core.Enums
   public enum ExecutionMode : uint
   {
     /// <summary>
-    /// Execution mode in which a server installation is configured, either as a new configuration, a
-    /// reconfiguration or an upgrade.
+    /// Execution mode in which a server installation is configured, either as a new configuration or a
+    /// reconfiguration.
     /// </summary>
     Configure = 0,
     /// <summary>
@@ -42,5 +42,9 @@ namespace MySql.Configurator.Core.Enums
     /// the Configurator is automatically closed and a warning is added to the log.
     /// </summary>
     RemoveNoShow = 2,
+    /// <summary>
+    /// Execution mode in which a server installation is upgraded.
+    /// </summary>
+    Upgrade = 3
   }
 }
