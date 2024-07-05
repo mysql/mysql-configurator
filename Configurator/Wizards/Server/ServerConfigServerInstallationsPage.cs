@@ -337,6 +337,7 @@ namespace MySql.Configurator.Wizards.Server
     private void ResetConnectionTest()
     {
       ConnectionErrorProvider.Clear();
+      UserWarningProvider.Clear();
       DataDirectoryRenameWarningProvider.Clear();
       ValidationsErrorProvider.Clear();
       VersionErrorProvider.Clear();
@@ -375,7 +376,7 @@ namespace MySql.Configurator.Wizards.Server
       switch (upgradeViability)
       {
         case UpgradeViability.UnsupportedWithWarning:
-          versionErrorMessage = Resources.UpgradeNotSupportedWithWarningError;
+          versionErrorMessage = string.Format(Resources.UpgradeNotSupportedWithWarningError, oldVersion, newVersion);
           break;
         case UpgradeViability.Unsupported:
           if (oldVersion.Major < 8)
@@ -467,7 +468,7 @@ namespace MySql.Configurator.Wizards.Server
       _controller.RootUserAuthenticationPlugin = _existingServerInstallationInstance.GetUserAuthenticationPlugin(MySqlServerUser.ROOT_USERNAME);
       if (_controller.RootUserAuthenticationPlugin == MySqlAuthenticationPluginType.MysqlNativePassword)
       {
-        ValidationsErrorProvider.SetProperties(RootPasswordTextBox, new ErrorProviderProperties(Resources.ServerConfigInvalidAuthenticationPlugin));
+        UserWarningProvider.SetProperties(RootPasswordTextBox, new ErrorProviderProperties(Resources.ServerConfigInvalidAuthenticationPlugin, Resources.warning_sign_icon));
       }
 
       // Set existing instance relevant properties for rollback.
