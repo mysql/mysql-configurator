@@ -131,7 +131,7 @@ namespace MySql.Configurator.Wizards.Server
 
     private void DataDirectoryRevertButton_Click(object sender, EventArgs e)
     {
-      DataDirectoryTextBox.Text = _controller.Settings.DataDirectory;
+      DataDirectoryTextBox.Text = _controller.Settings.DefaultDataDirectory;
     }
 
     #endregion Event Handlers
