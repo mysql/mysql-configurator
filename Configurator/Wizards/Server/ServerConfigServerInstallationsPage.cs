@@ -38,6 +38,7 @@ using MySql.Configurator.Core.Wizard;
 using MySql.Configurator.Dialogs;
 using MySql.Configurator.Properties;
 using MySql.Data.MySqlClient;
+using Action = System.Action;
 
 namespace MySql.Configurator.Wizards.Server
 {
@@ -73,6 +74,11 @@ namespace MySql.Configurator.Wizards.Server
     /// </summary>
     private bool _rootPasswordOk;
 
+    /// <summary>
+    /// A flag indicating whether the controller needs to be recalculated.
+    /// </summary>
+    private bool _resetController;
+
     #endregion Fields
 
     /// <summary>
@@ -84,6 +90,7 @@ namespace MySql.Configurator.Wizards.Server
       InitializeComponent();
       _controller = controller;
       _package = _controller.Package;
+      _resetController = true;
       _rootPasswordOk = false;
       _originalPagesVisibility = new Dictionary<ConfigWizardPage, bool>();
       PortTextBox.Text = BaseServerSettings.DEFAULT_PORT.ToString();
@@ -130,45 +137,56 @@ namespace MySql.Configurator.Wizards.Server
 
     public override bool Next()
     {
-      if (ReplaceServerInstallationRadioButton.Checked)
+      if (!_resetController)
       {
-        var existingPackage = ProductManager.LoadPackage(_existingServerInstallationInstance.ServerVersion.ToString(), _existingServerInstallationInstance.BaseDir);
-        var oldController = (ServerConfigurationController) existingPackage.Controller;
-        oldController.LoadState();
-        _controller.Settings.OldSettings = oldController.Settings;
-        _controller.ConfigurationType = ConfigurationType.Upgrade;
-        var dataDirectory = new DirectoryInfo(ExistingDataDirectoryTextBox.Text);
-        _controller.Settings.DataDirectory = dataDirectory.Parent.FullName;
-        _controller.Settings.ExistingRootPassword = RootPasswordTextBox.Text;
-        _controller.Settings.IniDirectory = new FileInfo(ExistingConfigFilePathTextBox.Text).DirectoryName;
-        _controller.IsRemoveExistingServerInstallationStepNeeded = true;
-        _controller.IsDataDirectoryRenameNeeded = DataDirectoryRenameWarningProvider.HasErrors();
-        _controller.ExistingServerInstallationInstance = _existingServerInstallationInstance;
-        
-        // Find if existing instance is configured as service.
-        var serviceNames = MySqlServiceControlManager.FindServiceNamesWithBaseDirectory(_existingServerInstallationInstance.BaseDir);
-        if (serviceNames.Length > 0)
-        {
-          _existingServerInstallationInstance.ServiceName = serviceNames[0];
-        }
+        return base.Next();
+      }
 
-        _controller.IsServiceRenameNeeded = _existingServerInstallationInstance.IsServiceNameDefault(
-          _existingServerInstallationInstance.ServiceName,
-          _existingServerInstallationInstance.ServerVersion);
-        DetermineExistingServerPersistedVariablesToReset();
-      }
-      else
+      Action action;
+      action = delegate
       {
-        _controller.Package = _package;
-        _controller.LoadState();
-        _controller.ConfigurationType = ConfigurationType.New;
-        _controller.Settings.DataDirectory = NewDataDirectoryTextBox.Text;
-        _controller.Settings.IniDirectory = _controller.Settings.DataDirectory;
-        _controller.ExistingServerInstallationInstance = null;
-        _controller.IsDataDirectoryRenameNeeded = false;
-        _controller.IsRemoveExistingServerInstallationStepNeeded = false;
-        _controller.PrepareForConfigure();
-      }
+        if (ReplaceServerInstallationRadioButton.Checked)
+        {
+          var existingPackage = ProductManager.LoadPackage(_existingServerInstallationInstance.ServerVersion.ToString(), _existingServerInstallationInstance.BaseDir);
+          var oldController = (ServerConfigurationController)existingPackage.Controller;
+          oldController.LoadState();
+          _controller.Settings.OldSettings = oldController.Settings;
+          _controller.ConfigurationType = ConfigurationType.Upgrade;
+          var dataDirectory = new DirectoryInfo(ExistingDataDirectoryTextBox.Text);
+          _controller.Settings.DataDirectory = dataDirectory.Parent.FullName;
+          _controller.Settings.ExistingRootPassword = RootPasswordTextBox.Text;
+          _controller.Settings.IniDirectory = new FileInfo(ExistingConfigFilePathTextBox.Text).DirectoryName;
+          _controller.IsRemoveExistingServerInstallationStepNeeded = true;
+          _controller.IsDataDirectoryRenameNeeded = DataDirectoryRenameWarningProvider.HasErrors();
+          _controller.ExistingServerInstallationInstance = _existingServerInstallationInstance;
+
+          // Find if existing instance is configured as service.
+          var serviceNames = MySqlServiceControlManager.FindServiceNamesWithBaseDirectory(_existingServerInstallationInstance.BaseDir);
+          if (serviceNames.Length > 0)
+          {
+            _existingServerInstallationInstance.ServiceName = serviceNames[0];
+          }
+
+          _controller.IsServiceRenameNeeded = _existingServerInstallationInstance.IsServiceNameDefault(
+            _existingServerInstallationInstance.ServiceName,
+            _existingServerInstallationInstance.ServerVersion);
+          DetermineExistingServerPersistedVariablesToReset();
+        }
+        else
+        {
+          _controller.Package = _package;
+          _controller.LoadState();
+          _controller.ConfigurationType = ConfigurationType.New;
+          _controller.Settings.DataDirectory = NewDataDirectoryTextBox.Text;
+          _controller.Settings.IniDirectory = _controller.Settings.DataDirectory;
+          _controller.ExistingServerInstallationInstance = null;
+          _controller.IsDataDirectoryRenameNeeded = false;
+          _controller.IsRemoveExistingServerInstallationStepNeeded = false;
+          _controller.PrepareForConfigure();
+        }
+      };
+      ExecuteLongRunningOperation(action);
+      _resetController = false;
 
       if (Wizard is ConfigWizard.ConfigWizard configWizard)
       {
@@ -348,6 +366,7 @@ namespace MySql.Configurator.Wizards.Server
       ExistingDataDirectoryTextBox.Text = string.Empty;
       ExistingConfigFilePathTextBox.Text = string.Empty;
       _existingServerInstallationInstance = null;
+      _resetController = true;
       _rootPasswordOk = false;
       ConnectButton.Enabled = ConnectEnabled;
     }
@@ -662,6 +681,7 @@ namespace MySql.Configurator.Wizards.Server
 
     private void InstallationRadioButtonsCheckedChanged(object sender, EventArgs e)
     {
+      _resetController = true;
       ReplaceInstallationControlsPanel.Enabled = ReplaceServerInstallationRadioButton.Checked;
       ReplaceInstallationControlsPanel.Visible = ReplaceServerInstallationRadioButton.Checked;
       SideBySideInstallationControlsPanel.Enabled = SideBySideInstallationRadioButton.Checked;
