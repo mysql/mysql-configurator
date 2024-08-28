@@ -76,7 +76,7 @@ namespace MySql.Configurator.Core.Controls
       this.ValueLabel.Name = "ValueLabel";
       this.ValueLabel.Size = new System.Drawing.Size(36, 13);
       this.ValueLabel.TabIndex = 30;
-      this.ValueLabel.Text = "Max";
+      this.ValueLabel.Text = "Weak";
       // 
       // PasswordStrengthLabel
       // 
