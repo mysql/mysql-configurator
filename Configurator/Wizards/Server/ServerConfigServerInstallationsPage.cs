@@ -514,7 +514,7 @@ namespace MySql.Configurator.Wizards.Server
         _existingServerInstallationInstance.DataDir,
         serverConfigurationFilePath,
         _existingServerInstallationInstance.Controller.ServerVersion,
-        _existingServerInstallationInstance.Controller.Settings.ServerInstallType,
+        _existingServerInstallationInstance.Controller.Settings.ServerInstallationType,
         null);
 
       return template.IsValid;

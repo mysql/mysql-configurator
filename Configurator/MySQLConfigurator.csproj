@@ -186,7 +186,6 @@
     <Compile Include="Core\Controllers\ControllerSettingAttribute.cs" />
     <Compile Include="Core\Controllers\ControllerSettings.cs" />
     <Compile Include="Core\Controllers\ControllerType.cs" />
-    <Compile Include="Core\Controllers\ExtendedServerSettings.cs" />
     <Compile Include="Core\Controllers\PluginManager.cs" />
     <Compile Include="Core\Controllers\ProductConfigurationAttribute.cs" />
     <Compile Include="Core\Controllers\ProductConfigurationController.cs" />

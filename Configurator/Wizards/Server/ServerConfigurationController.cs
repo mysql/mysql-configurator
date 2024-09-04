@@ -2090,7 +2090,7 @@ namespace MySql.Configurator.Wizards.Server
                              Settings.IniDirectory,
                              !string.IsNullOrEmpty(Settings.ConfigFile) ? Settings.ConfigFile : BaseServerSettings.DEFAULT_CONFIG_FILE_NAME,
                              version,
-                             Settings.ServerInstallType,
+                             Settings.ServerInstallationType,
                              _revertController);
     }
 
