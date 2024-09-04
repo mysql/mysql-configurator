@@ -91,6 +91,7 @@ namespace MySql.Configurator.Wizards.Server
       this.DataDirectoryRenameWarningProvider = new System.Windows.Forms.ErrorProvider(this.components);
       this.VersionErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
       this.VersionWarningProvider = new System.Windows.Forms.ErrorProvider(this.components);
+      this.UserWarningProvider = new System.Windows.Forms.ErrorProvider(this.components);
       ((System.ComponentModel.ISupportInitialize)(this.ValidationsErrorProvider)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.ConnectionErrorProvider)).BeginInit();
       this.InstallationTypeFlowLayoutPanel.SuspendLayout();
@@ -356,7 +357,7 @@ namespace MySql.Configurator.Wizards.Server
       this.NameLabel.AccessibleName = "Selected MySQL server named pipe or shared memory label";
       this.NameLabel.AutoSize = true;
       this.NameLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.NameLabel.Location = new System.Drawing.Point(408, 52);
+      this.NameLabel.Location = new System.Drawing.Point(422, 52);
       this.NameLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
       this.NameLabel.Name = "NameLabel";
       this.NameLabel.Size = new System.Drawing.Size(63, 25);
@@ -369,7 +370,7 @@ namespace MySql.Configurator.Wizards.Server
     "rver instance.";
       this.PipeOrSharedMemoryNameTextBox.AccessibleName = "Pipe shared memory name";
       this.PipeOrSharedMemoryNameTextBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.PipeOrSharedMemoryNameTextBox.Location = new System.Drawing.Point(479, 46);
+      this.PipeOrSharedMemoryNameTextBox.Location = new System.Drawing.Point(493, 46);
       this.PipeOrSharedMemoryNameTextBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
       this.PipeOrSharedMemoryNameTextBox.Name = "PipeOrSharedMemoryNameTextBox";
       this.PipeOrSharedMemoryNameTextBox.Size = new System.Drawing.Size(251, 31);
@@ -384,7 +385,7 @@ namespace MySql.Configurator.Wizards.Server
       this.PortLabel.AccessibleName = "Existing MySQL Server port number label";
       this.PortLabel.AutoSize = true;
       this.PortLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.PortLabel.Location = new System.Drawing.Point(408, 52);
+      this.PortLabel.Location = new System.Drawing.Point(415, 52);
       this.PortLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
       this.PortLabel.Name = "PortLabel";
       this.PortLabel.Size = new System.Drawing.Size(48, 25);
@@ -487,7 +488,7 @@ namespace MySql.Configurator.Wizards.Server
       this.ConnectButton.AccessibleDescription = "A button to connect to the existing MySQL Server instance.";
       this.ConnectButton.AccessibleName = "Connect";
       this.ConnectButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.ConnectButton.Location = new System.Drawing.Point(413, 97);
+      this.ConnectButton.Location = new System.Drawing.Point(445, 97);
       this.ConnectButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
       this.ConnectButton.Name = "ConnectButton";
       this.ConnectButton.Size = new System.Drawing.Size(111, 41);
@@ -649,6 +650,11 @@ namespace MySql.Configurator.Wizards.Server
       this.VersionWarningProvider.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
       this.VersionWarningProvider.ContainerControl = this;
       // 
+      // UserWarningProvider
+      // 
+      this.UserWarningProvider.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
+      this.UserWarningProvider.ContainerControl = this;
+      // 
       // ServerConfigServerInstallationsPage
       // 
       this.AccessibleDescription = "A configuration wizard page used to select the type of server installation";
@@ -678,6 +684,7 @@ namespace MySql.Configurator.Wizards.Server
       ((System.ComponentModel.ISupportInitialize)(this.DataDirectoryRenameWarningProvider)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.VersionErrorProvider)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.VersionWarningProvider)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.UserWarningProvider)).EndInit();
       this.ResumeLayout(false);
       this.PerformLayout();
 
@@ -724,5 +731,6 @@ namespace MySql.Configurator.Wizards.Server
     private System.Windows.Forms.ErrorProvider DataDirectoryRenameWarningProvider;
     private System.Windows.Forms.ErrorProvider VersionErrorProvider;
     private System.Windows.Forms.ErrorProvider VersionWarningProvider;
+    private System.Windows.Forms.ErrorProvider UserWarningProvider;
   }
 }

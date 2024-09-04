@@ -483,13 +483,6 @@ namespace MySql.Configurator.Wizards.Server
         ExistingConfigFilePathTextBox.Text = string.Empty;
       }
 
-      // Get authentication plugin.
-      _controller.RootUserAuthenticationPlugin = _existingServerInstallationInstance.GetUserAuthenticationPlugin(MySqlServerUser.ROOT_USERNAME);
-      if (_controller.RootUserAuthenticationPlugin == MySqlAuthenticationPluginType.MysqlNativePassword)
-      {
-        UserWarningProvider.SetProperties(RootPasswordTextBox, new ErrorProviderProperties(Resources.ServerConfigInvalidAuthenticationPlugin, Resources.warning_sign_icon));
-      }
-
       // Set existing instance relevant properties for rollback.
       if (!errorInVersionTextbox)
       {
