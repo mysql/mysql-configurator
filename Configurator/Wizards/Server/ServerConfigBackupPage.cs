@@ -125,19 +125,25 @@ namespace MySql.Configurator.Wizards.Server
     /// <param name="e">The event arguments.</param>
     private void ConnectButton_Click(object sender, EventArgs e)
     {
-      ResultLabel.Text = Resources.StartingServerAndTestingConnection;
-      var providerProperties = new ErrorProviderProperties(Resources.StartingServerAndTestingConnection, Resources.Config_InProgressIcon, true);
-      ConnectionErrorProvider.SetProperties(ConnectButton, providerProperties);
-      _connectionResult = LocalServerInstance.CanConnect(_controller, out string errorMessage, PasswordTextBox.Text, true, true);
-      providerProperties.ErrorMessage = string.IsNullOrEmpty(errorMessage)
-        ? _connectionResult.GetDescription()
-        : errorMessage;
-      providerProperties.ErrorIcon = _connectionResult == ConnectionResultType.ConnectionSuccess
-        ? Resources.Config_DoneIcon
-        : Resources.Config_ErrorIcon;
-      ConnectionErrorProvider.SetProperties(ConnectButton, providerProperties);
-      ResultLabel.Text = providerProperties.ErrorMessage;
-      UpdateButtons();
+      Action action;
+      action = delegate
+      {
+        ResultLabel.Text = Resources.StartingServerAndTestingConnection;
+        var providerProperties = new ErrorProviderProperties(Resources.StartingServerAndTestingConnection, Resources.Config_InProgressIcon, true);
+        ConnectionErrorProvider.SetProperties(ConnectButton, providerProperties);
+        _connectionResult = LocalServerInstance.CanConnect(_controller, out string errorMessage, PasswordTextBox.Text, true, true);
+        providerProperties.ErrorMessage = string.IsNullOrEmpty(errorMessage)
+          ? _connectionResult.GetDescription()
+          : errorMessage;
+        providerProperties.ErrorIcon = _connectionResult == ConnectionResultType.ConnectionSuccess
+          ? Resources.Config_DoneIcon
+          : Resources.Config_ErrorIcon;
+        ConnectionErrorProvider.SetProperties(ConnectButton, providerProperties);
+        ResultLabel.Text = providerProperties.ErrorMessage;
+        UpdateButtons();
+      };
+
+      ExecuteLongRunningOperation(action);
     }
 
     /// <summary>

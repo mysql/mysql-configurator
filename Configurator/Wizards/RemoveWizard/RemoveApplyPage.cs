@@ -38,6 +38,7 @@ using MySql.Configurator.Core.Package;
 using MySql.Configurator.Core.Product;
 using MySql.Configurator.Properties;
 using MySql.Configurator.Wizards.Common;
+using Action = System.Action;
 
 namespace MySql.Configurator.Wizards.RemoveWizard
 {
@@ -178,7 +179,7 @@ namespace MySql.Configurator.Wizards.RemoveWizard
     public override bool Cancel()
     {
       if (PackageManager != null
-          && Executing)
+          && !OperationExecuting)
       {
         PackageManager.Cancel();
       }
@@ -192,30 +193,36 @@ namespace MySql.Configurator.Wizards.RemoveWizard
     /// </summary>
     public override void Execute()
     {
-      subCaptionLabel.Visible = false;
-      Wizard.BackButton.Enabled = false;
-      Wizard.ExecuteButton.Enabled = false;
-
-      // Reset failed steps.
-      foreach (var removeStepControl in RemoveStepsFlowLayoutPanel.Controls.OfType<RemoveStepControl>().Where(removeStepControl => removeStepControl.Controller.CurrentState == ConfigState.ConfigurationError))
+      Action action;
+      action = delegate
       {
-        removeStepControl.Controller.ResetState();
-        removeStepControl.Step.Status = ConfigurationStepStatus.NotStarted;
-        removeStepControl.SetStatus(ConfigStepControl.OPEN);
-        if (removeStepControl.SubSteps == null
-            || removeStepControl.SubSteps.Count == 0)
+        subCaptionLabel.Visible = false;
+        Wizard.BackButton.Enabled = false;
+        Wizard.ExecuteButton.Enabled = false;
+
+        // Reset failed steps.
+        foreach (var removeStepControl in RemoveStepsFlowLayoutPanel.Controls.OfType<RemoveStepControl>().Where(removeStepControl => removeStepControl.Controller.CurrentState == ConfigState.ConfigurationError))
         {
-          continue;
+          removeStepControl.Controller.ResetState();
+          removeStepControl.Step.Status = ConfigurationStepStatus.NotStarted;
+          removeStepControl.SetStatus(ConfigStepControl.OPEN);
+          if (removeStepControl.SubSteps == null
+              || removeStepControl.SubSteps.Count == 0)
+          {
+            continue;
+          }
+
+          foreach (var subStep in removeStepControl.SubSteps)
+          {
+            subStep.Step.Status = ConfigurationStepStatus.NotStarted;
+            subStep.SetStatus(ConfigStepControl.OPEN);
+          }
         }
 
-        foreach (var subStep in removeStepControl.SubSteps)
-        {
-          subStep.Step.Status = ConfigurationStepStatus.NotStarted;
-          subStep.SetStatus(ConfigStepControl.OPEN);
-        }
-      }
+        UninstallNextProduct();
+      };
 
-      UninstallNextProduct();
+      ExecuteLongRunningOperation(action, false, false);
     }
 
     /// <summary>
@@ -307,12 +314,39 @@ namespace MySql.Configurator.Wizards.RemoveWizard
     }
 
     /// <summary>
-    /// Unsubscribes events from the handlers.
+    /// Subscribes custom events relavant to this wizard page.
     /// </summary>
-    protected override void DetachEvents()
+    public override void SubscribeEvents()
     {
-      if (_parentRemoveStepControl == null)
+      base.SubscribeEvents();
+      if (_parentRemoveStepControl == null
+          || _parentRemoveStepControl.Controller == null)
       {
+        // We don't raise an exception because for this page the _parentRemoveStepControl
+        // is determined until the operation is ongoing and the control assinged
+        // to _parentRemoveStepControl changes based on the product currently being removed.
+        return;
+      }
+
+      _parentRemoveStepControl.Controller.ConfigurationStarted += ConfigurationStarted;
+      _parentRemoveStepControl.Controller.ConfigurationEnded += ConfigurationEnded;
+      _parentRemoveStepControl.Controller.ConfigureTimedOut += ConfigureTimedOut;
+      _parentRemoveStepControl.Controller.ConfigurationStatusChanged += controller_ConfigurationStatusChanged;
+      _parentRemoveStepControl.Controller.PackageUninstall += PackageUninstall;
+    }
+
+    /// <summary>
+    /// Unsubscribes custom events relavant to this wizard page.
+    /// </summary>
+    public override void UnsubscribeEvents()
+    {
+      base.UnsubscribeEvents();
+      if (_parentRemoveStepControl == null
+          || _parentRemoveStepControl.Controller == null)
+      {
+        // We don't raise an exception because for this page the _parentRemoveStepControl
+        // is determined until the operation is ongoing and the control assinged
+        // to _parentRemoveStepControl changes based on the product currently being removed.
         return;
       }
 
@@ -415,7 +449,6 @@ namespace MySql.Configurator.Wizards.RemoveWizard
     /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
     private void ConfigurationEnded(object sender, EventArgs e)
     {
-      Executing = false;
       _currentProgress = 100;
       SetProgress(100);
 
@@ -450,6 +483,7 @@ namespace MySql.Configurator.Wizards.RemoveWizard
         return;
       }
 
+      BeginLongRunningOperation();
       _currentProgress = 0;
       var stepCount = _parentRemoveStepControl.SubSteps == null
                       || _parentRemoveStepControl.SubSteps.Count == 0
@@ -806,55 +840,61 @@ namespace MySql.Configurator.Wizards.RemoveWizard
     /// </summary>
     private void TerminateUninstallOperation()
     {
-      subCaptionLabel.Text = Resources.RemoveStepsFinished;
-      if (RemoveStepsFlowLayoutPanel.Controls.OfType<RemoveStepControl>().Any(control =>
-           control.Controller.CurrentState == ConfigState.ConfigurationCancelled
-           || control.Controller.CurrentState == ConfigState.ConfigurationError))
+      try
       {
-        ConfigurationResultLabel.Text = Resources.RemoveFailed;
-        RetryButton.Visible = true;
-        RebootWhenDonePanel.Visible = true;
-        RebootWhenDoneCheckBox.Visible = false;
-        RebootWhenDoneLabel.Visible = false;
-        Wizard.BackButton.Enabled = true;
-        Wizard.BackButton.Visible = true;
-      }
-      else
-      {
-        ConfigurationResultLabel.Text = RemoveStepsFlowLayoutPanel.Controls.OfType<RemoveStepControl>().Any(control =>
-                                        control.HasFailedSubSteps(false) == true)
-                                          ? Resources.RemoveSuccessWithErrors
-                                          : Resources.RemoveSuccess;
-        RetryButton.Visible = false;
-        RebootWhenDonePanel.Visible = false;
-        Wizard.ExecuteButton.Visible = false;
-        Wizard.CancelButton.Visible = false;
-        Wizard.BackButton.Visible = false;
-        Wizard.FinishButton.Visible = true;
-        RemoveStepsFlowLayoutPanel.Height -= HEIGHT_REDUCED_WHEN_UNINSTALL_COMPLETE;
-      }
-
-      if (UninstallInstallerPanel.Visible)
-      {
-        ExecutionTabControl.Height -= HEIGHT_REDUCED_WHEN_UNINSTALL_COMPLETE;
-      }
-
-      if (RemoveStepsFlowLayoutPanel.Controls.OfType<RemoveStepControl>().Any(control => control.Controller.RebootRequired))
-      {
-        RebootWhenDonePanel.Visible = true;
-        RebootWhenDoneCheckBox.Visible = true;
-        RebootWhenDoneLabel.Visible = true;
-        RebootWhenDoneCheckBox.Checked = true;
-        ToolTip.SetToolTip(RebootWhenDoneCheckBox, GetRebootWhenDoneCheckBoxToolTip());
+        subCaptionLabel.Text = Resources.RemoveStepsFinished;
+        if (RemoveStepsFlowLayoutPanel.Controls.OfType<RemoveStepControl>().Any(control =>
+             control.Controller.CurrentState == ConfigState.ConfigurationCancelled
+             || control.Controller.CurrentState == ConfigState.ConfigurationError))
+        {
+          ConfigurationResultLabel.Text = Resources.RemoveFailed;
+          RetryButton.Visible = true;
+          RebootWhenDonePanel.Visible = true;
+          RebootWhenDoneCheckBox.Visible = false;
+          RebootWhenDoneLabel.Visible = false;
+          Wizard.BackButton.Enabled = true;
+          Wizard.BackButton.Visible = true;
+        }
+        else
+        {
+          ConfigurationResultLabel.Text = RemoveStepsFlowLayoutPanel.Controls.OfType<RemoveStepControl>().Any(control =>
+                                          control.HasFailedSubSteps(false) == true)
+                                            ? Resources.RemoveSuccessWithErrors
+                                            : Resources.RemoveSuccess;
+          RetryButton.Visible = false;
+          RebootWhenDonePanel.Visible = false;
+          Wizard.ExecuteButton.Visible = false;
+          Wizard.CancelButton.Visible = false;
+          Wizard.BackButton.Visible = false;
+          Wizard.FinishButton.Visible = true;
+          RemoveStepsFlowLayoutPanel.Height -= HEIGHT_REDUCED_WHEN_UNINSTALL_COMPLETE;
+        }
 
         if (UninstallInstallerPanel.Visible)
         {
           ExecutionTabControl.Height -= HEIGHT_REDUCED_WHEN_UNINSTALL_COMPLETE;
-          RebootWhenDonePanel.Location = new Point(RebootWhenDonePanel.Location.X, ExecutionTabControl.Location.Y + ExecutionTabControl.Height + 5);
+        }
+
+        if (RemoveStepsFlowLayoutPanel.Controls.OfType<RemoveStepControl>().Any(control => control.Controller.RebootRequired))
+        {
+          RebootWhenDonePanel.Visible = true;
+          RebootWhenDoneCheckBox.Visible = true;
+          RebootWhenDoneLabel.Visible = true;
+          RebootWhenDoneCheckBox.Checked = true;
+          ToolTip.SetToolTip(RebootWhenDoneCheckBox, GetRebootWhenDoneCheckBoxToolTip());
+
+          if (UninstallInstallerPanel.Visible)
+          {
+            ExecutionTabControl.Height -= HEIGHT_REDUCED_WHEN_UNINSTALL_COMPLETE;
+            RebootWhenDonePanel.Location = new Point(RebootWhenDonePanel.Location.X, ExecutionTabControl.Location.Y + ExecutionTabControl.Height + 5);
+          }
         }
       }
-
-      Wizard.FinishButton.Enabled = FinishOk;
+      finally
+      {
+        EndLongRunningOperation();
+        Wizard.FinishButton.Enabled = FinishOk;
+      }
     }
 
     /// <summary>
@@ -863,7 +903,7 @@ namespace MySql.Configurator.Wizards.RemoveWizard
     /// <returns></returns>
     private bool UninstallNextProduct()
     {
-      DetachEvents();
+      UnsubscribeEvents();
       var parentRemoveStepControl = RemoveStepsFlowLayoutPanel.Controls.OfType<RemoveStepControl>().FirstOrDefault(removeStepControl =>
         removeStepControl.Step.Status == ConfigurationStepStatus.NotStarted
         && removeStepControl.Controller.CurrentState != ConfigState.ConfigurationError);
@@ -874,12 +914,12 @@ namespace MySql.Configurator.Wizards.RemoveWizard
 
       _parentRemoveStepControl = parentRemoveStepControl;
       CurrentController = _parentRemoveStepControl.Controller;
-      Executing = true;
       CurrentController.ConfigurationStarted += ConfigurationStarted;
       CurrentController.ConfigurationEnded += ConfigurationEnded;
       CurrentController.ConfigureTimedOut += ConfigureTimedOut;
       CurrentController.ConfigurationStatusChanged += controller_ConfigurationStatusChanged;
       CurrentController.PackageUninstall += PackageUninstall;
+      SubscribeEvents();
       CurrentController.Remove();
       return true;
     }

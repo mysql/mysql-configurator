@@ -39,7 +39,6 @@ namespace MySql.Configurator.Wizards.Common
     #region Fields
 
     protected ProductConfigurationController CurrentController;
-    protected bool Executing;
     protected Stopwatch StopWatch;
 
     #endregion Fields
@@ -48,7 +47,6 @@ namespace MySql.Configurator.Wizards.Common
     {
       InitializeComponent();
       StopWatch = new Stopwatch();
-      Executing = false;
     }
 
     public BaseConfigureRemoveApplyPage(ProductConfigurationController controller)
@@ -79,16 +77,9 @@ namespace MySql.Configurator.Wizards.Common
       {
         string msg = string.Format(Resources.ConfirmFinishWithFailingConfig, CurrentController.Package.NameWithVersion);
         result = InfoDialog.ShowDialog(InfoDialogProperties.GetYesNoDialogProperties(InfoDialog.InfoType.Warning, Resources.AppName, msg)).DialogResult;
-        bool shouldClose = result == DialogResult.Yes;
-        if (shouldClose)
-        {
-          DetachEvents();
-        }
-
-        return shouldClose;
+        return result == DialogResult.Yes;
       }
 
-      DetachEvents();
       if (!RebootWhenDoneCheckBox.Checked)
       {
         return base.Finish();
@@ -144,15 +135,11 @@ namespace MySql.Configurator.Wizards.Common
       {
         SetControlVisibleStatus(Wizard.FinishButton, !Wizard.ExecuteButton.Visible);
         SetControlVisibleStatus(Wizard.BackButton, Wizard.ExecuteButton.Visible);
-        return !Executing;
+        return !OperationExecuting;
       }
     }
 
     #endregion Properties
-
-    protected virtual void DetachEvents()
-    {
-    }
     
     protected void RebootWhenDoneCheckBox_CheckedChanged_1(object sender, EventArgs e)
     {

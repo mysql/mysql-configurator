@@ -27,6 +27,7 @@ using System.Windows.Forms;
 using MySql.Configurator.Core.Classes;
 using MySql.Configurator.Core.Classes.Logging;
 using MySql.Configurator.Core.Interfaces;
+using Action = System.Action;
 using Utilities = MySql.Configurator.Core.Classes.Utilities;
 
 namespace MySql.Configurator.Core.Wizard
@@ -47,7 +48,6 @@ namespace MySql.Configurator.Core.Wizard
       InitializeComponent();
       ErrorProperties = ErrorProviderProperties.Empty;
       ErrorLabel = null;
-      WorkDone = false;
       PageVisible = true;
       DisabledControlShowingTooltip = null;
       SkipUpdateButtons = false;
@@ -82,6 +82,11 @@ namespace MySql.Configurator.Core.Wizard
     public virtual bool NextOk => Wizard.CanGoNext
                                   && !ValidationsErrorProvider.HasErrors();
 
+    /// <summary>
+    /// Gets or sets a value indicating that the page is busy executing an operation.
+    /// </summary>
+    public bool OperationExecuting { get; set; }
+
     public bool PageVisible { get; set; }
 
     public string SubCaption
@@ -95,12 +100,6 @@ namespace MySql.Configurator.Core.Wizard
     public virtual string TabTitle => AlternateTabTitle ?? captionLabel.Text;
 
     public IWizard Wizard { get; set; }
-
-    /// <summary>
-    /// Property that can be used to signal that a panel has done all its work and there is no
-    /// need to ask the user if he agrees when closing the application.
-    /// </summary>
-    public bool WorkDone { get; set; }
 
     /// <summary>
     /// Gets or sets <see cref="Utility.Classes.ErrorProviderProperties"/> to use with the <see cref="ValidationsErrorProvider"/>.
@@ -138,11 +137,21 @@ namespace MySql.Configurator.Core.Wizard
     public virtual void Activate()
     {
       Logger.LogInformation($"Beginning {Name}.");
+      OperationExecuting = false;
     }
 
     public virtual bool Back()
     {
       return true;
+    }
+
+    /// <summary>
+    /// Executes prep work needed before a long running operation. 
+    /// </summary>
+    public virtual void BeginLongRunningOperation()
+    {
+      Cursor = Cursors.WaitCursor;
+      OperationExecuting = true;
     }
 
     public virtual bool Cancel()
@@ -155,8 +164,43 @@ namespace MySql.Configurator.Core.Wizard
       Logger.LogInformation($"Finished {Name}.");
     }
 
+    /// <summary>
+    /// Executes post work needed after a long running operation.
+    /// </summary>
+    public virtual void EndLongRunningOperation()
+    {
+      Cursor = Cursors.Default;
+      OperationExecuting = false;
+    }
+
     public virtual void Execute()
     {
+    }
+
+    /// <summary>
+    /// Executes a long running operation with optional pre and post actions.
+    /// </summary>
+    /// <param name="longRunningOperation">An action corresponding to the code that will be executed.</param>
+    /// <param name="executeBeforeTasks">Flag to indicate if preparation tasks should be executed.</param>
+    /// <param name="executeAfterTasks">Flag to indicate if post tasks should be executed.</param>
+    protected void ExecuteLongRunningOperation(Action longRunningOperation, bool executeBeforeTasks = true, bool executeAfterTasks = true)
+    {
+      try
+      {
+        if (executeBeforeTasks)
+        {
+          BeginLongRunningOperation();
+        }
+
+        longRunningOperation();
+      }
+      finally
+      {
+        if (executeBeforeTasks)
+        {
+          EndLongRunningOperation();
+        }
+      }
     }
 
     public virtual bool Finish()
@@ -167,6 +211,18 @@ namespace MySql.Configurator.Core.Wizard
     public virtual bool Next()
     {
       return true;
+    }
+
+    /// <summary>
+    /// Subscribes custom events relavant to this wizard page.
+    /// </summary>
+    public virtual void SubscribeEvents()
+    {
+    }
+
+    /// Unsubscribes custom events relavant to this wizard page.
+    public virtual void UnsubscribeEvents()
+    {
     }
 
     public virtual void WizardShowing()
