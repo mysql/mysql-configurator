@@ -164,7 +164,7 @@ namespace MySql.Configurator.Core.IniFile.Template
     public string LogError { get; set; }
     public string LogOutput { get; set; }
     public string LongQueryTime { get; set; }
-    public uint LooseMySqlXPort { get; set; }
+    public uint MySqlXPort { get; set; }
     public LowerCaseTableNamesTypes LowerCaseTableNames { get; set; }
     public string MemoryName { get; set; }
     public double MyisamUsage { get; set; }
@@ -470,7 +470,7 @@ namespace MySql.Configurator.Core.IniFile.Template
       _formulaEngine.AssignFormulaVariable("bitedness", Win32.Is64BitOs ? "0" : "1");
       _formulaEngine.AssignFormulaVariable("secure_file_priv", SecureFilePriv);
       _formulaEngine.AssignFormulaVariable("plugin_load", PluginLoad);
-      _formulaEngine.AssignFormulaVariable("loose_mysqlx_port", LooseMySqlXPort.ToString());
+      _formulaEngine.AssignFormulaVariable("mysqlx_port", MySqlXPort.ToString());
       _formulaEngine.AssignFormulaVariable("named_pipe_full_access_group", NamedPipeFullAccessGroup);
       
       // In this case we don't want the existing file to be replaced.
@@ -1119,6 +1119,7 @@ namespace MySql.Configurator.Core.IniFile.Template
         new DeprecatedServerVariable("innodbclustertypeselection", ServerSeriesType.S57 | ServerSeriesType.S80),
         new DeprecatedServerVariable("sync_master_info", new Version(8,0,26)),
         new DeprecatedServerVariable("sync_relay_log_info=", new Version(8,0,34)),
+        new DeprecatedServerVariable("loose_mysqlx_port", ServerSeriesType.All),
         new DeprecatedServerVariable("server_type", ServerSeriesType.All)
       };
     }
