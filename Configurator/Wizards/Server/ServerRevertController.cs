@@ -60,7 +60,7 @@ namespace MySql.Configurator.Wizards.Server
     /// <summary>
     /// Gets or sets the existing server installation instance.
     /// </summary>
-    public LocalServerInstance ExistingServerInstallationInstance { get; set; }
+    public MySqlServerInstance ExistingServerInstallationInstance { get; set; }
 
     /// <summary>
     /// Flag indicating if the ini file was renamed.

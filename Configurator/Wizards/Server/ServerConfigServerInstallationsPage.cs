@@ -57,7 +57,7 @@ namespace MySql.Configurator.Wizards.Server
     /// <summary>
     /// A MySQL Server instance corresponding to an existing server installation differnt to the one being configured.
     /// </summary>
-    private LocalServerInstance _existingServerInstallationInstance;
+    private MySqlServerInstance _existingServerInstallationInstance;
 
     /// <summary>
     /// A dictionary containing configuration wizard pages and their corresponding original visibility values.
@@ -614,7 +614,7 @@ namespace MySql.Configurator.Wizards.Server
             break;
         }
 
-        _existingServerInstallationInstance = new LocalServerInstance(controller, null, port);
+        _existingServerInstallationInstance = new MySqlServerInstance(controller, null, port);
         _existingServerInstallationInstance.UserAccount.Password = RootPasswordTextBox.Text;
         _existingServerInstallationInstance.Controller.Settings.ExistingRootPassword = _existingServerInstallationInstance.UserAccount.Password;
         _existingServerInstallationInstance.ConnectionProtocol = ProtocolComboBox.SelectedIndex == 0
@@ -626,7 +626,7 @@ namespace MySql.Configurator.Wizards.Server
                                                                      ? PipeOrSharedMemoryNameTextBox.Text.Trim()
                                                                      : null;
         
-        var connectionResult = _existingServerInstallationInstance.CanConnectWithoutDedicatedProcess();
+        var connectionResult = _existingServerInstallationInstance.CanConnect();
         _rootPasswordOk = connectionResult == ConnectionResultType.ConnectionSuccess;
         ExistingConfigFileBrowseButton.Enabled = _rootPasswordOk;
         if (_rootPasswordOk)

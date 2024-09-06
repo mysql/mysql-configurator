@@ -83,7 +83,7 @@ namespace MySql.Configurator.Core.Dialogs
       OkButton.Enabled = false;
       TestConnectionButton.Enabled = false;
       var instance = new MySqlServerInstance(Port, new MySqlServerUser(Username, Password, _authenticationPlugin));
-      ConnectionResult = instance.CanConnect(true);
+      ConnectionResult = instance.CanConnectWithFallBackAuthenticationPlugin();
       ConnectionResultPictureBox.Image = ConnectionResult == ConnectionResultType.ConnectionSuccess
         ? Resources.ok_sign
         : Resources.error_sign;

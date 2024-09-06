@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -28,17 +28,18 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading;
+using System.ServiceProcess;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using MySql.Configurator.Core.Classes.Logging;
+using MySql.Configurator.Core.Common;
 using MySql.Configurator.Core.Controllers;
 using MySql.Configurator.Core.Enums;
 using MySql.Configurator.Properties;
 using MySql.Configurator.Wizards.Server;
 using MySql.Data.MySqlClient;
-using MySql.Data.MySqlClient.Authentication;
-using MySql.Configurator.Core.Common;
 
 namespace MySql.Configurator.Core.Classes.MySql
 {
@@ -53,6 +54,11 @@ namespace MySql.Configurator.Core.Classes.MySql
     /// The default name assigned to data directories.
     /// </summary>
     public const string DEFAULT_DATADIR_NAME_REGEX = @"MySQL Server (?<Series>\d{1,3}\.\d{1,3})";
+
+    /// <summary>
+    /// The default maximum number of retries for a connection attempt.
+    /// </summary>
+    public const int DEFAULT_MAX_CONNECTION_RETRIES = 10;
 
     /// <summary>
     /// The MySQL default port.
@@ -124,19 +130,24 @@ namespace MySql.Configurator.Core.Classes.MySql
     #region Fields
 
     /// <summary>
+    /// A dictionary with versions and variables that have been removed on each one since version 8.0.0.
+    /// </summary>
+    private static Dictionary<Version, List<string>> _removedVariables;
+
+    /// <summary>
     /// The base directory containing the MySQL Server instance installation files.
     /// </summary>
     private string _baseDir;
 
     /// <summary>
+    /// The <see cref="ServerConfigurationController"/> related to this instance.
+    /// </summary>
+    private ServerConfigurationController _controller;
+
+    /// <summary>
     /// The directory where the MySQL Server instance stores the data files.
     /// </summary>
     private string _dataDir;
-
-    /// <summary>
-    /// The member role of this instance in a group replication cluster.
-    /// </summary>
-    private GroupReplicationMemberRoleType _groupReplicationMemberRole;
 
     /// <summary>
     /// The ID of the process associated with this MySQL Server instance.
@@ -152,16 +163,6 @@ namespace MySql.Configurator.Core.Classes.MySql
     /// </summary>
     private Version _serverVersion;
 
-    /// <summary>
-    /// The MySQL service control manager associated to Windows services related to this instance (if any).
-    /// </summary>
-    private MySqlServiceControlManager _serviceControlManager;
-
-    /// <summary>
-    /// A dictionary with versions and variables that have been removed on each one since version 8.0.0.
-    /// </summary>
-    private static Dictionary<Version, List<string>> _removedVariables;
-
     #endregion Fields
 
     /// <summary>
@@ -171,7 +172,8 @@ namespace MySql.Configurator.Core.Classes.MySql
     /// <param name="reportStatusDelegate">An <seealso cref="System.Action"/> to output status messages.</param>
     public MySqlServerInstance(uint port, Action<string> reportStatusDelegate = null)
     {
-      _groupReplicationMemberRole = GroupReplicationMemberRoleType.Unknown;
+      _controller = null;
+      _removedVariables = new Dictionary<Version, List<string>>();
       ConnectionProtocol = MySqlConnectionProtocol.Tcp;
       DisableReportStatus = false;
       PipeOrSharedMemoryName = null;
@@ -191,6 +193,25 @@ namespace MySql.Configurator.Core.Classes.MySql
       : this(port, reportStatusDelegate)
     {
       UserAccount = userAccount;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <seealso cref="MySqlServerInstance"/> class.
+    /// </summary>
+    /// <param name="controller">The <see cref="ServerConfigurationController"/> related to this instance.</param>
+    /// <param name="reportStatusDelegate">An <seealso cref="System.Action"/> to output status messages.</param>
+    /// <param name="port">The port where this instance listens for connections.</param>
+    public MySqlServerInstance(ServerConfigurationController controller, Action<string> reportStatusDelegate = null, uint port = MySqlServerInstance.DEFAULT_PORT)
+      : this(port, reportStatusDelegate)
+    {
+      _controller = controller ?? throw new ArgumentNullException(nameof(controller));
+      MaxConnectionRetries = DEFAULT_MAX_CONNECTION_RETRIES;
+      Type = ServerConfigurationType.StandAlone;
+      ParseErrorLogForAcceptingConnections = true;
+      Port = _controller.Settings.Port;
+      UserAccount = MySqlServerUser.GetLocalRootUser(_controller.Settings.RootPassword, _controller.Settings.DefaultAuthenticationPlugin);
+      UseOldSettings = false;
+      WaitUntilAcceptingConnections = true;
     }
 
     #region Properties
@@ -288,7 +309,7 @@ namespace MySql.Configurator.Core.Classes.MySql
                                    "metadata_locks_cache_size",
                                    "metadata_locks_hash_instances" }
             },
-            { 
+            {
               new Version(8, 0, 16),
               new List<string>() { "internal_tmp_disk_storage_engine" }
             },
@@ -333,9 +354,19 @@ namespace MySql.Configurator.Core.Classes.MySql
     }
 
     /// <summary>
+    /// Gets the password used to configure this instance.
+    /// </summary>
+    public string ConfigurationRootPassword => _controller.Settings.ExistingRootPassword;
+
+    /// <summary>
     /// Gets or sets the <see cref="MySqlConnectionProtocol"/> for establishing connections.
     /// </summary>
     public MySqlConnectionProtocol ConnectionProtocol { get; set; }
+
+    /// <summary>
+    /// Gets the controller associated to this server instance.
+    /// </summary>
+    public ServerConfigurationController Controller => _controller;
 
     /// <summary>
     /// Gets the directory where the MySQL Server instance stores the data files.
@@ -365,32 +396,15 @@ namespace MySql.Configurator.Core.Classes.MySql
     }
 
     /// <summary>
-    /// Flag indicating if any reporting of statuses is disabled even if the <seealso cref="ReportStatusDelegate"/> exists.
+    /// Gets a value indicating whether this instance is local or not.
     /// </summary>
-    protected bool DisableReportStatus { get; set; }
-
-    /// <summary>
-    /// Gets the member role of this instance in a group replication cluster.
-    /// </summary>
-    /// <remarks>Accesses the database the first time it is called.
-    /// Otherwise, it returns the previously obtained value.</remarks>
-    public GroupReplicationMemberRoleType GroupReplicationMemberRole
-    {
-      get
-      {
-        if (_groupReplicationMemberRole == GroupReplicationMemberRoleType.Unknown)
-        {
-          _groupReplicationMemberRole = GetGroupReplicationMemberRole();
-        }
-
-        return _groupReplicationMemberRole;
-      }
-    }
+    public bool IsLocalInstance => ProcessId != 0;
 
     /// <summary>
     /// Gets a value indicating whether this instance is running and connections can be made.
     /// </summary>
-    public bool IsRunning => RunningProcess != null
+    public bool IsRunning => IsLocalInstance
+                             && RunningProcess != null
                              && !RunningProcess.HasExited;
 
     /// <summary>
@@ -412,9 +426,19 @@ namespace MySql.Configurator.Core.Classes.MySql
     }
 
     /// <summary>
+    /// Gets or sets the maximum number of retries to perform with the connection.
+    /// </summary>
+    public int MaxConnectionRetries { get; set; }
+
+    /// <summary>
     /// Gets the name of this instance containing its Server version.
     /// </summary>
-    public virtual string NameWithVersion => $"{UserAccount.Host}:{Port}";
+    public string NameWithVersion => _controller?.Package?.NameWithVersion;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to determine if the server is accepting connections after starting it by parsing its error log, or by attempting connecting to it.
+    /// </summary>
+    public bool ParseErrorLogForAcceptingConnections { get; set; }
 
     /// <summary>
     /// Gets or sets the name of the Windows pipe or the shared memory to use when establishing connections.
@@ -454,7 +478,8 @@ namespace MySql.Configurator.Core.Classes.MySql
     {
       get
       {
-        if (_runningProcess == null && ProcessId > 0)
+        if (_runningProcess == null 
+            && ProcessId > 0)
         {
           _runningProcess = Utilities.GetRunningProcess(ProcessId);
         }
@@ -464,19 +489,14 @@ namespace MySql.Configurator.Core.Classes.MySql
     }
 
     /// <summary>
-    /// Gets the Server ID of this instance.
+    /// Gets the full file path for the Server configuration file.
     /// </summary>
-    public virtual uint ServerId
-    {
-      get
-      {
-        const string SQL = "SELECT @@server_id";
-        var id = ExecuteScalar(SQL, out var error);
-        return string.IsNullOrEmpty(error)
-          ? (uint)id
-          : 0;
-      }
-    }
+    public string ServerConfigFilePath => _controller?.Settings?.FullConfigFilePath;
+
+    /// <summary>
+    /// Gets the full file path for the Server executable.
+    /// </summary>
+    public string ServerExecutableFilePath => _controller?.ServerExecutableFilePath;
 
     /// <summary>
     /// Gets the server version number of this instance.
@@ -495,19 +515,20 @@ namespace MySql.Configurator.Core.Classes.MySql
     }
 
     /// <summary>
-    /// Gets the MySQL service control manager associated to Windows services related to this instance (if any).
+    /// Gets or sets the service name.
     /// </summary>
-    public MySqlServiceControlManager ServiceControlManager
+    public string ServiceName
     {
-      get
+      get { return _controller?.Settings?.ServiceName; }
+      set 
       {
-        if (_serviceControlManager == null
-            && !string.IsNullOrEmpty(BaseDir))
+        if (_controller == null
+            || _controller.Settings == null)
         {
-          _serviceControlManager = new MySqlServiceControlManager(BaseDir);
+          throw new ArgumentNullException(nameof(_controller));
         }
 
-        return _serviceControlManager;
+        _controller.Settings.ServiceName = value;
       }
     }
 
@@ -517,27 +538,203 @@ namespace MySql.Configurator.Core.Classes.MySql
     public MySqlSslMode SslMode { get; set; }
 
     /// <summary>
+    /// Gets the <seealso cref="ServerConfigurationType"/> this instance was configured as.
+    /// </summary>
+    public ServerConfigurationType Type { get; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether settings before current configuration changes are used, otherwise the settings after configuration changes.
+    /// </summary>
+    public bool UseOldSettings { get; set; }
+
+    /// <summary>
     /// Gets the <see cref="MySqlServerUser"/> to establish connections.
     /// </summary>
     public MySqlServerUser UserAccount { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the method keeps trying to connect until successful or the given maximum number of retries is reached.
+    /// </summary>
+    public bool WaitUntilAcceptingConnections { get; set; }
+
+    /// <summary>
+    /// Flag indicating if any reporting of statuses is disabled even if the <seealso cref="ReportStatusDelegate"/> exists.
+    /// </summary>
+    protected bool DisableReportStatus { get; set; }
+
     #endregion Properties
 
     /// <summary>
-    /// Checks if the name of the data directory matches the default name assigned by the configurator.
+    /// Checks if a connection to the server can be established.
     /// </summary>
-    /// <param name="checkForVersion">If not <c>null</c>, it also checks the first 2 digits of the given version are not used in the name.</param>
-    /// <returns><c>true</c> if name of the data directory matches the default name assigned by the configurator, <c>false</c> otherwise.</returns>
-    public bool IsDataDirNameDefault(Version differentToVersion = null)
+    /// <param name="controller">The <see cref="ServerConfigurationController"/> related to this instance.</param>
+    /// <param name="passwordOverride">A password to use instead of the one in the configuration settings.</param>
+    /// <param name="useOldSettings">Flag indicating whether settings before current configuration changes are used, otherwise the settings after configuration changes.</param>
+    /// <returns>A <see cref="ConnectionResultType"/> value.</returns>
+    public static ConnectionResultType CanConnect(ServerConfigurationController controller, string passwordOverride = null, bool useOldSettings = false)
     {
-      if (string.IsNullOrEmpty(DataDir))
+      if (controller == null)
       {
-        throw new Exception(Resources.ServerInstanceFailedToRetrieveDataDir);
+        throw new ArgumentNullException(nameof(controller));
       }
 
-      var parentFolder = new DirectoryInfo(DataDir).Parent.Name;
-      var match = Regex.Match(parentFolder, DEFAULT_DATADIR_NAME_REGEX, RegexOptions.IgnoreCase);
-      return differentToVersion != null ? match.Success && match.Groups["Series"].Value != differentToVersion.ToString(2) : match.Success;
+      var serverInstance = new MySqlServerInstance(controller)
+      {
+        UseOldSettings = useOldSettings
+      };
+
+      var settings = useOldSettings
+                     ? controller.OldSettings
+                     : controller.Settings;
+      serverInstance.ConnectionProtocol = settings.EnableTcpIp
+                                            ? MySqlConnectionProtocol.Tcp
+                                            : settings.EnableSharedMemory
+                                              ? MySqlConnectionProtocol.SharedMemory
+                                              : MySqlConnectionProtocol.NamedPipe;
+      serverInstance.AllowPublicKeyRetrieval = settings.IsNamedPipeTheOnlyEnabledProtocol;
+      if (settings.IsNamedPipeTheOnlyEnabledProtocol)
+      {
+        serverInstance.PipeOrSharedMemoryName = settings.PipeName;
+        serverInstance.SslMode = MySqlSslMode.Disabled;
+      }
+
+      if (passwordOverride != null)
+      {
+        serverInstance.UserAccount.Password = passwordOverride;
+      }
+
+      if (useOldSettings)
+      {
+        serverInstance.UserAccount.AuthenticationPlugin = controller.DefaultAuthenticationPluginChanged
+        ? controller.OldSettings.DefaultAuthenticationPlugin
+        : controller.Settings.DefaultAuthenticationPlugin;
+      }
+
+      var isInitiallyRunning = serverInstance.IsRunning;
+      if (!isInitiallyRunning)
+      {
+        var additionalOptions = controller.IsStartAndUpgradeConfigurationStepNeeded
+          ? "--upgrade=MINIMAL"
+          : null;
+        if (!serverInstance.StartInstanceAsProcess(additionalOptions))
+        {
+          return ConnectionResultType.HostNotRunning;
+        }
+      }
+
+      var connectionResult = serverInstance.CanConnect();
+      if (!isInitiallyRunning)
+      {
+        serverInstance.KillInstanceProcess();
+      }
+
+      return connectionResult;
+    }
+
+    /// <summary>
+    /// Checks if a connection to the server can be established.
+    /// </summary>
+    /// <param name="controller">The <see cref="ServerConfigurationController"/> related to this instance.</param>
+    /// <param name="errorMessage">A custom error message for specific cases.</param>
+    /// <param name="passwordOverride">A password to use instead of the one in the configuration settings.</param>
+    /// <param name="useOldSettings">Flag indicating whether settings before current configuration changes are used, otherwise the settings after configuration changes.</param>
+    /// <param name="checkDataDirectoryInUse">Flag indicating whether to check that the error was caused by the data directory already being used by another process.</param>
+    /// <returns>A <see cref="ConnectionResultType"/> value.</returns>
+    public static ConnectionResultType CanConnect(ServerConfigurationController controller, out string errorMessage, string passwordOverride = null, bool useOldSettings = false, bool checkDataDirectoryInUse = false)
+    {
+      errorMessage = null;
+      var mySqlErrorLog = new ServerErrorLog(controller.ErrorLogFilePath);
+      var connectionResult = CanConnect(controller, passwordOverride, useOldSettings);
+      if (!checkDataDirectoryInUse
+          || connectionResult != ConnectionResultType.HostNotRunning)
+      {
+        return connectionResult;
+      }
+
+      errorMessage = GetDataDirectoryInUseErrorMessage(mySqlErrorLog, controller);
+      return connectionResult;
+    }
+
+    /// <summary>
+    /// Gets the list of MySQL processes that potentially conflict with the current process.
+    /// </summary>
+    /// <param name="controller">The <see cref="ServerConfigurationController"/> related to this instance.</param>
+    /// <returns>An array containing a list of conflicting processes.</returns>
+    public static Process[] GetPotentialConflictingProcesses(ServerConfigurationController controller)
+    {
+      if (controller == null)
+      {
+        throw new ArgumentNullException(nameof(controller));
+      }
+
+      var processId = Utilities.GetServerInstanceProcessId(controller.DataDirectory);
+      Process[] processes = null;
+      var processList = new List<Process>();
+      Process currentProcess = null;
+      try
+      {
+        processes = Process.GetProcessesByName("mysqld");
+        currentProcess = Process.GetProcessById(processId);
+        if (processes == null
+          || processes.Length == 0)
+        {
+          return null;
+        }
+
+        processList.AddRange(processes.Where(process => process.Id != processId));
+      }
+      catch (Exception)
+      {
+        Logger.LogError(Resources.FailedToRetrieveMySqldProcesses);
+        return null;
+      }
+
+      return processList.ToArray();
+    }
+
+    /// <summary>
+    /// Gets the error message associated to the host not running because the data directory is being used.
+    /// </summary>
+    /// <param name="mySqlErrorLog">An object representing the error log of the current server instance.</param>
+    /// <param name="controller">The current server instance controller.</param>
+    /// <returns>A string representing the error message found in the error log.</returns>
+    public static string GetDataDirectoryInUseErrorMessage(ServerErrorLog mySqlErrorLog, ServerConfigurationController controller)
+    {
+      if (mySqlErrorLog == null)
+      {
+        return null;
+      }
+
+      string errorMessage = null;
+      mySqlErrorLog.ReadNewLinesFromFile(true);
+      var logLines = mySqlErrorLog.LogLines.Select(line => line.Message).ToList();
+      if (logLines.Count > 0)
+      {
+        var latestFail = logLines.FindLast(o => o.Contains("must be writable"));
+        if (!string.IsNullOrEmpty(latestFail))
+        {
+          var affectedFilesMessage = "The process(es) id(s) potentially using the affected files are: {0}.";
+          var conflictingProcesses = GetPotentialConflictingProcesses(controller);
+          if (conflictingProcesses == null)
+          {
+            return Resources.DataDirectoryInUse;
+          }
+
+          var builder = new StringBuilder();
+          for (int i = 0; i < conflictingProcesses.Length; i++)
+          {
+            builder.Append(conflictingProcesses[i].Id);
+            if (i < conflictingProcesses.Length - 1)
+            {
+              builder.Append(", ");
+            }
+          }
+
+          errorMessage = $"{Resources.DataDirectoryInUse}.{Environment.NewLine}{string.Format(affectedFilesMessage, builder.ToString())}";
+        }
+      }
+
+      return errorMessage;
     }
 
     /// <summary>
@@ -588,41 +785,6 @@ namespace MySql.Configurator.Core.Classes.MySql
              || exeName.EndsWith("mysqld-nt.exe")
              || exeName.EndsWith("mysqld")
              || exeName.EndsWith("mysqld-nt");
-    }
-
-    /// <summary>
-    /// Validates if the provided service name follows the default naming convention.
-    /// </summary>
-    /// <param name="serviceName">The service name.</param>
-    /// <param name="differentToVersion">Flag to indicate if the comparison should validate that the service doesn't match the provided version.</param>
-    /// <returns><c>true</c> if the service name follows the default naming convention; otherwise, <c>false</c>.</returns>
-    public bool IsServiceNameDefault(string serviceName, Version differentToVersion = null)
-    {
-      if (string.IsNullOrEmpty(serviceName))
-      {
-        return false;
-      }
-
-      var match = Regex.Match(serviceName, DEFAULT_SERVICE_NAME_REGEX, RegexOptions.IgnoreCase);
-      return differentToVersion != null ? match.Success && match.Groups["Series"].Value != differentToVersion.ToString(2) : match.Success;
-    }
-
-    /// <summary>
-    /// Validates that the given host name or IP address is well formed.
-    /// </summary>
-    /// <param name="hostNameOrIpAddress">A host name or IP address.</param>
-    /// <param name="validHostNameType">The type of hostnames to validate against (a combination of flags can be given).</param>
-    /// <returns>An empty string if the host name or IP address is well formed, otherwise an error message.</returns>
-    public static string ValidateHostNameOrIpAddress(string hostNameOrIpAddress, ValidHostNameType validHostNameType = ValidHostNameType.DNS | ValidHostNameType.IPv4)
-    {
-      if (string.IsNullOrWhiteSpace(hostNameOrIpAddress))
-      {
-        return Resources.MySqlServerInstanceRequiredHostOrIpError;
-      }
-
-      return !validHostNameType.HasFlag(Uri.CheckHostName(hostNameOrIpAddress).ToValidHostNameType())
-        ? Resources.MySqlServerInstanceInvalidHostOrIpError
-        : string.Empty;
     }
 
     /// <summary>
@@ -713,36 +875,6 @@ namespace MySql.Configurator.Core.Classes.MySql
     }
 
     /// <summary>
-    /// Validates the given MySQL schema or table name.
-    /// </summary>
-    /// <param name="name">A MySQL schema or table name.</param>
-    /// <returns>An empty string if the MySQL schema or table name is valid, otherwise an error message.</returns>
-    public static string ValidateSchemaOrTableName(string name)
-    {
-      if (string.IsNullOrWhiteSpace(name))
-      {
-        return Resources.MySqlSchemaTableNameEmptyOrWhiteSpaceError;
-      }
-
-      if (name.Length > MAX_MYSQL_SCHEMA_OR_TABLE_NAME_LENGTH)
-      {
-        return string.Format(Resources.MySqlSchemaTableNameExceedsMaxLengthError, MAX_MYSQL_SCHEMA_OR_TABLE_NAME_LENGTH);
-      }
-
-      if (name.EndsWith(" "))
-      {
-        return Resources.MySqlSchemaTableNameEndsWithWhiteSpaceError;
-      }
-
-      if (name.All(char.IsDigit))
-      {
-        return Resources.MySqlSchemaTableNameAllDigitsError;
-      }
-
-      return string.Empty;
-    }
-
-    /// <summary>
     /// Validates that the given MySQL user name is well formed.
     /// </summary>
     /// <param name="username">A MySQL user name.</param>
@@ -754,15 +886,48 @@ namespace MySql.Configurator.Core.Classes.MySql
     }
 
     /// <summary>
-    /// Checks if a connection to this instance can be established with the credentials in <see cref="UserAccount"/>.
+    /// Checks if the name of the data directory matches the default name assigned by the configurator.
     /// </summary>
-    /// <param name="fallbackAuthenticationPlugin">Flag indicating if the connection must be retried with a different authentication plugin if it fails.</param>
+    /// <param name="checkForVersion">If not <c>null</c>, it also checks the first 2 digits of the given version are not used in the name.</param>
+    /// <returns><c>true</c> if name of the data directory matches the default name assigned by the configurator, <c>false</c> otherwise.</returns>
+    public bool IsDataDirNameDefault(Version differentToVersion = null)
+    {
+      if (string.IsNullOrEmpty(DataDir))
+      {
+        throw new Exception(Resources.ServerInstanceFailedToRetrieveDataDir);
+      }
+
+      var parentFolder = new DirectoryInfo(DataDir).Parent.Name;
+      var match = Regex.Match(parentFolder, DEFAULT_DATADIR_NAME_REGEX, RegexOptions.IgnoreCase);
+      return differentToVersion != null ? match.Success && match.Groups["Series"].Value != differentToVersion.ToString(2) : match.Success;
+    }
+
+    /// <summary>
+    /// Validates if the provided service name follows the default naming convention.
+    /// </summary>
+    /// <param name="serviceName">The service name.</param>
+    /// <param name="differentToVersion">Flag to indicate if the comparison should validate that the service doesn't match the provided version.</param>
+    /// <returns><c>true</c> if the service name follows the default naming convention; otherwise, <c>false</c>.</returns>
+    public bool IsServiceNameDefault(string serviceName, Version differentToVersion = null)
+    {
+      if (string.IsNullOrEmpty(serviceName))
+      {
+        return false;
+      }
+
+      var match = Regex.Match(serviceName, DEFAULT_SERVICE_NAME_REGEX, RegexOptions.IgnoreCase);
+      return differentToVersion != null ? match.Success && match.Groups["Series"].Value != differentToVersion.ToString(2) : match.Success;
+    }
+
+    /// <summary>
+    /// Checks if a connection to this instance can be established with the credentials in <see cref="UserAccount"/>.
+    /// The connection is retried with a different authentication plugin if it fails.
+    /// </summary>
     /// <returns>A <see cref="ConnectionResultType"/> value.</returns>
-    public ConnectionResultType CanConnect(bool fallbackAuthenticationPlugin)
+    public ConnectionResultType CanConnectWithFallBackAuthenticationPlugin()
     {
       var connectionResult = CanConnect();
       if (connectionResult == ConnectionResultType.ConnectionError
-          && fallbackAuthenticationPlugin
           && UserAccount.AuthenticationPlugin != MySqlAuthenticationPluginType.None
           && UserAccount.AuthenticationPlugin != MySqlAuthenticationPluginType.Windows)
       {
@@ -789,8 +954,14 @@ namespace MySql.Configurator.Core.Classes.MySql
     /// Checks if a connection to this instance can be established with the credentials in <see cref="UserAccount"/>.
     /// </summary>
     /// <returns>A <see cref="ConnectionResultType"/> value.</returns>
-    public virtual ConnectionResultType CanConnect()
+    public ConnectionResultType CanConnect()
     {
+      if (IsLocalInstance
+          && !IsRunning)
+      {
+        return ConnectionResultType.HostNotRunning;
+      }
+
       if (!IsUsernameValid)
       {
         return ConnectionResultType.InvalidUserName;
@@ -898,7 +1069,7 @@ namespace MySql.Configurator.Core.Classes.MySql
     /// <param name="sqlQuery">A query that returns a <see cref="DataTable"/>.</param>
     /// <param name="error">An error message if an error occurred.</param>
     /// <returns>A <see cref="DataTable"/> with the query results, or <c>null</c> if an error occurs.</returns>
-    public virtual DataTable ExecuteQuery(string sqlQuery, out string error)
+    public DataTable ExecuteQuery(string sqlQuery, out string error)
     {
       error = null;
       DataTable dataTable = null;
@@ -924,7 +1095,7 @@ namespace MySql.Configurator.Core.Classes.MySql
     /// <param name="outputScriptToStatus">Flag indicating whether feedback about the scripts being executed is sent to the output.</param>
     /// <param name="sqlScripts">An array of SQL scripts to execute.</param>
     /// <returns>The number of scripts that executed successfully.</returns>
-    public virtual int ExecuteScripts(bool outputScriptToStatus, params string[] sqlScripts)
+    public int ExecuteScripts(bool outputScriptToStatus, params string[] sqlScripts)
     {
       if (sqlScripts.Length == 0
           || !IsUsernameValid)
@@ -978,128 +1149,14 @@ namespace MySql.Configurator.Core.Classes.MySql
     /// </summary>
     /// <param name="schemaName">The name of the default schema to work with.</param>
     /// <returns>The connection string builder used to establish a connection to this instance.</returns>
-    public virtual MySqlConnectionStringBuilder GetConnectionStringBuilder(string schemaName = null)
+    public MySqlConnectionStringBuilder GetConnectionStringBuilder(string schemaName = null)
     {
-      if (UserAccount == null)
+      if (_controller == null)
       {
-        return null;
+        throw new ArgumentNullException(nameof(_controller));
       }
 
-      var builder = new MySqlConnectionStringBuilder()
-      {
-        Server = string.IsNullOrEmpty(UserAccount.Host) ? MySqlServerUser.LOCALHOST : UserAccount.Host,
-        DefaultCommandTimeout = 120,
-        Pooling = false,
-        UserID = UserAccount.Username,
-        Password = UserAccount.Password,
-        ConnectionProtocol = ConnectionProtocol,
-        AllowPublicKeyRetrieval = AllowPublicKeyRetrieval,
-        SslMode = SslMode
-      };
-
-      // Previous versions of Connector/NET had SslMode=None now SslMode=Required is the default value
-      // and only works when using a SHA256 authentication plugin. For other plugins it needs to explicitly bet set to None.
-      if (UserAccount.AuthenticationPlugin != MySqlAuthenticationPluginType.Sha256Password
-          && UserAccount.AuthenticationPlugin != MySqlAuthenticationPluginType.CachingSha2Password)
-      {
-        builder.SslMode = MySqlSslMode.Disabled;
-      }
-
-      if (!string.IsNullOrEmpty(schemaName))
-      {
-        builder.Database = schemaName;
-      }
-
-      switch (ConnectionProtocol)
-      {
-        case MySqlConnectionProtocol.Tcp:
-          builder.Port = Port;
-          break;
-
-        case MySqlConnectionProtocol.Pipe:
-        case MySqlConnectionProtocol.SharedMemory:
-          builder.PipeName = PipeOrSharedMemoryName;
-          break;
-      }
-
-      return builder;
-    }
-
-    /// <summary>
-    /// <summary>
-    /// Gets a value indicating the member role of this instance in a group replication cluster.
-    /// </summary>
-    /// <returns>A value indicating the member role of this instance in a group replication cluster.</returns>
-    /// <remarks>Forces accesing the database to get the member role.</remarks>
-    public GroupReplicationMemberRoleType GetGroupReplicationMemberRole()
-    {
-      if (ServerVersion == null)
-      {
-        return GroupReplicationMemberRoleType.Unknown;
-      }
-
-      string error;
-      if (ServerVersion.ServerSupportsMemberRoleColumn())
-      {
-        const string SQL = "SELECT `member_role` FROM `performance_schema`.`replication_group_members` AS `rgmems` WHERE `rgmems`.`member_id`= @@server_uuid";
-        var status = ExecuteScalar(SQL, out error);
-        if (string.IsNullOrEmpty(error))
-        {
-          // No entries found in the performance_schema.replication_group_members table.
-          if (status == null)
-          {
-            return GroupReplicationMemberRoleType.None;
-          }
-
-          return Enum.TryParse(status.ToString(), true, out GroupReplicationMemberRoleType parsed)
-            ? parsed
-            : GroupReplicationMemberRoleType.Unknown;
-        }
-      }
-      else
-      {
-        const string COUNT_SQL = "SELECT COUNT(*) FROM `performance_schema`.`replication_group_members` AS `rgmems` WHERE `rgmems`.`member_id`= @@server_uuid";
-        if (int.TryParse(ExecuteScalar(COUNT_SQL, out error).ToString(), out var count)
-            && string.IsNullOrEmpty(error))
-        {
-          // No entries found in the performance_schema.replication_group_members table.
-          if (count != 1)
-          {
-            return GroupReplicationMemberRoleType.None;
-          }
-
-          // An instance having an entry in the performance_schema.replication_group_members table and set as read_only indicates it is a replica(secondary) instance.
-          const string READ_ONLY_SQL = "SELECT @@read_only";
-          if (int.TryParse(ExecuteScalar(READ_ONLY_SQL, out error).ToString(), out count)
-              && string.IsNullOrEmpty(error))
-          {
-            return count == 1
-              ? GroupReplicationMemberRoleType.Secondary
-              : GroupReplicationMemberRoleType.Primary;
-          }
-        }
-      }
-
-      ReportStatus($"{Resources.ServerInstanceGetGroupReplicationMemberRoleError} {error}");
-      return GroupReplicationMemberRoleType.Unknown;
-    }
-
-    /// <summary>
-    /// Gets the server id of the instance.
-    /// </summary>
-    /// <returns>The server id if it could be successfully retrieved; otherwise <c>null</c>.</returns>
-    public uint? GetServerId()
-    {
-      const string SQL = "SELECT @@server_id";
-      var serverid = ExecuteScalar(SQL, out var error);
-      if (string.IsNullOrEmpty(error))
-      {
-        uint.TryParse(serverid.ToString(), out uint parsed);
-        return parsed;
-      }
-
-      ReportStatus($"{Resources.ServerInstanceGetServerIdError} {error}");
-      return null;
+      return _controller.GetConnectionStringBuilder(UserAccount, UseOldSettings, schemaName);
     }
 
     /// <summary>
@@ -1322,9 +1379,89 @@ namespace MySql.Configurator.Core.Classes.MySql
     }
 
     /// <summary>
+    /// Attempts to connect to the Server instance and do a graceful shutdown before stopping it.
+    /// </summary>
+    /// <param name="useOldSettings">Flag indicating whether the old settings must be used instead of the new settings to build the command line options.</param>
+    /// <returns><c>true</c> if the Server is stopped (gracefully or not), <c>false</c> otherwise.</returns>
+    public new bool ShutdownInstance(bool useOldSettings)
+    {
+      if (_controller.Package.License == LicenseType.Commercial
+          && _controller.ConfigurationType == ConfigurationType.New
+          && !_controller.IsThereServerDataFiles
+          && _controller.ServerVersion.ServerSupportsEnterpriseFirewall())
+      {
+        // If the user is retrying configuration the data will be recreated so the root user will have a blank password
+        // Changes done for Bug #21085453 - FAILED CONFIGURATION STEPS FOR EFW ARE NOT PROPERLY INDICATED AFTER EXECUTION
+        _controller.Settings.ExistingRootPassword = string.Empty;
+      }
+
+      if ((_controller.OldSettings == null
+           || !_controller.OldSettings.ConfigureAsService)
+          &&
+          !string.IsNullOrEmpty(_controller.Settings.ExistingRootPassword))
+      {
+        var tempConfigFileWithPassword = Core.Classes.Utilities.CreateTempConfigurationFile(IniFile.IniFile.GetClientPasswordLines(_controller.Settings.ExistingRootPassword));
+        var sendingPasswordInCommandLine = tempConfigFileWithPassword == null;
+        var connectionOptions = sendingPasswordInCommandLine
+          ? $"--password={_controller.Settings.ExistingRootPassword} "
+          : $"--defaults-extra-file=\"{tempConfigFileWithPassword}\" ";
+        connectionOptions += _controller.GetCommandLineConnectionOptions(null, false, useOldSettings);
+        ReportStatus(Resources.ServerShutdownSettingInnoDbFastShutdown);
+        var result = Core.Classes.Utilities.RunProcess(
+          Path.Combine(_controller.InstallDirectory, ServerProductConfigurationController.BINARY_DIRECTORY_NAME, ServerProductConfigurationController.CLIENT_EXECUTABLE_FILENAME),
+          $" {connectionOptions} -e\"SET GLOBAL innodb_fast_shutdown = 0\"",
+          null,
+          ReportStatus,
+          ReportStatus,
+          true);
+        ReportStatus(result.ExitCode == 0
+          ? Resources.ServerShutdownSettingInnoDbFastShutdownSuccess
+          : Resources.ServerShutdownSettingInnoDbFastShutdownError);
+
+        ReportStatus(Resources.ServerShutdownMySqlAdminShutDown);
+        result = Core.Classes.Utilities.RunProcess(
+          Path.Combine(_controller.InstallDirectory, ServerProductConfigurationController.BINARY_DIRECTORY_NAME, ServerProductConfigurationController.ADMIN_TOOL_EXECUTABLE_FILENAME),
+          $" {connectionOptions} shutdown",
+          null,
+          ReportStatus,
+          ReportStatus,
+          true);
+        ReportStatus(result.ExitCode == 0
+          ? Resources.ServerShutdownMySqlAdminShutDownSuccess
+          : Resources.ServerShutdownMySqlAdminShutDownError);
+        Core.Classes.Utilities.DeleteFile(tempConfigFileWithPassword, 10, 500);
+      }
+
+      StopInstance();
+      return WaitUntilNotRunning(1, 30);
+    }
+
+    /// <summary>
+    /// Starts this Server instance as previously configured (Windows Service or process).
+    /// </summary>
+    /// <param name="additionalOptions">Additional options to pass to the server process.</param>
+    /// <returns>A <see cref="ServerStartStatus"/> value.</returns>
+    public ServerStartStatus StartInstance(string additionalOptions = null)
+    {
+      return _controller.Settings.ConfigureAsService
+        ? StartInstanceAsServiceWithExtendedStatus(additionalOptions)
+        : StartInstanceAsProcessWithExtendedStatus(additionalOptions, true);
+    }
+
+    /// <summary>
+    /// Starts a new process for this MySQL Server instance.
+    /// </summary>
+    /// <param name="additionalOptions">Additional options to pass to the server process.</param>
+    /// <returns><c>true</c> if the instance process was started successfully, <c>false</c> otherwise.</returns>
+    public bool StartInstanceAsProcess(string additionalOptions = null)
+    {
+      return StartInstanceAsProcessWithExtendedStatus(additionalOptions).Started;
+    }
+
+    /// <summary>
     /// Stops this Server instance as previously configured (Windows Service or process).
     /// </summary>
-    public virtual void StopInstance()
+    public void StopInstance()
     {
       if (!IsRunning)
       {
@@ -1334,15 +1471,25 @@ namespace MySql.Configurator.Core.Classes.MySql
       ReportStatus(Resources.StoppingServerInstanceText);
       try
       {
-        if (ServiceControlManager != null)
+        string mysqlWindowsServiceName = null;
+        if (_controller.OldSettings != null
+            && MySqlServiceControlManager.ServiceExists(_controller.OldSettings.ServiceName)
+            && MySqlServiceControlManager.GetServiceStatus(_controller.OldSettings.ServiceName) == ServiceControllerStatus.Running)
         {
-          var serviceName = ServiceControlManager.GetBestServiceNameMatchingConfigFileDirectory(DataDir);
-          if (!string.IsNullOrEmpty(serviceName))
-          {
-            ReportStatus(Resources.ServerInstanceStoppingWindowsServiceText);
-            MySqlServiceControlManager.Stop(serviceName);
-            ReportStatus(Resources.ServerInstanceStoppedWindowsServiceText);
-          }
+          mysqlWindowsServiceName = _controller.OldSettings.ServiceName;
+        }
+        else if (_controller.Settings != null
+                 && MySqlServiceControlManager.ServiceExists(_controller.Settings.ServiceName)
+                 && MySqlServiceControlManager.GetServiceStatus(_controller.Settings.ServiceName) == ServiceControllerStatus.Running)
+        {
+          mysqlWindowsServiceName = _controller.Settings.ServiceName;
+        }
+
+        if (!string.IsNullOrEmpty(mysqlWindowsServiceName))
+        {
+          ReportStatus(Resources.ServerInstanceStoppingWindowsServiceText);
+          MySqlServiceControlManager.Stop(mysqlWindowsServiceName, _controller.CancellationToken);
+          ReportStatus(Resources.ServerInstanceStoppedWindowsServiceText);
         }
         else if (IsRunning)
         {
@@ -1383,11 +1530,127 @@ namespace MySql.Configurator.Core.Classes.MySql
         result = cmd.ExecuteNonQuery();
         cmd.FlushPrivileges();
       }
-      
+
       if (result == -1)
       {
         throw new ConfiguratorException(ConfiguratorError.AuthenticationPluginUpdateFailed);
       }
+    }
+
+    /// <summary>
+    /// Keeps retrying to open a connection to this instance until it is successful.
+    /// </summary>
+    /// <param name="reportStatusChanges">Flag indicating whether status changes are output to configuration log.</param>
+    /// <param name="maxRetries">The number of retries to attempt a connection. If <c>0</c> or lower, retry indefinitely.</param>
+    /// <returns><c>true</c> if a connection could be opened, <c>false</c> otherwise.</returns>
+    public bool WaitUntilConnectionSuccessful(bool reportStatusChanges, int maxRetries = DEFAULT_MAX_CONNECTION_RETRIES)
+    {
+      if (maxRetries < 0)
+      {
+        // Set a reasonable maximum, no need to have a never-ending loop.
+        maxRetries = 100;
+      }
+
+      int currentRetry = 0;
+      var currentUseOldSettings = UseOldSettings;
+      if (reportStatusChanges)
+      {
+        ReportStatus(string.Format(Resources.ServerConfigWaitingForSuccesfulConnectionText, NameWithVersion, maxRetries));
+      }
+
+      var success = false;
+      uint connectionTimeOut = 10;
+      const int WAITING_TIME_BETWEEN_CONNECTIONS_IN_SECONDS = 5;
+      while (!success && currentRetry < maxRetries)
+      {
+        var flipSettings = true;
+        currentRetry++;
+        if (currentRetry > 1)
+        {
+          if (reportStatusChanges)
+          {
+            ReportStatus(string.Format(Resources.ServerConfigWaitingForSuccesfulConnectionRetryWaitText, WAITING_TIME_BETWEEN_CONNECTIONS_IN_SECONDS));
+          }
+
+          Thread.Sleep(WAITING_TIME_BETWEEN_CONNECTIONS_IN_SECONDS * 1000);
+        }
+
+        try
+        {
+          var connStringBuilder = GetConnectionStringBuilder();
+          connStringBuilder.ConnectionTimeout = connectionTimeOut;
+          if (reportStatusChanges)
+          {
+            ReportStatus(string.Format(Resources.ServerConfigWaitingForSuccesfulConnectionRetryText, currentRetry, connStringBuilder.GetHostIdentifier(), connStringBuilder.UserID, string.IsNullOrEmpty(connStringBuilder.Password) ? "no" : "a"));
+          }
+
+          using (var c = new MySqlConnection(connStringBuilder.ConnectionString))
+          {
+            c.Open();
+          }
+
+          success = true;
+        }
+        catch (System.TimeoutException timeoutException)
+        {
+          // Increase the timeout, see what happens in the next retry.
+          connectionTimeOut *= 2;
+          Logger.LogException(timeoutException);
+          if (reportStatusChanges)
+          {
+            ReportStatus($"Timeout error: {timeoutException.Message}");
+            ReportStatus($"Increasing timeout to {connectionTimeOut} seconds and retrying.");
+          }
+        }
+        catch (MySqlException mySqlException)
+        {
+          if (mySqlException.Message.IndexOf("access denied", StringComparison.InvariantCultureIgnoreCase) >= 0)
+          {
+            // This means the current root user can't connect with the current credentials but the Server is accepting connections
+            success = true;
+            break;
+          }
+
+          if (reportStatusChanges)
+          {
+            ReportStatus($"MySQL error {mySqlException.Number}: {mySqlException.Message}");
+          }
+
+          Logger.LogException(mySqlException);
+          if (mySqlException.Message.IndexOf("hosts", StringComparison.InvariantCultureIgnoreCase) > 0)
+          {
+            if (UseOldSettings)
+            {
+              UseOldSettings = false;
+              flipSettings = false;
+            }
+          }
+
+          if (flipSettings)
+          {
+            // Try flipping the UseOldSettings value and reconnecting
+            UseOldSettings = !UseOldSettings;
+          }
+        }
+        catch (Exception ex)
+        {
+          Logger.LogException(ex);
+          if (reportStatusChanges)
+          {
+            ReportStatus($"Unknown error: {ex.Message}");
+          }
+        }
+      }
+
+      if (reportStatusChanges)
+      {
+        ReportStatus(success
+                      ? string.Format(Resources.ServerConfigWaitingForSuccesfulConnectionSuccessText, NameWithVersion)
+                      : string.Format(Resources.ServerConfigWaitingForSuccesfulConnectionFailedText, NameWithVersion, currentRetry));
+      }
+
+      UseOldSettings = currentUseOldSettings;
+      return success;
     }
 
     /// <summary>
@@ -1477,27 +1740,6 @@ namespace MySql.Configurator.Core.Classes.MySql
     }
 
     /// <summary>
-    /// Gets a value indicating the member count for the group replication cluster.
-    /// </summary>
-    /// <returns>A value indicating the member count for the group replication cluster.</returns>
-    private int GetGroupReplicationMemberCount()
-    {
-      const string SQL = "SELECT COUNT(*) FROM `performance_schema`.`replication_group_members`";
-      var count = ExecuteScalar(SQL, out var error);
-      if (string.IsNullOrEmpty(error))
-      {
-        if (count == null)
-        {
-          return -1;
-        }
-        return Convert.ToInt32(count.ToString());
-      }
-
-      ReportStatus($"An error occurred when trying to retrieve the member count of the cluster: {error}");
-      return -1;
-    }
-
-    /// <summary>
     /// Gets a value representing the version number of this instance.
     /// </summary>
     /// <returns>The version number of this instance.</returns>
@@ -1520,6 +1762,309 @@ namespace MySql.Configurator.Core.Classes.MySql
 
       ReportStatus($"{Resources.ServerInstanceGetServerVersionError} {error}");
       return null;
+    }
+
+    /// <summary>
+    /// Reports any errors related to starting the server.
+    /// </summary>
+    /// <param name="logLines">A list of log lines to process.</param>
+    private void ReportServerStartErrors(List<ServerErrorLogLine> logLines)
+    {
+      if (logLines == null
+          || logLines.Count() == 0)
+      {
+        return;
+      }
+
+      var errorLines = logLines.Where(line => line.Type.Equals("Error", StringComparison.OrdinalIgnoreCase));
+      if (errorLines.Count() > 0)
+      {
+        var errorLineMessages = errorLines.Select(line => line.Message).ToList();
+        var builder = new StringBuilder();
+        builder.AppendLine(Resources.ServerConfigStartServerFailedWithErrors);
+        foreach (var errorLineMessage in errorLineMessages)
+        {
+          builder.AppendLine(errorLineMessage);
+        }
+
+        ReportStatus(builder.ToString());
+      }
+      else
+      {
+        ReportStatus(Resources.ServerConfigStartServerFailedWIthUnknownError);
+      }
+    }
+
+    /// <summary>
+    /// Starts a new process for this MySQL Server instance.
+    /// </summary>
+    /// <param name="additionalOptions">Additional options to pass to the server process.</param>
+    /// <param name="connectionsWaitReportStatus">Flag indicating if messages are reported while testing connection attempts.</param>
+    /// <returns>A <see cref="ServerStartStatus"/> instance.</returns>
+    private ServerStartStatus StartInstanceAsProcessWithExtendedStatus(string additionalOptions = null, bool connectionsWaitReportStatus = false)
+    {
+      var startStatus = new ServerStartStatus(false);
+      if (IsRunning)
+      {
+        startStatus.Started = true;
+        return startStatus;
+      }
+
+      if (string.IsNullOrEmpty(ServerExecutableFilePath)
+          || string.IsNullOrEmpty(ServerConfigFilePath))
+      {
+        startStatus.Started = false;
+        return startStatus;
+      }
+
+      ReportStatus(string.Format(Resources.ServerConfigProcessStartingText, NameWithVersion));
+      var isAdditionalOptionEmpty = string.IsNullOrEmpty(additionalOptions);
+      var isSelfContainedUpgrade = !isAdditionalOptionEmpty
+                                   && additionalOptions.IndexOf("--upgrade", StringComparison.InvariantCultureIgnoreCase) >= 0;
+      var isInitializingDatabase = !isAdditionalOptionEmpty
+                                   && additionalOptions.IndexOf("--initialize", StringComparison.InvariantCultureIgnoreCase) >= 0;
+      var redirectOutputToConsole = !isSelfContainedUpgrade
+                                    && ReportStatusDelegate != null;
+      var coreOptionsBuilder = new StringBuilder();
+      if (File.Exists(ServerConfigFilePath))
+      {
+        coreOptionsBuilder.Append("--defaults-file=\"");
+        coreOptionsBuilder.Append(ServerConfigFilePath);
+        coreOptionsBuilder.Append("\"");
+      }
+      else
+      {
+        coreOptionsBuilder.Append("--port=");
+        coreOptionsBuilder.Append(Port);
+        if (!string.IsNullOrEmpty(_controller.DataDirectory))
+        {
+          coreOptionsBuilder.Append(" --datadir=\"");
+          coreOptionsBuilder.Append(Path.Combine(_controller.DataDirectory, "data"));
+          coreOptionsBuilder.Append("\"");
+        }
+      }
+
+      // Initialize the async task that will parse the error log in case of a self-contained upgrade or in case of parsing the error log file to determine if the server is accepting connections
+      Task<ServerUpgradeStatus> parsingLogForUpgradeTask = null;
+      Task<bool> parsingLogForAcceptingConnectionsTask = null;
+      ServerErrorLog mySqlErrorLog = null;
+      var parseErrorLog = isSelfContainedUpgrade
+                          || ParseErrorLogForAcceptingConnections
+                             && WaitUntilAcceptingConnections;
+      if (parseErrorLog)
+      {
+        _controller.UseStatusesList = redirectOutputToConsole;
+        mySqlErrorLog = new ServerErrorLog(_controller.ErrorLogFilePath, redirectOutputToConsole ? _controller.StatusesList : null)
+        {
+          ReportStatusDelegate = ReportStatus,
+          ReportWaitingDelegate = _controller.ReportWaiting
+        };
+        if (isSelfContainedUpgrade)
+        {
+          parsingLogForUpgradeTask = Task.Factory.StartNew(() => mySqlErrorLog.ParseServerUpgradeMessages(_controller.ServerVersion), _controller.CancellationToken);
+        }
+        else
+        {
+          parsingLogForAcceptingConnectionsTask = Task.Factory.StartNew(() => mySqlErrorLog.ParseServerAcceptingConnectionMessage(_controller.ServerVersion, !redirectOutputToConsole), _controller.CancellationToken);
+        }
+      }
+
+      var consoleOption = redirectOutputToConsole
+        ? " --console"
+        : string.Empty;
+      if (!string.IsNullOrEmpty(additionalOptions))
+      {
+        additionalOptions = " " + additionalOptions;
+      }
+
+      var processResult = Core.Classes.Utilities.RunProcess(
+        ServerExecutableFilePath,
+        $"{coreOptionsBuilder}{consoleOption}{additionalOptions}",
+        null,
+        ReportStatus,
+        ReportStatus,
+        isInitializingDatabase);
+      startStatus.Started = processResult != null
+                            && (isInitializingDatabase
+                              ? processResult.ExitCode == 0
+                              : processResult.RunProcess != null
+                                && !processResult.RunProcess.HasExited);
+      ReportStatus(string.Format(startStatus.Started ? Resources.ServerConfigProcessStartedSuccessfullyText : Resources.ServerConfigProcessStartFailedText, NameWithVersion));
+      if (startStatus.Started
+          && parseErrorLog)
+      {
+        if (isSelfContainedUpgrade)
+        {
+          parsingLogForUpgradeTask.Wait(_controller.CancellationToken);
+          startStatus.UpgradeStatus = parsingLogForUpgradeTask.IsCompleted
+            ? parsingLogForUpgradeTask.Result
+            : new ServerUpgradeStatus();
+          startStatus.AcceptingConnections = startStatus.UpgradeStatus.AcceptingConnections;
+        }
+        else
+        {
+          parsingLogForAcceptingConnectionsTask.Wait(_controller.CancellationToken);
+          startStatus.AcceptingConnections = parsingLogForAcceptingConnectionsTask.IsCompleted
+                                             && parsingLogForAcceptingConnectionsTask.Result;
+        }
+      }
+      else if (parseErrorLog)
+      {
+        ReportServerStartErrors(mySqlErrorLog.LogLines);
+      }
+
+      if (WaitUntilAcceptingConnections
+          && startStatus.Started
+          && (!parseErrorLog
+              || !startStatus.AcceptingConnections))
+      {
+        startStatus.AcceptingConnections = WaitUntilConnectionSuccessful(connectionsWaitReportStatus);
+      }
+
+      _controller.UseStatusesList = false;
+      parsingLogForUpgradeTask?.Dispose();
+      parsingLogForAcceptingConnectionsTask?.Dispose();
+      return startStatus;
+    }
+
+    /// <summary>
+    /// Starts the Windows service related to this MySQL Server instance.
+    /// </summary>
+    /// <param name="additionalOptions">Additional options to pass to the Windows service.</param>
+    /// <returns>A <see cref="ServerStartStatus"/> instance.</returns>
+    private ServerStartStatus StartInstanceAsServiceWithExtendedStatus(string additionalOptions = null)
+    {
+      var isSelfContainedUpgrade = !string.IsNullOrEmpty(additionalOptions)
+                                   && additionalOptions.IndexOf("--upgrade", StringComparison.InvariantCultureIgnoreCase) >= 0;
+      var startStatus = new ServerStartStatus(true);
+      Task<ServerUpgradeStatus> parsingLogForUpgradeTask = null;
+      Task<bool> parsingLogTask = null;
+      var mySqlErrorLog = new ServerErrorLog(_controller.ErrorLogFilePath)
+      {
+        ReportStatusDelegate = ReportStatus,
+        ReportWaitingDelegate = _controller.ReportWaiting
+      };
+      ReportStatus(string.Format(Resources.ServerConfigEventStartServiceInfo, _controller.Settings.ServiceName));
+
+      // Initialize the async task that will parse the error log in case of a self-contained upgrade
+      if (isSelfContainedUpgrade)
+      {
+        parsingLogForUpgradeTask = Task.Factory.StartNew(() => mySqlErrorLog.ParseServerUpgradeMessages(_controller.ServerVersion), _controller.CancellationToken);
+        try
+        {
+          MySqlServiceControlManager.Start(_controller.Settings.ServiceName, _controller.CancellationToken, additionalOptions, 90);
+          parsingLogForUpgradeTask.Wait(_controller.CancellationToken);
+          if (parsingLogForUpgradeTask.IsCompleted
+              && parsingLogForUpgradeTask.Result.AcceptingConnections)
+          {
+            startStatus.Started = true;
+            ReportStatus(string.Format(Resources.ServerConfigEventStartServiceSuccess, _controller.Settings.ServiceName));
+          }
+        }
+        catch (System.ServiceProcess.TimeoutException)
+        {
+          startStatus.Started = false;
+          ReportServerStartErrors(mySqlErrorLog.LogLines);
+        }
+        catch
+        {
+          startStatus.Started = false;
+          ReportStatus(string.Format(Resources.ServerConfigEventStartServiceError, _controller.Settings.ServiceName));
+        }
+
+        if (!startStatus.Started)
+        {
+          // One final check in case parsing log failed.
+          try
+          {
+            using (var ssc = new ExpandedServiceController(_controller.Settings.ServiceName))
+            {
+              if (ssc.Status == ServiceControllerStatus.Running)
+              {
+                startStatus.Started = true;
+                startStatus.AcceptingConnections = true;
+              }
+            }
+          }
+          catch (Exception ex)
+          {
+            Logger.LogException(ex);
+            throw;
+          }
+        }
+
+        // Await for the async task that parses the error log in case of a self-contained upgrade to check when the upgrade has finished
+        if (startStatus.Started)
+        {
+          parsingLogForUpgradeTask.Wait(_controller.CancellationToken);
+          startStatus.UpgradeStatus = parsingLogForUpgradeTask.IsCompleted
+            ? parsingLogForUpgradeTask.Result
+            : new ServerUpgradeStatus();
+          startStatus.AcceptingConnections = startStatus.UpgradeStatus.AcceptingConnections;
+        }
+
+        parsingLogForUpgradeTask.Dispose();
+      }
+      else
+      {
+        parsingLogTask = Task.Factory.StartNew(() => mySqlErrorLog.ParseServerAcceptingConnectionMessage(_controller.ServerVersion, true, !isSelfContainedUpgrade, 90), _controller.CancellationToken);
+        try
+        {
+          MySqlServiceControlManager.Start(_controller.Settings.ServiceName, _controller.CancellationToken, additionalOptions, 90);
+          parsingLogTask.Wait(_controller.CancellationToken);
+          if (parsingLogTask.IsCompleted
+              && parsingLogTask.Result)
+          {
+            startStatus.Started = true;
+            ReportStatus(string.Format(Resources.ServerConfigEventStartServiceSuccess, _controller.Settings.ServiceName));
+          }
+        }
+        catch (System.ServiceProcess.TimeoutException)
+        {
+          startStatus.Started = false;
+          ReportServerStartErrors(mySqlErrorLog.LogLines);
+        }
+        catch
+        {
+          startStatus.Started = false;
+          ReportStatus(string.Format(Resources.ServerConfigEventStartServiceError, _controller.Settings.ServiceName));
+        }
+        finally
+        {
+          parsingLogTask.Dispose();
+        }
+
+        if (!startStatus.Started)
+        {
+          // One final check in case parsing log failed.
+          try
+          {
+            using (var ssc = new ExpandedServiceController(_controller.Settings.ServiceName))
+            {
+              if (ssc.Status == ServiceControllerStatus.Running)
+              {
+                startStatus.Started = true;
+                startStatus.AcceptingConnections = true;
+              }
+            }
+          }
+          catch (Exception ex)
+          {
+            Logger.LogException(ex);
+            throw;
+          }
+        }
+      }
+
+      if (WaitUntilAcceptingConnections
+          && startStatus.Started
+          && (!startStatus.AcceptingConnections
+              || !ParseErrorLogForAcceptingConnections))
+      {
+        startStatus.AcceptingConnections = WaitUntilConnectionSuccessful(true, MaxConnectionRetries);
+      }
+
+      return startStatus;
     }
   }
 }

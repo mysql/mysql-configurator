@@ -28,6 +28,7 @@ using System.Windows.Forms;
 using MySql.Configurator.Core.Wizard;
 using MySql.Configurator.Properties;
 using Action = System.Action;
+using MySql.Configurator.Core.Classes.MySql;
 
 namespace MySql.Configurator.Wizards.Server
 {
@@ -131,7 +132,7 @@ namespace MySql.Configurator.Wizards.Server
         ResultLabel.Text = Resources.StartingServerAndTestingConnection;
         var providerProperties = new ErrorProviderProperties(Resources.StartingServerAndTestingConnection, Resources.Config_InProgressIcon, true);
         ConnectionErrorProvider.SetProperties(ConnectButton, providerProperties);
-        _connectionResult = LocalServerInstance.CanConnect(_controller, out string errorMessage, PasswordTextBox.Text, true, true);
+        _connectionResult = MySqlServerInstance.CanConnect(_controller, out string errorMessage, PasswordTextBox.Text, true, true);
         providerProperties.ErrorMessage = string.IsNullOrEmpty(errorMessage)
           ? _connectionResult.GetDescription()
           : errorMessage;

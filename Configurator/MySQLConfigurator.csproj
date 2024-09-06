@@ -163,9 +163,9 @@
     <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchPasswordVault.cs" />
     <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchServer.cs" />
     <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchServerCollection.cs" />
-    <Compile Include="Core\Classes\MySQL\MySqlServerInstance.cs" />
     <Compile Include="Core\Classes\MySQL\MySqlServerStartupParameters.cs" />
     <Compile Include="Core\Classes\MySQL\MySqlServerUser.cs" />
+    <Compile Include="Core\Classes\MySQL\MySqlServerInstance.cs" />
     <Compile Include="Core\Classes\NativeMethods.cs" />
     <Compile Include="Core\Classes\Options\CommandLineOption.cs" />
     <Compile Include="Core\Classes\Options\CommandLineOptions.cs" />
@@ -501,7 +501,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Wizards\Server\GrantedPrivilege.cs" />
-    <Compile Include="Wizards\Server\LocalServerInstance.cs" />
     <Compile Include="Wizards\Server\MysqlSCM.cs" />
     <Compile Include="Wizards\Server\MySqlServerSettings.cs" />
     <Compile Include="Wizards\Server\Plugin.cs" />
@@ -904,9 +903,7 @@
       </AssemblyAttributes>
     </ItemGroup>
     <MakeDir Directories="$(IntermediateOutputPath)" />
-    <WriteCodeFragment Language="C#"
-                       OutputFile="$(IntermediateOutputPath)Version.cs"
-                       AssemblyAttributes="@(AssemblyAttributes)" />
+    <WriteCodeFragment Language="C#" OutputFile="$(IntermediateOutputPath)Version.cs" AssemblyAttributes="@(AssemblyAttributes)" />
     <ItemGroup>
       <Compile Include="$(IntermediateOutputPath)Version.cs" />
     </ItemGroup>
