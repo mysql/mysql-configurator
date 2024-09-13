@@ -25,6 +25,7 @@ namespace MySql.Configurator.Core.Enums
 {
   public enum ServerInstallationType
   {
+    None = 0,
     Dedicated = 1,
     Server = 2,
     Developer = 3,

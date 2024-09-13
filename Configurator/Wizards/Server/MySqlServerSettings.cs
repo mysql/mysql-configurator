@@ -64,6 +64,7 @@ namespace MySql.Configurator.Wizards.Server
     {
       NewServerUsers = new List<ServerUser>();
       Plugins = new PluginsList(p.Version);
+      ServerInstallationType = ServerInstallationType.Developer;
     }
 
     #region Properties
