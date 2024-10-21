@@ -119,7 +119,7 @@ namespace MySql.Configurator.Wizards.Server
     private ConfigurationStep _updateWindowsFirewallRulesStep;
     private ConfigurationStep _updateWindowsServiceStep;
     private ConfigurationStep _upgradeStandAloneServerStep;
-    private LocalServerInstance _upgradingInstance;
+    private MySqlServerInstance _upgradingInstance;
     private ConfigurationStep _writeConfigurationFileStep;
 
     #endregion
@@ -224,7 +224,7 @@ namespace MySql.Configurator.Wizards.Server
     /// <summary>
     /// Gets or sets a MySQL Server instance corresponding to an existing server installation different to the one being configured.
     /// </summary>
-    public LocalServerInstance ExistingServerInstallationInstance { get; set; }
+    public MySqlServerInstance ExistingServerInstallationInstance { get; set; }
 
     /// <summary>
     /// Gets the list of firewall rules on this computer.
@@ -359,7 +359,7 @@ namespace MySql.Configurator.Wizards.Server
     {
       get
       {
-        var serverInstanceInfo = new LocalServerInstance(this, ReportStatus);
+        var serverInstanceInfo = new MySqlServerInstance(this, ReportStatus);
         serverInstanceInfo.UseOldSettings = ConfigurationType == ConfigurationType.Reconfiguration;
         return (ConfigurationType == ConfigurationType.Reconfiguration
                 && IsStartServerConfigurationStepNeeded
@@ -1530,7 +1530,7 @@ namespace MySql.Configurator.Wizards.Server
         return;
       }
 
-      var serverInstance = new LocalServerInstance(this, ReportErrLogLine)
+      var serverInstance = new MySqlServerInstance(this, ReportErrLogLine)
       {
         UserAccount = GetUserAccountToConnectBeforeUpdatingRootUser()
       };
@@ -1862,7 +1862,7 @@ namespace MySql.Configurator.Wizards.Server
 
       CancellationToken.ThrowIfCancellationRequested();
       ReportStatus(Resources.ServerConfigInitializeDatabaseRunningInitializeInsecureText);
-      var localServerInstance = new LocalServerInstance(this, ReportErrLogLine)
+      var localServerInstance = new MySqlServerInstance(this, ReportErrLogLine)
       {
         WaitUntilAcceptingConnections = false
       };
@@ -2158,7 +2158,7 @@ namespace MySql.Configurator.Wizards.Server
     {
       if (_upgradingInstance == null)
       {
-        _upgradingInstance = new LocalServerInstance(this, ReportStatus);
+        _upgradingInstance = new MySqlServerInstance(this, ReportStatus);
       }
 
       var success = _upgradingInstance.IsRunning;
@@ -2475,7 +2475,7 @@ namespace MySql.Configurator.Wizards.Server
     private ServerStartStatus StartServer(bool waitUntilAcceptingConnections = true, bool setStepStatus = true, string additionalOptions = null)
     {
       CancellationToken.ThrowIfCancellationRequested();
-      var serverInstance = new LocalServerInstance(this, ReportErrLogLine)
+      var serverInstance = new MySqlServerInstance(this, ReportErrLogLine)
       {
         UserAccount = GetUserAccountToConnectBeforeUpdatingRootUser(),
         WaitUntilAcceptingConnections = waitUntilAcceptingConnections
@@ -2562,7 +2562,7 @@ namespace MySql.Configurator.Wizards.Server
     private void StopServerSafe(bool useOldSettings)
     {
       CancellationToken.ThrowIfCancellationRequested();
-      var serverInstanceInfo = new LocalServerInstance(this, ReportStatus);
+      var serverInstanceInfo = new MySqlServerInstance(this, ReportStatus);
       serverInstanceInfo.UseOldSettings = useOldSettings;
 
       // Set the data directory to allow the call to the ShutdownInstance method to correctly validate
@@ -2675,7 +2675,7 @@ namespace MySql.Configurator.Wizards.Server
           return;
         }
         
-        var serverInstanceInfo = new LocalServerInstance(this, ReportStatus);
+        var serverInstanceInfo = new MySqlServerInstance(this, ReportStatus);
         if (serverInstanceInfo.IsRunning)
         {
           ReportStatus(Resources.ServerConfigInstanceRunning);

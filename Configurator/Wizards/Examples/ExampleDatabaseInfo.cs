@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using MySql.Configurator.Core.Classes.MySql;
 using MySql.Configurator.Wizards.Server;
 
 namespace MySql.Configurator.Wizards.Examples
@@ -118,9 +119,9 @@ namespace MySql.Configurator.Wizards.Examples
     /// <summary>
     /// Installs the sample database (schema and/or data) in the given MySQL Server instance.
     /// </summary>
-    /// <param name="localInstance">The <seealso cref="LocalServerInstance"/> where the sample database will be installed.</param>
+    /// <param name="localInstance">The <seealso cref="MySqlServerInstance"/> where the sample database will be installed.</param>
     /// <returns><c>true</c> if the sample database was installed successfully, <c>false</c> otherwise.</returns>
-    public bool Install(LocalServerInstance localInstance)
+    public bool Install(MySqlServerInstance localInstance)
     {
       if (localInstance == null
           || string.IsNullOrEmpty(SchemaFilePath)
@@ -143,7 +144,7 @@ namespace MySql.Configurator.Wizards.Examples
       return localInstance.ExecuteScripts(false, sqlSchema, sqlData) == scriptsCount;
     }
 
-    public bool Remove(string schemaName, LocalServerInstance localInstance)
+    public bool Remove(string schemaName, MySqlServerInstance localInstance)
     {
       if (localInstance == null
           || string.IsNullOrEmpty(schemaName))
