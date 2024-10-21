@@ -104,19 +104,19 @@ namespace MySql.Configurator.Wizards.Server
       switch (ConfigTypeComboBox.SelectedIndex)
       {
         case 0:
-          _settings.ServerInstallType = ServerInstallationType.Developer;
+          _settings.ServerInstallationType = ServerInstallationType.Developer;
           break;
 
         case 1:
-          _settings.ServerInstallType = ServerInstallationType.Server;
+          _settings.ServerInstallationType = ServerInstallationType.Server;
           break;
 
         case 2:
-          _settings.ServerInstallType = ServerInstallationType.Dedicated;
+          _settings.ServerInstallationType = ServerInstallationType.Dedicated;
           break;
 
         case 3:
-          _settings.ServerInstallType = ServerInstallationType.Manual;
+          _settings.ServerInstallationType = ServerInstallationType.Manual;
           break;
       }
 
@@ -167,7 +167,7 @@ namespace MySql.Configurator.Wizards.Server
       ConfigTypeComboBox.SelectedIndex = 0;
       if (_controller.ConfigurationType == ConfigurationType.Reconfiguration)
       {
-        switch(_settings.ServerInstallType)
+        switch(_settings.ServerInstallationType)
         {
           case ServerInstallationType.Dedicated:
             ConfigTypeComboBox.SelectedIndex = 2;

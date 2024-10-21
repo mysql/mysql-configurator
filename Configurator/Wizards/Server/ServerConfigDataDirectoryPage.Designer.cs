@@ -128,7 +128,6 @@ namespace MySql.Configurator.Wizards.Server
       // DataDirectoryBrowserDialog
       // 
       this.DataDirectoryBrowserDialog.Description = "Select the MySQL Server data directory";
-      this.DataDirectoryBrowserDialog.RootFolder = System.Environment.SpecialFolder.CommonApplicationData;
       // 
       // ServerConfigDataDirectoryPage
       // 

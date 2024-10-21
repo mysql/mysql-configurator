@@ -310,11 +310,12 @@ namespace MySql.Configurator.Wizards.Server
     /// <summary>
     /// Gets a value indicating if there are steps that require to be executed for a server removal.
     /// </summary>
-    public bool IsRemovalExecutionNeeded => IsDeleteDataDirectoryStepNeeded
-      || IsDeleteConfigurationFileStepNeeded
-      || IsDeleteServiceStepNeeded
-      || IsRemoveFirewallRuleStepNeeded
-      || IsStopServerConfigurationStepNeeded;
+    public bool IsRemovalExecutionNeeded => IsDataDirectoryConfigured
+      && (IsDeleteDataDirectoryStepNeeded
+          || IsDeleteConfigurationFileStepNeeded
+          || IsDeleteServiceStepNeeded
+          || IsRemoveFirewallRuleStepNeeded
+          || IsStopServerConfigurationStepNeeded);
 
     /// <summary>
     /// Gets a value indicating whether the removal step that deletes the firewall rules needs to run.
@@ -2090,7 +2091,7 @@ namespace MySql.Configurator.Wizards.Server
                              Settings.IniDirectory,
                              !string.IsNullOrEmpty(Settings.ConfigFile) ? Settings.ConfigFile : BaseServerSettings.DEFAULT_CONFIG_FILE_NAME,
                              version,
-                             Settings.ServerInstallType,
+                             Settings.ServerInstallationType,
                              _revertController);
     }
 
@@ -2221,7 +2222,8 @@ namespace MySql.Configurator.Wizards.Server
       ReportStatus(string.Format(Resources.RemovingFirewallRuleText, Settings.Port));
 
       var removedXProtocolFirewallRule = true;
-      if (Settings.OpenFirewallForXProtocol)
+      if (Settings.OpenFirewallForXProtocol
+          && Settings.MySqlXPort != 0)
       {
         removedXProtocolFirewallRule = RemoveFirewallRule(Settings.MySqlXPort);
       }

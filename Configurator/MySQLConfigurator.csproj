@@ -2,6 +2,7 @@
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Version Condition=" '$(Configuration)' == 'Debug' ">999.999.999</Version>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
@@ -186,7 +187,6 @@
     <Compile Include="Core\Controllers\ControllerSettingAttribute.cs" />
     <Compile Include="Core\Controllers\ControllerSettings.cs" />
     <Compile Include="Core\Controllers\ControllerType.cs" />
-    <Compile Include="Core\Controllers\ExtendedServerSettings.cs" />
     <Compile Include="Core\Controllers\PluginManager.cs" />
     <Compile Include="Core\Controllers\ProductConfigurationAttribute.cs" />
     <Compile Include="Core\Controllers\ProductConfigurationController.cs" />
@@ -896,4 +896,18 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="BeforeBuild">
+    <ItemGroup>
+      <AssemblyAttributes Include="AssemblyVersion">
+        <_Parameter1>$(Version)</_Parameter1>
+      </AssemblyAttributes>
+    </ItemGroup>
+    <MakeDir Directories="$(IntermediateOutputPath)" />
+    <WriteCodeFragment Language="C#"
+                       OutputFile="$(IntermediateOutputPath)Version.cs"
+                       AssemblyAttributes="@(AssemblyAttributes)" />
+    <ItemGroup>
+      <Compile Include="$(IntermediateOutputPath)Version.cs" />
+    </ItemGroup>
+  </Target>
 </Project>

@@ -294,11 +294,17 @@ namespace MySql.Configurator.Dialogs
       var wizard = Controls.OfType<Wizard>().FirstOrDefault();
       if (wizard == null)
       {
-        // This is unexpected, a Wizard should be already in the Controls collection, but if not found just let the form close.
         return true;
       }
 
-      return wizard.CanCancel;
+      if (wizard.CurrentPage.OperationExecuting)
+      {
+        var result = InfoDialog.ShowDialog(InfoDialogProperties.GetYesNoDialogProperties(InfoDialog.InfoType.Warning, Resources.MainFormOnGoingOperationTitle, Resources.MainFormOnGoingOperationDescription, Resources.MainFormOnGoingOperationDetail));
+        return result.DialogResult == DialogResult.OK
+               || result.DialogResult == DialogResult.Yes;
+      }
+
+      return true;
     }
 
     #region Event handling
