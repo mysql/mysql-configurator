@@ -49,3 +49,9 @@ This directory is expected to contain the bin, share, etc and other server direc
            
 For MSI installations this path is usually "C:\Program Files\MySQL\MySQL Server 8.4" or the custom path set during installation.
 For ZIP installations this path is whichever location where the server files were extracted to.
+
+### Report a bug
+
+To report a bug, access the [MySQL Bugs Tracking System](https://bugs.mysql.com/). Before reporting the bug please read the **Report a Bug** section for tips. If the bug hasn't been reported yet click the **Report a bug** tab and provide relevant details. The category corresponding to **MySQL Configurator** is **MySQL Sever: Install Configuration Tool**, this will ensure that the bug is routed to the appropriate team.
+
+
