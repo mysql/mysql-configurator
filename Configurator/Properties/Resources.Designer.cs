@@ -1842,15 +1842,6 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Package has already been queued..
-        /// </summary>
-        public static string PackageAlreadyQueued {
-            get {
-                return ResourceManager.GetString("PackageAlreadyQueued", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Please provide a {0} Login.
         /// </summary>
         public static string PasswordDialogLargeTitle {
@@ -4084,6 +4075,15 @@ namespace MySql.Configurator.Properties {
         public static string ServerInitializeDatabaseStep {
             get {
                 return ResourceManager.GetString("ServerInitializeDatabaseStep", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Server installation has already been queued..
+        /// </summary>
+        public static string ServerInstallationAlreadyQueued {
+            get {
+                return ResourceManager.GetString("ServerInstallationAlreadyQueued", resourceCulture);
             }
         }
         

@@ -24,7 +24,7 @@
 using System;
 using System.Diagnostics;
 using System.Text;
-using MySql.Configurator.Core.Enums;
+using MySql.Configurator.Base.Enums;
 
 namespace MySql.Configurator.Core.MSI
 {
@@ -42,11 +42,6 @@ namespace MySql.Configurator.Core.MSI
     private string _msiPath;
 
     private static FileVersionInfo _msiVersion;
-
-    static MsiQuery()
-    {
-      _msiVersion = FileVersionInfo.GetVersionInfo(Environment.SystemDirectory + "\\msi.dll");
-    }
 
     /// <summary>
     /// Initializes an instance of this class with the provided product code.
@@ -163,30 +158,6 @@ namespace MySql.Configurator.Core.MSI
 
           default:
             return null;
-        }
-      }
-    }
-
-    public bool GetBool(int index)
-    {
-      StringBuilder value = new StringBuilder(256);
-      int valueLength = value.Capacity;
-
-      while (true)
-      {
-        MsiEnumError result = MsiInterop.MsiRecordGetString(_results, (uint)index, value, ref valueLength);
-        switch (result)
-        {
-          case MsiEnumError.MoreData:
-            value = new StringBuilder(valueLength * 2);
-            valueLength = value.Capacity;
-            break;
-
-          case MsiEnumError.Success:
-            return value.ToString() == "y";
-
-          default:
-            return false;
         }
       }
     }

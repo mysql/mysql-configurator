@@ -23,7 +23,7 @@
 
 using System;
 using System.Collections.Generic;
-using MySql.Configurator.Core.Classes;
+using MySql.Configurator.Base.Classes;
 using NetFwTypeLib;
 
 namespace MySql.Configurator.Core.Firewall

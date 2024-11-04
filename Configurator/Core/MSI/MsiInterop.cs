@@ -25,7 +25,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
-using MySql.Configurator.Core.Enums;
+using MySql.Configurator.Base.Enums;
 
 namespace MySql.Configurator.Core.MSI
 {
@@ -89,22 +89,12 @@ namespace MySql.Configurator.Core.MSI
         : string.Empty;
     }
 
-    [DllImport("msi", CharSet = CharSet.Auto)]
-    static extern int MsiGetProductCode(string component, StringBuilder buffer);
-    [DllImport("msi.dll")]
-    public static extern InstallUIHandler MsiSetExternalUI(InstallUIHandler handler, InstallLogMode messageFilter, IntPtr context);
-    [DllImport("msi.dll")]
-    internal static extern InstallUIHandler MsiSetExternalUIRecord(InstallUIHandlerRecord handler, InstallLogMode messageFilter, IntPtr context);
     [DllImport("msi.dll")]
     public static extern int MsiSetInternalUI(InstallUILevel uiLevel, IntPtr hwnd);
-    [DllImport("msi.dll", CharSet = CharSet.Unicode)]
-    internal static extern MsiEnumError MsiInstallProduct(string packagePath, string commandLine);
     [DllImport("msi.dll", CharSet = CharSet.Unicode)]
     public static extern MsiEnumError MsiConfigureProductEx(string productCode, InstallLevel installLevel, InstallState installState, string commandLine);
     [DllImport("msi.dll")]
     internal static extern InstallState MsiQueryProductState(string productCode);
-    [DllImport("msi.dll")]
-    internal static extern bool MsiGetMode(UIntPtr msiHandle, int runMode);
     [DllImport("msi.dll")]
     internal static extern MsiEnumError MsiOpenProduct(string productId, ref UIntPtr msiHandle);
     [DllImport("msi.dll")]
@@ -114,21 +104,11 @@ namespace MySql.Configurator.Core.MSI
     [DllImport("msi.dll")]
     internal static extern MsiEnumError MsiGetProductProperty(UIntPtr msiHandle, string propertyName, StringBuilder valueBuffer, ref int valueBufferLength);
     [DllImport("msi.dll")]
-    internal static extern MsiEnumError MsiDoAction(UIntPtr installHandle, string action);
-    [DllImport("msi.dll")]
-    internal static extern MsiEnumError MsiGetFeatureCost(UIntPtr installHandle, string feature, MsiCostTree installCostTree, InstallState installState, out int installCost);
-    [DllImport("msi.dll")]
-    internal static extern MsiEnumError MsiGetFeatureInfo(UIntPtr productHandle, string feature, ref MsiInstallFeatureAttribute attributes, StringBuilder titleBuf, ref uint titleLength, StringBuilder helpBuf, ref uint helpLength);
-    [DllImport("msi.dll")]
     internal static extern MsiEnumError MsiCloseHandle(UIntPtr msiHandle);
     [DllImport("msi.dll")]
     public static extern MsiEnumError MsiEnumRelatedProducts(string upgradeCode, uint reserved, uint productIndex, StringBuilder productBuf);
     [DllImport("msi.dll")]
-    internal static extern MsiEnumError MsiEnumFeatures(string productCode, uint featureIndex, StringBuilder featureBuf, StringBuilder parentBuf);
-    [DllImport("msi.dll")]
     internal static extern InstallState MsiQueryFeatureState(string productCode, string featureName);
-    [DllImport("msi.dll")]
-    internal static extern InstallState MsiLocateComponent(string component, StringBuilder pathBugger, ref uint bufferLength);
     [DllImport("msi.dll")]
     internal static extern InstallState MsiGetComponentPath(string productCode, string componentId, StringBuilder path, ref uint pathLen);
 
@@ -143,17 +123,7 @@ namespace MySql.Configurator.Core.MSI
     internal static extern MsiEnumError MsiViewFetch(UIntPtr view, ref UIntPtr record);
     [DllImport("msi.dll")]
     internal static extern MsiEnumError MsiRecordGetString(UIntPtr record, uint field, StringBuilder valueBuf, ref int valueBufLength);
-    [DllImport("msi.dll")]
-    internal static extern MsiEnumError MsiRecordGetFieldCount(UIntPtr record);
-    [DllImport("msi.dll", CharSet = CharSet.Unicode)]
-    internal static extern MsiEnumError MsiDatabaseCommit(UIntPtr database);
     [DllImport("msi.dll", EntryPoint = "MsiOpenDatabaseW", CharSet = CharSet.Unicode)]
     internal static extern MsiEnumError MsiOpenDatabase(string databasePath, IntPtr persist, out UIntPtr database);
-    [DllImport("msi.dll", CharSet = CharSet.Unicode)]
-    internal static extern MsiEnumError MsiRecordSetInteger(UIntPtr record, int field, int value);
-    [DllImport("msi.dll", CharSet = CharSet.Unicode)]
-    internal static extern MsiEnumError MsiViewClose(UIntPtr view);
-    [DllImport("msi.dll", CharSet = CharSet.Unicode)]
-    internal static extern MsiEnumError MsiViewModify(UIntPtr view, int modifyMode, UIntPtr record);
   }
 }

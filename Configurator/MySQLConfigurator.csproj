@@ -121,189 +121,111 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\SelectablePictureBox.cs">
+    <Compile Include="Core\Server\ServerInstallation.cs" />
+    <Compile Include="UI\Controls\SelectablePictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Core\Classes\AppConfiguration.cs" />
-    <Compile Include="Core\Classes\AppConfigurationData.cs" />
-    <Compile Include="Core\Classes\Attributes\AlternateNameAttribute.cs" />
-    <Compile Include="Core\Classes\Attributes\ExcludeAttribute.cs" />
-    <Compile Include="Core\Classes\Attributes\NumericCodeAttribute.cs" />
-    <Compile Include="Core\Classes\Attributes\SupportedByAttribute.cs" />
-    <Compile Include="Core\Classes\BaseStartupParameters.cs" />
-    <Compile Include="Core\Classes\CommandAreaProperties.cs" />
-    <Compile Include="Core\Classes\Configuration\IniFile.cs" />
-    <Compile Include="Core\Classes\Configuration\IniFileLine.cs" />
-    <Compile Include="Core\Classes\Configuration\IniFileLineType.cs" />
-    <Compile Include="Core\Classes\Configuration\IniFileSection.cs" />
-    <Compile Include="Core\Classes\DeprecatedServerVariable.cs" />
-    <Compile Include="Core\Classes\DirectoryServicesWrapper.cs" />
-    <Compile Include="Core\Classes\DllImportConstants.cs" />
-    <Compile Include="Core\Classes\ErrorProviderProperties.cs" />
-    <Compile Include="Core\Classes\ExtensionMethods.cs" />
-    <Compile Include="Core\Classes\ImageComboBoxItem.cs" />
-    <Compile Include="Core\Classes\InfoDialogProperties.cs" />
-    <Compile Include="Core\Classes\MySqlUpgradeHistoryManager.cs" />
-    <Compile Include="Core\Classes\LastFocusedControlFilter.cs" />
-    <Compile Include="Core\Classes\LinkActivationEventArgs.cs" />
-    <Compile Include="Core\Classes\ListViewHelper.cs" />
-    <Compile Include="Core\Classes\Logging\LogFile.cs" />
-    <Compile Include="Core\Classes\Logging\LogFileMonitor.cs" />
-    <Compile Include="Core\Classes\Logging\Logger.cs" />
-    <Compile Include="Core\Classes\Logging\LoggerListener.cs" />
-    <Compile Include="Core\Classes\Logging\LoggerPropertySetException.cs" />
-    <Compile Include="Core\Classes\Logging\LoggerUndefinedLogFileException.cs" />
-    <Compile Include="Core\Classes\MigrationResult.cs" />
-    <Compile Include="Core\Classes\MyListViewSubItem.cs" />
-    <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbench.cs" />
-    <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchConnection.cs" />
-    <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchConnectionCollection.cs" />
-    <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchConnectionExtraParameters.cs" />
-    <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchConnectionExtraParametersCollection.cs" />
-    <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchPasswordVault.cs" />
-    <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchServer.cs" />
-    <Compile Include="Core\Classes\MySQLWorkbench\MySqlWorkbenchServerCollection.cs" />
-    <Compile Include="Core\Classes\MySQL\MySqlServerStartupParameters.cs" />
-    <Compile Include="Core\Classes\MySQL\MySqlServerUser.cs" />
-    <Compile Include="Core\Classes\MySQL\MySqlServerInstance.cs" />
-    <Compile Include="Core\Classes\NativeMethods.cs" />
-    <Compile Include="Core\Classes\Options\CommandLineOption.cs" />
-    <Compile Include="Core\Classes\Options\CommandLineOptions.cs" />
-    <Compile Include="Core\Classes\PasswordStrengthVerifier.cs" />
-    <Compile Include="Core\Classes\ProcessResult.cs" />
-    <Compile Include="Core\Classes\Security\SecureVault.cs" />
-    <Compile Include="Core\Classes\Service.cs" />
-    <Compile Include="Core\Classes\TwoKeyDictionary.cs" />
-    <Compile Include="Core\Classes\Utilities.cs" />
-    <Compile Include="Core\Classes\VisualStyles\CustomVisualStyleElements.cs" />
-    <Compile Include="Core\Classes\VisualStyles\StyleableHelper.cs" />
-    <Compile Include="Core\Classes\Win32.cs" />
-    <Compile Include="Core\Classes\XmlRepository.cs" />
-    <Compile Include="Core\Common\BaseStep.cs" />
-    <Compile Include="Core\Common\ConfiguratorException.cs" />
-    <Compile Include="Core\Common\GeneralSettings.cs" />
-    <Compile Include="Core\Controllers\BaseServerSettings.cs" />
+    <Compile Include="Core\Settings\AppConfiguration.cs" />
+    <Compile Include="Base\Attributes\AlternateNameAttribute.cs" />
+    <Compile Include="Base\Attributes\ExcludeAttribute.cs" />
+    <Compile Include="Base\Classes\CommandAreaProperties.cs" />
+    <Compile Include="Core\Ini\IniFileLine.cs" />
+    <Compile Include="Core\Ini\IniFileLineType.cs" />
+    <Compile Include="Core\Ini\IniFileSection.cs" />
+    <Compile Include="Base\Classes\DeprecatedServerVariable.cs" />
+    <Compile Include="Base\Classes\DirectoryServicesWrapper.cs" />
+    <Compile Include="Base\Classes\DllImportConstants.cs" />
+    <Compile Include="Base\Classes\ErrorProviderProperties.cs" />
+    <Compile Include="Base\Classes\ExtensionMethods.cs" />
+    <Compile Include="Base\Classes\ImageComboBoxItem.cs" />
+    <Compile Include="Base\Classes\InfoDialogProperties.cs" />
+    <Compile Include="Core\Controllers\MySqlUpgradeHistoryManager.cs" />
+    <Compile Include="Base\Classes\LastFocusedControlFilter.cs" />
+    <Compile Include="Base\Classes\LinkActivationEventArgs.cs" />
+    <Compile Include="Core\Logging\LogFile.cs" />
+    <Compile Include="Core\Logging\Logger.cs" />
+    <Compile Include="Core\Logging\LoggerListener.cs" />
+    <Compile Include="Core\Logging\LoggerPropertySetException.cs" />
+    <Compile Include="Core\Logging\LoggerUndefinedLogFileException.cs" />
+    <Compile Include="Base\Classes\MyListViewSubItem.cs" />
+    <Compile Include="Core\Server\MySqlServerInstance.cs" />
+    <Compile Include="Base\Classes\PasswordStrengthVerifier.cs" />
+    <Compile Include="Base\Classes\ProcessResult.cs" />
+    <Compile Include="Base\Classes\Service.cs" />
+    <Compile Include="Base\Classes\Utilities.cs" />
+    <Compile Include="Base\Classes\CustomVisualStyleElements.cs" />
+    <Compile Include="Base\Classes\StyleableHelper.cs" />
+    <Compile Include="Base\Classes\Win32.cs" />
+    <Compile Include="Core\Controllers\BaseStep.cs" />
+    <Compile Include="Core\Settings\ConfiguratorException.cs" />
+    <Compile Include="Core\Settings\GeneralSettings.cs" />
     <Compile Include="Core\Controllers\ConfigurationStep.cs" />
-    <Compile Include="Core\Controllers\ControllerSettingAttribute.cs" />
-    <Compile Include="Core\Controllers\ControllerSettings.cs" />
+    <Compile Include="Core\Settings\ControllerSettingAttribute.cs" />
     <Compile Include="Core\Controllers\ControllerType.cs" />
-    <Compile Include="Core\Controllers\PluginManager.cs" />
-    <Compile Include="Core\Controllers\ProductConfigurationAttribute.cs" />
-    <Compile Include="Core\Controllers\ProductConfigurationController.cs" />
     <Compile Include="Core\Controllers\RemoveStep.cs" />
-    <Compile Include="Core\Controllers\ServerProductConfigurationController.cs" />
     <Compile Include="Core\Controllers\ValueList.cs" />
-    <Compile Include="Core\Controls\ConfigStepControl.cs">
+    <Compile Include="UI\Controls\ConfigStepControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Core\Controls\ConfigStepControl.Designer.cs">
+    <Compile Include="UI\Controls\ConfigStepControl.Designer.cs">
       <DependentUpon>ConfigStepControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Core\Controls\ImageComboBox.cs">
+    <Compile Include="UI\Controls\ImageComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Core\Controls\LocalIpAddressesComboBox.cs">
+    <Compile Include="UI\Controls\MyListView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Core\Controls\LocalIpAddressesComboBox.Designer.cs">
-      <DependentUpon>LocalIpAddressesComboBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Core\Controls\MyListView.cs">
+    <Compile Include="UI\Controls\PasswordStrengthLabel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Core\Controls\NewUserControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Core\Controls\NewUserControl.Designer.cs">
-      <DependentUpon>NewUserControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Core\Controls\PasswordStrengthLabel.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Core\Controls\PasswordStrengthLabel.Designer.cs">
+    <Compile Include="UI\Controls\PasswordStrengthLabel.Designer.cs">
       <DependentUpon>PasswordStrengthLabel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Core\Controls\RemoveStepControl.cs">
+    <Compile Include="UI\Controls\RemoveStepControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Core\Controls\RemoveStepControl.Designer.cs">
+    <Compile Include="UI\Controls\RemoveStepControl.Designer.cs">
       <DependentUpon>RemoveStepControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Core\Controls\RootCredentialsCheckControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Core\Controls\RootCredentialsCheckControl.Designer.cs">
-      <DependentUpon>RootCredentialsCheckControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Core\Controls\StepFlowLayoutPanel.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Core\Dialogs\BaseAdvancedOptionsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Core\Dialogs\BaseAdvancedOptionsDialog.Designer.cs">
-      <DependentUpon>BaseAdvancedOptionsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Core\Dialogs\RootPasswordPromptDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Core\Dialogs\RootPasswordPromptDialog.Designer.cs">
-      <DependentUpon>RootPasswordPromptDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Core\Enums\AuthenticationResponse.cs" />
-    <Compile Include="Core\Enums\ChainedInstallerAction.cs" />
-    <Compile Include="Core\Enums\ConfigState.cs" />
-    <Compile Include="Core\Enums\ConfigurationEventType.cs" />
-    <Compile Include="Core\Enums\ConfigurationKeyType.cs" />
-    <Compile Include="Core\Enums\ConfigurationStepStatus.cs" />
-    <Compile Include="Core\Enums\ConfigurationTimeoutReason.cs" />
-    <Compile Include="Core\Enums\ConfigurationType.cs" />
-    <Compile Include="Core\Enums\ConfiguratorError.cs" />
-    <Compile Include="Core\Enums\ConnectionResultType.cs" />
-    <Compile Include="Core\Enums\DeviceCap.cs" />
-    <Compile Include="Core\Enums\ExecutionMode.cs" />
-    <Compile Include="Core\Enums\FormulaTokenType.cs" />
-    <Compile Include="Core\Enums\GroupReplicationMemberRoleType.cs" />
-    <Compile Include="Core\Enums\IniLineType.cs" />
-    <Compile Include="Core\Enums\InstallAction.cs" />
-    <Compile Include="Core\Enums\InstallLevel.cs" />
-    <Compile Include="Core\Enums\InstallLogMode.cs" />
-    <Compile Include="Core\Enums\InstallMessage.cs" />
-    <Compile Include="Core\Enums\InstallProgressState.cs" />
-    <Compile Include="Core\Enums\InstallState.cs" />
-    <Compile Include="Core\Enums\InstallUILevel.cs" />
-    <Compile Include="Core\Enums\LicenseType.cs" />
-    <Compile Include="Core\Enums\ListViewExtendedStyles.cs" />
-    <Compile Include="Core\Enums\ListViewMessages.cs" />
-    <Compile Include="Core\Enums\LowerCaseTableNameTypes.cs" />
-    <Compile Include="Core\Enums\MSICostTree.cs" />
-    <Compile Include="Core\Enums\MSIEnumError.cs" />
-    <Compile Include="Core\Enums\MsiInstallFeatureAttribute.cs" />
-    <Compile Include="Core\Enums\MySqlAuthenticationPluginType.cs" />
-    <Compile Include="Core\Enums\PackageAction.cs" />
-    <Compile Include="Core\Enums\PackageArchitecture.cs" />
-    <Compile Include="Core\Enums\PackageMaturity.cs" />
-    <Compile Include="Core\Enums\PackagePlatform.cs" />
-    <Compile Include="Core\Enums\PackageStatus.cs" />
-    <Compile Include="Core\Enums\PackageType.cs" />
-    <Compile Include="Core\Enums\PasswordStrengthType.cs" />
-    <Compile Include="Core\Enums\PathWarningType.cs" />
-    <Compile Include="Core\Enums\PluginActivationStateType.cs" />
-    <Compile Include="Core\Enums\ProductState.cs" />
-    <Compile Include="Core\Enums\ResultProcessingLogicType.cs" />
-    <Compile Include="Core\Enums\SchemaInformationType.cs" />
-    <Compile Include="Core\Enums\ServerConfigurationType.cs" />
-    <Compile Include="Core\Enums\ServerInstallationType.cs" />
-    <Compile Include="Core\Enums\ServerMaturity.cs" />
-    <Compile Include="Core\Enums\ServerSeriesType.cs" />
-    <Compile Include="Core\Enums\ServiceAccountMissingRequirement.cs" />
-    <Compile Include="Core\Enums\StepType.cs" />
-    <Compile Include="Core\Enums\SystemTablesUpgradedType.cs" />
-    <Compile Include="Core\Enums\UpgradeType.cs" />
-    <Compile Include="Core\Enums\UpgradeViability.cs" />
-    <Compile Include="Core\Enums\UserCrudOperationType.cs" />
-    <Compile Include="Core\Enums\UserRoleType.cs" />
-    <Compile Include="Core\Enums\ValidHostNameType.cs" />
+    <Compile Include="Base\Enums\ChainedInstallerAction.cs" />
+    <Compile Include="Base\Enums\ConfigState.cs" />
+    <Compile Include="Base\Enums\ConfigurationEventType.cs" />
+    <Compile Include="Base\Enums\ConfigurationKeyType.cs" />
+    <Compile Include="Base\Enums\ConfigurationStepStatus.cs" />
+    <Compile Include="Base\Enums\ConfigurationType.cs" />
+    <Compile Include="Base\Enums\ConfiguratorError.cs" />
+    <Compile Include="Base\Enums\ConnectionResultType.cs" />
+    <Compile Include="Base\Enums\DeviceCap.cs" />
+    <Compile Include="Base\Enums\ExecutionMode.cs" />
+    <Compile Include="Base\Enums\FormulaTokenType.cs" />
+    <Compile Include="Base\Enums\IniLineType.cs" />
+    <Compile Include="Base\Enums\InstallLevel.cs" />
+    <Compile Include="Base\Enums\InstallState.cs" />
+    <Compile Include="Base\Enums\InstallUILevel.cs" />
+    <Compile Include="Base\Enums\LicenseType.cs" />
+    <Compile Include="Base\Enums\LowerCaseTableNameTypes.cs" />
+    <Compile Include="Base\Enums\MSIEnumError.cs" />
+    <Compile Include="Base\Enums\MySqlAuthenticationPluginType.cs" />
+    <Compile Include="Base\Enums\ServerInstallationAction.cs" />
+    <Compile Include="Base\Enums\ServerInstallationArchitecture.cs" />
+    <Compile Include="Base\Enums\ServerInstallationStatus.cs" />
+    <Compile Include="Base\Enums\PasswordStrengthType.cs" />
+    <Compile Include="Base\Enums\PathWarningType.cs" />
+    <Compile Include="Base\Enums\PluginActivationStateType.cs" />
+    <Compile Include="Base\Enums\ProductState.cs" />
+    <Compile Include="Base\Enums\SchemaInformationType.cs" />
+    <Compile Include="Base\Enums\ServerConfigurationType.cs" />
+    <Compile Include="Base\Enums\ServerInstallationType.cs" />
+    <Compile Include="Base\Enums\ServerMaturity.cs" />
+    <Compile Include="Base\Enums\ServerSeriesType.cs" />
+    <Compile Include="Base\Enums\ServiceAccountMissingRequirement.cs" />
+    <Compile Include="Base\Enums\StepType.cs" />
+    <Compile Include="Base\Enums\UpgradeType.cs" />
+    <Compile Include="Base\Enums\UpgradeViability.cs" />
+    <Compile Include="Base\Enums\UserCrudOperationType.cs" />
+    <Compile Include="Base\Enums\UserRoleType.cs" />
+    <Compile Include="Base\Enums\ValidHostNameType.cs" />
     <Compile Include="Core\Firewall\Action.cs" />
     <Compile Include="Core\Firewall\Policy.cs" />
     <Compile Include="Core\Firewall\ProfileType.cs" />
@@ -311,103 +233,78 @@
     <Compile Include="Core\Firewall\RuleDirection.cs" />
     <Compile Include="Core\Firewall\Rules.cs" />
     <Compile Include="Core\Firewall\ServiceRestriction.cs" />
-    <Compile Include="Core\Forms\AutoStyleableBaseDialog.cs">
+    <Compile Include="UI\Dialogs\AutoStyleableBaseDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Core\Forms\AutoStyleableBaseDialog.Designer.cs">
+    <Compile Include="UI\Dialogs\AutoStyleableBaseDialog.Designer.cs">
       <DependentUpon>AutoStyleableBaseDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Core\Forms\AutoStyleableBaseForm.cs">
+    <Compile Include="UI\Forms\AutoStyleableBaseForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Core\Forms\AutoStyleableBaseForm.Designer.cs">
+    <Compile Include="UI\Forms\AutoStyleableBaseForm.Designer.cs">
       <DependentUpon>AutoStyleableBaseForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Core\Forms\InfoDialog.cs">
+    <Compile Include="UI\Dialogs\InfoDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Core\Forms\InfoDialog.Designer.cs">
+    <Compile Include="UI\Dialogs\InfoDialog.Designer.cs">
       <DependentUpon>InfoDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Core\Forms\PasswordDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Core\Forms\PasswordDialog.designer.cs">
-      <DependentUpon>PasswordDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Core\Forms\ValidatingBaseDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Core\Forms\ValidatingBaseDialog.Designer.cs">
-      <DependentUpon>ValidatingBaseDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Core\IniFile\IniFile.cs" />
-    <Compile Include="Core\IniFile\IniFileEngine.cs" />
-    <Compile Include="Core\IniFile\IniLineFullDetail.cs" />
-    <Compile Include="Core\IniFile\IniSection.cs" />
-    <Compile Include="Core\IniFile\Template\Formula\FormulaEngine.cs" />
-    <Compile Include="Core\IniFile\Template\Formula\FormulaToken.cs" />
-    <Compile Include="Core\IniFile\Template\IniTemplate.cs" />
-    <Compile Include="Core\IniFile\Template\IniTemplateVariable.cs" />
-    <Compile Include="Core\IniFile\Template\InitTemplateStatic.cs" />
-    <Compile Include="Core\Interfaces\IPackage.cs" />
-    <Compile Include="Core\Interfaces\IProgressObserver.cs" />
-    <Compile Include="Core\Interfaces\IWizard.cs" />
+    <Compile Include="Core\Ini\IniFile.cs" />
+    <Compile Include="Core\Ini\IniFileEngine.cs" />
+    <Compile Include="Core\Ini\IniLineFullDetail.cs" />
+    <Compile Include="Core\Ini\IniSection.cs" />
+    <Compile Include="Core\Ini\FormulaEngine.cs" />
+    <Compile Include="Core\Ini\FormulaToken.cs" />
+    <Compile Include="Core\Ini\IniTemplate.cs" />
+    <Compile Include="Core\Ini\IniTemplateVariable.cs" />
+    <Compile Include="Core\Ini\InitTemplateStatic.cs" />
+    <Compile Include="Base\Interfaces\IProgressObserver.cs" />
+    <Compile Include="Base\Interfaces\IWizard.cs" />
     <Compile Include="Core\MSI\ChainedInstallerEventArgs.cs" />
     <Compile Include="Core\MSI\MsiInterop.cs" />
     <Compile Include="Core\MSI\MsiQuery.cs" />
-    <Compile Include="Core\MSI\PackageParameters.cs" />
-    <Compile Include="Core\MSI\Record.cs" />
-    <Compile Include="Core\Package\Package.cs" />
-    <Compile Include="Core\Package\PackageFeature.cs" />
-    <Compile Include="Core\Package\PackageManager.cs" />
-    <Compile Include="Core\Package\PackageOperation.cs" />
-    <Compile Include="Core\Package\PackageStatusEventArgs.cs" />
-    <Compile Include="Core\Product\Product.cs" />
-    <Compile Include="Core\Product\ProductManager.cs" />
-    <Compile Include="Core\Structs\InfoDialogResult.cs" />
-    <Compile Include="Core\Structs\PasswordDialogFlags.cs" />
-    <Compile Include="Core\Wizard\ConfigWizardPage.cs">
+    <Compile Include="Core\Server\ServerInstallationOperation.cs" />
+    <Compile Include="Core\Server\ServerInstallationStatusEventArgs.cs" />
+    <Compile Include="Core\Server\ServerInstallationManager.cs" />
+    <Compile Include="Base\Structs\InfoDialogResult.cs" />
+    <Compile Include="Base\Structs\PasswordDialogFlags.cs" />
+    <Compile Include="UI\Wizards\ConfigWizardPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Core\Wizard\ConfigWizardPage.Designer.cs">
+    <Compile Include="UI\Wizards\ConfigWizardPage.Designer.cs">
       <DependentUpon>ConfigWizardPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Core\Wizard\WizardPage.cs">
+    <Compile Include="UI\Wizards\WizardPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Core\Wizard\WizardPage.designer.cs">
+    <Compile Include="UI\Wizards\WizardPage.designer.cs">
       <DependentUpon>WizardPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\AboutScreenForm.cs">
+    <Compile Include="UI\Forms\AboutScreenForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\AboutScreenForm.Designer.cs">
+    <Compile Include="UI\Forms\AboutScreenForm.Designer.cs">
       <DependentUpon>AboutScreenForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\ConfigurationFileDialog.cs">
+    <Compile Include="UI\Dialogs\ConfigurationFileDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\ConfigurationFileDialog.Designer.cs">
+    <Compile Include="UI\Dialogs\ConfigurationFileDialog.Designer.cs">
       <DependentUpon>ConfigurationFileDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\UpgradeFromServerPreGaWarningDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\UpgradeFromServerPreGaWarningDialog.Designer.cs">
-      <DependentUpon>UpgradeFromServerPreGaWarningDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\SideBarTab.cs" />
-    <Compile Include="Controls\InstallWizardSideBarControl.cs">
+    <Compile Include="UI\Controls\SideBarTab.cs" />
+    <Compile Include="UI\Controls\InstallWizardSideBarControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\InstallWizardSideBarControl.Designer.cs">
+    <Compile Include="UI\Controls\InstallWizardSideBarControl.Designer.cs">
       <DependentUpon>InstallWizardSideBarControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\MainForm.cs">
+    <Compile Include="UI\Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\MainForm.Designer.cs">
+    <Compile Include="UI\Forms\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
@@ -417,253 +314,218 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Common\ConfigOverviewPage.cs">
+    <Compile Include="UI\Wizards\BaseConfigureRemoveApplyPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Common\ConfigOverviewPage.Designer.cs">
-      <DependentUpon>ConfigOverviewPage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Wizards\Common\PathsConflictPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Wizards\Common\PathsConflictPage.Designer.cs">
-      <DependentUpon>PathsConflictPage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Wizards\Common\BaseConfigureRemoveApplyPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Wizards\Common\BaseConfigureRemoveApplyPage.Designer.cs">
+    <Compile Include="UI\Wizards\BaseConfigureRemoveApplyPage.Designer.cs">
       <DependentUpon>BaseConfigureRemoveApplyPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Common\WelcomePage.cs">
+    <Compile Include="UI\Wizards\WelcomePage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Common\WelcomePage.Designer.cs">
+    <Compile Include="UI\Wizards\WelcomePage.Designer.cs">
       <DependentUpon>WelcomePage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\ConfigWizard\ConfigWizard.Designer.cs">
+    <Compile Include="UI\Wizards\ConfigWizard.Designer.cs">
       <DependentUpon>ConfigWizard.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\ConfigWizard\ConfigWizard.cs">
+    <Compile Include="UI\Wizards\ConfigWizard.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\ConfigWizard\ConfigApplyPage.cs">
+    <Compile Include="UI\Wizards\ConfigApplyPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\ConfigWizard\ConfigApplyPage.Designer.cs">
+    <Compile Include="UI\Wizards\ConfigApplyPage.Designer.cs">
       <DependentUpon>ConfigApplyPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\ConfigWizard\ConfigCompletePage.cs">
+    <Compile Include="UI\Wizards\ConfigCompletePage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\ConfigWizard\ConfigCompletePage.Designer.cs">
+    <Compile Include="UI\Wizards\ConfigCompletePage.Designer.cs">
       <DependentUpon>ConfigCompletePage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\ConfigWizard\ConfigureErrorPage.cs">
+    <Compile Include="UI\Wizards\ConfigureErrorPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\ConfigWizard\ConfigureErrorPage.Designer.cs">
+    <Compile Include="UI\Wizards\ConfigureErrorPage.Designer.cs">
       <DependentUpon>ConfigureErrorPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Examples\ExampleDatabaseInfo.cs" />
-    <Compile Include="Wizards\RemoveWizard\RemoveErrorPage.cs">
+    <Compile Include="Core\Controllers\ExampleDatabaseInfo.cs" />
+    <Compile Include="UI\Wizards\RemoveErrorPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\RemoveWizard\RemoveErrorPage.Designer.cs">
+    <Compile Include="UI\Wizards\RemoveErrorPage.Designer.cs">
       <DependentUpon>RemoveErrorPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\RemoveWizard\RemoveApplyPage.cs">
+    <Compile Include="UI\Wizards\RemoveApplyPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\RemoveWizard\RemoveApplyPage.Designer.cs">
+    <Compile Include="UI\Wizards\RemoveApplyPage.Designer.cs">
       <DependentUpon>RemoveApplyPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\RemoveWizard\RemoveCompletePage.cs">
+    <Compile Include="UI\Wizards\RemoveCompletePage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\RemoveWizard\RemoveCompletePage.Designer.cs">
+    <Compile Include="UI\Wizards\RemoveCompletePage.Designer.cs">
       <DependentUpon>RemoveCompletePage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\RemoveWizard\RemoveProductsWizard.cs">
+    <Compile Include="UI\Wizards\RemoveProductsWizard.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\RemoveWizard\RemoveProductsWizard.Designer.cs">
+    <Compile Include="UI\Wizards\RemoveProductsWizard.Designer.cs">
       <DependentUpon>RemoveProductsWizard.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Server\ColumnSorter.cs" />
-    <Compile Include="Wizards\Server\DatabaseUserDialog.cs">
+    <Compile Include="Base\Classes\ColumnSorter.cs" />
+    <Compile Include="UI\Dialogs\DatabaseUserDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Wizards\Server\DatabaseUserDialog.Designer.cs">
+    <Compile Include="UI\Dialogs\DatabaseUserDialog.Designer.cs">
       <DependentUpon>DatabaseUserDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Server\ExpandedServiceController.cs">
+    <Compile Include="Core\Controllers\ExpandedServiceController.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Wizards\Server\GrantedPrivilege.cs" />
-    <Compile Include="Wizards\Server\MysqlSCM.cs" />
-    <Compile Include="Wizards\Server\MySqlServerSettings.cs" />
-    <Compile Include="Wizards\Server\Plugin.cs" />
-    <Compile Include="Wizards\Server\PluginsList.cs" />
-    <Compile Include="Wizards\Server\Privilege.cs" />
-    <Compile Include="Wizards\Server\Role.cs" />
-    <Compile Include="Wizards\Server\RoleDefinitions.cs" />
-    <Compile Include="Wizards\Server\RolePrivilege.cs" />
-    <Compile Include="Wizards\Server\ServerConfigAdvancedOptionsPage.cs">
+    <Compile Include="Core\Server\GrantedPrivilege.cs" />
+    <Compile Include="Core\Server\MysqlSCM.cs" />
+    <Compile Include="Core\Server\MySqlServerSettings.cs" />
+    <Compile Include="Core\Server\Plugin.cs" />
+    <Compile Include="Core\Server\PluginsList.cs" />
+    <Compile Include="Core\Server\Privilege.cs" />
+    <Compile Include="Core\Server\Role.cs" />
+    <Compile Include="Core\Server\RoleDefinitions.cs" />
+    <Compile Include="Core\Server\RolePrivilege.cs" />
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigAdvancedOptionsPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigAdvancedOptionsPage.Designer.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigAdvancedOptionsPage.Designer.cs">
       <DependentUpon>ServerConfigAdvancedOptionsPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigDataDirectoryPage.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigDataDirectoryPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigDataDirectoryPage.Designer.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigDataDirectoryPage.Designer.cs">
       <DependentUpon>ServerConfigDataDirectoryPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigDefaultAuthenticationPage.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigDefaultAuthenticationPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigDefaultAuthenticationPage.Designer.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigDefaultAuthenticationPage.Designer.cs">
       <DependentUpon>ServerConfigDefaultAuthenticationPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigLocalMachinePage.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigLocalMachinePage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigLocalMachinePage.Designer.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigLocalMachinePage.Designer.cs">
       <DependentUpon>ServerConfigLocalMachinePage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigLoggingOptionsPage.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigLoggingOptionsPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigLoggingOptionsPage.Designer.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigLoggingOptionsPage.Designer.cs">
       <DependentUpon>ServerConfigLoggingOptionsPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigNamedPipesPage.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigNamedPipesPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigNamedPipesPage.Designer.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigNamedPipesPage.Designer.cs">
       <DependentUpon>ServerConfigNamedPipesPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigSecurityPage.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigSecurityPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigSecurityPage.Designer.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigSecurityPage.Designer.cs">
       <DependentUpon>ServerConfigSecurityPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigServerInstallationsPage.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigServerInstallationsPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigServerInstallationsPage.Designer.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigServerInstallationsPage.Designer.cs">
       <DependentUpon>ServerConfigServerInstallationsPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigServicePage.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigServicePage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigServicePage.Designer.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigServicePage.Designer.cs">
       <DependentUpon>ServerConfigServicePage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigBackupPage.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigBackupPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigBackupPage.Designer.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigBackupPage.Designer.cs">
       <DependentUpon>ServerConfigBackupPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigurationController.cs" />
-    <Compile Include="Wizards\Server\ServerConfigUserAccountsPage.cs">
+    <Compile Include="Core\Server\ServerConfigurationController.cs" />
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigUserAccountsPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Server\ServerConfigUserAccountsPage.Designer.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigUserAccountsPage.Designer.cs">
       <DependentUpon>ServerConfigUserAccountsPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Server\ServerErrorLog.cs" />
-    <Compile Include="Wizards\Server\ServerErrorLogLine.cs" />
-    <Compile Include="Wizards\Server\ServerExampleDatabasesPage.cs">
+    <Compile Include="Core\Server\ServerErrorLog.cs" />
+    <Compile Include="Core\Server\ServerErrorLogLine.cs" />
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerExampleDatabasesPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Server\ServerExampleDatabasesPage.Designer.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerExampleDatabasesPage.Designer.cs">
       <DependentUpon>ServerExampleDatabasesPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Server\ServerRemovePage.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerRemovePage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Server\ServerRemovePage.Designer.cs">
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerRemovePage.Designer.cs">
       <DependentUpon>ServerRemovePage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Server\ServerRevertController.cs" />
-    <Compile Include="Wizards\Server\ServerStartStatus.cs" />
-    <Compile Include="Wizards\Server\ServerUpgradeStatus.cs" />
-    <Compile Include="Wizards\Server\ServerUser.cs" />
-    <Compile Include="Wizards\Server\Service.cs" />
-    <Compile Include="Wizards\UpgradeWizard\UpgradeWelcomePage.cs">
+    <Compile Include="Core\Server\ServerRevertController.cs" />
+    <Compile Include="Core\Server\ServerStartStatus.cs" />
+    <Compile Include="Core\Server\ServerUpgradeStatus.cs" />
+    <Compile Include="Core\Server\MySqlServerUser.cs" />
+    <Compile Include="UI\Wizards\UpgradeWelcomePage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\UpgradeWizard\UpgradeWelcomePage.Designer.cs">
+    <Compile Include="UI\Wizards\UpgradeWelcomePage.Designer.cs">
       <DependentUpon>UpgradeWelcomePage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Wizards\Utilities\UtilitiesConfigurationController.cs" />
-    <Compile Include="Wizards\Wizard.cs">
+    <Compile Include="UI\Wizards\Wizard.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Wizards\Wizard.Designer.cs">
+    <Compile Include="UI\Wizards\Wizard.Designer.cs">
       <DependentUpon>Wizard.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Core\Controls\ConfigStepControl.resx">
+    <EmbeddedResource Include="UI\Controls\ConfigStepControl.resx">
       <DependentUpon>ConfigStepControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Core\Controls\NewUserControl.resx">
-      <DependentUpon>NewUserControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Core\Controls\PasswordStrengthLabel.resx">
+    <EmbeddedResource Include="UI\Controls\PasswordStrengthLabel.resx">
       <DependentUpon>PasswordStrengthLabel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Core\Controls\RemoveStepControl.resx">
+    <EmbeddedResource Include="UI\Controls\RemoveStepControl.resx">
       <DependentUpon>RemoveStepControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Core\Controls\RootCredentialsCheckControl.resx">
-      <DependentUpon>RootCredentialsCheckControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Core\Dialogs\BaseAdvancedOptionsDialog.resx">
-      <DependentUpon>BaseAdvancedOptionsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Core\Dialogs\RootPasswordPromptDialog.resx">
-      <DependentUpon>RootPasswordPromptDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Core\Forms\AutoStyleableBaseDialog.resx">
+    <EmbeddedResource Include="UI\Dialogs\AutoStyleableBaseDialog.resx">
       <DependentUpon>AutoStyleableBaseDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Core\Forms\AutoStyleableBaseForm.resx">
+    <EmbeddedResource Include="UI\Forms\AutoStyleableBaseForm.resx">
       <DependentUpon>AutoStyleableBaseForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Core\Forms\InfoDialog.resx">
+    <EmbeddedResource Include="UI\Dialogs\InfoDialog.resx">
       <DependentUpon>InfoDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Core\Forms\PasswordDialog.resx">
-      <DependentUpon>PasswordDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Core\Forms\ValidatingBaseDialog.resx">
-      <DependentUpon>ValidatingBaseDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Core\Wizard\ConfigWizardPage.resx">
+    <EmbeddedResource Include="UI\Wizards\ConfigWizardPage.resx">
       <DependentUpon>ConfigWizardPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Core\Wizard\WizardPage.resx">
+    <EmbeddedResource Include="UI\Wizards\WizardPage.resx">
       <DependentUpon>WizardPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\AboutScreenForm.resx">
+    <EmbeddedResource Include="UI\Forms\AboutScreenForm.resx">
       <DependentUpon>AboutScreenForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\ConfigurationFileDialog.resx">
+    <EmbeddedResource Include="UI\Dialogs\ConfigurationFileDialog.resx">
       <DependentUpon>ConfigurationFileDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\UpgradeFromServerPreGaWarningDialog.resx">
-      <DependentUpon>UpgradeFromServerPreGaWarningDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\InstallWizardSideBarControl.resx">
+    <EmbeddedResource Include="UI\Controls\InstallWizardSideBarControl.resx">
       <DependentUpon>InstallWizardSideBarControl.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\MainForm.resx">
+    <EmbeddedResource Include="UI\Forms\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -672,96 +534,90 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Common\ConfigOverviewPage.resx">
-      <DependentUpon>ConfigOverviewPage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Common\PathsConflictPage.resx">
-      <DependentUpon>PathsConflictPage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Common\BaseConfigureRemoveApplyPage.resx">
+    <EmbeddedResource Include="UI\Wizards\BaseConfigureRemoveApplyPage.resx">
       <DependentUpon>BaseConfigureRemoveApplyPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Common\WelcomePage.resx">
+    <EmbeddedResource Include="UI\Wizards\WelcomePage.resx">
       <DependentUpon>WelcomePage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\ConfigWizard\ConfigWizard.resx">
+    <EmbeddedResource Include="UI\Wizards\ConfigWizard.resx">
       <DependentUpon>ConfigWizard.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\ConfigWizard\ConfigApplyPage.resx">
+    <EmbeddedResource Include="UI\Wizards\ConfigApplyPage.resx">
       <DependentUpon>ConfigApplyPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\ConfigWizard\ConfigCompletePage.resx">
+    <EmbeddedResource Include="UI\Wizards\ConfigCompletePage.resx">
       <DependentUpon>ConfigCompletePage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\ConfigWizard\ConfigureErrorPage.resx">
+    <EmbeddedResource Include="UI\Wizards\ConfigureErrorPage.resx">
       <DependentUpon>ConfigureErrorPage.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\RemoveWizard\RemoveErrorPage.resx">
+    <EmbeddedResource Include="UI\Wizards\RemoveErrorPage.resx">
       <DependentUpon>RemoveErrorPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\RemoveWizard\RemoveApplyPage.resx">
+    <EmbeddedResource Include="UI\Wizards\RemoveApplyPage.resx">
       <DependentUpon>RemoveApplyPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\RemoveWizard\RemoveCompletePage.resx">
+    <EmbeddedResource Include="UI\Wizards\RemoveCompletePage.resx">
       <DependentUpon>RemoveCompletePage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\RemoveWizard\RemoveProductsWizard.resx">
+    <EmbeddedResource Include="UI\Wizards\RemoveProductsWizard.resx">
       <DependentUpon>RemoveProductsWizard.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Server\DatabaseUserDialog.resx">
+    <EmbeddedResource Include="UI\Dialogs\DatabaseUserDialog.resx">
       <DependentUpon>DatabaseUserDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Server\ServerConfigAdvancedOptionsPage.resx">
+    <EmbeddedResource Include="UI\Wizards\ServerConfigPages\ServerConfigAdvancedOptionsPage.resx">
       <DependentUpon>ServerConfigAdvancedOptionsPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Server\ServerConfigDataDirectoryPage.resx">
+    <EmbeddedResource Include="UI\Wizards\ServerConfigPages\ServerConfigDataDirectoryPage.resx">
       <DependentUpon>ServerConfigDataDirectoryPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Server\ServerConfigDefaultAuthenticationPage.resx">
+    <EmbeddedResource Include="UI\Wizards\ServerConfigPages\ServerConfigDefaultAuthenticationPage.resx">
       <DependentUpon>ServerConfigDefaultAuthenticationPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Server\ServerConfigLocalMachinePage.resx">
+    <EmbeddedResource Include="UI\Wizards\ServerConfigPages\ServerConfigLocalMachinePage.resx">
       <DependentUpon>ServerConfigLocalMachinePage.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Server\ServerConfigLoggingOptionsPage.resx">
+    <EmbeddedResource Include="UI\Wizards\ServerConfigPages\ServerConfigLoggingOptionsPage.resx">
       <DependentUpon>ServerConfigLoggingOptionsPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Server\ServerConfigNamedPipesPage.resx">
+    <EmbeddedResource Include="UI\Wizards\ServerConfigPages\ServerConfigNamedPipesPage.resx">
       <DependentUpon>ServerConfigNamedPipesPage.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Server\ServerConfigSecurityPage.resx">
+    <EmbeddedResource Include="UI\Wizards\ServerConfigPages\ServerConfigSecurityPage.resx">
       <DependentUpon>ServerConfigSecurityPage.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Server\ServerConfigServerInstallationsPage.resx">
+    <EmbeddedResource Include="UI\Wizards\ServerConfigPages\ServerConfigServerInstallationsPage.resx">
       <DependentUpon>ServerConfigServerInstallationsPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Server\ServerConfigServicePage.resx">
+    <EmbeddedResource Include="UI\Wizards\ServerConfigPages\ServerConfigServicePage.resx">
       <DependentUpon>ServerConfigServicePage.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Server\ServerConfigBackupPage.resx">
+    <EmbeddedResource Include="UI\Wizards\ServerConfigPages\ServerConfigBackupPage.resx">
       <DependentUpon>ServerConfigBackupPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Server\ServerConfigUserAccountsPage.resx">
+    <EmbeddedResource Include="UI\Wizards\ServerConfigPages\ServerConfigUserAccountsPage.resx">
       <DependentUpon>ServerConfigUserAccountsPage.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Server\ServerExampleDatabasesPage.resx">
+    <EmbeddedResource Include="UI\Wizards\ServerConfigPages\ServerExampleDatabasesPage.resx">
       <DependentUpon>ServerExampleDatabasesPage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Server\ServerRemovePage.resx">
+    <EmbeddedResource Include="UI\Wizards\ServerConfigPages\ServerRemovePage.resx">
       <DependentUpon>ServerRemovePage.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\UpgradeWizard\UpgradeWelcomePage.resx">
+    <EmbeddedResource Include="UI\Wizards\UpgradeWelcomePage.resx">
       <DependentUpon>UpgradeWelcomePage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Wizards\Wizard.resx">
+    <EmbeddedResource Include="UI\Wizards\Wizard.resx">
       <DependentUpon>Wizard.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -814,9 +670,6 @@
     <None Include="Resources\TransparentSakilaLogo.png" />
     <None Include="Resources\upgrade_logo.png" />
     <None Include="Resources\SplashScreen.png" />
-    <None Include="Wizards\Scripts\UninstallEnterpriseFirewall.sql" />
-    <None Include="Wizards\Scripts\PreInstallEnterpriseFirewall.sql" />
-    <None Include="Wizards\Scripts\InstallEnterpriseFirewall.sql" />
     <None Include="Resources\error_sign.png" />
     <Content Include="mysql-server.ico" />
     <Content Include="Resources\AboutButton.png" />
@@ -888,6 +741,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

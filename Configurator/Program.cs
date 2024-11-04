@@ -22,29 +22,21 @@
   51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
-using MySql.Configurator.Core.Classes;
-using MySql.Configurator.Core.Classes.Configuration;
-using MySql.Configurator.Core.Classes.Forms;
-using MySql.Configurator.Core.Classes.Logging;
-using MySql.Configurator.Core.Common;
-using MySql.Configurator.Core.Controllers;
-using MySql.Configurator.Core.Enums;
-using MySql.Configurator.Core.Forms;
-using MySql.Configurator.Core.IniFile;
-using MySql.Configurator.Core.IniFile.Template;
-using MySql.Configurator.Core.Package;
-using MySql.Configurator.Core.Product;
-using MySql.Configurator.Dialogs;
+using MySql.Configurator.Base.Classes;
+using MySql.Configurator.Base.Enums;
+using MySql.Configurator.Core.Logging;
+using MySql.Configurator.Core.Server;
+using MySql.Configurator.Core.Settings;
 using MySql.Configurator.Properties;
-using MySql.Configurator.Wizards.Server;
-using Utilities = MySql.Configurator.Core.Classes.Utilities;
+using MySql.Configurator.UI.Dialogs;
+using MySql.Configurator.UI.Forms;
+using Utilities = MySql.Configurator.Base.Classes.Utilities;
 
 namespace MySql.Configurator
 {
@@ -74,8 +66,6 @@ namespace MySql.Configurator
       InfoDialog.ErrorLogo = Resources.MainLogo_Error;
       InfoDialog.WarningLogo = Resources.MainLogo_Warn;
       InfoDialog.InformationLogo = Resources.MainLogo;
-      PasswordDialog.ApplicationIcon = Resources.mysql_server;
-      PasswordDialog.SecurityLogo = Resources.MainLogo;
     }
 
     /// <summary>
@@ -121,11 +111,11 @@ namespace MySql.Configurator
         var executionMode = ProcessCommandLineArguments(Environment.GetCommandLineArgs());
 
         // Do not show form if running in removal mode and option --show-removal-warning was not provided.
-        Package package = null;
-        package = ProductManager.LoadPackage(_version, _installDirPath);
+        ServerInstallation serverInstallation = null;
+        serverInstallation = ServerInstallationManager.LoadServerInstallation(_version, _installDirPath);
         if (executionMode == ExecutionMode.RemoveNoShow)
         {
-          var controller = package.Controller as ServerConfigurationController;
+          var controller = serverInstallation.Controller;
           if (controller == null)
           {
             throw new ArgumentNullException(nameof(controller));
@@ -140,7 +130,7 @@ namespace MySql.Configurator
 
         // Uncomment the following line to print to the debug output console messages indicating what control got focus.
         //Application.AddMessageFilter(new LastFocusedControlFilter(true));
-        Application.Run(new MainForm(package, executionMode));
+        Application.Run(new MainForm(serverInstallation, executionMode));
       }
       catch (ConfiguratorException ex)
       {

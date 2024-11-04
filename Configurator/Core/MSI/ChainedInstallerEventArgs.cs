@@ -22,7 +22,7 @@
   51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 using System;
-using MySql.Configurator.Core.Enums;
+using MySql.Configurator.Base.Enums;
 
 namespace MySql.Configurator.Core.MSI
 {

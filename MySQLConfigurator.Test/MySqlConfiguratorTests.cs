@@ -26,15 +26,11 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using MySql.Configurator.Core.Classes;
-using MySql.Configurator.Core.Enums;
-using MySql.Configurator.Wizards.Server;
-using MySql.Configurator.Core.Package;
 using MySql.Configurator;
-using System.Runtime;
-using MySql.Configurator.Core.Common;
-using System.Configuration;
-using System.Runtime.InteropServices;
+using MySql.Configurator.Base.Classes;
+using MySql.Configurator.Base.Enums;
+using MySql.Configurator.Core.Server;
+using MySql.Configurator.Core.Settings;
 
 namespace MySQLConfigurator.Test
 {
@@ -117,14 +113,9 @@ namespace MySQLConfigurator.Test
     [TestMethod]
     public void ValidateAuthenticationPolicyServerVariableParsing()
     {
-      var package = new Package
-      {
-        VersionString = "8.0.4",
-        Publisher = "MySQL AB",
-        DisplayName = "MySQL Server",
-      };
-      package.Version = new Version(package.VersionString);
-      var settings = new MySqlServerSettings(package);
+      var serverInstallation = new ServerInstallation(AppConfiguration.License);
+      serverInstallation.Initialize("8.0.4", null);
+      var settings = new MySqlServerSettings(serverInstallation);
       var privateObject = new PrivateObject(settings);
       var methodName = "ParseFirstFactorAuthentication";
       Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke(methodName, new object[] { null }));

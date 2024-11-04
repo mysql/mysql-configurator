@@ -944,7 +944,7 @@ Provide a more complex password for stronger security.</value>
     <value>Stopping MySQL Server instance...</value>
   </data>
   <data name="UninstallEnterpriseFirewall" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\UninstallEnterpriseFirewall.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+    <value>..\Resources\UninstallEnterpriseFirewall.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;iso-8859-1</value>
   </data>
   <data name="WindowsServiceAlreadyRunning" xml:space="preserve">
     <value>Service {0} is running already.</value>
@@ -989,7 +989,7 @@ Provide a more complex password for stronger security.</value>
     <value>Service {0} is being stopped. Waiting until the status changes...</value>
   </data>
   <data name="user_roles" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\user-roles.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+    <value>..\Resources\user-roles.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;iso-8859-1</value>
   </data>
   <data name="ActionCancelledText" xml:space="preserve">
     <value>The action '{1}' for product '{0}' was cancelled by the user.</value>
@@ -1331,8 +1331,8 @@ If you choose not to migrate connections now, you will be prompted later to perf
   <data name="OldPasswordLabelText" xml:space="preserve">
     <value>Old Password:</value>
   </data>
-  <data name="PackageAlreadyQueued" xml:space="preserve">
-    <value>Package has already been queued.</value>
+  <data name="ServerInstallationAlreadyQueued" xml:space="preserve">
+    <value>Server installation has already been queued.</value>
   </data>
   <data name="PasswordDialogLargeTitle" xml:space="preserve">
     <value>Please provide a {0} Login</value>

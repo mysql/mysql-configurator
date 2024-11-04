@@ -24,8 +24,7 @@
 using System;
 using System.Data.Common;
 
-namespace MySql.
-Configurator.Core.Controllers
+namespace MySql.Configurator.Core.Controllers
 {
   public class ValueList : DbConnectionStringBuilder
   {
