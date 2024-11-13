@@ -1025,9 +1025,11 @@ namespace MySql.Configurator.Base.Classes
 
       if (oldVersion.Major == newVersion.Major
           && ((oldVersion.Major == 8
-               && oldVersion.Minor < 4)
+               && oldVersion.Minor < 4
+               && newVersion.Minor < 4)
               || (oldVersion.Major == 9
-                  && oldVersion.Minor < 7)))
+                  && oldVersion.Minor < 7
+                  && newVersion.Minor < 7)))
       {
         return true;
       }

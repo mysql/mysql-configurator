@@ -46,6 +46,9 @@
     <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\MSTest.TestFramework.2.2.10\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="MySql.Data">
+      <HintPath>..\common\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
@@ -79,9 +82,7 @@
       </AssemblyAttributes>
     </ItemGroup>
     <MakeDir Directories="$(IntermediateOutputPath)" />
-    <WriteCodeFragment Language="C#"
-                       OutputFile="$(IntermediateOutputPath)Version.cs"
-                       AssemblyAttributes="@(AssemblyAttributes)" />
+    <WriteCodeFragment Language="C#" OutputFile="$(IntermediateOutputPath)Version.cs" AssemblyAttributes="@(AssemblyAttributes)" />
     <ItemGroup>
       <Compile Include="$(IntermediateOutputPath)Version.cs" />
     </ItemGroup>

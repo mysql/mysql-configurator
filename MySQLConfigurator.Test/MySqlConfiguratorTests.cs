@@ -49,26 +49,26 @@ namespace MySQLConfigurator.Test
       Assert.AreEqual(UpgradeViability.Unsupported, currentVersion.ServerSupportsInPlaceUpgrades(new Version(5, 7, 0)));
       Assert.AreEqual(UpgradeViability.Unsupported, currentVersion.ServerSupportsInPlaceUpgrades(currentVersion));
       Assert.AreEqual(UpgradeViability.Unsupported, currentVersion.ServerSupportsInPlaceUpgrades(currentVersion));
-      
+
       // Unsupported with warning scenarios.
       Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, currentVersion.ServerSupportsInPlaceUpgrades(new Version(8, 0, 0)));
       Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, currentVersion.ServerSupportsInPlaceUpgrades(new Version(8, 0, 34)));
-      Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(8, 4, 0).ServerSupportsInPlaceUpgrades(new Version(8, 2, 0)));
       Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(8, 5, 0).ServerSupportsInPlaceUpgrades(new Version(8, 3, 0)));
       Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(9, 0, 0).ServerSupportsInPlaceUpgrades(new Version(8, 3, 0)));
-      Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(8, 3, 1).ServerSupportsInPlaceUpgrades(new Version(8, 3, 0)));
-      Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(9, 1, 0).ServerSupportsInPlaceUpgrades(new Version(8, 4, 1)));
-      Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(8, 2, 0).ServerSupportsInPlaceUpgrades(new Version(8, 0, 35)));
 
       // Supported scenarios.
+      Assert.AreEqual(UpgradeViability.Supported, new Version(8, 2, 0).ServerSupportsInPlaceUpgrades(new Version(8, 0, 35)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(8, 3, 1).ServerSupportsInPlaceUpgrades(new Version(8, 3, 0)));
       Assert.AreEqual(UpgradeViability.Supported, new Version(8, 4, 0).ServerSupportsInPlaceUpgrades(new Version(8, 0, 35)));
       Assert.AreEqual(UpgradeViability.Supported, new Version(8, 1, 0).ServerSupportsInPlaceUpgrades(new Version(8, 0, 35)));
       Assert.AreEqual(UpgradeViability.Supported, new Version(8, 1, 0).ServerSupportsInPlaceUpgrades(new Version(8, 0, 35)));
       Assert.AreEqual(UpgradeViability.Supported, new Version(8, 3, 0).ServerSupportsInPlaceUpgrades(new Version(8, 2, 0)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(8, 4, 0).ServerSupportsInPlaceUpgrades(new Version(8, 2, 0)));
       Assert.AreEqual(UpgradeViability.Supported, new Version(8, 4, 0).ServerSupportsInPlaceUpgrades(new Version(8, 3, 0)));
       Assert.AreEqual(UpgradeViability.Supported, new Version(8, 4, 1).ServerSupportsInPlaceUpgrades(new Version(8, 4, 0)));
       Assert.AreEqual(UpgradeViability.Supported, new Version(8, 4, 3).ServerSupportsInPlaceUpgrades(new Version(8, 4, 1)));
       Assert.AreEqual(UpgradeViability.Supported, new Version(9, 0, 0).ServerSupportsInPlaceUpgrades(new Version(8, 4, 1)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(9, 1, 0).ServerSupportsInPlaceUpgrades(new Version(8, 4, 1)));
     }
 
     [TestMethod]
@@ -143,7 +143,6 @@ namespace MySQLConfigurator.Test
       var bindingFlags = BindingFlags.NonPublic | BindingFlags.Static;
       Assert.ThrowsException<ArgumentNullException>(() => privateObject.Invoke(methodName, bindingFlags, new object[] { null }));
       Assert.ThrowsException<ConfiguratorException>(() => privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "configure" } }));
-      Assert.ThrowsException<ConfiguratorException>(() => privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--upgrade" } }));
       Assert.AreEqual(ExecutionMode.Configure, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName } }));
       Assert.AreEqual(ExecutionMode.Configure, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--configure" } }));
       Assert.AreEqual(ExecutionMode.Configure, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--CONFIGURE" } }));
@@ -151,6 +150,7 @@ namespace MySQLConfigurator.Test
       Assert.ThrowsException<ConfiguratorException>(() => privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--configure", "--other" } }));
       Assert.AreEqual(ExecutionMode.Remove, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--remove" } }));
       Assert.AreEqual(ExecutionMode.RemoveNoShow, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--removenoshow" } }));
+      Assert.AreEqual(ExecutionMode.Upgrade, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--upgrade" } }));
       try
       {
         privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "configure" } });

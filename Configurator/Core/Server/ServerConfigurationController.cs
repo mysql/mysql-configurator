@@ -34,7 +34,6 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
-using Microsoft.Win32;
 using MySql.Data.MySqlClient;
 using MySql.Configurator.Base.Classes;
 using MySql.Configurator.Base.Enums;

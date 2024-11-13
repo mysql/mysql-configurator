@@ -35,6 +35,7 @@ namespace MySql.Configurator.Core.Server
   /// <summary>
   /// Defines MySQL Server users that support authentication mechanisms and roles.
   /// </summary>
+  [Serializable]
   public class MySqlServerUser
   {
     #region Constants
