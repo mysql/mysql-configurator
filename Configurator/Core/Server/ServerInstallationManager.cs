@@ -91,11 +91,6 @@ namespace MySql.Configurator.Core.Server
     private bool _running;
 
     /// <summary>
-    /// Flag to identify if Installer is running in CLI mode (console) or with a UI.
-    /// </summary>
-    private bool _runningOnConsole;
-
-    /// <summary>
     /// Defines the progress percentage of the on-going operation.
     /// </summary>
     private int _step;
@@ -127,7 +122,6 @@ namespace MySql.Configurator.Core.Server
       _operationActionLog = new StringBuilder();
       _useDefaultContext = useDefaultContext;
       ServerInstallationList = new List<ServerInstallationOperation>();
-      _runningOnConsole = Utilities.RunningOnConsole();
     }
 
     #region Events
@@ -304,7 +298,7 @@ namespace MySql.Configurator.Core.Server
     public void Start()
     {
       _cancellationTokenSource = new CancellationTokenSource();
-      if (_runningOnConsole)
+      if (AppConfiguration.ConsoleMode)
       {
         SynchronizationContext.SetSynchronizationContext(_consoleContext);
       }
@@ -380,7 +374,7 @@ namespace MySql.Configurator.Core.Server
       if (!_currentOperation.TwoStepsAction)
       {
         task = Task.Factory.StartNew(() => DoAction(StepType.MainStep), _cancellationTokenSource.Token, TaskCreationOptions.None, TS.Default);
-        if (_runningOnConsole)
+        if (AppConfiguration.ConsoleMode)
         {
           task.Wait();
         }
@@ -392,13 +386,13 @@ namespace MySql.Configurator.Core.Server
           .ContinueWith(t => DoAction(StepType.MainStep), _cancellationTokenSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion,
           TS.FromCurrentSynchronizationContext());
 
-        if (_runningOnConsole)
+        if (AppConfiguration.ConsoleMode)
         {
           task.Wait();
         }
       }
 
-      if (!_runningOnConsole)
+      if (!AppConfiguration.ConsoleMode)
       {
         task.ContinueWith(t => EndAction(),
                           _cancellationTokenSource.Token,
@@ -475,7 +469,7 @@ namespace MySql.Configurator.Core.Server
 
       // We ensure that the controller for this server installations is reset to its default values in
       // case the user is attempting to do multiple operations without closing installer.
-      if (!_runningOnConsole
+      if (!AppConfiguration.ConsoleMode
           && action == ServerInstallationAction.Install
           && status == ServerInstallationStatus.Complete)
       {
@@ -648,7 +642,8 @@ namespace MySql.Configurator.Core.Server
         return;
       }
 
-      if (!_runningOnConsole
+      if (!AppConfiguration.ConsoleMode
+          && Application.OpenForms.Count > 0
           && Application.OpenForms[0].InvokeRequired)
       {
         Application.OpenForms[0].Invoke((MethodInvoker)(() => StatusChanged(status)));

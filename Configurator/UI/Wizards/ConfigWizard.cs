@@ -67,13 +67,13 @@ namespace MySql.Configurator.UI.Wizards
       }
 
       // Need to assign correctly for some operations how will behave the configuration UI and backend operations
-      if (configurationType == ConfigurationType.Reconfiguration
+      if (configurationType == ConfigurationType.Reconfigure
           && configurationController.GetType().IsSameOrSubclass(typeof(ServerConfigurationController)))
         {
           var serverController = configurationController;
           if (!serverController.Settings.GeneralSettingsFileExists)
           {
-            configurationType = ConfigurationType.New;
+            configurationType = ConfigurationType.Configure;
             AddPage(new WelcomePage() { AlternateTabTitle = "Welcome" });
           }
           else if (serverController.Settings.PendingSystemTablesUpgrade)

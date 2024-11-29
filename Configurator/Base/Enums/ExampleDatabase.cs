@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2024, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -21,19 +21,31 @@
   along with this program; if not, write to the Free Software Foundation, Inc., 
   51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
-using System;
-
 namespace MySql.Configurator.Base.Enums
 {
-  [Flags]
-  public enum ConfigurationType
+  /// <summary>
+  /// Defines the different example databases that should be affected in an operation.
+  /// </summary>
+  public enum ExampleDatabase
   {
-    None = 0,
-    Configure = 1 << 0,
-    Reconfigure = 1 << 1,
-    Upgrade = 1 << 2,
-    Remove = 1 << 3,
-    Incomplete = 1 << 4,
-    All = Configure | Reconfigure | Upgrade | Remove | Incomplete,
+    /// <summary>
+    /// No example databases will be installed/removed.
+    /// </summary>
+    None,
+
+    /// <summary>
+    /// All example databases will be installed/removed.
+    /// </summary>
+    All,
+
+    /// <summary>
+    /// Only the Sakila example database will be installed/removed.
+    /// </summary>
+    Sakila,
+
+    /// <summary>
+    /// Only the World example database will be installed/removed.
+    /// </summary>
+    World
   }
 }

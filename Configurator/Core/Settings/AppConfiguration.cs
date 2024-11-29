@@ -63,6 +63,16 @@ namespace MySql.Configurator.Core.Settings
     #region Properties
 
     /// <summary>
+    /// Gets or sets a flag indicating if the application is running in console mode.
+    /// </summary>
+    public static bool ConsoleMode { get; set; }
+
+    /// <summary>
+    /// Gets or sets the execution mode that the application will run with.
+    /// </summary>
+    public static ExecutionMode ExecutionMode { get; set; }
+
+    /// <summary>
     /// Gets or sets the license type of the application.
     /// </summary>
     public static LicenseType License { get; set; }

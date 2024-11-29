@@ -43,21 +43,15 @@ namespace MySql.Configurator.UI.Forms
     #region Fields
 
     /// <summary>
-    /// The application execution mode.
-    /// </summary>
-    private ExecutionMode _executionMode;
-
-    /// <summary>
     /// The server installation associated to the current installation.
     /// </summary>
     private ServerInstallation _serverInstallation;
 
     #endregion
 
-    public MainForm(ServerInstallation serverInstallation, ExecutionMode executionMode)
+    public MainForm(ServerInstallation serverInstallation)
     {
       InitializeComponent();
-      _executionMode = executionMode;
       _serverInstallation = serverInstallation;
       SetWindowPosition();
     }
@@ -127,7 +121,7 @@ namespace MySql.Configurator.UI.Forms
 
       var upgradeHistoryFileExists = false;
       Version existingServerVersion = new Version();
-      if (_executionMode == ExecutionMode.Configure)
+      if (AppConfiguration.ExecutionMode == ExecutionMode.Configure)
       {
         var path = Path.Combine(controller.DataDirectory, "Data", MySqlUpgradeHistoryManager.UPGRADE_HISTORY_FILE_NAME);
         upgradeHistoryFileExists = File.Exists(path);
@@ -172,7 +166,7 @@ namespace MySql.Configurator.UI.Forms
                 && _serverInstallation.Version.Minor == existingServerVersion.Minor)
             {
               Logger.LogInformation(Resources.ExecutionModeSwitch);
-              _executionMode = ExecutionMode.Upgrade;
+              AppConfiguration.ExecutionMode = ExecutionMode.Upgrade;
               controller.IsSameDirectoryUpgrade = true;
             }
           }
@@ -181,10 +175,10 @@ namespace MySql.Configurator.UI.Forms
       
       // Show wizard matching the selected execution mode.
       ConfigurationType configurationType;
-      switch (_executionMode)
+      switch (AppConfiguration.ExecutionMode)
       {
         case ExecutionMode.Configure:
-          configurationType = ConfigurationType.Reconfiguration;
+          configurationType = ConfigurationType.Reconfigure;
           var configWizard = new ConfigWizard();
           Controls.Add(configWizard);
           configWizard.WizardCanceled += WizardClosed;
@@ -224,7 +218,7 @@ namespace MySql.Configurator.UI.Forms
       var stringConfigurationType = string.Empty;
       switch (controllerConfigurationType)
       {
-        case (ConfigurationType.New):
+        case (ConfigurationType.Configure):
           stringConfigurationType = $"{controllerConfigurationType} configuration";
           break;
 
@@ -234,7 +228,7 @@ namespace MySql.Configurator.UI.Forms
       }
       
       ConfigurationTypeLabel.Text = stringConfigurationType;
-      if (controllerConfigurationType == ConfigurationType.Reconfiguration
+      if (controllerConfigurationType == ConfigurationType.Reconfigure
           || controllerConfigurationType == ConfigurationType.Remove
           || controllerConfigurationType == ConfigurationType.Upgrade)
       {

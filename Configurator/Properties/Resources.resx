@@ -1817,4 +1817,170 @@ Proceeding with the upgrade will update the plugin to 'caching_sha2_password'.</
   <data name="MainFormOnGoingOperationTitle" xml:space="preserve">
     <value>An operation is currently running</value>
   </data>
+  <data name="CLIBeginOperation" xml:space="preserve">
+    <value>{0} operation has started.</value>
+  </data>
+  <data name="CLIConfigurationStarting" xml:space="preserve">
+    <value>Configuring {0} installation...</value>
+  </data>
+  <data name="CLIConfigurationStepCompleted" xml:space="preserve">
+    <value>- Completed!</value>
+  </data>
+  <data name="CLIConfigurationStepFailed" xml:space="preserve">
+    <value>- Failed!</value>
+  </data>
+  <data name="CLICopyrightNotice" xml:space="preserve">
+    <value>Copyright (c) 2023, 2025, Oracle and/or its affiliates. Oracle(R), Java, MySQL, and NetSuite are registered trademarks of Oracle and/or its affiliates.</value>
+  </data>
+  <data name="CLIEndOperation" xml:space="preserve">
+    <value>{0} operation has finished.</value>
+  </data>
+  <data name="CLIOperationCompleted" xml:space="preserve">
+    <value>Operation {0} for {1} has completed </value>
+  </data>
+  <data name="CLIOperationCompletedSuccessfully" xml:space="preserve">
+    <value>successfully!</value>
+  </data>
+  <data name="CLIOperationCompletedWithErrors" xml:space="preserve">
+    <value>unsuccessfully! (Review the log for more details)</value>
+  </data>
+  <data name="CLIOperationCompletedWithWarnings" xml:space="preserve">
+    <value>with warnings!</value>
+  </data>
+  <data name="CLINoConfigurationsFound" xml:space="preserve">
+    <value>Oops! Looks like there is nothing to remove.
+
+MySQL Configurator was not able to find any configurations for the specified MySQL Server installation.</value>
+  </data>
+  <data name="CLIRunningInUIMode" xml:space="preserve">
+    <value>Running MySQL Configurator in UI mode.</value>
+  </data>
+  <data name="CLIRunningInConsoleMode" xml:space="preserve">
+    <value>Running MySQL Configurator in console mode.</value>
+  </data>
+  <data name="CLIGeneralHelp" xml:space="preserve">
+    <value>General syntax
+---------------------------------------------------------------------------------------------------
+
+mysql_configurator.exe --console [--action=action_name | -a=action_name] [--help | --silent]] | [--action_option=action_value]...]
+
+
+Options
+---------------------------------------------------------------------------------------------------
+Name            Description
+---------------------------------------------------------------------------------------------------
+console(c)      Activates the usage of the CLI in MySQL Configurator. If not provided, Configurator will launch with a GUI.
+action(a)       Runs MySQL Configurator CLI in new configuration, reconfiguration, removal or upgrade mode.
+                Supported values: configure, reconfigure, remove, upgrade
+help(h)         Displays general help or help for the corresponding action. If no --action element is provided, the general help section is displayed. If an action option elements such as --action-option=action-value is provided, it is ignored and the corresponding help is displayed.
+silent(s)       Executes the specified action without requiring any user intervention. If any error occurs, the action is aborted.
+action_option   Defines the various configuration options available for each CLI action (configuration, reconfiguration, removal or upgrade). See the help section of each individual action for details on the supported actions.
+
+
+Usage examples
+---------------------------------------------------------------------------------------------------
+--console
+--console --action=configure --port=3306
+--console --help
+--console --action=remove --help
+--console --action=configure --silent --password=test
+-c -a=configure -h
+-c -a=remove --help
+</value>
+  </data>
+  <data name="CLIConfigureActionHelp" xml:space="preserve">
+    <value>Configure action
+
+Executes a new configuration operation. Using this action for an already configured server installation will raise an error.
+
+Syntax
+---------------------------------------------------------------------------------------------------
+
+--action=configure [--help | --silent] [--action_option[=action_value]]...
+
+
+Options
+---------------------------------------------------------------------------------------------------
+Name:Shortcut:Aliases:Supported Values:Description
+---------------------------------------------------------------------------------------------------
+[options]
+
+Usage examples
+---------------------------------------------------------------------------------------------------
+--action=configure --password=test
+--action=configure --password=test --port=3320 --enable-pipe-names --pipe-name=MYSQL_PIPE --server-id=2 --install-sample-database=both
+--action=configure --password=other123 --add-user=john:"Db Admin":MYSQL:pa$$ --add-user=mary:"Administrator":MYSQL:p4ssW0rd
+</value>
+  </data>
+  <data name="CLIReconfigureActionHelp" xml:space="preserve">
+    <value>Reconfigure action
+
+Executes a reconfiguration operation. Using this action for a non-configured server installation will raise an error.
+
+Syntax
+---------------------------------------------------------------------------------------------------
+
+--action=reconfigure [--help | --silent] [--action_option[=action_value]]...
+
+
+Options
+---------------------------------------------------------------------------------------------------
+Name:Shortcut:Aliases:Supported Values:Description
+---------------------------------------------------------------------------------------------------
+[options]
+
+Usage examples
+---------------------------------------------------------------------------------------------------
+--action=reconfigure --password=test --port=3310
+--action=reconfigure --password=test --enable-shared-memory=false
+</value>
+  </data>
+  <data name="CLIRemoveActionHelp" xml:space="preserve">
+    <value>Remove action
+
+Executes a removal operation. In this case, any configurations created using MySQL Configurator will be removed allowing to configure the server from scratch using the configure action.
+
+Syntax
+---------------------------------------------------------------------------------------------------
+
+--action=remove [--help | --silent] [--action_option[=action_value]]...
+
+
+Options
+---------------------------------------------------------------------------------------------------
+Name:Shortcut:Aliases:Supported Values:Description
+---------------------------------------------------------------------------------------------------
+[options]
+
+Usage examples
+---------------------------------------------------------------------------------------------------
+--action=remove
+-a=remove
+--action=remove --keep-data-directory=true
+--action=remove --keep-data=false
+</value>
+  </data>
+  <data name="CLIUpgradeActionHelp" xml:space="preserve">
+    <value>Upgrade action
+
+Executes an in-place upgrade operation.
+
+Syntax
+---------------------------------------------------------------------------------------------------
+
+--action=upgrade [--help | --silent] [--action_option[=action_value]]...
+
+
+Options
+---------------------------------------------------------------------------------------------------
+Name:Shortcut:Aliases:Supported Values:Description
+---------------------------------------------------------------------------------------------------
+[options]
+
+Usage examples
+---------------------------------------------------------------------------------------------------
+--action=upgrade --old-instance-password=test
+--action=upgrade --old-instance-password=test --backup-data=false --server-file-permissions-access=full
+</value>
+  </data>
 </root>

@@ -132,7 +132,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
         _rootPasswordOk = false;
         var providerProperties = new ErrorProviderProperties(Resources.ConnectionTestingText, Resources.Config_InProgressIcon, true);
         ConnectionErrorProvider.SetProperties(PasswordCheckButton, providerProperties);
-        var connectionResult = MySqlServerInstance.CanConnect(_controller, CurrentRootPasswordTextBox.Text, _controller.ConfigurationType == ConfigurationType.Reconfiguration);
+        var connectionResult = MySqlServerInstance.CanConnect(_controller, CurrentRootPasswordTextBox.Text, _controller.ConfigurationType == ConfigurationType.Reconfigure);
         _rootPasswordOk = connectionResult == ConnectionResultType.ConnectionSuccess;
         providerProperties.ErrorIcon = _rootPasswordOk
           ? Resources.Config_DoneIcon

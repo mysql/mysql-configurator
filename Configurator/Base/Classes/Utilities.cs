@@ -29,13 +29,10 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.IO.Compression;
-using System.IO.Pipes;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Versioning;
@@ -1247,6 +1244,30 @@ namespace MySql.Configurator.Base.Classes
     }
 
     /// <summary>
+    /// Reads the contents of a text file.
+    /// </summary>
+    /// <returns>An array with the contents of the file</returns>
+    public static string ReadTextFile(string fileName, out string errorMessage)
+    {
+      errorMessage = null;
+      if (string.IsNullOrEmpty(fileName))
+      {
+        throw new ArgumentNullException(nameof(fileName));
+      }
+
+      try
+      {
+        return File.ReadAllText(fileName);
+      }
+      catch (Exception ex)
+      {
+        errorMessage = ex.Message;
+        Logger.LogException(ex);
+        return null;
+      }
+    }
+
+    /// <summary>
     /// Runs the NetShell in the background.
     /// </summary>
     /// <param name="arguments">The arguments passed to the NetShell.</param>
@@ -1295,12 +1316,6 @@ namespace MySql.Configurator.Base.Classes
       }
 
       return success;
-    }
-
-    public static bool RunningOnConsole()
-    {
-      var p = Process.GetCurrentProcess();
-      return p.ProcessName.ToLowerInvariant().Contains("console");
     }
 
     /// <summary>

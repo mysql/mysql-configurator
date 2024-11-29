@@ -81,7 +81,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       ShowAdvancedLoggingOptionsCheckBox.Checked = _controller.ShowAdvancedOptions;
       HandleAdvancedOptions(_controller.ShowAdvancedOptions);
 
-      if (_controller.ConfigurationType == ConfigurationType.New || _controller.ConfigurationType == ConfigurationType.Reconfiguration)
+      if (_controller.ConfigurationType == ConfigurationType.Configure || _controller.ConfigurationType == ConfigurationType.Reconfigure)
       {
         var supportsEnterpriseFirewallConfiguration = _controller.SupportsEnterpriseFirewallConfiguration;
         EnterpriseFirewallCheckBox.Visible = supportsEnterpriseFirewallConfiguration;
@@ -164,7 +164,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       _oldSettings = _controller.Settings.OldSettings as MySqlServerSettings;
 
       ConfigTypeComboBox.SelectedIndex = 0;
-      if (_controller.ConfigurationType == ConfigurationType.Reconfiguration)
+      if (_controller.ConfigurationType == ConfigurationType.Reconfigure)
       {
         switch(_settings.ServerInstallationType)
         {
@@ -312,7 +312,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       }
 
       bool exists = _controller.PipeOrMemoryNameExists(name, namedPipe);
-      if (_controller.ConfigurationType != ConfigurationType.New)
+      if (_controller.ConfigurationType != ConfigurationType.Configure)
       {
         var oldName = namedPipe ? _oldSettings.PipeName : _oldSettings.SharedMemoryName;
         exists &= !oldName.Equals(name, StringComparison.OrdinalIgnoreCase);
@@ -348,12 +348,12 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
         return string.Empty;
       }
 
-      if (_controller.ConfigurationType == ConfigurationType.New)
+      if (_controller.ConfigurationType == ConfigurationType.Configure)
       {
         return Resources.ServerConfigPortInUse;
       }
 
-      if ((_controller.ConfigurationType == ConfigurationType.Reconfiguration || _controller.ConfigurationType == ConfigurationType.Upgrade) && port != oldPort)
+      if ((_controller.ConfigurationType == ConfigurationType.Reconfigure || _controller.ConfigurationType == ConfigurationType.Upgrade) && port != oldPort)
       {
         return Resources.ServerConfigPortInUse;
       }

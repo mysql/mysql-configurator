@@ -118,7 +118,7 @@ namespace MySql.Configurator.Core.Controllers
       GetBinaryPath();
     }
 
-    //// New constructors used to create new services and cope an existing one.
+    //// Configure constructors used to create new services and cope an existing one.
     public ExpandedServiceController(string name, string displayName, string fileName, string username, string password, bool startAtStartUp)
     {
       PollingDelay = DEFAULT_POLLING_DELAY_MILLISECONDS;

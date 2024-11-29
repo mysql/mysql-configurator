@@ -204,7 +204,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       {
         case nameof(WindowsServiceNameTextBox):
           var serviceName = WindowsServiceNameTextBox.Text.Trim();
-          if (_controller.ConfigurationType != ConfigurationType.Reconfiguration
+          if (_controller.ConfigurationType != ConfigurationType.Reconfigure
               || !serviceName.Equals(_controller.Settings.ServiceName, StringComparison.OrdinalIgnoreCase))
           {
             errorMessage = MySqlServiceControlManager.ValidateServiceName(serviceName);

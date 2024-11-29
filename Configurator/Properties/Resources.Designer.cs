@@ -311,6 +311,231 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} operation has started..
+        /// </summary>
+        public static string CLIBeginOperation {
+            get {
+                return ResourceManager.GetString("CLIBeginOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configuring {0} installation....
+        /// </summary>
+        public static string CLIConfigurationStarting {
+            get {
+                return ResourceManager.GetString("CLIConfigurationStarting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to - Completed!.
+        /// </summary>
+        public static string CLIConfigurationStepCompleted {
+            get {
+                return ResourceManager.GetString("CLIConfigurationStepCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to - Failed!.
+        /// </summary>
+        public static string CLIConfigurationStepFailed {
+            get {
+                return ResourceManager.GetString("CLIConfigurationStepFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configure action
+        ///
+        ///Executes a new configuration operation. Using this action for an already configured server installation will raise an error.
+        ///
+        ///Syntax
+        ///---------------------------------------------------------------------------------------------------
+        ///
+        ///--action=configure [--help | --silent] [--action_option[=action_value]]...
+        ///
+        ///
+        ///Options
+        ///---------------------------------------------------------------------------------------------------
+        ///Name:Shortcut:Aliases:Supported Values:Description
+        ///----------- [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string CLIConfigureActionHelp {
+            get {
+                return ResourceManager.GetString("CLIConfigureActionHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copyright (c) 2023, 2025, Oracle and/or its affiliates. Oracle(R), Java, MySQL, and NetSuite are registered trademarks of Oracle and/or its affiliates..
+        /// </summary>
+        public static string CLICopyrightNotice {
+            get {
+                return ResourceManager.GetString("CLICopyrightNotice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} operation has finished..
+        /// </summary>
+        public static string CLIEndOperation {
+            get {
+                return ResourceManager.GetString("CLIEndOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to General syntax
+        ///---------------------------------------------------------------------------------------------------
+        ///
+        ///mysql_configurator.exe --console [--action=action_name | -a=action_name] [--help | --silent]] | [--action_option=action_value]...]
+        ///
+        ///
+        ///Options
+        ///---------------------------------------------------------------------------------------------------
+        ///Name            Description
+        ///---------------------------------------------------------------------------------------------------
+        ///console(c)      A [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string CLIGeneralHelp {
+            get {
+                return ResourceManager.GetString("CLIGeneralHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Oops! Looks like there is nothing to remove.
+        ///
+        ///MySQL Configurator was not able to find any configurations for the specified MySQL Server installation..
+        /// </summary>
+        public static string CLINoConfigurationsFound {
+            get {
+                return ResourceManager.GetString("CLINoConfigurationsFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Operation {0} for {1} has completed .
+        /// </summary>
+        public static string CLIOperationCompleted {
+            get {
+                return ResourceManager.GetString("CLIOperationCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to successfully!.
+        /// </summary>
+        public static string CLIOperationCompletedSuccessfully {
+            get {
+                return ResourceManager.GetString("CLIOperationCompletedSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to unsuccessfully! (Review the log for more details).
+        /// </summary>
+        public static string CLIOperationCompletedWithErrors {
+            get {
+                return ResourceManager.GetString("CLIOperationCompletedWithErrors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to with warnings!.
+        /// </summary>
+        public static string CLIOperationCompletedWithWarnings {
+            get {
+                return ResourceManager.GetString("CLIOperationCompletedWithWarnings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reconfigure action
+        ///
+        ///Executes a reconfiguration operation. Using this action for a non-configured server installation will raise an error.
+        ///
+        ///Syntax
+        ///---------------------------------------------------------------------------------------------------
+        ///
+        ///--action=reconfigure [--help | --silent] [--action_option[=action_value]]...
+        ///
+        ///
+        ///Options
+        ///---------------------------------------------------------------------------------------------------
+        ///Name:Shortcut:Aliases:Supported Values:Description
+        ///-------------- [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string CLIReconfigureActionHelp {
+            get {
+                return ResourceManager.GetString("CLIReconfigureActionHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove action
+        ///
+        ///Executes a removal operation. In this case, any configurations created using MySQL Configurator will be removed allowing to configure the server from scratch using the configure action.
+        ///
+        ///Syntax
+        ///---------------------------------------------------------------------------------------------------
+        ///
+        ///--action=remove [--help | --silent] [--action_option[=action_value]]...
+        ///
+        ///
+        ///Options
+        ///---------------------------------------------------------------------------------------------------
+        ///Name:Sho [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string CLIRemoveActionHelp {
+            get {
+                return ResourceManager.GetString("CLIRemoveActionHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Running MySQL Configurator in console mode..
+        /// </summary>
+        public static string CLIRunningInConsoleMode {
+            get {
+                return ResourceManager.GetString("CLIRunningInConsoleMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Running MySQL Configurator in UI mode..
+        /// </summary>
+        public static string CLIRunningInUIMode {
+            get {
+                return ResourceManager.GetString("CLIRunningInUIMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upgrade action
+        ///
+        ///Executes an in-place upgrade operation.
+        ///
+        ///Syntax
+        ///---------------------------------------------------------------------------------------------------
+        ///
+        ///--action=upgrade [--help | --silent] [--action_option[=action_value]]...
+        ///
+        ///
+        ///Options
+        ///---------------------------------------------------------------------------------------------------
+        ///Name:Shortcut:Aliases:Supported Values:Description
+        ///---------------------------------------------------------------------------------------------------        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string CLIUpgradeActionHelp {
+            get {
+                return ResourceManager.GetString("CLIUpgradeActionHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to If you want to remove a connection, please close MySQL Workbench..
         /// </summary>
         public static string CloseWBAdviceToDelete {

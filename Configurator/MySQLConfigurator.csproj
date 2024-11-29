@@ -121,6 +121,14 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\Enums\ExitCode.cs" />
+    <Compile Include="Base\Enums\ExampleDatabase.cs" />
+    <Compile Include="Base\Enums\ServerFilePermissionsAccess.cs" />
+    <Compile Include="Core\CLI\CLIExitCode.cs" />
+    <Compile Include="Core\CLI\CommandLine.cs" />
+    <Compile Include="Core\CLI\CommandLineParser.cs" />
+    <Compile Include="Core\CLI\CommandLineOption.cs" />
+    <Compile Include="Core\CLI\ConsoleSpinner.cs" />
     <Compile Include="Core\Server\ServerInstallation.cs" />
     <Compile Include="UI\Controls\SelectablePictureBox.cs">
       <SubType>Component</SubType>
@@ -160,7 +168,7 @@
     <Compile Include="Core\Settings\ConfiguratorException.cs" />
     <Compile Include="Core\Settings\GeneralSettings.cs" />
     <Compile Include="Core\Controllers\ConfigurationStep.cs" />
-    <Compile Include="Core\Settings\ControllerSettingAttribute.cs" />
+    <Compile Include="Core\Settings\ServerSettingAttribute.cs" />
     <Compile Include="Core\Controllers\ControllerType.cs" />
     <Compile Include="Core\Controllers\RemoveStep.cs" />
     <Compile Include="Core\Controllers\ValueList.cs" />

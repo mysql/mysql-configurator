@@ -108,33 +108,43 @@ namespace MySql.Configurator.Core.Server
     /// <summary>
     /// Gets or sets the authentication plugin assigned to new users.
     /// </summary>
-    [ControllerSetting("The authentication plugin used for a specific user when connecting to the server.", "authentication_plugin,auth_plugin")]
+    [ServerSetting("The authentication plugin used for a specific user when connecting to the server.",
+      "authentication_plugin",
+      new string[] { "auth_plugin"})]
     public MySqlAuthenticationPluginType AuthenticationPlugin { get; set; }
 
     /// <summary>
     /// Gets or sets the host names allowed to connect. 
     /// </summary>
-    [ControllerSetting("The access restriction to connections originated from a specific host. Host names, IPv4 and IPv6 " +
+    [ServerSetting("The access restriction to connections originated from a specific host. Host names, IPv4 and IPv6 " +
       "addresses are permitted. The \" % \" and \"_\" wildcards are permitted for matching zero or more characters or a single character " +
-      "respectively.", "from_host,host")]
+      "respectively.",
+      "from_host",
+      new string[] { "host" })]
     public string Host { get; set; }
 
     /// <summary>
     /// Gets or sets the password used to authenticate the current user.
     /// </summary>
-    [ControllerSetting("The password used to authenticate a specific user.", "password,pwd")]
+    [ServerSetting("The password used to authenticate a specific user.",
+      "password",
+      new string[] { "pwd" })]
     public string Password { get; set; }
 
     /// <summary>
     /// Gets or sets the <see cref="Role"/> that maps to granted permissions on database objects.
     /// </summary>
-    [ControllerSetting("The administrative role that grants a set of privileges to the database user.", "role")]
+    [ServerSetting("The administrative role that grants a set of privileges to the database user.",
+      "role",
+      new string[] { "user-role" })]
     public Role UserRole { get; set; }
 
     /// <summary>
     /// Gets or sets the name of the user used to connect to the server.
     /// </summary>
-    [ControllerSetting("The name of a user account to be created for the server instance.", "user,user_name")]
+    [ServerSetting("The name of a user account to be created for the server instance.",
+      "user",
+      new string[] { "user_name" })]
     public string Username
     {
       get
@@ -151,8 +161,10 @@ namespace MySql.Configurator.Core.Server
     /// <summary>
     /// Gets or sets a comma separated list of Windows tokens allowed to authenticate to the server.
     /// </summary>
-    [ControllerSetting("A comma-separated list of tokens representing Windows users or user groups that are permitted to " +
-      "authenticate to the server as the specified MySQL user.", "windows_security_tokens,win_sec_tokens,tokens")]
+    [ServerSetting("A comma-separated list of tokens representing Windows users or user groups that are permitted to " +
+      "authenticate to the server as the specified MySQL user.",
+      "windows_security_tokens",
+      new string[] { "win_sec_tokens", "tokens" })]
     public string WindowsSecurityTokenList
     {
       get

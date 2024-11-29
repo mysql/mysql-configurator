@@ -27,9 +27,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using MySql.Configurator.Base.Classes;
 using MySql.Configurator.Base.Enums;
+using MySql.Configurator.Core.CLI;
 using MySql.Configurator.Core.Logging;
 using MySql.Configurator.Core.Server;
 using MySql.Configurator.Core.Settings;
@@ -42,6 +44,32 @@ namespace MySql.Configurator
 {
   public class Program
   {
+    #region Constants
+
+    /// <summary>
+    /// The id of the parent console when in CLI mode.
+    /// </summary>
+    private static int PARENT_CONSOLE_ID = -1;
+
+    #endregion
+
+    #region Unmanaged code
+
+    /// <summary>
+    /// Attaches the console to this application to support running in CLI mode.
+    /// </summary>
+    /// <param name="dwProcessId"></param>
+    /// <returns></returns>
+    [DllImport("kernel32", SetLastError = true)]
+    static extern bool AttachConsole(int dwProcessId);
+    
+    /// <summary>
+    /// Frees the console.
+    /// </summary>
+    [DllImport("kernel32", SetLastError = true)]
+    static extern bool FreeConsole();
+    #endregion
+
     #region Fields
 
     /// <summary>
@@ -72,15 +100,11 @@ namespace MySql.Configurator
     /// The main entry point for the application.
     /// </summary>
     [STAThread]
-    static void Main()
+    static int Main()
     {
       try
       {
         AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
-        Utilities.InitializeLogger(false);
-        CustomizeUtilityDialogs();
-        Application.ApplicationExit += ApplicationExit;
-
 #if DEBUG
         /* Before debugging, update the path to the server installation directory in the "installationDirectory" key of the app.config file.
            The path set as the installation directory must be the root directory of the server installation. 
@@ -98,22 +122,41 @@ namespace MySql.Configurator
         AppConfiguration.License = LicenseType.Community;
 #endif
 
+        // Parse command line options.
+        var processingResult = ParseCommandLineArguments();
+        Utilities.InitializeLogger(AppConfiguration.ConsoleMode);
+        if (processingResult.ExitCode != ExitCode.Success)
+        {
+          return PrintAndReturnExitCode(processingResult);
+        }
+
+        // Set configuration type and execution mode.
+        ServerInstallation serverInstallation = ServerInstallationManager.LoadServerInstallation(_version, _installDirPath);
+        processingResult = SetConfigurationTypeAndExecutionMode(serverInstallation);
+        if (processingResult.ExitCode != ExitCode.Success)
+        {
+          return PrintAndReturnExitCode(processingResult);
+        }
+
+        Application.ApplicationExit += ApplicationExit;
+        if (AppConfiguration.ConsoleMode)
+        {
+          Console.WriteLine(Resources.CLIRunningInConsoleMode);
+          var exitCode = CommandLine.ProcessCommandLineOptions(serverInstallation);
+          return PrintAndReturnExitCode(exitCode);
+        }
+
+        CustomizeUtilityDialogs();
         // Make sure our app cannot run twice.
         var exists = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location)).Count() > 1;
         if (exists)
         {
           InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties(Resources.AppName, Resources.AppAlreadyRunning));
-          return;
+          return PrintAndReturnExitCode(new CLIExitCode(ExitCode.MultipleInstances));
         }
 
-        Application.EnableVisualStyles();
-        Application.SetCompatibleTextRenderingDefault(false);
-        var executionMode = ProcessCommandLineArguments(Environment.GetCommandLineArgs());
-
         // Do not show form if running in removal mode and option --show-removal-warning was not provided.
-        ServerInstallation serverInstallation = null;
-        serverInstallation = ServerInstallationManager.LoadServerInstallation(_version, _installDirPath);
-        if (executionMode == ExecutionMode.RemoveNoShow)
+        if (AppConfiguration.ExecutionMode == ExecutionMode.RemoveNoShow)
         {
           var controller = serverInstallation.Controller;
           if (controller == null)
@@ -124,18 +167,28 @@ namespace MySql.Configurator
           if (!controller.IsRemovalExecutionNeeded)
           {
             Logger.LogWarning(string.Format(Resources.RemoveWithNoUIWarningMessage));
-            return;
+            return PrintAndReturnExitCode(new CLIExitCode(ExitCode.Success));
           }
         }
 
-        // Uncomment the following line to print to the debug output console messages indicating what control got focus.
-        //Application.AddMessageFilter(new LastFocusedControlFilter(true));
-        Application.Run(new MainForm(serverInstallation, executionMode));
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
+        Application.Run(new MainForm(serverInstallation));
+        return PrintAndReturnExitCode(new CLIExitCode(ExitCode.Success));
       }
       catch (ConfiguratorException ex)
       {
-        InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties("Error loading the specified MySQL Server product", ex.Message));
+        if (!AppConfiguration.ConsoleMode)
+        {
+          InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties("Error loading the specified MySQL Server product", ex.Message));
+        }
+        else
+        {
+          Console.WriteLine(ex.Message);
+        }
+
         Logger.LogError(ex.Message);
+        return PrintAndReturnExitCode(new CLIExitCode(ExitCode.GeneralError));
       }
       catch (Exception ex)
       {
@@ -148,8 +201,18 @@ namespace MySql.Configurator
       }
       finally
       {
+        if (AppConfiguration.ConsoleMode)
+        {
+          FreeConsole();
+        }
+
         Logger.LogInformation("Configurator exit");
       }
+
+#if (!DEBUG)
+      // For internal debug only.
+      return PrintAndReturnExitCode(new CLIExitCode(ExitCode.Success));
+#endif
     }
 
     private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs e)
@@ -171,38 +234,38 @@ namespace MySql.Configurator
     }
 
     /// <summary>
-    /// Processes the command line arguments provided when executing the application.
+    /// Parses the command line arguments provided when executing the application.
     /// </summary>
     /// <param name="arguments">The command line options provided by the user.</param>
-    /// <returns>An enumeration value representing the execution mode.</returns>
-    private static ExecutionMode ProcessCommandLineArguments(string[] arguments)
+    /// <returns>A <see cref="CLIExitCode"/> instance representing the result of the parsing of the command line arguments.</returns>
+    private static CLIExitCode ParseCommandLineArguments()
     {
-      var executionMode = ExecutionMode.Configure;
+      var arguments = Environment.GetCommandLineArgs();
+      AppConfiguration.ExecutionMode = ExecutionMode.Configure;
       if (arguments == null)
       {
         throw new ArgumentNullException(nameof(arguments));
       }
 
-      if (arguments.Length > 1)
+      arguments = arguments.Skip(1).ToArray();
+      if (arguments.Length > 0)
       {
-        arguments = arguments.Skip(1).ToArray();
-        foreach (var argument in arguments)
+        // Check for console option first.
+        if (arguments.Any(argument => argument.Equals("--console", StringComparison.InvariantCultureIgnoreCase)))
         {
-          var option = argument.StartsWith("--")
-            ? argument.Substring(2).ToLowerInvariant()
-            : null;
-          if (option == null)
-          {
-            throw new ConfiguratorException(ConfiguratorError.InvalidOptionStart, argument);
-          }
+          AppConfiguration.ConsoleMode = true;
+          AttachConsole(PARENT_CONSOLE_ID);
+        }
 
-          if (!Enum.TryParse<ExecutionMode>(option, true, out executionMode))
-          {
-            throw new ConfiguratorException(ConfiguratorError.InvalidOption, option);
-          }
+        // Process all options.
+        var processingResult = CommandLineParser.ParseCommandLineArguments(arguments);
+        if (processingResult.ExitCode != ExitCode.Success)
+        {
+          return processingResult;
         }
       }
 
+      // If no arguments were provided default to running in configuration mode with an UI.
       // Set default version.
       try
       {
@@ -248,16 +311,83 @@ namespace MySql.Configurator
       catch (Exception ex)
       {
         Logger.LogException(ex);
+        return new CLIExitCode(ExitCode.BadImplementation);
       }
 
+      return new CLIExitCode(ExitCode.Success);
+    }
 
-      return executionMode;
+    /// <summary>
+    /// Prints the descriptive message associated to the CLIExitCode instance and return the exit code.
+    /// </summary>
+    /// <param name="cliExitCode">The CLI exit code.</param>
+    /// <returns>An integer representing the exit code.</returns>
+    private static int PrintAndReturnExitCode(CLIExitCode cliExitCode)
+    {
+      var message = cliExitCode.GetExitCodeMessage();
+      if (AppConfiguration.ConsoleMode)
+      {
+        Console.WriteLine(message);
+      }
+
+      Logger.LogInformation(message);
+      return (int)cliExitCode.ExitCode;
+    }
+
+    /// <summary>
+    /// Sets the configuration type of the specified server installation and the execution mode for the application.
+    /// </summary>
+    /// <param name="serverInstallation">The server installation.</param>
+    /// <returns>A <see cref="CLIExitCode"/> instance representing the result of setting the configuration type and execution mode.</returns>
+    private static CLIExitCode SetConfigurationTypeAndExecutionMode(ServerInstallation serverInstallation)
+    {
+      var action = CommandLineParser.GetMatchingProvidedOption("action");
+      if (action == null)
+      {
+        serverInstallation.Controller.ConfigurationType = ConfigurationType.Reconfigure;
+      }
+      else
+      {
+        if (!Enum.TryParse(action.Value, true, out ConfigurationType configurationType)
+            || configurationType == ConfigurationType.None
+            || configurationType == ConfigurationType.Incomplete
+            || configurationType == ConfigurationType.All)
+        {
+          return new CLIExitCode(ExitCode.InvalidAction, action.Value, action.Name);
+        }
+
+        switch (configurationType)
+        {
+          case ConfigurationType.Reconfigure:
+          case ConfigurationType.Configure:
+            AppConfiguration.ExecutionMode = ExecutionMode.Configure;
+            break;
+          case ConfigurationType.Upgrade:
+            AppConfiguration.ExecutionMode = ExecutionMode.Upgrade;
+            break;
+          case ConfigurationType.Remove:
+            AppConfiguration.ExecutionMode = ExecutionMode.Remove;
+            break;
+        }
+
+        serverInstallation.Controller.ConfigurationType = configurationType;
+      }
+
+      CommandLineParser.ProvidedOptions.Remove(action);
+      return new CLIExitCode(ExitCode.Success);
     }
 
     static void ReportUnhandledException(Exception ex)
     {
       Logger.LogException(ex);
-      InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties("Error", string.Format(Resources.UnhandledException, ex.Message)));
+      if (AppConfiguration.ConsoleMode)
+      {
+        Console.WriteLine(string.Format(Resources.UnhandledException, ex.Message));
+      }
+      else
+      {
+        InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties("Error", string.Format(Resources.UnhandledException, ex.Message)));
+      }
     }
   }
 }

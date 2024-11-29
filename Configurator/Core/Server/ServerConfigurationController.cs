@@ -333,7 +333,6 @@ namespace MySql.Configurator.Core.Server
       FullControlDictionary = new Dictionary<SecurityIdentifier, string>();
       Pages = new List<ConfigWizardPage>();
       UpdateDataDirectoryPermissions = true;
-      RemoveDataDirectory = true;
       CurrentState = ConfigState.ConfigurationRequired;
       UseStatusesList = false;
       Logger.LogInformation("Product configuration controller created.");
@@ -485,9 +484,9 @@ namespace MySql.Configurator.Core.Server
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the database is backed up during an upgrade.
+    /// Gets a value indicating whether the database is backed up during an upgrade.
     /// </summary>
-    public bool IsBackupDatabaseStepNeeded { get; set; }
+    public bool IsBackupDatabaseStepNeeded => Settings.BackupData;
 
     /// <summary>
     /// Gets or sets a value indicating whether the example databases are created.
@@ -582,8 +581,8 @@ namespace MySql.Configurator.Core.Server
       get
       {
         var serverInstanceInfo = new MySqlServerInstance(this, ReportStatus);
-        serverInstanceInfo.UseOldSettings = ConfigurationType == ConfigurationType.Reconfiguration;
-        return (ConfigurationType == ConfigurationType.Reconfiguration
+        serverInstanceInfo.UseOldSettings = ConfigurationType == ConfigurationType.Reconfigure;
+        return (ConfigurationType == ConfigurationType.Reconfigure
                 && IsStartServerConfigurationStepNeeded
                 && (IsStartAndUpgradeConfigurationStepNeeded || serverInstanceInfo.IsRunning));
       }
@@ -610,8 +609,8 @@ namespace MySql.Configurator.Core.Server
     /// Gets a value indicating whether the configuration step that updates the access permissions to the data folder needs to run.
     /// </summary>
     public bool IsUpdateServerFilesPermissionsStepNeeded => UpdateDataDirectoryPermissions
-                                                            && (ConfigurationType == ConfigurationType.New
-                                                                || (ConfigurationType == ConfigurationType.Reconfiguration
+                                                            && (ConfigurationType == ConfigurationType.Configure
+                                                                || (ConfigurationType == ConfigurationType.Reconfigure
                                                                     || ConfigurationType == ConfigurationType.Upgrade
                                                                     && IsThereServerDataFiles));
 
@@ -632,12 +631,12 @@ namespace MySql.Configurator.Core.Server
     /// <summary>
     /// Gets a value indicating if updating the Server ID is supported for the current configuration.
     /// </summary>
-    public bool IsUpdateServerIdSupported => ConfigurationType == ConfigurationType.New;
+    public bool IsUpdateServerIdSupported => ConfigurationType == ConfigurationType.Configure;
 
     /// <summary>
     /// Gets a value indicating whether the configuration step that updates the Start menu links needs to run.
     /// </summary>
-    public bool IsUpdateStartMenuLinksConfigurationStepNeeded => (ConfigurationType != ConfigurationType.Reconfiguration
+    public bool IsUpdateStartMenuLinksConfigurationStepNeeded => (ConfigurationType != ConfigurationType.Reconfigure
                                                                  || IsThereServerDataFiles)
                                                                  && Utilities.ExecutionIsFromMSI(ServerInstallation.Version);
 
@@ -651,7 +650,7 @@ namespace MySql.Configurator.Core.Server
     /// </summary>
     public bool IsUpdateWindowsServiceConfigurationStepNeeded => (OldSettings != null
                                                                   && OldSettings.ServiceExists()
-                                                                  && ConfigurationType != ConfigurationType.New
+                                                                  && ConfigurationType != ConfigurationType.Configure
                                                                   && (!Settings.ConfigureAsService
                                                                       || OldSettings.ServiceName != Settings.ServiceName))
                                                                  || Settings.ConfigureAsService
@@ -708,9 +707,9 @@ namespace MySql.Configurator.Core.Server
     public bool RebootRequired { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating if the data directory should be removed when uninstalling the product.
+    /// Gets a value indicating if the data directory should be removed when uninstalling the product.
     /// </summary>
-    public bool RemoveDataDirectory { get; set; }
+    public bool RemoveDataDirectory => !Settings.KeepDataDirectory;
 
     /// <summary>
     /// Gets or sets the list of removal steps.
@@ -915,11 +914,10 @@ namespace MySql.Configurator.Core.Server
       Logger.LogInformation("Starting configuration of " + ServerInstallation.NameWithVersion);
       ResetTimer();
 
-      bool console = Utilities.RunningOnConsole();
       var task = Task.Factory.StartNew(DoConfigure, CancellationTokenSource.Token, TaskCreationOptions.None, TS.Default)
          .ContinueWith(t => EndConfigure(), CancellationTokenSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion,
-         console ? TS.Default : TS.FromCurrentSynchronizationContext());
-      if (Utilities.RunningOnConsole())
+         AppConfiguration.ConsoleMode ? TS.Default : TS.FromCurrentSynchronizationContext());
+      if (AppConfiguration.ConsoleMode)
       {
         task.Wait();
       }
@@ -1314,7 +1312,7 @@ namespace MySql.Configurator.Core.Server
     public void PrepareForConfigure()
     {
       Settings.CloneToOldSettings();
-      if (ConfigurationType == ConfigurationType.Reconfiguration)
+      if (ConfigurationType == ConfigurationType.Reconfigure)
       {
         return;
       }
@@ -1360,11 +1358,10 @@ namespace MySql.Configurator.Core.Server
       Logger.LogInformation("Starting removal of " + ServerInstallation.NameWithVersion);
       ResetTimer();
 
-      bool console = Utilities.RunningOnConsole();
       var task = Task.Factory.StartNew(DoRemove, CancellationTokenSource.Token, TaskCreationOptions.None, TS.Default)
          .ContinueWith(t => EndRemove(), CancellationTokenSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion,
-         console ? TS.Default : TS.FromCurrentSynchronizationContext());
-      if (Utilities.RunningOnConsole())
+         AppConfiguration.ConsoleMode ? TS.Default : TS.FromCurrentSynchronizationContext());
+      if (AppConfiguration.ConsoleMode)
       {
         task.Wait();
       }
@@ -1468,8 +1465,8 @@ namespace MySql.Configurator.Core.Server
 
       Logger.LogInformation(string.Format(Resources.SettingUpControllerMessage, ConfigurationType.GetDescription()));
 
-      // New configuration pages.
-      if (ConfigurationType == ConfigurationType.New)
+      // Configure configuration pages.
+      if (ConfigurationType == ConfigurationType.Configure)
       {
         var fullInstallDir = Path.GetFullPath(Settings.InstallDirectory).TrimEnd('\\');
         var otherServersRunning = Base.Classes.Utilities.GetRunningProcessses("mysqld").Where(p => string.Compare(Path.GetDirectoryName(p.MainModule.FileName).TrimEnd('\\'),
@@ -1484,7 +1481,7 @@ namespace MySql.Configurator.Core.Server
         // Otherwise, let user set the data directory path.
         else
         {
-          Pages.Add(new ServerConfigDataDirectoryPage(this) { PageVisible = ConfigurationType == ConfigurationType.New });
+          Pages.Add(new ServerConfigDataDirectoryPage(this) { PageVisible = ConfigurationType == ConfigurationType.Configure });
         }
       }
 
@@ -1496,7 +1493,7 @@ namespace MySql.Configurator.Core.Server
         return;
       }
 
-      // New configuration and reconfiguration pages.
+      // Configure configuration and reconfiguration pages.
       Pages.Add(new ServerConfigLocalMachinePage(this));
       Pages.Add(new ServerConfigNamedPipesPage(this) { PageVisible = Settings != null
                                                        && Settings.EnableNamedPipe});
@@ -1504,10 +1501,10 @@ namespace MySql.Configurator.Core.Server
       Pages.Add(new ServerConfigServicePage(this));
       Pages.Add(new ServerConfigSecurityPage(this) { PageVisible = !ValidateServerFilesHaveRecommendedPermissions() });
       ConfigWizardPage loggingPage = new ServerConfigLoggingOptionsPage(this);
-      loggingPage.PageVisible = ConfigurationType != ConfigurationType.Reconfiguration;
+      loggingPage.PageVisible = ConfigurationType != ConfigurationType.Reconfigure;
       Pages.Add(loggingPage);
       ConfigWizardPage advancedPage = new ServerConfigAdvancedOptionsPage(this);
-      advancedPage.PageVisible = ConfigurationType == ConfigurationType.New;
+      advancedPage.PageVisible = ConfigurationType == ConfigurationType.Configure;
       Pages.Add(advancedPage);
       Pages.Add(new ServerExampleDatabasesPage(this));
     }
@@ -2607,9 +2604,9 @@ namespace MySql.Configurator.Core.Server
     {
       // Initialize configuration steps.
       _backupDatabaseStep = new ConfigurationStep(Resources.ServerConfigBackupDatabaseStep, 60, BackupDatabase, true, ConfigurationType.Upgrade);
-      _createRemoveExampleDatabasesStep = new ConfigurationStep(Resources.ServerUpdateExampleDatabasesText, 10, CreateRemoveExampleDatabases, false, ConfigurationType.New | ConfigurationType.Reconfiguration);
-      _initializeServerConfigurationStep = new ConfigurationStep(Resources.ServerInitializeDatabaseStep, 900, InitializeServer, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
-      //_prepareAuthenticationPluginChangeStep = new ConfigurationStep(Resources.ServerPrepareAuthenticationPluginChangeStep, 20, PrepareAuthenticationPluginChange, true, ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
+      _createRemoveExampleDatabasesStep = new ConfigurationStep(Resources.ServerUpdateExampleDatabasesText, 10, CreateRemoveExampleDatabases, false, ConfigurationType.Configure | ConfigurationType.Reconfigure);
+      _initializeServerConfigurationStep = new ConfigurationStep(Resources.ServerInitializeDatabaseStep, 900, InitializeServer, true, ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade);
+      //_prepareAuthenticationPluginChangeStep = new ConfigurationStep(Resources.ServerPrepareAuthenticationPluginChangeStep, 20, PrepareAuthenticationPluginChange, true, ConfigurationType.Reconfigure | ConfigurationType.Upgrade);
       _removeExistingServerInstallationStep = new ConfigurationStep(Resources.ServerRemoveOldInstallationStep, 60, RemoveExistingServerInstallationStep, false, ConfigurationType.Upgrade);
       _renameExistingDataDirectoryStep = new ConfigurationStep(Resources.RenameExistingDataDirectoryStep, 10, RenameExistingDataDirectoryStep, false, ConfigurationType.Upgrade);
       _resetPersistedVariablesStep = new ConfigurationStep(Resources.ServerResetPersistedVariablesStep, 20, ResetPersistedVariablesStep, false, ConfigurationType.Upgrade);
@@ -2617,15 +2614,15 @@ namespace MySql.Configurator.Core.Server
       _startServerConfigurationStep = new ConfigurationStep(Resources.ServerStartProcessStep, 90, StartServerStep);
       _stopExistingServerInstanceStep = new ConfigurationStep(Resources.StoppingExistingServerInstanceStep, 40, StopExistingServerInstance, true, ConfigurationType.Upgrade);
       _stopServerConfigurationStep = new ConfigurationStep(Resources.ServerStopProcessStep, 40, StopServerSafe);
-      _updateAccessPermissions = new ConfigurationStep(Resources.ServerUpdateServerFilePermissions, 10, UpdateServerFilesPermissions, false, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
+      _updateAccessPermissions = new ConfigurationStep(Resources.ServerUpdateServerFilePermissions, 10, UpdateServerFilesPermissions, false, ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade);
       _updateAuthenticationPluginStep = new ConfigurationStep(Resources.ServerUpdateAuthenticationPluginStep, 10, UpdateAuthenticationPlugin, true, ConfigurationType.Upgrade);
-      _updateEnterpriseFirewallPluginConfigStep = new ConfigurationStep(Resources.ServerEnableEnterpriseFirewallStep, 45, InstallEnterpriseFirewallPlugin, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
-      _updateProcessStep = new ConfigurationStep(Resources.ServerAdjustProcessStep, 10, UpdateProcessSettings, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
-      _updateStartMenuLinksStep = new ConfigurationStep(Resources.ServerUpdateStartMenuLinkStep, 20, UpdateStartMenuLink, false, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
-      _updateSecurityStep = new ConfigurationStep(Resources.ServerApplySecurityStep, 20, UpdateSecurity, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
-      _updateUsersStep = new ConfigurationStep(Resources.ServerCreateUsersStep, 20, UpdateUsers, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade);
-      _updateWindowsFirewallRulesStep = new ConfigurationStep(Resources.ServerUpdateWindowsFirewallStep, 40, UpdateWindowsFirewall, false, ConfigurationType.New | ConfigurationType.Reconfiguration);
-      _updateWindowsServiceStep = new ConfigurationStep(Resources.ServerAdjustServiceStep, 25, UpdateServiceSettings, true, ConfigurationType.New | ConfigurationType.Reconfiguration | ConfigurationType.Upgrade); ;
+      _updateEnterpriseFirewallPluginConfigStep = new ConfigurationStep(Resources.ServerEnableEnterpriseFirewallStep, 45, InstallEnterpriseFirewallPlugin, true, ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade);
+      _updateProcessStep = new ConfigurationStep(Resources.ServerAdjustProcessStep, 10, UpdateProcessSettings, true, ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade);
+      _updateStartMenuLinksStep = new ConfigurationStep(Resources.ServerUpdateStartMenuLinkStep, 20, UpdateStartMenuLink, false, ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade);
+      _updateSecurityStep = new ConfigurationStep(Resources.ServerApplySecurityStep, 20, UpdateSecurity, true, ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade);
+      _updateUsersStep = new ConfigurationStep(Resources.ServerCreateUsersStep, 20, UpdateUsers, true, ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade);
+      _updateWindowsFirewallRulesStep = new ConfigurationStep(Resources.ServerUpdateWindowsFirewallStep, 40, UpdateWindowsFirewall, false, ConfigurationType.Configure | ConfigurationType.Reconfigure);
+      _updateWindowsServiceStep = new ConfigurationStep(Resources.ServerAdjustServiceStep, 25, UpdateServiceSettings, true, ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade); ;
       _upgradeStandAloneServerStep = new ConfigurationStep(Resources.ServerUpgradeStep, 3600, UpgradeServer, true, ConfigurationType.Upgrade);
       _writeConfigurationFileStep = new ConfigurationStep(Resources.ServerWriteConfigFileStep, 20, WriteConfigurationFile);
       
@@ -2997,7 +2994,8 @@ namespace MySql.Configurator.Core.Server
         return;
       }
 
-      if (!Utilities.RunningOnConsole()
+      if (!AppConfiguration.ConsoleMode
+          && Application.OpenForms.Count > 0
           && Application.OpenForms[0].InvokeRequired)
       {
         Application.OpenForms[0].Invoke((MethodInvoker)delegate { ConfigurationStatusChanged(this, type, details); });
@@ -3679,7 +3677,7 @@ namespace MySql.Configurator.Core.Server
       // If server was previously configured as a service but now it will run as a process.
       bool existingService = (OldSettings != null
                               && OldSettings.ServiceExists());
-      bool isNew = ConfigurationType == ConfigurationType.New;
+      bool isNew = ConfigurationType == ConfigurationType.Configure;
       if (existingService
           && !isNew
           && ConfigurationType != ConfigurationType.Upgrade
@@ -3885,7 +3883,7 @@ namespace MySql.Configurator.Core.Server
       CancellationToken.ThrowIfCancellationRequested();
       _firewallRulesList.Clear();
       bool isDataDirectoryConfigured = IsDataDirectoryConfigured;
-      if ((ConfigurationType == ConfigurationType.Reconfiguration
+      if ((ConfigurationType == ConfigurationType.Reconfigure
            || isDataDirectoryConfigured)
           && OldSettings != null
           && OldSettings.OpenFirewallForXProtocol
@@ -3906,7 +3904,7 @@ namespace MySql.Configurator.Core.Server
       }
 
       CancellationToken.ThrowIfCancellationRequested();
-      if ((ConfigurationType == ConfigurationType.Reconfiguration
+      if ((ConfigurationType == ConfigurationType.Reconfigure
            || isDataDirectoryConfigured)
           && OldSettings != null
           && OldSettings.OpenFirewallForXProtocol)

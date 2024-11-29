@@ -172,7 +172,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
         {
           _controller.ServerInstallation = _serverInstallation;
           _controller.LoadState();
-          _controller.ConfigurationType = ConfigurationType.New;
+          _controller.ConfigurationType = ConfigurationType.Configure;
           _controller.Settings.DataDirectory = NewDataDirectoryTextBox.Text;
           _controller.Settings.IniDirectory = _controller.Settings.DataDirectory;
           _controller.ExistingServerInstallationInstance = null;
@@ -202,7 +202,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
         mainForm.VersionLabel.Text = _controller.ConfigurationType == ConfigurationType.Upgrade
           ? $"MySQL Server {VersionTextBox.Text} -> {_controller.ServerInstallation.VersionString}"
           : $"MySQL Server {_controller.ServerInstallation.VersionString}";
-        mainForm.ConfigurationTypeLabel.Text = $"{_controller.ConfigurationType}{(_controller.ConfigurationType == ConfigurationType.New ? " configuration" : string.Empty)}";
+        mainForm.ConfigurationTypeLabel.Text = $"{_controller.ConfigurationType}{(_controller.ConfigurationType == ConfigurationType.Configure ? " configuration" : string.Empty)}";
         mainForm.StatusStrip.Refresh();
         Logger.LogInformation($"Status: {mainForm.ConfigurationTypeLabel.Text};{mainForm.VersionLabel.Text};{mainForm.DataDirectoryLabel.Text}");
       }

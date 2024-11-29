@@ -26,7 +26,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using MySql.Configurator;
 using MySql.Configurator.Base.Classes;
 using MySql.Configurator.Base.Enums;
 using MySql.Configurator.Core.Server;
@@ -128,64 +127,6 @@ namespace MySQLConfigurator.Test
       Assert.AreEqual(MySqlAuthenticationPluginType.CachingSha2Password, privateObject.Invoke(methodName, new object[] { "*:invalid,," }));
       Assert.AreEqual(MySqlAuthenticationPluginType.MysqlNativePassword, privateObject.Invoke(methodName, new object[] { "*:mysql_native_password,," }));
       Assert.AreEqual(MySqlAuthenticationPluginType.Sha256Password, privateObject.Invoke(methodName, new object[] { "*:sha256_password,," }));
-    }
-
-    /// <summary>
-    /// Validates that the provided command line options are parsed correctly. 
-    /// </summary>
-    [TestMethod]
-    public void ValidateCommandLineParsing()
-    {
-      var program = new Program();
-      var privateObject = new PrivateObject(program);
-      var configuratorExeName = "mysql_configurator.exe";
-      var methodName = "ProcessCommandLineArguments";
-      var bindingFlags = BindingFlags.NonPublic | BindingFlags.Static;
-      Assert.ThrowsException<ArgumentNullException>(() => privateObject.Invoke(methodName, bindingFlags, new object[] { null }));
-      Assert.ThrowsException<ConfiguratorException>(() => privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "configure" } }));
-      Assert.AreEqual(ExecutionMode.Configure, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName } }));
-      Assert.AreEqual(ExecutionMode.Configure, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--configure" } }));
-      Assert.AreEqual(ExecutionMode.Configure, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--CONFIGURE" } }));
-      Assert.AreEqual(ExecutionMode.Configure, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--CONfigure" } }));
-      Assert.ThrowsException<ConfiguratorException>(() => privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--configure", "--other" } }));
-      Assert.AreEqual(ExecutionMode.Remove, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--remove" } }));
-      Assert.AreEqual(ExecutionMode.RemoveNoShow, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--removenoshow" } }));
-      Assert.AreEqual(ExecutionMode.Upgrade, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--upgrade" } }));
-      try
-      {
-        privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "configure" } });
-      }
-      catch(ConfiguratorException exception)
-      {
-        Assert.AreEqual(ConfiguratorError.InvalidOptionStart, exception.ErrorCode);
-      }
-
-      try
-      {
-        privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--upgrade" } });
-      }
-      catch (ConfiguratorException exception)
-      {
-        Assert.AreEqual(ConfiguratorError.InvalidOption, exception.ErrorCode);
-      }
-
-      try
-      {
-        privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--configure", "--other" } });
-      }
-      catch (ConfiguratorException exception)
-      {
-        Assert.AreEqual(ConfiguratorError.InvalidOption, exception.ErrorCode);
-      }
-
-      try
-      {
-        privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "--configure,", "--show-remove-warning" } });
-      }
-      catch (ConfiguratorException exception)
-      {
-        Assert.AreEqual(ConfiguratorError.InvalidOption, exception.ErrorCode);
-      }
     }
   }
 }

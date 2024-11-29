@@ -266,7 +266,7 @@ namespace MySql.Configurator.UI.Wizards
             break;
         }
 
-        if (CurrentController.ConfigurationType == ConfigurationType.Reconfiguration
+        if (CurrentController.ConfigurationType == ConfigurationType.Reconfigure
             && CurrentController.RebootRequired)
         {
           ExecutionTabControl.Height -= RebootWhenDonePanel.Height;

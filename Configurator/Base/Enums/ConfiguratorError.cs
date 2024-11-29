@@ -85,18 +85,6 @@ namespace MySql.Configurator.Base.Enums
     ShortVersion = 8,
 
     /// <summary>
-    /// Invalid option.
-    /// </summary>
-    [Description("Invalid option '{0}'.")]
-    InvalidOption = 9,
-
-    /// <summary>
-    /// Invalid option start.
-    /// </summary>
-    [Description("Option '{0}' must start with '--'.")]
-    InvalidOptionStart = 10,
-
-    /// <summary>
     /// Invalid execution mode.
     /// </summary>
     [Description("An invalid execution mode was provided.")]
@@ -120,6 +108,9 @@ namespace MySql.Configurator.Base.Enums
     [Description("Configuration file not found at: '{0}'")]
     ConfigurationFileNotFound = 14,
 
+    /// <summary>
+    /// The authentication plugin of the root user could not be updated.
+    /// </summary>
     [Description("Failed to update the authentication plugin of the root user.")]
     AuthenticationPluginUpdateFailed = 15
   }

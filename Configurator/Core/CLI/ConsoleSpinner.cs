@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2024, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -23,17 +23,49 @@
 
 using System;
 
-namespace MySql.Configurator.Base.Enums
+namespace MySql.Configurator.Core.CLI
 {
-  [Flags]
-  public enum ConfigurationType
+  /// <summary>
+  /// Basic class used to show a spinning effect in the command line.
+  /// </summary>
+  public class ConsoleSpinner
   {
-    None = 0,
-    Configure = 1 << 0,
-    Reconfigure = 1 << 1,
-    Upgrade = 1 << 2,
-    Remove = 1 << 3,
-    Incomplete = 1 << 4,
-    All = Configure | Reconfigure | Upgrade | Remove | Incomplete,
+    /// <summary>
+    /// A counter used to keep track of the character to display.
+    /// </summary>
+    private int _counter;
+
+    /// <summary>
+    /// Initalizes a new instace of the <see cref="ConsoleSpinner"/> class.
+    /// </summary>
+    public ConsoleSpinner()
+    {
+      _counter = 0;
+    }
+
+    /// <summary>
+    /// Controls how the cursor is displayed to create the effect of a spinning line.
+    /// </summary>
+    public void Turn()
+    {
+      _counter++;
+      switch (_counter % 4)
+      {
+        case 0:
+          Console.Write("/");
+          break;
+        case 1:
+          Console.Write("-");
+          break;
+        case 2:
+          Console.Write("\\");
+          break;
+        case 3: 
+          Console.Write("|");
+          break;
+      }
+
+      Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+    }
   }
 }

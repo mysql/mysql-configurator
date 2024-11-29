@@ -120,7 +120,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
     /// </summary>
     private void UpdateExampleDatabasesCreationStatus()
     {
-      if (_controller.ConfigurationType == ConfigurationType.New)
+      if (_controller.ConfigurationType == ConfigurationType.Configure)
       {
         return;
       }
@@ -149,7 +149,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       try
       {
         var rootUser = MySqlServerUser.GetLocalRootUser(_controller.Settings.ExistingRootPassword, _controller.Settings.DefaultAuthenticationPlugin);
-        var connectionString = _controller.GetConnectionString(rootUser, _controller.ConfigurationType != ConfigurationType.New);
+        var connectionString = _controller.GetConnectionString(rootUser, _controller.ConfigurationType != ConfigurationType.Configure);
         using (var connection = new MySqlConnection(connectionString))
         {
           connection.Open();

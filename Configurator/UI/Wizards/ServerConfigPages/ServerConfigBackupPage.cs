@@ -96,7 +96,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
     /// <returns><c>true</c> if it the configuration should proceed to the next panel, <c>false</c> otherwise.</returns>
     public override bool Next()
     {
-      _controller.IsBackupDatabaseStepNeeded = RunBackupRadioButton.Checked;
+      _controller.Settings.BackupData = RunBackupRadioButton.Checked;
       _controller.UpdateUpgradeConfigSteps();
       if (!_controller.RootUserCredentialsSet)
       {

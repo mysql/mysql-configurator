@@ -1387,7 +1387,7 @@ namespace MySql.Configurator.Core.Server
     public new bool ShutdownInstance(bool useOldSettings)
     {
       if (_controller.ServerInstallation.License == LicenseType.Commercial
-          && _controller.ConfigurationType == ConfigurationType.New
+          && _controller.ConfigurationType == ConfigurationType.Configure
           && !_controller.IsThereServerDataFiles
           && _controller.ServerVersion.ServerSupportsEnterpriseFirewall())
       {

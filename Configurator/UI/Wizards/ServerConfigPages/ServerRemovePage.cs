@@ -58,8 +58,8 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
     /// <param name="packageVersion">The version of the package being removed.</param>
     public ServerRemovePage(ServerConfigurationController controller, string packageVersion = null)
     {
-      ValidConfigureTypes = ConfigurationType.New
-        | ConfigurationType.Reconfiguration
+      ValidConfigureTypes = ConfigurationType.Configure
+        | ConfigurationType.Reconfigure
         | ConfigurationType.Upgrade
         | ConfigurationType.Remove;
       InitializeComponent();
@@ -75,7 +75,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       }
 
       _settings = _controller.ConfigurationType == ConfigurationType.Remove
-        || _controller.ConfigurationType == ConfigurationType.New
+        || _controller.ConfigurationType == ConfigurationType.Configure
         ? _controller.Settings
         : _controller.ConfigurationType == ConfigurationType.Upgrade
           && _controller.OldSettings == null
@@ -110,7 +110,8 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       // Set the controller properties.
       if (_controller.ConfigurationType == ConfigurationType.Remove)
       {
-        _controller.RemoveDataDirectory = RemoveDataDirectoryPanel.Visible && RemoveDataDirectoryCheckBox.Checked;
+        _controller.Settings.KeepDataDirectory = !(RemoveDataDirectoryPanel.Visible 
+          && RemoveDataDirectoryCheckBox.Checked);
       }
 
       return base.Next();
