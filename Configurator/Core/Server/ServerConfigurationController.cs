@@ -2142,11 +2142,6 @@ namespace MySql.Configurator.Core.Server
               cmd.CommandText = grantSql;
               cmd.ExecuteNonQuery();
             }
-
-            if (grantSqlStatements.Count > 0)
-            {
-              cmd.FlushPrivileges();
-            }
           }
         }
       }
@@ -2202,9 +2197,8 @@ namespace MySql.Configurator.Core.Server
     /// <param name="adminUser">The <see cref="MySqlServerUser"/> used to establish the connection.</param>
     /// <param name="affectedUser">The <see cref="MySqlServerUser"/> accounts to delete.</param>
     /// <param name="useOldSettings">Flag indicating whether the configuration previous to current changes will be used instead of current.</param>
-    /// <param name="flushPrivileges">Flag indicating whether FLUSH PRIVILEGES is executed after deleting the user.</param>
     /// <returns><c>true</c> if the user account was deleted successfully or if it did not exist, <c>false</c> otherwise.</returns>
-    private bool DeleteServerUserAccount(MySqlServerUser adminUser, MySqlServerUser affectedUser, bool useOldSettings = false, bool flushPrivileges = true)
+    private bool DeleteServerUserAccount(MySqlServerUser adminUser, MySqlServerUser affectedUser, bool useOldSettings = false)
     {
       if (adminUser == null)
       {
@@ -2226,10 +2220,6 @@ namespace MySql.Configurator.Core.Server
           var sql = $"DROP USER IF EXISTS '{affectedUser.Username}'@'{affectedUser.Host}';";
           var cmd = new MySqlCommand(sql, c);
           cmd.ExecuteNonQuery();
-          if (flushPrivileges)
-          {
-            cmd.FlushPrivileges();
-          }
         }
       }
       catch (Exception ex)
@@ -3641,10 +3631,8 @@ namespace MySql.Configurator.Core.Server
           {
             // Delete the user account with empty username that might have been created when the Server was initialized insecurely
             adminUser.Password = Settings.RootPassword;
-            DeleteServerUserAccount(adminUser, new MySqlServerUser(), DefaultAuthenticationPluginChanged, false);
+            DeleteServerUserAccount(adminUser, new MySqlServerUser(), DefaultAuthenticationPluginChanged);
           }
-
-          cmd.FlushPrivileges();
         }
       }
       catch (Exception ex)

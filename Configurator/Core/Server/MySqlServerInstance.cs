@@ -1529,7 +1529,6 @@ namespace MySql.Configurator.Core.Server
         var sql = $"ALTER USER '{userName}'@'localhost' IDENTIFIED WITH {authenticationPlugin.GetDescription()} BY '{password}'";
         var cmd = new MySqlCommand(sql, connection);
         result = cmd.ExecuteNonQuery();
-        cmd.FlushPrivileges();
       }
 
       if (result == -1)
