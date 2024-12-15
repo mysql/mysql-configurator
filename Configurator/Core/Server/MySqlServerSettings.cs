@@ -929,15 +929,11 @@ namespace MySql.Configurator.Core.Server
     public void LoadInstalled()
     {
       LoadGeneralSettings();
-      if (!string.IsNullOrEmpty(DataDirectory))
-      {
-        return;
-      }
-
       if (string.IsNullOrEmpty(DataDirectory))
       {
         DataDirectory = _defaultDataDir;
       }
+
       Logger.LogInformation("Server Settings - Load Installed - load service information");
       LoadServiceInformation();
       Logger.LogInformation("Server Settings - Load Installed - Load my Ini Settings");

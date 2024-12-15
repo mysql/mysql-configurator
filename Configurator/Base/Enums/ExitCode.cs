@@ -99,6 +99,12 @@ namespace MySql.Configurator.Base.Enums
     [Description("The password file '{0}' is expected to only contain the 'password=' entry.")]
     PasswordFileInvalidContents = 21,
 
+    [Description("Option '{0}' does not support being assigned a value.")]
+    OptionDoesNotSupportValue = 22,
+
+    [Description("Invalid syntax. Execute '--console --help' for details on the general syntax.")]
+    InvalidGenericSyntax = 23,
+
     /// Configure related exit codes.
     /// Reserved codes from 30 through 39.
 

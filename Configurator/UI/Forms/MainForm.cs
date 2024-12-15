@@ -216,17 +216,7 @@ namespace MySql.Configurator.UI.Forms
         ? $"MySQL Server {_serverInstallation.Version.ToString()}"
         : $"MySQL Server {(upgradeHistoryFileExists ? existingServerVersion.ToString() : "Unknown")} -> {_serverInstallation.VersionString}";
       var stringConfigurationType = string.Empty;
-      switch (controllerConfigurationType)
-      {
-        case (ConfigurationType.Configure):
-          stringConfigurationType = $"{controllerConfigurationType} configuration";
-          break;
-
-        default:
-          stringConfigurationType = controllerConfigurationType.ToString();
-          break;
-      }
-      
+      stringConfigurationType = controllerConfigurationType.ToString();
       ConfigurationTypeLabel.Text = stringConfigurationType;
       if (controllerConfigurationType == ConfigurationType.Reconfigure
           || controllerConfigurationType == ConfigurationType.Remove

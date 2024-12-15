@@ -251,7 +251,8 @@ namespace MySql.Configurator
       if (arguments.Length > 0)
       {
         // Check for console option first.
-        if (arguments.Any(argument => argument.Equals("--console", StringComparison.InvariantCultureIgnoreCase)))
+        if (arguments.Any(argument => argument.Equals("--console", StringComparison.InvariantCultureIgnoreCase)
+                                      || argument.Equals("-c", StringComparison.InvariantCultureIgnoreCase)))
         {
           AppConfiguration.ConsoleMode = true;
           AttachConsole(PARENT_CONSOLE_ID);
@@ -344,10 +345,19 @@ namespace MySql.Configurator
       var action = CommandLineParser.GetMatchingProvidedOption("action");
       if (action == null)
       {
-        serverInstallation.Controller.ConfigurationType = ConfigurationType.Reconfigure;
+        serverInstallation.Controller.ConfigurationType = serverInstallation.Controller.Settings.GeneralSettingsFileExists
+          ? ConfigurationType.Reconfigure
+          : ConfigurationType.Configure;
       }
       else
       {
+        var noShow = false;
+        if (action.Value.Equals("removenoshow", StringComparison.InvariantCultureIgnoreCase))
+        {
+          noShow = true;
+          action.Value = "remove";
+        }
+
         if (!Enum.TryParse(action.Value, true, out ConfigurationType configurationType)
             || configurationType == ConfigurationType.None
             || configurationType == ConfigurationType.Incomplete
@@ -359,6 +369,13 @@ namespace MySql.Configurator
         switch (configurationType)
         {
           case ConfigurationType.Reconfigure:
+            if (!serverInstallation.Controller.Settings.GeneralSettingsFileExists)
+            {
+              return new CLIExitCode(ExitCode.ServerNotConfigured);
+            }
+
+            AppConfiguration.ExecutionMode = ExecutionMode.Configure;
+            break;
           case ConfigurationType.Configure:
             AppConfiguration.ExecutionMode = ExecutionMode.Configure;
             break;
@@ -366,14 +383,15 @@ namespace MySql.Configurator
             AppConfiguration.ExecutionMode = ExecutionMode.Upgrade;
             break;
           case ConfigurationType.Remove:
-            AppConfiguration.ExecutionMode = ExecutionMode.Remove;
+            AppConfiguration.ExecutionMode = noShow
+              ? ExecutionMode.RemoveNoShow
+              : ExecutionMode.Remove;
             break;
         }
 
         serverInstallation.Controller.ConfigurationType = configurationType;
       }
 
-      CommandLineParser.ProvidedOptions.Remove(action);
       return new CLIExitCode(ExitCode.Success);
     }
 

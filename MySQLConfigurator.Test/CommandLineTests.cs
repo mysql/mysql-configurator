@@ -40,22 +40,6 @@ namespace MySQLConfigurator.Test
   [TestClass]
   public class CommandLineTests
   {
-    /// <summary>
-    /// Validates parsing of the command line options at the exe level. 
-    /// </summary>
-    //[TestMethod]
-    //public void ValidateCommandLineParsing()
-    //{
-    //try
-    //{
-    //  privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { configuratorExeName, "configure" } });
-    //}
-    //catch (ConfiguratorException exception)
-    //{
-    //  Assert.AreEqual(ConfiguratorError.InvalidOptionStart, exception.ErrorCode);
-    //}
-    //}
-
     [TestMethod]
     public void ValidateGetMatchingSupportedOption()
     {
@@ -84,8 +68,10 @@ namespace MySQLConfigurator.Test
       var privateObject = new PrivateObject(parser);
       var methodName = "IsValidOption";
       var bindingFlags = BindingFlags.NonPublic | BindingFlags.Static;
-      Assert.AreEqual(ExitCode.OptionValueNotFound, privateObject.Invoke(methodName, bindingFlags, new object[] { "datadir", null }));
-      Assert.AreEqual(ExitCode.Success, privateObject.Invoke(methodName, bindingFlags, new object[] { "datadir", "C:\\Mysql" }));
+      var result = privateObject.Invoke(methodName, bindingFlags, new object[] { "datadir", null }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.OptionValueNotFound, result.ExitCode);
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { "datadir", "C:\\Mysql" }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.Success, result.ExitCode);
     }
 
     [TestMethod]
@@ -96,20 +82,31 @@ namespace MySQLConfigurator.Test
       var methodName = "IsValidOption";
       var bindingFlags = BindingFlags.NonPublic | BindingFlags.Static;
       Assert.ThrowsException<ArgumentNullException>(() => privateObject.Invoke(methodName, bindingFlags, new object[] { null, null }));
-      Assert.AreEqual(ExitCode.InvalidOption, privateObject.Invoke(methodName, bindingFlags, new object[] { "--console", null }));
-      Assert.AreEqual(ExitCode.Success, privateObject.Invoke(methodName, bindingFlags, new object[] { "console", null }));
-      Assert.AreEqual(ExitCode.RepeatedOption, privateObject.Invoke(methodName, bindingFlags, new object[] { "console", null }));
-      Assert.AreEqual(ExitCode.InvalidOption, privateObject.Invoke(methodName, bindingFlags, new object[] { "invalidoption", null }));
-      Assert.AreEqual(ExitCode.OptionValueNotFound, privateObject.Invoke(methodName, bindingFlags, new object[] { "action", null }));
-      Assert.AreEqual(ExitCode.InvalidOptionValue, privateObject.Invoke(methodName, bindingFlags, new object[] { "action", "redo" }));
-      Assert.AreEqual(ExitCode.Success, privateObject.Invoke(methodName, bindingFlags, new object[] { "a", "configure" }));
+      var result = privateObject.Invoke(methodName, bindingFlags, new object[] { "--console", null }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.InvalidOption, result.ExitCode);
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { "console", null }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.Success, result.ExitCode);
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { "console", null }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.RepeatedOption, result.ExitCode);
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { "invalidoption", null }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.InvalidOption, result.ExitCode);
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { "action", null }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.OptionValueNotFound, result.ExitCode);
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { "action", "redo" }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.InvalidOptionValue, result.ExitCode);
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { "a", "configure" }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.Success, result.ExitCode);
       CommandLineParser.ProvidedOptions = new List<CommandLineOption>();
-      Assert.AreEqual(ExitCode.Success, privateObject.Invoke(methodName, bindingFlags, new object[] { "action", "configure" }));
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { "action", "configure" }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.Success, result.ExitCode);
       CommandLineParser.ProvidedOptions = new List<CommandLineOption>();
-      Assert.AreEqual(ExitCode.Success, privateObject.Invoke(methodName, bindingFlags, new object[] { "action", "REMOVE" }));
-      Assert.AreEqual(ExitCode.InvalidOption, privateObject.Invoke(methodName, bindingFlags, new object[] { "A", "configure" }));
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { "action", "REMOVE" }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.Success, result.ExitCode);
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { "A", "configure" }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.InvalidOption, result.ExitCode);
       CommandLineParser.ProvidedOptions = new List<CommandLineOption>();
-      Assert.AreEqual(ExitCode.Success, privateObject.Invoke(methodName, bindingFlags, new object[] { "a", "upgrade" }));
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { "a", "upgrade" }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.Success, result.ExitCode);
     }
 
     [TestMethod]
@@ -119,13 +116,20 @@ namespace MySQLConfigurator.Test
       var privateObject = new PrivateObject(parser);
       var methodName = "ParseArgument";
       var bindingFlags = BindingFlags.NonPublic | BindingFlags.Static;
-      Assert.AreEqual(ExitCode.NoArgument, privateObject.Invoke(methodName, bindingFlags, new object[] { null }));
-      Assert.AreEqual(ExitCode.NoArgument, privateObject.Invoke(methodName, bindingFlags, new object[] { string.Empty }));
-      Assert.AreEqual(ExitCode.NoArgument, privateObject.Invoke(methodName, bindingFlags, new object[] { "" }));
-      Assert.AreEqual(ExitCode.InvalidOptionSyntax, privateObject.Invoke(methodName, bindingFlags, new object[] { "console" }));
-      Assert.AreEqual(ExitCode.InvalidOptionSyntax, privateObject.Invoke(methodName, bindingFlags, new object[] { "console=" }));
-      Assert.AreEqual(ExitCode.InvalidOptionSyntax, privateObject.Invoke(methodName, bindingFlags, new object[] { "console=true=false" }));
-      Assert.AreEqual(ExitCode.Success, privateObject.Invoke(methodName, bindingFlags, new object[] { "--console" }));
+      var result = privateObject.Invoke(methodName, bindingFlags, new object[] { null }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.NoArgument, result.ExitCode);
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { string.Empty }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.NoArgument, result.ExitCode);
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { "" }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.NoArgument, result.ExitCode);
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { "console" }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.InvalidOptionSyntax, result.ExitCode);
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { "console=" }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.InvalidOptionSyntax, result.ExitCode);
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { "console=true=false" }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.InvalidOptionSyntax, result.ExitCode);
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { "--console" }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.Success, result.ExitCode);
     }
 
     /// <summary>
@@ -139,13 +143,14 @@ namespace MySQLConfigurator.Test
       var methodName = "ParseCommandLineArguments";
       var bindingFlags = BindingFlags.Public | BindingFlags.Static;
       Assert.ThrowsException<ArgumentNullException>(() => privateObject.Invoke(methodName, bindingFlags, new object[] { null }));
-      var exitCode = privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { "--console" } });
+      var result = privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { "--console" } }) as CLIExitCode;
       Assert.AreEqual(true, AppConfiguration.ConsoleMode);
-      Assert.AreEqual(ExitCode.Success, exitCode);
-      exitCode = privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { "--action=remove" } });
+      Assert.AreEqual(ExitCode.Success, result.ExitCode);
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { "--action=remove" } }) as CLIExitCode;
       Assert.AreEqual(false, AppConfiguration.ConsoleMode);
-      Assert.AreEqual(ExitCode.Success, exitCode);
-      Assert.AreEqual(ExitCode.TooManyArguments, privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { "--action=remove", "--port=3306" } }));
+      Assert.AreEqual(ExitCode.Success, result.ExitCode);
+      result = privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { "--action=remove", "--port=3306" } }) as CLIExitCode;
+      Assert.AreEqual(ExitCode.TooManyArguments, result.ExitCode);
     }
   }
 }

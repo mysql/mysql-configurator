@@ -114,6 +114,12 @@ namespace MySql.Configurator.Core.CLI
 
         return new CLIExitCode(ExitCode.Success);
       }
+      
+      // Remove action option since it will no longer be needed.
+      if (action != null)
+      {
+        CommandLineParser.ProvidedOptions.Remove(action);
+      }
 
       // Validate that all provided options are applicable to the specified action.
       var optionsForConfigurationType = GetOptionsForAction(serverInstallation.Controller.ConfigurationType);

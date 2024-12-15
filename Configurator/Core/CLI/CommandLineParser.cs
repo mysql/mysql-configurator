@@ -58,7 +58,7 @@ namespace MySql.Configurator.Core.CLI
       SupportedOptions = new List<CommandLineOption>()
       {
         new CommandLineOption("console", null, null, false, false, false, "c"),
-        new CommandLineOption("action", null, null, true, false, false, "a", new string[]{ "configure", "reconfigure", "upgrade", "remove" }),
+        new CommandLineOption("action", null, null, true, false, false, "a", new string[]{ "configure", "reconfigure", "upgrade", "remove", "removenoshow" }),
         new CommandLineOption("help", null, null, false, false, false,"h"),
         new CommandLineOption("add-user", null, null, true, true)
       };
@@ -234,21 +234,28 @@ namespace MySql.Configurator.Core.CLI
 
       var consoleOption = GetMatchingProvidedOption("console");
       var actionOption = GetMatchingProvidedOption("action");
+      var helpOption = GetMatchingProvidedOption("help");
       AppConfiguration.ConsoleMode = consoleOption != null;
-      if (!AppConfiguration.ConsoleMode
-          && ((actionOption != null
-               && !actionOption.Value.Equals("configure", StringComparison.InvariantCultureIgnoreCase)
-               && !actionOption.Value.Equals("reconfigure", StringComparison.InvariantCultureIgnoreCase)
-               && !actionOption.Value.Equals("remove", StringComparison.InvariantCultureIgnoreCase))
-              || ProvidedOptions.Count > 1))
+      if (consoleOption != null)
+      {
+        ProvidedOptions.Remove(consoleOption);
+      }
+
+      if ((!AppConfiguration.ConsoleMode
+           && (((actionOption != null
+                 && !actionOption.Value.Equals("configure", StringComparison.InvariantCultureIgnoreCase)
+                 && !actionOption.Value.Equals("reconfigure", StringComparison.InvariantCultureIgnoreCase)
+                 && !actionOption.Value.Equals("remove", StringComparison.InvariantCultureIgnoreCase)
+                 && !actionOption.Value.Equals("removenoshow", StringComparison.InvariantCultureIgnoreCase))
+                || (actionOption == null 
+                    && ProvidedOptions.Count > 0))))
+         || (AppConfiguration.ConsoleMode
+             && helpOption != null
+             && ProvidedOptions.Count > 1))
       {
         // If console option was not provided and action is different than configure, reconfigure or remove
         // then the combination is not supported.
         return new CLIExitCode(ExitCode.TooManyArguments);
-      }
-      else
-      {
-        ProvidedOptions.Remove(consoleOption);
       }
 
       return new CLIExitCode(ExitCode.Success);
@@ -299,21 +306,23 @@ namespace MySql.Configurator.Core.CLI
       {
         return new CLIExitCode(ExitCode.InvalidOption, optionName);
       }
-
-      if (commandLineOption.SupportsValue
-          && string.IsNullOrEmpty(optionValue))
+      else if (commandLineOption.SupportsValue
+               && string.IsNullOrEmpty(optionValue))
       {
         return new CLIExitCode(ExitCode.OptionValueNotFound, optionName);
       }
-
-      if (commandLineOption.HasFixedValues
-          && commandLineOption.SupportedValues.FirstOrDefault(value => value.Equals(optionValue, StringComparison.InvariantCultureIgnoreCase)) == null)
+      else if(!commandLineOption.SupportsValue
+              && !string.IsNullOrEmpty(optionValue))
+      {
+        return new CLIExitCode(ExitCode.OptionDoesNotSupportValue, optionName);
+      }
+      else if (commandLineOption.HasFixedValues
+               && commandLineOption.SupportedValues.FirstOrDefault(value => value.Equals(optionValue, StringComparison.InvariantCultureIgnoreCase)) == null)
       {
         return new CLIExitCode(ExitCode.InvalidOptionValue, optionValue, optionName);
       }
-
-      if (!commandLineOption.SupportsRepeat
-          && (GetMatchingProvidedOption(commandLineOption.Name) != null))
+      else if (!commandLineOption.SupportsRepeat
+               && (GetMatchingProvidedOption(commandLineOption.Name) != null))
       {
         return new CLIExitCode(ExitCode.RepeatedOption, optionName);
       }
@@ -335,6 +344,17 @@ namespace MySql.Configurator.Core.CLI
         return new CLIExitCode(ExitCode.NoArgument);
       }
 
+      // Special cases until we ask RE to update MSI to use new syntax.
+      if (argument.Equals("--remove", StringComparison.InvariantCultureIgnoreCase))
+      {
+        argument = "--action=remove";
+      }
+
+      if (argument.Equals("--removenoshow", StringComparison.InvariantCultureIgnoreCase))
+      {
+        argument = "--action=removenoshow";
+      }
+
       // Remove trailing - or --.
       if (argument.StartsWith("--"))
       {
@@ -347,6 +367,11 @@ namespace MySql.Configurator.Core.CLI
       else
       {
         return new CLIExitCode(ExitCode.InvalidOptionSyntax, argument);
+      }
+
+      if (string.IsNullOrEmpty(argument))
+      {
+        return new CLIExitCode(ExitCode.InvalidGenericSyntax);
       }
 
       // Separate into key value pair (if applicable)
