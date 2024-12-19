@@ -320,7 +320,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Configuring {0} installation....
+        ///   Looks up a localized string similar to Beginning operation for the {0} installation....
         /// </summary>
         public static string CLIConfigurationStarting {
             get {
@@ -329,7 +329,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to - Completed!.
+        ///   Looks up a localized string similar to Step execution completed!.
         /// </summary>
         public static string CLIConfigurationStepCompleted {
             get {
@@ -338,7 +338,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to - Failed!.
+        ///   Looks up a localized string similar to Step execution failed!.
         /// </summary>
         public static string CLIConfigurationStepFailed {
             get {

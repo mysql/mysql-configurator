@@ -1919,7 +1919,7 @@ namespace MySql.Configurator.Core.Server
       }
 
       ReportStatus(string.Format(Resources.ServerConfigEventFirewallSettingNetshCmd, action, arguments));
-      var success = Base.Classes.Utilities.RunNetShellProcess(arguments, out var netShellProcessOutput, out var netShellProcessError);
+      var success = Utilities.RunNetShellProcess(arguments, out var netShellProcessOutput, out var netShellProcessError);
       ReportStatus(netShellProcessOutput);
       if (!success)
       {
@@ -2307,7 +2307,7 @@ namespace MySql.Configurator.Core.Server
       {
         CurrentStep = step;
         // report starting
-        ReportStatus(ConfigurationEventType.StepStarting, "Beginning configuration step: " + step.Description);
+        ReportStatus(ConfigurationEventType.StepStarting, "Executing step: " + step.Description);
         step.Status = ConfigurationStepStatus.Started;
 
         // now do the configure step
@@ -2323,7 +2323,7 @@ namespace MySql.Configurator.Core.Server
         }
 
         // report stop
-        ReportStatus(ConfigurationEventType.StepFinished, "Ended configuration step: " + step.Description);
+        ReportStatus(ConfigurationEventType.StepFinished, "Completed execution of step: " + step.Description);
         if (step.Required && step.Status == ConfigurationStepStatus.Error)
         {
           break;
@@ -2341,7 +2341,7 @@ namespace MySql.Configurator.Core.Server
       {
         CurrentStep = step;
         // Report starting,
-        ReportStatus(ConfigurationEventType.StepStarting, $"Beginning remove step: {step.Description}");
+        ReportStatus(ConfigurationEventType.StepStarting, $"Completed execution of step: {step.Description}");
         step.Status = ConfigurationStepStatus.Started;
 
         // Now do the remove step.

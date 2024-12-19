@@ -1821,13 +1821,13 @@ Proceeding with the upgrade will update the plugin to 'caching_sha2_password'.</
     <value>{0} operation has started.</value>
   </data>
   <data name="CLIConfigurationStarting" xml:space="preserve">
-    <value>Configuring {0} installation...</value>
+    <value>Beginning operation for the {0} installation...</value>
   </data>
   <data name="CLIConfigurationStepCompleted" xml:space="preserve">
-    <value>- Completed!</value>
+    <value>Step execution completed!</value>
   </data>
   <data name="CLIConfigurationStepFailed" xml:space="preserve">
-    <value>- Failed!</value>
+    <value>Step execution failed!</value>
   </data>
   <data name="CLICopyrightNotice" xml:space="preserve">
     <value>Copyright (c) 2023, 2025, Oracle and/or its affiliates. Oracle(R), Java, MySQL, and NetSuite are registered trademarks of Oracle and/or its affiliates.</value>

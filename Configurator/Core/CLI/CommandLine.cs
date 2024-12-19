@@ -197,7 +197,15 @@ namespace MySql.Configurator.Core.CLI
       serverInstallation.Controller.ConfigurationStarted += ConfigurationStarted;
       serverInstallation.Controller.ConfigurationEnded += ConfigurationEnded;
       ResetEvent.Reset();
-      serverInstallation.Controller.Configure();
+      if (serverInstallation.Controller.ConfigurationType == ConfigurationType.Remove)
+      {
+        serverInstallation.Controller.Remove();
+      }
+      else
+      {
+        serverInstallation.Controller.Configure();
+      }
+
       ResetEvent.WaitOne();
       serverInstallation.Controller.ConfigurationStatusChanged -= ConfigurationStatusChanged;
       serverInstallation.Controller.ConfigurationStarted -= ConfigurationStarted;
@@ -715,15 +723,15 @@ namespace MySql.Configurator.Core.CLI
           break;
 
         case ConfigurationEventType.StepStarting:
-          Console.WriteLine(controller.CurrentStep.Description);
+          Console.WriteLine($"Step: {controller.CurrentStep.Description}");
           break;
 
         case ConfigurationEventType.StepFinished:
-          Console.WriteLine();
-          Console.WriteLine();
           Console.WriteLine(controller.CurrentStep.Status == ConfigurationStepStatus.Finished
             ? Resources.CLIConfigurationStepCompleted
             : Resources.CLIConfigurationStepFailed);
+          Console.WriteLine();
+          Console.WriteLine();
           break;
       }
     }
@@ -774,6 +782,8 @@ namespace MySql.Configurator.Core.CLI
 
       Console.WriteLine();
       Console.WriteLine(string.Format(Resources.CLIConfigurationStarting, $"MySQL Server {controller.ServerVersion.ToString()}"));
+      Console.WriteLine();
+      Console.WriteLine();
       _stepTimer.Enabled = true;
     }
 
