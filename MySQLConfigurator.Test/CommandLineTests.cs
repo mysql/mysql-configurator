@@ -150,7 +150,7 @@ namespace MySQLConfigurator.Test
       Assert.AreEqual(false, AppConfiguration.ConsoleMode);
       Assert.AreEqual(ExitCode.Success, result.ExitCode);
       result = privateObject.Invoke(methodName, bindingFlags, new object[] { new string[] { "--action=remove", "--port=3306" } }) as CLIExitCode;
-      Assert.AreEqual(ExitCode.TooManyArguments, result.ExitCode);
+      Assert.AreEqual(ExitCode.Success, result.ExitCode);
     }
   }
 }

@@ -1469,7 +1469,7 @@ namespace MySql.Configurator.Core.Server
       if (ConfigurationType == ConfigurationType.Configure)
       {
         var fullInstallDir = Path.GetFullPath(Settings.InstallDirectory).TrimEnd('\\');
-        var otherServersRunning = Base.Classes.Utilities.GetRunningProcessses("mysqld").Where(p => string.Compare(Path.GetDirectoryName(p.MainModule.FileName).TrimEnd('\\'),
+        var otherServersRunning = Utilities.GetRunningProcessses("mysqld").Where(p => string.Compare(Path.GetDirectoryName(p.MainModule.FileName).TrimEnd('\\'),
                                                                                                                   fullInstallDir,
                                                                                                                   StringComparison.InvariantCultureIgnoreCase) != 0);
 

@@ -1983,4 +1983,7 @@ Usage examples
 --action=upgrade --old-instance-password=test --backup-data=false --server-file-permissions-access=full
 </value>
   </data>
+  <data name="CLISuccessfulConnection" xml:space="preserve">
+    <value>Successfully connected to the MySQL Server instance.</value>
+  </data>
 </root>

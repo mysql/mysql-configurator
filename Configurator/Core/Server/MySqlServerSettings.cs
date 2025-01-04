@@ -261,9 +261,6 @@ namespace MySql.Configurator.Core.Server
       new string[] { "error-log", "error-log-file", "errorlogname" })]
     public string ErrorLogFileName { get; set; }
 
-    [ServerSetting("The password of the root user of the existing local MySQL server instance.",
-      "existing-password",
-      new string[] { "existing-root-password" })]
     public string ExistingRootPassword { get; set; }
 
     [XmlIgnore]
@@ -363,7 +360,7 @@ namespace MySql.Configurator.Core.Server
       null,
       ConfigurationType.Configure,
       new string[] { "1", "2" })]
-    [DefaultValue(1)]
+    [DefaultValue(LowerCaseTableNamesTypes.LowerCaseStoredInsensitiveComparison)]
     public LowerCaseTableNamesTypes LowerCaseTableNames { get; set; }
 
     [ServerSetting("The network port on which X Plugin listens for TCP/IP connections. This is the X Plugin equivalent " +
@@ -399,7 +396,7 @@ namespace MySql.Configurator.Core.Server
       null,
       ConfigurationType.Upgrade)]
     [DefaultValue("MYSQL")]
-    public int OldInstanceMemoryName { get; set; }
+    public string OldInstanceMemoryName { get; set; }
 
     [ServerSetting("The password of the root user used by the server instance that will be uppgraded.",
       "old-instance-password",
@@ -409,7 +406,7 @@ namespace MySql.Configurator.Core.Server
       ConfigurationType.Upgrade,
       null,
       "CheckPassword")]
-    public int OldInstancePassword { get; set; }
+    public string OldInstancePassword { get; set; }
 
     [ServerSetting("Specifies the pipe name to use by the server instance that will be upgraded when listening for local connections " +
       "that use a named pipe.",
@@ -419,7 +416,7 @@ namespace MySql.Configurator.Core.Server
       null,
       ConfigurationType.Upgrade)]
     [DefaultValue("MYSQL")]
-    public int OldInstancePipeName { get; set; }
+    public string OldInstancePipeName { get; set; }
 
     [ServerSetting("The port number to use by the server instance that will be upgraded when listening for TCP/IP connections.",
       "old-instance-port",
@@ -430,12 +427,12 @@ namespace MySql.Configurator.Core.Server
       null,
       "CheckPort")]
     [DefaultValue(DEFAULT_PORT)]
-    public int OldInstancePort { get; set; }
+    public uint OldInstancePort { get; set; }
 
     [ServerSetting("The connection protocol used by the server instance that will be upgraded.",
       "old-instance-protocol",
       new string[] { "existing-instance-protocol" },
-      true,
+      false,
       null,
       ConfigurationType.Upgrade)]
     [DefaultValue(MySqlConnectionProtocol.Socket)]
@@ -560,7 +557,7 @@ namespace MySql.Configurator.Core.Server
     [ServerSetting("If configured as a Windows Service, this value sets the service to start " +
       "automatically at system startup.",
       "windows-service-auto-start",
-      new string[] {  "win-service-auto-start", "service-auto-start", "auto-start", "autostart" })]
+      new string[] { "win-service-auto-start", "service-auto-start", "auto-start", "autostart" })]
     [DefaultValue(true)]
     public bool ServiceStartAtStartup { get; set; }
 
@@ -1247,6 +1244,11 @@ namespace MySql.Configurator.Core.Server
         // Ensure that if the current ini file doesn't have a value set, then use the default
         VerifySecureFilePrivFolder();
         MySqlXPort = iniFile.FindValue<uint>("mysqld", "loose_mysqlx_port", false);
+        if (MySqlXPort == 0)
+        {
+          MySqlXPort = iniFile.FindValue<uint>("mysqld", "mysqlx_port", false);
+        }
+
         var pluginLoad = iniFile.FindValue("mysqld", "plugin_load", false);
 
         Plugins.LoadFromIniFile(pluginLoad);

@@ -123,9 +123,15 @@ namespace MySql.Configurator.Base.Enums
     [Description("The reconfiguration operation failed.")]
     FailedReconfiguration = 41,
 
+    [Description("No options to reconfigure were provided.")]
+    MissingOptionToReconfigure = 42,
+
+    [Description("Failed to connect to the MySQL Server instance with error: {0}.")]
+    FailedConnectionTestDuringReconfiguration = 43,
+
     /// Remove related exit codes.
     /// Reserved codes from 50 through 59.
-    
+
     [Description("The server has not been configured, nothing to remove.")]
     NothingToRemove = 50,
 
@@ -135,7 +141,7 @@ namespace MySql.Configurator.Base.Enums
     /// Upgrade related exit codes.
     /// Reserved codes from 60 through 69.
     
-    [Description("No running MySQL instances found.")]
+    [Description("No running MySQL instances found. The instance that will be upgraded must be running.")]
     NoRunningInstancesFound = 60,
 
     [Description("Failed to connect to the specified MySQL Instance.")]
@@ -144,8 +150,11 @@ namespace MySql.Configurator.Base.Enums
     [Description("The upgrade operation failed.")]
     FailedUpgrade = 62,
 
-    [Description("Unsupported upgrade scenario.")]
+    [Description("This upgrade scenario is not supported. Error is: {0}.")]
     UnsupportedUpgrade = 63,
+
+    [Description("The specified ini file could not be read. Provide a valid server configuration file or select a different file to continue.")]
+    InvalidIniFile = 64,
 
     /// Custom user related exit codes.
     /// Reserved codes from 70 through 89.

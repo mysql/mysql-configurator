@@ -343,9 +343,10 @@ namespace MySql.Configurator
     private static CLIExitCode SetConfigurationTypeAndExecutionMode(ServerInstallation serverInstallation)
     {
       var action = CommandLineParser.GetMatchingProvidedOption("action");
+      var serverIsConfigured = serverInstallation.Controller.Settings.GeneralSettingsFileExists;
       if (action == null)
       {
-        serverInstallation.Controller.ConfigurationType = serverInstallation.Controller.Settings.GeneralSettingsFileExists
+        serverInstallation.Controller.ConfigurationType = serverIsConfigured
           ? ConfigurationType.Reconfigure
           : ConfigurationType.Configure;
       }
@@ -366,16 +367,16 @@ namespace MySql.Configurator
           return new CLIExitCode(ExitCode.InvalidAction, action.Value, action.Name);
         }
 
+        // Set reconfigure if server is already configured.
+        if (configurationType == ConfigurationType.Configure
+            && serverIsConfigured)
+        {
+          configurationType = ConfigurationType.Reconfigure;
+        }
+
         switch (configurationType)
         {
           case ConfigurationType.Reconfigure:
-            if (!serverInstallation.Controller.Settings.GeneralSettingsFileExists)
-            {
-              return new CLIExitCode(ExitCode.ServerNotConfigured);
-            }
-
-            AppConfiguration.ExecutionMode = ExecutionMode.Configure;
-            break;
           case ConfigurationType.Configure:
             AppConfiguration.ExecutionMode = ExecutionMode.Configure;
             break;

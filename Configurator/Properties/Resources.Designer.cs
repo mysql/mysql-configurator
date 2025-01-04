@@ -514,6 +514,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Successfully connected to the MySQL Server instance..
+        /// </summary>
+        public static string CLISuccessfulConnection {
+            get {
+                return ResourceManager.GetString("CLISuccessfulConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Upgrade action
         ///
         ///Executes an in-place upgrade operation.

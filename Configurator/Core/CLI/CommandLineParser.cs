@@ -251,7 +251,10 @@ namespace MySql.Configurator.Core.CLI
                     && ProvidedOptions.Count > 0))))
          || (AppConfiguration.ConsoleMode
              && helpOption != null
-             && ProvidedOptions.Count > 1))
+             && ((actionOption == null
+                  && ProvidedOptions.Count > 1)
+                  || (actionOption != null
+                      && ProvidedOptions.Count > 2))))
       {
         // If console option was not provided and action is different than configure, reconfigure or remove
         // then the combination is not supported.
