@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2024, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2024, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -343,6 +343,7 @@ namespace MySql.Configurator.Core.CLI
       _existingServerInstallationInstance.UserAccount.Password = serverInstallation.Controller.Settings.OldInstancePassword;
       _existingServerInstallationInstance.Controller.Settings.ExistingRootPassword = _existingServerInstallationInstance.UserAccount.Password;
       _existingServerInstallationInstance.ConnectionProtocol = serverInstallation.Controller.Settings.OldInstanceProtocol;
+      _existingServerInstallationInstance.Controller.Settings.Port = serverInstallation.Controller.Settings.OldInstancePort;
       _existingServerInstallationInstance.PipeOrSharedMemoryName = serverInstallation.Controller.Settings.OldInstanceProtocol == MySqlConnectionProtocol.Pipe
         || serverInstallation.Controller.Settings.OldInstanceProtocol == MySqlConnectionProtocol.NamedPipe
         ? serverInstallation.Controller.Settings.OldInstancePipeName
@@ -350,6 +351,22 @@ namespace MySql.Configurator.Core.CLI
           || serverInstallation.Controller.Settings.OldInstanceProtocol == MySqlConnectionProtocol.SharedMemory
           ? serverInstallation.Controller.Settings.OldInstanceMemoryName
           : null;
+
+      switch (serverInstallation.Controller.Settings.OldInstanceProtocol)
+      {
+        case MySqlConnectionProtocol.Sockets:
+          controller.Settings.Port = serverInstallation.Controller.Settings.OldInstancePort;
+          controller.Settings.EnableTcpIp = true;
+          break;
+        case MySqlConnectionProtocol.Pipe:
+          controller.Settings.PipeName = serverInstallation.Controller.Settings.OldInstancePipeName;
+          controller.Settings.EnableNamedPipe = true;
+          break;
+        case MySqlConnectionProtocol.SharedMemory:
+          controller.Settings.SharedMemoryName = serverInstallation.Controller.Settings.OldInstanceMemoryName;
+          controller.Settings.EnableSharedMemory = true;
+          break;
+      }
 
       var connectionResult = _existingServerInstallationInstance.CanConnect();
       if (connectionResult != ConnectionResultType.ConnectionSuccess)
@@ -652,11 +669,12 @@ namespace MySql.Configurator.Core.CLI
       }
 
       // Process user role.
-      var role = serverInstallation.Controller.RolesDefined.Roles.Find(name => name.ID.Equals(serverUserItems[3], StringComparison.InvariantCultureIgnoreCase)
-                                                                               || name.Display.Equals(serverUserItems[3], StringComparison.InvariantCultureIgnoreCase));
+      var roleString = serverUserItems[3].Substring(1, serverUserItems[3].Length - 2);
+      var role = serverInstallation.Controller.RolesDefined.Roles.Find(name => name.ID.Equals(roleString, StringComparison.InvariantCultureIgnoreCase)
+                                                                               || name.Display.Equals(roleString, StringComparison.InvariantCultureIgnoreCase));
       if (role == null)
       {
-        return new CLIExitCode(ExitCode.InvalidCustomUserRole, serverUserItems[3], CommandLineParser.ADD_USER_OPTION_NAME);
+        return new CLIExitCode(ExitCode.InvalidCustomUserRole, roleString, CommandLineParser.ADD_USER_OPTION_NAME);
       }
 
       // Add user instance to list.
@@ -803,18 +821,37 @@ namespace MySql.Configurator.Core.CLI
             return new CLIExitCode(ExitCode.InvalidOptionValue, oldInstanceProtocol.Value, oldInstanceProtocol.Name);
           }
 
+          TryToSetValue(serverInstallation.Controller, oldInstanceProtocol.Name, oldInstanceProtocol.Value);
           CommandLineParser.ProvidedOptions.Remove(oldInstanceProtocol);
           CommandLineOption requiredProtocolOption = null;
           switch (connectionProtocol)
           {
             case MySqlConnectionProtocol.Tcp:
               requiredProtocolOption = CommandLineParser.GetMatchingProvidedOption("old-instance-port");
+              if (requiredProtocolOption == null)
+              {
+                requiredProtocolOption = CommandLineParser.GetMatchingSupportedOption("old-instance-port");
+                requiredProtocolOption.Value = MySqlServerSettings.DEFAULT_PORT.ToString();
+              }
+
               break;
             case MySqlConnectionProtocol.Pipe:
               requiredProtocolOption = CommandLineParser.GetMatchingProvidedOption("old-instance-pipe-name");
+              if (requiredProtocolOption == null)
+              {
+                requiredProtocolOption = CommandLineParser.GetMatchingSupportedOption("old-instance-pipe-name");
+                requiredProtocolOption.Value = MySqlServerSettings.DEFAULT_PIPE_OR_SHARED_MEMORY_NAME.ToString();
+              }
+
               break;
             case MySqlConnectionProtocol.SharedMemory:
               requiredProtocolOption = CommandLineParser.GetMatchingProvidedOption("old-instance-memory-name");
+              if (requiredProtocolOption == null)
+              {
+                requiredProtocolOption = CommandLineParser.GetMatchingSupportedOption("old-instance-memory-name");
+                requiredProtocolOption.Value = MySqlServerSettings.DEFAULT_PIPE_OR_SHARED_MEMORY_NAME.ToString();
+              }
+
               break;
           }
 
@@ -825,6 +862,16 @@ namespace MySql.Configurator.Core.CLI
 
           TryToSetValue(serverInstallation.Controller, requiredProtocolOption.Name, requiredProtocolOption.Value);
           CommandLineParser.ProvidedOptions.Remove(requiredProtocolOption);
+        }
+        else
+        {
+          oldInstanceProtocol = CommandLineParser.GetMatchingSupportedOption("old-instance-protocol");
+          oldInstanceProtocol.Value = MySqlConnectionProtocol.Socket.ToString();
+          TryToSetValue(serverInstallation.Controller, oldInstanceProtocol.Name, oldInstanceProtocol.Value);
+          var portOption = CommandLineParser.GetMatchingProvidedOption("old-instance-port");
+          portOption = CommandLineParser.GetMatchingSupportedOption("old-instance-port");
+          portOption.Value = MySqlServerSettings.DEFAULT_PORT.ToString();
+          TryToSetValue(serverInstallation.Controller, portOption.Name, portOption.Value);
         }
       }
 

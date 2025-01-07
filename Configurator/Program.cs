@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -73,6 +73,11 @@ namespace MySql.Configurator
     #region Fields
 
     /// <summary>
+    /// A flag indicating if the MySql.Data assembly has already been loaded.
+    /// </summary>
+    private static bool _assemblyLoaded;
+
+    /// <summary>
     /// The installation directory path of the current installation.
     /// </summary>
     private static string _installDirPath;
@@ -102,6 +107,7 @@ namespace MySql.Configurator
     [STAThread]
     static int Main()
     {
+      _assemblyLoaded = false;
       try
       {
         AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
@@ -217,6 +223,11 @@ namespace MySql.Configurator
 
     private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs e)
     {
+      if (_assemblyLoaded)
+      {
+        return null;
+      }
+
       //The namespace of the project is embeddll, and the embedded dll resources are in the libs folder, so the namespace used here is: embeddll.libs.
       var assembly = Assembly.GetExecutingAssembly();
       var resources = assembly.GetManifestResourceNames();
@@ -225,6 +236,7 @@ namespace MySql.Configurator
       {
         byte[] _data = new byte[_stream.Length];
         _stream.Read(_data, 0, _data.Length);
+        _assemblyLoaded = true;
         return Assembly.Load(_data);
       }
     }
