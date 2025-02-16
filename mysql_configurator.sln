@@ -5,6 +5,8 @@ VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySQLConfigurator", "Configurator\MySQLConfigurator.csproj", "{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySQLConfigurator.Test", "MySQLConfigurator.Test\MySQLConfigurator.Test.csproj", "{5304B25D-746B-465D-B866-48606D9B6F68}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +32,22 @@ Global
 		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Release|Win32.ActiveCfg = Release|Any CPU
 		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Release|x86.ActiveCfg = Release|Any CPU
 		{07B31F5A-9F17-4ACF-B3B6-2AF9000B1414}.Release|x86.Build.0 = Release|Any CPU
+		{5304B25D-746B-465D-B866-48606D9B6F68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5304B25D-746B-465D-B866-48606D9B6F68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5304B25D-746B-465D-B866-48606D9B6F68}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{5304B25D-746B-465D-B866-48606D9B6F68}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{5304B25D-746B-465D-B866-48606D9B6F68}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{5304B25D-746B-465D-B866-48606D9B6F68}.Debug|Win32.Build.0 = Debug|Any CPU
+		{5304B25D-746B-465D-B866-48606D9B6F68}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5304B25D-746B-465D-B866-48606D9B6F68}.Debug|x86.Build.0 = Debug|Any CPU
+		{5304B25D-746B-465D-B866-48606D9B6F68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5304B25D-746B-465D-B866-48606D9B6F68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5304B25D-746B-465D-B866-48606D9B6F68}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{5304B25D-746B-465D-B866-48606D9B6F68}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{5304B25D-746B-465D-B866-48606D9B6F68}.Release|Win32.ActiveCfg = Release|Any CPU
+		{5304B25D-746B-465D-B866-48606D9B6F68}.Release|Win32.Build.0 = Release|Any CPU
+		{5304B25D-746B-465D-B866-48606D9B6F68}.Release|x86.ActiveCfg = Release|Any CPU
+		{5304B25D-746B-465D-B866-48606D9B6F68}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

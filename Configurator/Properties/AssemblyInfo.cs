@@ -1,17 +1,25 @@
-﻿/* Copyright (c) 2014, 2023, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; version 2 of the License.
+  This program is free software; you can redistribute it and/or modify 
+  it under the terms of the GNU General Public License, version 2.0, as 
+  published by the Free Software Foundation.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is designed to work with certain software (including
+  but not limited to OpenSSL) that is licensed under separate terms, as
+  designated in a particular file or component or in included license
+  documentation. The authors of MySQL hereby grant you an additional
+  permission to link the program and your derivative works with the
+  separately licensed software that they have either included with
+  the program or referenced in the documentation.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+  This program is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  See the GNU General Public License, version 2.0, for more details. 
+
+  You should have received a copy of the GNU General Public License 
+  along with this program; if not, write to the Free Software Foundation, Inc., 
+  51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -19,14 +27,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MySQL Configurator")]
-[assembly: AssemblyDescription("The MySQL Configurator is designed to allow the configuration of the MySQL Server product.")]
-[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyTitle("The MySQL Configurator is designed to allow the configuration and/or upgrade of the MySQL Server product.")]
 [assembly: AssemblyCompany("Oracle Corporation")]
 [assembly: AssemblyProduct("MySQL Configurator")]
-[assembly: AssemblyCopyright("Copyright (c) 2023, Oracle and/or its affiliates.")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+[assembly: AssemblyCopyright("Copyright (c) 2023, 2025, Oracle and/or its affiliates.")]
+[assembly: AssemblyTrademark("Oracle®, Java, MySQL, and NetSuite are registered trademarks of Oracle and/or its affiliates.")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -46,5 +51,3 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("8.2.0.0")]
-[assembly: AssemblyFileVersion("8.2.0.0")]
