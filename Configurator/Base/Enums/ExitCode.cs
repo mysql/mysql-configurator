@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2024, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2024, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -54,7 +54,7 @@ namespace MySql.Configurator.Base.Enums
     [Description("No value was provided for option '{0}'.")]
     OptionValueNotFound = 6,
 
-    [Description("Invalid syntax at '{0}'. Syntax is expected to be in the form of '--optionname[=optionvalue]'.")]
+    [Description("Invalid syntax at '{0}'. Syntax is expected to be in the form of '--option_name[=option_value]'.")]
     InvalidOptionSyntax = 7,
 
     [Description("Action '{0}' does not support option '{1}'.")]
@@ -99,6 +99,12 @@ namespace MySql.Configurator.Base.Enums
     [Description("The password file '{0}' is expected to only contain the 'password=' entry.")]
     PasswordFileInvalidContents = 21,
 
+    [Description("Option '{0}' does not support being assigned a value.")]
+    OptionDoesNotSupportValue = 22,
+
+    [Description("Invalid syntax. Execute '--console --help' for details on the general syntax.")]
+    InvalidGenericSyntax = 23,
+
     /// Configure related exit codes.
     /// Reserved codes from 30 through 39.
 
@@ -117,9 +123,15 @@ namespace MySql.Configurator.Base.Enums
     [Description("The reconfiguration operation failed.")]
     FailedReconfiguration = 41,
 
+    [Description("No options to reconfigure were provided.")]
+    MissingOptionToReconfigure = 42,
+
+    [Description("Failed to connect to the MySQL Server instance with error: {0}.")]
+    FailedConnectionTestDuringReconfiguration = 43,
+
     /// Remove related exit codes.
     /// Reserved codes from 50 through 59.
-    
+
     [Description("The server has not been configured, nothing to remove.")]
     NothingToRemove = 50,
 
@@ -129,7 +141,7 @@ namespace MySql.Configurator.Base.Enums
     /// Upgrade related exit codes.
     /// Reserved codes from 60 through 69.
     
-    [Description("No running MySQL instances found.")]
+    [Description("No running MySQL instances found. The instance that will be upgraded must be running.")]
     NoRunningInstancesFound = 60,
 
     [Description("Failed to connect to the specified MySQL Instance.")]
@@ -138,8 +150,11 @@ namespace MySql.Configurator.Base.Enums
     [Description("The upgrade operation failed.")]
     FailedUpgrade = 62,
 
-    [Description("Unsupported upgrade scenario.")]
+    [Description("This upgrade scenario is not supported. Error is: {0}.")]
     UnsupportedUpgrade = 63,
+
+    [Description("The specified ini file could not be read. Provide a valid server configuration file or select a different file to continue.")]
+    InvalidIniFile = 64,
 
     /// Custom user related exit codes.
     /// Reserved codes from 70 through 89.
@@ -147,40 +162,43 @@ namespace MySql.Configurator.Base.Enums
     [Description("An empty user block was provided for option '{0}'.")]
     EmptyUserBlock = 70,
 
-    [Description("A user name must be enclosed in single or double quotes at '{0}' for option '{1}'.")]
+    [Description("A user name must be enclosed in single quotes at '{0}' for option '{1}'.")]
     InvalidCustomUserUserNameValue = 71,
 
-    [Description("A user password must be enclosed in single or double quotes at '{0}' for option '{1}'.")]
+    [Description("A user password must be enclosed in single quotes at '{0}' for option '{1}'.")]
     InvalidCustomUserPasswordValue = 72,
 
+    [Description("A user role must be enclosed in single quotes at '{0}' for option '{1}'.")]
+    InvalidCustomUserRoleValue = 73,
+
     [Description("The user name, password/Windows Security Token, host, role and authentication plugin elements are mandatory at '{0}' for option '{1}'.")]
-    InvalidCustomUserEmptyValue = 73,
+    InvalidCustomUserEmptyValue = 74,
 
     [Description("The Windows security token list is mandatory for users authentication with the Windows plugin at '{0}' for option '{1}'.")]
-    InvalidCustomUserEmptyToken = 74,
+    InvalidCustomUserEmptyToken = 75,
 
     [Description("Expected a closing quote in the user block at '{0}' for option '{1}'.")]
-    MissingCustomUserClosingQuote = 75,
+    MissingCustomUserClosingQuote = 76,
 
     [Description("Too many elements found in the user block '{0}' for option '{1}'. A user block is expected to be in the form of '\"user_name\":\"password\":host:role[:windows_security_token]'.")]
-    TooManyElementsInUserBlock = 76,
+    TooManyElementsInUserBlock = 77,
 
     [Description("The root user can't be added as a user because it already exists for option '{0}'.")]
-    InvalidCustomUserRootUser = 77,
+    InvalidCustomUserRootUser = 78,
 
     [Description("'{0}' is an invalid user role for option '{1}'.")]
-    InvalidCustomUserRole = 78,
+    InvalidCustomUserRole = 79,
 
     [Description("'{0}' is an invalid user name for option '{1}'. Error message is '{2}'.")]
-    InvalidCustomUserName = 79,
+    InvalidCustomUserName = 80,
 
     [Description("An invalid password has been provided for option '{0}'. Error message is '{1}'.")]
-    InvalidCustomUserPassword = 80,
+    InvalidCustomUserPassword = 81,
 
     [Description("The user or group name '{0}' could not be found for option '{1}'. Error message is '{2}'.")]
-    CustomUserSecurityTokenNotFound = 81,
+    CustomUserSecurityTokenNotFound = 82,
 
     [Description("Two or more custom users have the same user name '{0}' and host '{1}'. Review your '--add-user' entries.")]
-    RepeatedCustomUser = 82
+    RepeatedCustomUser = 83
   }
 }

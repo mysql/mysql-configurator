@@ -309,22 +309,6 @@ namespace MySql.Configurator.Base.Classes
     }
 
     /// <summary>
-    /// Executes a FLUSH PRIVILEGES statement.
-    /// </summary>
-    /// <param name="command">A <see cref="MySqlCommand"/> to execute.</param>
-    public static void FlushPrivileges(this MySqlCommand command)
-    {
-      if (command == null
-          || command.Connection.State != ConnectionState.Open)
-      {
-        return;
-      }
-
-      command.CommandText = "FLUSH PRIVILEGES;";
-      command.ExecuteNonQuery();
-    }
-
-    /// <summary>
     /// Gets a property's alternate name (if the property is decorated by the <see cref="AlternateNameAttribute"/>).
     /// </summary>
     /// <param name="propertyInfo">A <see cref="PropertyInfo"/> instance.</param>

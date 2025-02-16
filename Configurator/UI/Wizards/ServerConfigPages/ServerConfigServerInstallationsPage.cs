@@ -536,7 +536,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       var template = new IniTemplate(_existingServerInstallationInstance.BaseDir,
         _existingServerInstallationInstance.DataDir,
         serverConfigurationFilePath,
-        _existingServerInstallationInstance.Controller.ServerVersion,
+        _existingServerInstallationInstance.ServerVersion,
         _existingServerInstallationInstance.Controller.Settings.ServerInstallationType,
         null);
 

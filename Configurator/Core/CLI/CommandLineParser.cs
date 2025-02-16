@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2024, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2024, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -58,7 +58,7 @@ namespace MySql.Configurator.Core.CLI
       SupportedOptions = new List<CommandLineOption>()
       {
         new CommandLineOption("console", null, null, false, false, false, "c"),
-        new CommandLineOption("action", null, null, true, false, false, "a", new string[]{ "configure", "reconfigure", "upgrade", "remove" }),
+        new CommandLineOption("action", null, null, true, false, false, "a", new string[]{ "configure", "reconfigure", "upgrade", "remove", "removenoshow" }),
         new CommandLineOption("help", null, null, false, false, false,"h"),
         new CommandLineOption("add-user", null, null, true, true)
       };
@@ -87,6 +87,16 @@ namespace MySql.Configurator.Core.CLI
     public static CommandLineOption GetMatchingProvidedOption(string optionName)
     {
       return GetMatchingOption(ProvidedOptions, optionName);
+    }
+
+    /// <summary>
+    /// Gets the matching command line option from the supported options collection.
+    /// </summary>
+    /// <param name="optionName">The option name.</param>
+    /// <returns>A matching <see cref="CommandLineOption"/>; otherwise, <c>null</c>.</returns>
+    public static CommandLineOption GetMatchingSupportedOption(string optionName)
+    {
+      return GetMatchingOption(SupportedOptions, optionName);
     }
 
     /// <summary>
@@ -127,7 +137,6 @@ namespace MySql.Configurator.Core.CLI
       var characters = value.ToCharArray();
       var index = 0;
       bool readingSingleQuoteBlock = false;
-      bool readingDoubleQuoteBlock = false;
       while (index < characters.Length)
       {
         var character = characters[index];
@@ -135,14 +144,9 @@ namespace MySql.Configurator.Core.CLI
         {
           readingSingleQuoteBlock = !readingSingleQuoteBlock;
         }
-        else if (character == '\"')
-        {
-          readingDoubleQuoteBlock = !readingDoubleQuoteBlock;
-        }
 
         // Assign value if we will start reading the next element.
         if (!readingSingleQuoteBlock
-            && !readingDoubleQuoteBlock
             && character == ':')
         {
           serverUserItems[itemIndex] = builder.ToString();
@@ -167,13 +171,12 @@ namespace MySql.Configurator.Core.CLI
       }
 
       // Ensure all quotes were closed.
-      if (readingSingleQuoteBlock
-          || readingDoubleQuoteBlock)
+      if (readingSingleQuoteBlock)
       {
         return new CLIExitCode(ExitCode.MissingCustomUserClosingQuote, ADD_USER_OPTION_NAME, builder.ToString());
       }
 
-      // All elements are mandatory except for the window security token list.
+      // All elements are mandatory except for the windows security token list.
       for(int i = 0; i< serverUserItems.Length - 1; i++)
       {
         if (string.IsNullOrEmpty(serverUserItems[i]))
@@ -182,21 +185,25 @@ namespace MySql.Configurator.Core.CLI
         }
       }
 
-      // User name and password are expected to be enclosed in single or double quotes.
-      if (!(serverUserItems[0].StartsWith("\"")
-            && serverUserItems[0].EndsWith("\""))
-          && !(serverUserItems[0].StartsWith("'")
-               && serverUserItems[0].EndsWith("'")))
+      // User name is expected to be enclosed in single or double quotes.
+      if (!serverUserItems[0].StartsWith("'")
+           && !serverUserItems[0].EndsWith("'"))
       {
         return new CLIExitCode(ExitCode.InvalidCustomUserUserNameValue, serverUserItems[0], ADD_USER_OPTION_NAME);
       }
 
-      if (!(serverUserItems[1].StartsWith("\"")
-            && serverUserItems[1].EndsWith("\""))
-          && !(serverUserItems[1].StartsWith("'")
-               && serverUserItems[1].EndsWith("'")))
+      // User password/token is expected to be enclosed in single or double quotes.
+      if (!serverUserItems[1].StartsWith("'")
+           && !serverUserItems[1].EndsWith("'"))
       {
         return new CLIExitCode(ExitCode.InvalidCustomUserPasswordValue, serverUserItems[1], ADD_USER_OPTION_NAME);
+      }
+
+      // Role is expected to be enclosed in single or double quotes.
+      if (!serverUserItems[3].StartsWith("'")
+           && !serverUserItems[3].EndsWith("'"))
+      {
+        return new CLIExitCode(ExitCode.InvalidCustomUserRoleValue, serverUserItems[3], ADD_USER_OPTION_NAME);
       }
 
       // Validate Windows security token is populated (if applicable).
@@ -234,21 +241,31 @@ namespace MySql.Configurator.Core.CLI
 
       var consoleOption = GetMatchingProvidedOption("console");
       var actionOption = GetMatchingProvidedOption("action");
+      var helpOption = GetMatchingProvidedOption("help");
       AppConfiguration.ConsoleMode = consoleOption != null;
-      if (!AppConfiguration.ConsoleMode
-          && ((actionOption != null
-               && !actionOption.Value.Equals("configure", StringComparison.InvariantCultureIgnoreCase)
-               && !actionOption.Value.Equals("reconfigure", StringComparison.InvariantCultureIgnoreCase)
-               && !actionOption.Value.Equals("remove", StringComparison.InvariantCultureIgnoreCase))
-              || ProvidedOptions.Count > 1))
+      if (consoleOption != null)
+      {
+        ProvidedOptions.Remove(consoleOption);
+      }
+
+      if ((!AppConfiguration.ConsoleMode
+           && (((actionOption != null
+                 && !actionOption.Value.Equals("configure", StringComparison.InvariantCultureIgnoreCase)
+                 && !actionOption.Value.Equals("reconfigure", StringComparison.InvariantCultureIgnoreCase)
+                 && !actionOption.Value.Equals("remove", StringComparison.InvariantCultureIgnoreCase)
+                 && !actionOption.Value.Equals("removenoshow", StringComparison.InvariantCultureIgnoreCase))
+                || (actionOption == null 
+                    && ProvidedOptions.Count > 0))))
+         || (AppConfiguration.ConsoleMode
+             && helpOption != null
+             && ((actionOption == null
+                  && ProvidedOptions.Count > 1)
+                  || (actionOption != null
+                      && ProvidedOptions.Count > 2))))
       {
         // If console option was not provided and action is different than configure, reconfigure or remove
         // then the combination is not supported.
         return new CLIExitCode(ExitCode.TooManyArguments);
-      }
-      else
-      {
-        ProvidedOptions.Remove(consoleOption);
       }
 
       return new CLIExitCode(ExitCode.Success);
@@ -271,16 +288,6 @@ namespace MySql.Configurator.Core.CLI
     }
 
     /// <summary>
-    /// Gets the matching command line option from the supported options collection.
-    /// </summary>
-    /// <param name="optionName">The option name.</param>
-    /// <returns>A matching <see cref="CommandLineOption"/>; otherwise, <c>null</c>.</returns>
-    private static CommandLineOption GetMatchingSupportedOption(string optionName)
-    {
-      return GetMatchingOption(SupportedOptions, optionName);
-    }
-
-    /// <summary>
     /// Checks that the provided option is valid.
     /// </summary>
     /// <param name="optionName">The option name.</param>
@@ -294,26 +301,45 @@ namespace MySql.Configurator.Core.CLI
         throw new ArgumentNullException(nameof(optionName));
       }
 
-      var commandLineOption = GetMatchingSupportedOption(optionName);
+      var option = GetMatchingSupportedOption(optionName);
+      CommandLineOption commandLineOption = null;
+      if (option != null)
+      {
+        commandLineOption = new CommandLineOption(
+        option.Name,
+        option.Description,
+        option.Aliases,
+        option.SupportsValue,
+        option.SupportsRepeat,
+        option.Required,
+        option.Shortcut,
+        option.SupportedValues,
+        option.CheckAction
+        );
+        commandLineOption.Value = optionValue;
+      }
+      
       if (commandLineOption == null)
       {
         return new CLIExitCode(ExitCode.InvalidOption, optionName);
       }
-
-      if (commandLineOption.SupportsValue
-          && string.IsNullOrEmpty(optionValue))
+      else if (commandLineOption.SupportsValue
+               && string.IsNullOrEmpty(optionValue))
       {
         return new CLIExitCode(ExitCode.OptionValueNotFound, optionName);
       }
-
-      if (commandLineOption.HasFixedValues
-          && commandLineOption.SupportedValues.FirstOrDefault(value => value.Equals(optionValue, StringComparison.InvariantCultureIgnoreCase)) == null)
+      else if(!commandLineOption.SupportsValue
+              && !string.IsNullOrEmpty(optionValue))
+      {
+        return new CLIExitCode(ExitCode.OptionDoesNotSupportValue, optionName);
+      }
+      else if (commandLineOption.HasFixedValues
+               && commandLineOption.SupportedValues.FirstOrDefault(value => value.Equals(optionValue, StringComparison.InvariantCultureIgnoreCase)) == null)
       {
         return new CLIExitCode(ExitCode.InvalidOptionValue, optionValue, optionName);
       }
-
-      if (!commandLineOption.SupportsRepeat
-          && (GetMatchingProvidedOption(commandLineOption.Name) != null))
+      else if (!commandLineOption.SupportsRepeat
+               && (GetMatchingProvidedOption(commandLineOption.Name) != null))
       {
         return new CLIExitCode(ExitCode.RepeatedOption, optionName);
       }
@@ -335,6 +361,17 @@ namespace MySql.Configurator.Core.CLI
         return new CLIExitCode(ExitCode.NoArgument);
       }
 
+      // Special cases until we ask RE to update MSI to use new syntax.
+      if (argument.Equals("--remove", StringComparison.InvariantCultureIgnoreCase))
+      {
+        argument = "--action=remove";
+      }
+
+      if (argument.Equals("--removenoshow", StringComparison.InvariantCultureIgnoreCase))
+      {
+        argument = "--action=removenoshow";
+      }
+
       // Remove trailing - or --.
       if (argument.StartsWith("--"))
       {
@@ -347,6 +384,11 @@ namespace MySql.Configurator.Core.CLI
       else
       {
         return new CLIExitCode(ExitCode.InvalidOptionSyntax, argument);
+      }
+
+      if (string.IsNullOrEmpty(argument))
+      {
+        return new CLIExitCode(ExitCode.InvalidGenericSyntax);
       }
 
       // Separate into key value pair (if applicable)

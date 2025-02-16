@@ -1545,9 +1545,6 @@ Please close MySQL Workbench and restart {0} to perform the merge.</value>
   <data name="YesOrNoForConsoleText" xml:space="preserve">
     <value>[Y]es or [N]o?:  </value>
   </data>
-  <data name="MySql_Data" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySql.Data.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="CommandLineOptionDuplicateKeysError" xml:space="preserve">
     <value>Duplicate keys found.</value>
   </data>
@@ -1821,13 +1818,13 @@ Proceeding with the upgrade will update the plugin to 'caching_sha2_password'.</
     <value>{0} operation has started.</value>
   </data>
   <data name="CLIConfigurationStarting" xml:space="preserve">
-    <value>Configuring {0} installation...</value>
+    <value>Beginning operation for the {0} installation...</value>
   </data>
   <data name="CLIConfigurationStepCompleted" xml:space="preserve">
-    <value>- Completed!</value>
+    <value>Step execution completed!</value>
   </data>
   <data name="CLIConfigurationStepFailed" xml:space="preserve">
-    <value>- Failed!</value>
+    <value>Step execution failed!</value>
   </data>
   <data name="CLICopyrightNotice" xml:space="preserve">
     <value>Copyright (c) 2023, 2025, Oracle and/or its affiliates. Oracle(R), Java, MySQL, and NetSuite are registered trademarks of Oracle and/or its affiliates.</value>
@@ -1862,7 +1859,7 @@ MySQL Configurator was not able to find any configurations for the specified MyS
     <value>General syntax
 ---------------------------------------------------------------------------------------------------
 
-mysql_configurator.exe --console [--action=action_name | -a=action_name] [--help | --silent]] | [--action_option=action_value]...]
+mysql_configurator.exe --console [--action=action_name | -a=action_name] [[--help] | [--action_option=action_value]...]
 
 
 Options
@@ -1873,8 +1870,7 @@ console(c)      Activates the usage of the CLI in MySQL Configurator. If not pro
 action(a)       Runs MySQL Configurator CLI in new configuration, reconfiguration, removal or upgrade mode.
                 Supported values: configure, reconfigure, remove, upgrade
 help(h)         Displays general help or help for the corresponding action. If no --action element is provided, the general help section is displayed. If an action option elements such as --action-option=action-value is provided, it is ignored and the corresponding help is displayed.
-silent(s)       Executes the specified action without requiring any user intervention. If any error occurs, the action is aborted.
-action_option   Defines the various configuration options available for each CLI action (configuration, reconfiguration, removal or upgrade). See the help section of each individual action for details on the supported actions.
+action_option   Defines the various configuration options available for each CLI action (configure, reconfigure, remove or upgrade). See the help section of each individual action for details on the supported actions.
 
 
 Usage examples
@@ -1883,10 +1879,9 @@ Usage examples
 --console --action=configure --port=3306
 --console --help
 --console --action=remove --help
---console --action=configure --silent --password=test
+--console --action=configure --password=test
 -c -a=configure -h
--c -a=remove --help
-</value>
+-c -a=remove --help</value>
   </data>
   <data name="CLIConfigureActionHelp" xml:space="preserve">
     <value>Configure action
@@ -1896,7 +1891,7 @@ Executes a new configuration operation. Using this action for an already configu
 Syntax
 ---------------------------------------------------------------------------------------------------
 
---action=configure [--help | --silent] [--action_option[=action_value]]...
+[--action=configure | -a=configure] [--help] [--action_option[=action_value]]...
 
 
 Options
@@ -1908,9 +1903,8 @@ Name:Shortcut:Aliases:Supported Values:Description
 Usage examples
 ---------------------------------------------------------------------------------------------------
 --action=configure --password=test
---action=configure --password=test --port=3320 --enable-pipe-names --pipe-name=MYSQL_PIPE --server-id=2 --install-sample-database=both
---action=configure --password=other123 --add-user=john:"Db Admin":MYSQL:pa$$ --add-user=mary:"Administrator":MYSQL:p4ssW0rd
-</value>
+--action=configure --password=test --port=3320 enable-named-pipes --pipe-name=MYSQL_PIPE --server-id=2 --install-sample-database=All
+--action=configure --password=other123 --add-user='john':'pa$$':localhost:'DBA':MYSQL --add-user='mary':'p4ssW0rd':%:'DBDesigner':MYSQL</value>
   </data>
   <data name="CLIReconfigureActionHelp" xml:space="preserve">
     <value>Reconfigure action
@@ -1920,7 +1914,7 @@ Executes a reconfiguration operation. Using this action for a non-configured ser
 Syntax
 ---------------------------------------------------------------------------------------------------
 
---action=reconfigure [--help | --silent] [--action_option[=action_value]]...
+[--action=reconfigure | -a=reconfigure] [--help] [--action_option[=action_value]]...
 
 
 Options
@@ -1943,7 +1937,7 @@ Executes a removal operation. In this case, any configurations created using MyS
 Syntax
 ---------------------------------------------------------------------------------------------------
 
---action=remove [--help | --silent] [--action_option[=action_value]]...
+[--action=remove | -a=remove] [--help] [--action_option[=action_value]]...
 
 
 Options
@@ -1968,7 +1962,7 @@ Executes an in-place upgrade operation.
 Syntax
 ---------------------------------------------------------------------------------------------------
 
---action=upgrade [--help | --silent] [--action_option[=action_value]]...
+[--action=upgrade | -a=upgrade] [--help] [--action_option[=action_value]]...
 
 
 Options
@@ -1980,7 +1974,13 @@ Name:Shortcut:Aliases:Supported Values:Description
 Usage examples
 ---------------------------------------------------------------------------------------------------
 --action=upgrade --old-instance-password=test
---action=upgrade --old-instance-password=test --backup-data=false --server-file-permissions-access=full
+--action=upgrade --old-instance-password=test --backup-data=false --server-file-permissions-access=FullAccess
 </value>
+  </data>
+  <data name="CLISuccessfulConnection" xml:space="preserve">
+    <value>Successfully connected to the MySQL Server instance.</value>
+  </data>
+  <data name="MySql.Data" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySql.Data.dll;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

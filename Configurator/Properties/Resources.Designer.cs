@@ -320,7 +320,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Configuring {0} installation....
+        ///   Looks up a localized string similar to Beginning operation for the {0} installation....
         /// </summary>
         public static string CLIConfigurationStarting {
             get {
@@ -329,7 +329,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to - Completed!.
+        ///   Looks up a localized string similar to Step execution completed!.
         /// </summary>
         public static string CLIConfigurationStepCompleted {
             get {
@@ -338,7 +338,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to - Failed!.
+        ///   Looks up a localized string similar to Step execution failed!.
         /// </summary>
         public static string CLIConfigurationStepFailed {
             get {
@@ -354,13 +354,13 @@ namespace MySql.Configurator.Properties {
         ///Syntax
         ///---------------------------------------------------------------------------------------------------
         ///
-        ///--action=configure [--help | --silent] [--action_option[=action_value]]...
+        ///[--action=configure | -a=configure] [--help] [--action_option[=action_value]]...
         ///
         ///
         ///Options
         ///---------------------------------------------------------------------------------------------------
         ///Name:Shortcut:Aliases:Supported Values:Description
-        ///----------- [rest of string was truncated]&quot;;.
+        ///----- [rest of string was truncated]&quot;;.
         /// </summary>
         public static string CLIConfigureActionHelp {
             get {
@@ -390,14 +390,14 @@ namespace MySql.Configurator.Properties {
         ///   Looks up a localized string similar to General syntax
         ///---------------------------------------------------------------------------------------------------
         ///
-        ///mysql_configurator.exe --console [--action=action_name | -a=action_name] [--help | --silent]] | [--action_option=action_value]...]
+        ///mysql_configurator.exe --console [--action=action_name | -a=action_name] [[--help] | [--action_option=action_value]...]
         ///
         ///
         ///Options
         ///---------------------------------------------------------------------------------------------------
         ///Name            Description
         ///---------------------------------------------------------------------------------------------------
-        ///console(c)      A [rest of string was truncated]&quot;;.
+        ///console(c)      Activates th [rest of string was truncated]&quot;;.
         /// </summary>
         public static string CLIGeneralHelp {
             get {
@@ -460,13 +460,13 @@ namespace MySql.Configurator.Properties {
         ///Syntax
         ///---------------------------------------------------------------------------------------------------
         ///
-        ///--action=reconfigure [--help | --silent] [--action_option[=action_value]]...
+        ///[--action=reconfigure | -a=reconfigure] [--help] [--action_option[=action_value]]...
         ///
         ///
         ///Options
         ///---------------------------------------------------------------------------------------------------
         ///Name:Shortcut:Aliases:Supported Values:Description
-        ///-------------- [rest of string was truncated]&quot;;.
+        ///------ [rest of string was truncated]&quot;;.
         /// </summary>
         public static string CLIReconfigureActionHelp {
             get {
@@ -482,12 +482,12 @@ namespace MySql.Configurator.Properties {
         ///Syntax
         ///---------------------------------------------------------------------------------------------------
         ///
-        ///--action=remove [--help | --silent] [--action_option[=action_value]]...
+        ///[--action=remove | -a=remove] [--help] [--action_option[=action_value]]...
         ///
         ///
         ///Options
         ///---------------------------------------------------------------------------------------------------
-        ///Name:Sho [rest of string was truncated]&quot;;.
+        ///Name: [rest of string was truncated]&quot;;.
         /// </summary>
         public static string CLIRemoveActionHelp {
             get {
@@ -514,6 +514,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Successfully connected to the MySQL Server instance..
+        /// </summary>
+        public static string CLISuccessfulConnection {
+            get {
+                return ResourceManager.GetString("CLISuccessfulConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Upgrade action
         ///
         ///Executes an in-place upgrade operation.
@@ -521,13 +530,13 @@ namespace MySql.Configurator.Properties {
         ///Syntax
         ///---------------------------------------------------------------------------------------------------
         ///
-        ///--action=upgrade [--help | --silent] [--action_option[=action_value]]...
+        ///[--action=upgrade | -a=upgrade] [--help] [--action_option[=action_value]]...
         ///
         ///
         ///Options
         ///---------------------------------------------------------------------------------------------------
         ///Name:Shortcut:Aliases:Supported Values:Description
-        ///---------------------------------------------------------------------------------------------------        /// [rest of string was truncated]&quot;;.
+        ///------------------------------------------------------------------------------------------------ [rest of string was truncated]&quot;;.
         /// </summary>
         public static string CLIUpgradeActionHelp {
             get {
@@ -1758,12 +1767,12 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
+        ///   Looks up a localized string similar to MZ����@���	�!�L�!This program cannot be run in DOS mode.        ///
+        ///$PEL�@@��&quot; 0�&amp;�  @        ///�`���O� ��T  H.text�� � `.rsrc��@@.reloc �@B [rest of string was truncated]&quot;;.
         /// </summary>
-        public static byte[] MySql_Data {
+        public static string MySql_Data {
             get {
-                object obj = ResourceManager.GetObject("MySql_Data", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("MySql.Data", resourceCulture);
             }
         }
         
