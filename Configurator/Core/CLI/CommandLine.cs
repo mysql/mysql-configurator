@@ -907,6 +907,7 @@ namespace MySql.Configurator.Core.CLI
             return new CLIExitCode(ExitCode.InvalidOptionValue, installSampleDbOption.Value, installSampleDbOption.Name);
           }
 
+          serverInstallation.Controller.IsCreateRemoveExamplesDatabasesStepNeeded = true;
           switch (installStatus)
           {
             case ExampleDatabase.All:
