@@ -860,7 +860,11 @@ namespace MySql.Configurator.Core.CLI
             return new CLIExitCode(ExitCode.MissingRequiredOption, requiredProtocolOption.Name);
           }
 
-          TryToSetValue(serverInstallation.Controller, requiredProtocolOption.Name, requiredProtocolOption.Value);
+          if (!TryToSetValue(serverInstallation.Controller, requiredProtocolOption.Name, requiredProtocolOption.Value))
+          {
+            return new CLIExitCode(ExitCode.InvalidOptionValue, requiredProtocolOption.Value, requiredProtocolOption.Name);
+          }
+
           CommandLineParser.ProvidedOptions.Remove(requiredProtocolOption);
         }
         else
