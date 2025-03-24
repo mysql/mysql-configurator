@@ -1904,7 +1904,12 @@ Usage examples
 ---------------------------------------------------------------------------------------------------
 --action=configure --password=test
 --action=configure --password=test --port=3320 enable-named-pipes --pipe-name=MYSQL_PIPE --server-id=2 --install-sample-database=All
---action=configure --password=other123 --add-user='john':'pa$$':localhost:'DBA':MYSQL --add-user='mary':'p4ssW0rd':%:'DBDesigner':MYSQL</value>
+--action=configure --password=other123 --add-user='john':'pa$$':localhost:'DBA':MYSQL --add-user='mary':'p4ssW0rd':%:'DBDesigner':MYSQL
+
+Notes
+---------------------------------------------------------------------------------------------------
+
+- Multiple --add-user entries with the same user name and host are considered duplicates, in which case only the first option will be processed and the rest ignored.</value>
   </data>
   <data name="CLIReconfigureActionHelp" xml:space="preserve">
     <value>Reconfigure action
@@ -1982,5 +1987,11 @@ Usage examples
   </data>
   <data name="MySql.Data" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySql.Data.dll;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ServerConfigCustomUserCreated" xml:space="preserve">
+    <value>Created user '{0}:{1}'.</value>
+  </data>
+  <data name="ServerConfigCustomUserCreationFailure" xml:space="preserve">
+    <value>Creating of users failed with message: {0}.</value>
   </data>
 </root>

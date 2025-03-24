@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -222,7 +222,6 @@ namespace MySql.Configurator.UI.Dialogs
       this.HostComboBox.Name = "HostComboBox";
       this.HostComboBox.Size = new System.Drawing.Size(205, 33);
       this.HostComboBox.TabIndex = 4;
-      this.HostComboBox.SelectedIndexChanged += new System.EventHandler(this.HostComboBox_SelectedIndexChanged);
       this.HostComboBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.HostComboBox_KeyUp);
       this.HostComboBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.HostComboBox_PreviewKeyDown);
       this.HostComboBox.Validated += new System.EventHandler(this.HostComboBox_Validated);
@@ -539,6 +538,7 @@ namespace MySql.Configurator.UI.Dialogs
       this.OkButton.TabIndex = 1;
       this.OkButton.Text = "&OK";
       this.OkButton.UseVisualStyleBackColor = true;
+      this.OkButton.Click += new System.EventHandler(this.OkButton_Click);
       // 
       // DialogCancelButton
       // 

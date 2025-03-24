@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -42,12 +42,29 @@ namespace MySql.Configurator.UI.Dialogs
     #region Fields
 
     private readonly MySqlAuthenticationPluginType _defaultAuthenticationPlugin;
+
+    // The list of existing users in the user list view control.
+    private List<MySqlServerUser> _existingUsers;
+
     private MySqlServerUser _serverUser;
+
+    // The user matching the user that is being edited, hence it should be skipped when validating for duplicate users.
+    private MySqlServerUser _skipUser;
+
     private bool _windowsSecurityTokensAreValid;
 
     #endregion Fields
 
-    public DatabaseUserDialog(bool showWinAuth, IEnumerable<Role> roles, MySqlAuthenticationPluginType defaultAuthenticationPlugin, Version serverVersion)
+    /// <summary>
+    /// Instantiates a <see cref="DatabaseUserDialog"/> object.
+    /// </summary>
+    /// <param name="showWinAuth">Flag to indicate if the option to select Windows authentication should be shown.</param>
+    /// <param name="roles">The list of supported DB roles.</param>
+    /// <param name="defaultAuthenticationPlugin">The default authentication plugin.</param>
+    /// <param name="serverVersion">The server version.</param>
+    /// <param name="existingUsers">The list of existing users.</param>
+    /// <param name="skipUser">The user to skip when validating for duplicate users.</param>
+    public DatabaseUserDialog(bool showWinAuth, IEnumerable<Role> roles, MySqlAuthenticationPluginType defaultAuthenticationPlugin, Version serverVersion, List<MySqlServerUser> existingUsers, MySqlServerUser skipUser)
     {
       InitializeComponent();
       if (!showWinAuth)
@@ -58,10 +75,12 @@ namespace MySql.Configurator.UI.Dialogs
 
       ServerVersion = serverVersion;
       _defaultAuthenticationPlugin = defaultAuthenticationPlugin;
+      _existingUsers = existingUsers;
       MySqlAuthenticationRadioButton.Checked = true;
       ActiveDirectoryValidationCheckBox.Checked = false;
       _windowsSecurityTokensAreValid = false;
       _serverUser = new MySqlServerUser();
+      _skipUser = skipUser;
       HostComboBox.SelectedIndex = 0;
 
       foreach (var r in roles)
@@ -128,6 +147,13 @@ namespace MySql.Configurator.UI.Dialogs
     /// </summary>
     public Version ServerVersion { get; }
 
+    // Gets the Server user host based on the selection of the host combobox.
+    private string Host => HostComboBox.SelectedIndex == -1
+      ? null
+      : HostComboBox.SelectedIndex == 0 
+        ? "%"
+        : HostComboBox.Items[HostComboBox.SelectedIndex].ToString();
+
     #endregion Properties
 
     /// <summary>
@@ -153,8 +179,31 @@ namespace MySql.Configurator.UI.Dialogs
         _serverUser.Password = PasswordTextBox.Text;
       }
 
+      _serverUser.Host = Host;
       _serverUser.Username = UsernameTextBox.Text.Trim();
       _serverUser.UserRole = (UserRoleComboBox.Items[UserRoleComboBox.SelectedIndex] as ImageComboBoxItem)?.Tag as Role;
+    }
+
+
+    /// <summary>
+    /// Checks for duplicate users provided by the user.
+    /// </summary>
+    /// <param name="userName">The user name to check.</param>
+    /// <param name="host">The host assigned to the user name.</param>
+    /// <returns><c>true</c> if a similar user was already entered; otherwise, <c>false<c>.</returns>
+    private bool DuplicateUsersExist(string userName, string host)
+    {
+      if (_existingUsers == null
+          || _existingUsers.Count == 0)
+      {
+        return false;
+      }
+
+      return _existingUsers.Any(su => su != null
+                                && su.Username.Equals(userName)
+                                && su.Host.Equals(host)
+                                && (_skipUser == null
+                                    || _skipUser != su));
     }
 
     protected override void OnLoad(EventArgs e)
@@ -191,23 +240,6 @@ namespace MySql.Configurator.UI.Dialogs
       if (!(e.Alt || e.Control || e.Shift || e.KeyCode == Keys.Tab))
       {
         HostComboBox.SelectedIndex = -1;
-      }
-    }
-
-    private void HostComboBox_SelectedIndexChanged(object sender, EventArgs e)
-    {
-      switch (HostComboBox.SelectedIndex)
-      {
-        case -1:
-          break;
-
-        case 0:
-          _serverUser.Host = "%";
-          break;
-
-        default:
-          _serverUser.Host = HostComboBox.Items[HostComboBox.SelectedIndex].ToString();
-          break;
       }
     }
 
@@ -422,6 +454,22 @@ namespace MySql.Configurator.UI.Dialogs
       WindowsTokensRichTextBox.SelectionFont = new Font(WindowsTokensRichTextBox.Font, FontStyle.Regular);
       WindowsTokensRichTextBox.Select(selectionStart, 0);
       UpdateOkButton();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the OK button is clicked.
+    /// </summary>
+    /// <param name="sender">The sender object.</param>
+    /// <param name="e">The evente arguments.</param>
+    private void OkButton_Click(object sender, EventArgs e)
+    {
+      if (!DuplicateUsersExist(UsernameTextBox.Text.Trim(), Host))
+      {
+        return;
+      }
+
+      InfoDialog.ShowDialog(InfoDialogProperties.GetWarningDialogProperties(Resources.ServerConfigDuplicateTitle, Resources.ServerConfigEditedDuplicateUser));
+      DialogResult = DialogResult.Cancel;
     }
 
     /// <summary>

@@ -3042,6 +3042,24 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Created user &apos;{0}:{1}&apos;..
+        /// </summary>
+        public static string ServerConfigCustomUserCreated {
+            get {
+                return ResourceManager.GetString("ServerConfigCustomUserCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creating of users failed with message: {0}..
+        /// </summary>
+        public static string ServerConfigCustomUserCreationFailure {
+            get {
+                return ResourceManager.GetString("ServerConfigCustomUserCreationFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Incorrect user name or password..
         /// </summary>
         public static string ServerConfigCustomUserInvalidCredentials {

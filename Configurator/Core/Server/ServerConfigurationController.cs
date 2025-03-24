@@ -2142,12 +2142,15 @@ namespace MySql.Configurator.Core.Server
               cmd.CommandText = grantSql;
               cmd.ExecuteNonQuery();
             }
+
+            ReportStatus(string.Format(Resources.ServerConfigCustomUserCreated, affectedUser.Username, affectedUser.Host));
           }
         }
       }
       catch (Exception ex)
       {
         Logger.LogException(ex);
+        ReportStatus(string.Format(Resources.ServerConfigCustomUserCreationFailure, ex.Message));
         success = false;
       }
 

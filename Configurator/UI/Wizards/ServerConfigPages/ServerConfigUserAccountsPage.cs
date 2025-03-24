@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -22,6 +22,7 @@
   51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using MySql.Configurator.Base.Classes;
@@ -156,22 +157,12 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
     private void EditUserItem()
     {
       var item = UserAccountsListView.SelectedItems[0];
-      using (var dialog = new DatabaseUserDialog(_showWinAuthOption, _controller.RolesDefined.Roles, _settings.DefaultAuthenticationPlugin, _controller.ServerVersion))
+      var serverUser = item.Tag as MySqlServerUser;
+      using (var dialog = new DatabaseUserDialog(_showWinAuthOption, _controller.RolesDefined.Roles, _settings.DefaultAuthenticationPlugin, _controller.ServerVersion, GetExistingUsers(), serverUser))
       {
-        dialog.ServerUser = item.Tag as MySqlServerUser;
+        dialog.ServerUser = serverUser;
         if (dialog.ShowDialog() == DialogResult.Cancel)
         {
-          return;
-        }
-
-        // Check to make sure a duplicate user/host was not entered.
-        if ((from ListViewItem li in UserAccountsListView.Items
-          let su = li.Tag as MySqlServerUser
-          where su.Username == dialog.ServerUser.Username
-          where (su.Host == "%" || su.Host == dialog.ServerUser.Host) && li != item
-          select li).Any())
-        {
-          InfoDialog.ShowDialog(InfoDialogProperties.GetWarningDialogProperties(Resources.ServerConfigDuplicateTitle, Resources.ServerConfigEditedDuplicateUser));
           return;
         }
 
@@ -181,6 +172,21 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
         item.SubItems[2].Text = dialog.ServerUser.Host;
         item.SubItems[3].Text = dialog.ServerUser.UserRole.Display;
       }
+    }
+
+    /// <summary>
+    /// Gets the list of existing users in the user accounts list view control.
+    /// </summary>
+    /// <returns>A list of existing users in the user accounts list view control.</returns>
+    private List<MySqlServerUser> GetExistingUsers()
+    {
+      var existingUsers = new List<MySqlServerUser>();
+      foreach (ListViewItem user in UserAccountsListView.Items)
+      {
+        existingUsers.Add(user.Tag as MySqlServerUser);
+      }
+
+      return existingUsers;
     }
 
     private void SetControlsVisibility()
@@ -241,7 +247,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
 
     private void AddUserButton_Click(object sender, EventArgs e)
     {
-      using (var dialog = new DatabaseUserDialog(_showWinAuthOption, _controller.RolesDefined.Roles, _settings.DefaultAuthenticationPlugin, _controller.ServerVersion))
+      using (var dialog = new DatabaseUserDialog(_showWinAuthOption, _controller.RolesDefined.Roles, _settings.DefaultAuthenticationPlugin, _controller.ServerVersion, GetExistingUsers(), null))
       {
         if (dialog.ShowDialog() == DialogResult.Cancel)
         {
@@ -259,13 +265,6 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
             InfoDialogProperties.GetErrorDialogProperties(
               string.Format(Resources.ServerConfigAddedExistingRootUserTitle, dialog.ServerUser.Host),
               string.Format(Resources.ServerConfigAddedExistingRootUserText, dialog.ServerUser.Host)));
-          return;
-        }
-
-        // Check to make sure a duplicate user/host was not entered.
-        if (UserAccountsListView.Items.Cast<ListViewItem>().Select(li => li.Tag as MySqlServerUser).Any(su => su != null && su.Username == dialog.ServerUser.Username && su.Host == dialog.ServerUser.Host))
-        {
-          InfoDialog.ShowDialog(InfoDialogProperties.GetWarningDialogProperties(Resources.ServerConfigDuplicateTitle, Resources.ServerConfigAddedDuplicateUser));
           return;
         }
 

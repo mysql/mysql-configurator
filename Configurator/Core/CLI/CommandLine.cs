@@ -695,13 +695,12 @@ namespace MySql.Configurator.Core.CLI
       }
 
       // Validate not repeated user.
-      if (serverInstallation.Controller.Settings.NewServerUsers.Any(existingUser => existingUser.Username.Equals(user.Username, StringComparison.InvariantCultureIgnoreCase)
+      if (!serverInstallation.Controller.Settings.NewServerUsers.Any(existingUser => existingUser.Username.Equals(user.Username, StringComparison.InvariantCultureIgnoreCase)
                                                                                     && existingUser.Host.Equals(user.Host, StringComparison.InvariantCultureIgnoreCase)))
       {
-        return new CLIExitCode(ExitCode.RepeatedCustomUser, user.Username, user.Host);
+        serverInstallation.Controller.Settings.NewServerUsers.Add(user);
       }
-
-      serverInstallation.Controller.Settings.NewServerUsers.Add(user);
+      
       return new CLIExitCode(ExitCode.Success);
     }
 
