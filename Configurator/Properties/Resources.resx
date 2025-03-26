@@ -1994,4 +1994,7 @@ Usage examples
   <data name="ServerConfigCustomUserCreationFailure" xml:space="preserve">
     <value>Creating of users failed with message: {0}.</value>
   </data>
+  <data name="CLIDuplicateUserWarning" xml:space="preserve">
+    <value>Multiple entries for user '{0}@{1}' have been found. Ignoring all duplicate entries except for the first one.</value>
+  </data>
 </root>

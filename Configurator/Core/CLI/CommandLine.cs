@@ -700,6 +700,12 @@ namespace MySql.Configurator.Core.CLI
       {
         serverInstallation.Controller.Settings.NewServerUsers.Add(user);
       }
+      else
+      {
+        var warningMessage = string.Format(Resources.CLIDuplicateUserWarning, user.Username, user.Host);
+        Logger.LogWarning(warningMessage);
+        Console.WriteLine(warningMessage);
+      }
       
       return new CLIExitCode(ExitCode.Success);
     }

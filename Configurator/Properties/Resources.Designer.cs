@@ -378,6 +378,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Multiple entries for user &apos;{0}@{1}&apos; have been found. Ignoring all duplicate entries except for the first one..
+        /// </summary>
+        public static string CLIDuplicateUserWarning {
+            get {
+                return ResourceManager.GetString("CLIDuplicateUserWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} operation has finished..
         /// </summary>
         public static string CLIEndOperation {
