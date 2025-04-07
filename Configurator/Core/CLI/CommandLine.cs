@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Timers;
 using MySql.Configurator.Base.Classes;
 using MySql.Configurator.Base.Enums;
@@ -450,6 +451,15 @@ namespace MySql.Configurator.Core.CLI
       serverInstallation.Controller.ConfigurationType = ConfigurationType.Upgrade;
       serverInstallation.Controller.Settings.DataDirectory = dataDirectory;
       serverInstallation.Controller.Settings.IniDirectory = new FileInfo(configFile).DirectoryName;
+      serverInstallation.Controller.Settings.ErrorLogFileName = oldController.Settings.ErrorLogFileName;
+
+      // Check if the error log file is in the default path, and if so update the path to the new version.
+      var pathToErrorFile = Path.GetDirectoryName(serverInstallation.Controller.Settings.ErrorLogFileName);
+      if (_existingServerInstallationInstance.IsDataDirNameDefault())
+      {
+        serverInstallation.Controller.Settings.ErrorLogFileName = Regex.Replace(serverInstallation.Controller.Settings.ErrorLogFileName, MySqlServerInstance.DEFAULT_DATADIR_NAME_REGEX, $"MySQL Server {serverInstallation.Controller.ServerVersion.ToString(2)}", RegexOptions.IgnoreCase);
+      }
+
       serverInstallation.Controller.IsRemoveExistingServerInstallationStepNeeded = true;
       serverInstallation.Controller.IsDataDirectoryRenameNeeded = _existingServerInstallationInstance.IsDataDirNameDefault(serverInstallation.Controller.ServerVersion);
       serverInstallation.Controller.ExistingServerInstallationInstance = _existingServerInstallationInstance;
@@ -480,7 +490,10 @@ namespace MySql.Configurator.Core.CLI
 
         var iniFile = new IniFileEngine(configFile).Load();
         _existingServerInstallationInstance.Controller.Settings.DataDirectory = new DirectoryInfo(iniFile.FindValue("mysqld", "datadir", false)).Parent.FullName;
-        _existingServerInstallationInstance.Controller.Settings.ErrorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
+        var errorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
+        _existingServerInstallationInstance.Controller.Settings.ErrorLogFileName = string.IsNullOrEmpty(errorLogFileName)
+          ? MySqlServerSettings.ErrorLogDefaultFileName
+          : errorLogFileName;
       }
 
       return new CLIExitCode(ExitCode.Success);

@@ -1214,7 +1214,10 @@ namespace MySql.Configurator.Core.Server
         }
 
         OpenFirewall = EnableTcpIp && IsRuleEnabled(Port.ToString());
-        ErrorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
+        var errorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
+        ErrorLogFileName = string.IsNullOrEmpty(errorLogFileName)
+          ? MySqlServerSettings.ErrorLogDefaultFileName
+          : errorLogFileName;
         EnableGeneralLog = iniFile.FindValue<bool>("mysqld", "general-log", false);
         GeneralQueryLogFileName = iniFile.FindValue("mysqld", "general_log_file", false);
         EnableSlowQueryLog = iniFile.FindValue<bool>("mysqld", "slow-query-log", false);
