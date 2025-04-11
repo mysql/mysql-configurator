@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -443,7 +443,8 @@ namespace MySql.Configurator.Core.Ini
     /// <param name="isReconfigure">Indicates if an existing ini file is being reconfigured.</param>
     /// <param name="writeTemplate">Indicates if the template should replace the existing ini file.</param>
     /// <param name="skipExistingValues">If an ini file already exists, indicates if existing values should not be replaced with the ones in the template.</param>
-    public void ProcessTemplate(bool isReconfigure = false, bool writeTemplate = true, bool skipExistingValues = false)
+    /// <param name="updateDefaultPaths">Indicates if the default data directory and related paths should be updated.</param>
+    public void ProcessTemplate(bool isReconfigure = false, bool writeTemplate = true, bool skipExistingValues = false, bool updateDefaultPaths = false)
     {
       _formulaEngine.AssignFormulaVariable("basedir", string.Format("\"{0}\"", BaseDir));
       _formulaEngine.AssignFormulaVariable("datadir", Path.Combine(DataDir, "Data")); // String.Format("\"{0}\\data\\\"", DataDir));
@@ -480,7 +481,7 @@ namespace MySql.Configurator.Core.Ini
 
       if (File.Exists(ConfigurationFile) && !isReconfigure)
       {
-        UpgradeIniFile(skipExistingValues);
+        UpgradeIniFile(skipExistingValues, updateDefaultPaths);
         return;
       }
 
@@ -630,49 +631,11 @@ namespace MySql.Configurator.Core.Ini
     }
 
     /// <summary>
-    /// Identifies if there are differences between the existing ini file and the template that needs to be applied during
-    /// the upgrade.
-    /// </summary>
-    /// <param name="version">The server package version.</param>
-    /// <returns><c>true</c> if the upgrade is required; otherwise, <c>false</c>.</returns>
-    public bool IsUpgradeIniFileRequired(Version version)
-    {
-      // Load the existing ini file into memory.
-      var oldIniFile = new IniFile(ConfigurationFile);
-
-      // Replace the existing ini file with a fresh one created from the template.
-      ProcessTemplate(true, false);
-
-      // Compare both ini files and identify if changes are needed for the existing file.
-      var templateBase = Path.Combine("", "my-template{0}.ini");
-      string templateFile = null;
-      if (version.Major >= 8
-          && version.Minor > 0)
-      {
-        templateFile = string.Format(templateBase, $"-{version.Major}.x");
-      }
-      else
-      {
-        templateFile = string.Format(templateBase, $"-{version.Major}.{version.Minor}");
-      }
-      
-      if (!File.Exists(templateFile))
-      {
-        return false;
-      }
-
-      var iniTemplateFile = new IniFile(templateFile);
-      return iniTemplateFile.Lines.FindAll(s => s.IniLineType == IniLineType.Section && !oldIniFile.SectionExists(s.Section)).Count > 0
-             || oldIniFile.Lines.FindAll(oldLine => DeprecatedVariablesForVersion.Any(dv => dv.Name.Equals(oldLine.Key, StringComparison.OrdinalIgnoreCase))).Count > 0
-             || iniTemplateFile.Lines.FindAll(newline =>
-                                                newline.IniLineType == IniLineType.KeyValuePair
-                                                | newline.IniLineType == IniLineType.Flag).Count > 0;
-    }
-
-    /// <summary>
     /// Recalculates the values for keys and adds new ones from the ini template.
+    /// <param name="skipExistingValues">If an ini file already exists, indicates if existing values should not be replaced with the ones in the template.</param>
+    /// <param name="updateDefaultPaths">Indicates if the default data directory and related paths should be updated.</param>
     /// </summary>
-    public void UpgradeIniFile(bool skipExistingValues = false)
+    public void UpgradeIniFile(bool skipExistingValues = false, bool updateDefaultPaths = false)
     {
       // Load the existing ini file into memory.
       IniFile oldIniFile = new IniFile(ConfigurationFile);
@@ -732,7 +695,16 @@ namespace MySql.Configurator.Core.Ini
         if (index >= 0)
         {
           // Skip replacement of existing variables if flag is set to true.
-          if (skipExistingValues)
+          if (skipExistingValues
+              && !updateDefaultPaths)
+          {
+            continue;
+          }
+
+          // Check for the need to update the default datadir or uploads folders during the upgrade.
+          if (updateDefaultPaths
+              && !oldIniFile.Lines[index].Key.Equals("datadir", StringComparison.InvariantCultureIgnoreCase)
+              && !oldIniFile.Lines[index].Key.Equals("secure-file-priv", StringComparison.InvariantCultureIgnoreCase))
           {
             continue;
           }

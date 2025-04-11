@@ -940,8 +940,9 @@ namespace MySql.Configurator.Core.Server
     /// </summary>
     /// <param name="template">The template containing the values to be saved into the configuration file.</param>
     /// <param name="skipExistingValues">If a configuration file already exists, indicates if the existing values
+    /// <param name="updateDefaultPaths">Indicates if the default data directory and related paths should be updated.</param>
     /// should be replaced with the re-calculated ones.</param>
-    public void Save(IniTemplate template, bool skipExistingValues = false)
+    public void Save(IniTemplate template, bool skipExistingValues = false, bool updateDefaultPaths = false)
     {
       if (!template.IsValid)
       {
@@ -975,7 +976,7 @@ namespace MySql.Configurator.Core.Server
       template.PluginLoad = string.IsNullOrEmpty(Plugins.ToString()) ? string.Empty : $"\"{Plugins}\"";
       template.MySqlXPort = MySqlXPort == 0 ? X_PROTOCOL_DEFAULT_PORT : MySqlXPort;
       template.NamedPipeFullAccessGroup = NamedPipeFullAccessGroup;
-      template.ProcessTemplate(false, true, skipExistingValues);
+      template.ProcessTemplate(false, true, skipExistingValues, updateDefaultPaths);
       SaveGeneralSettings();
     }
 
