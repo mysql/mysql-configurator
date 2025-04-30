@@ -701,7 +701,8 @@ namespace MySql.Configurator.Core.Ini
             continue;
           }
 
-          // Check for the need to update the default datadir or uploads folders during the upgrade.
+          // During an upgrade, if the data dir / uploads folder names are being renamed then we must skip updating these entries
+          // in the ini file because they have already been updated.
           if (updateDefaultPaths
               && !oldIniFile.Lines[index].Key.Equals("datadir", StringComparison.InvariantCultureIgnoreCase)
               && !oldIniFile.Lines[index].Key.Equals("secure-file-priv", StringComparison.InvariantCultureIgnoreCase))
