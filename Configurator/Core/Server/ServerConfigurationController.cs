@@ -221,9 +221,9 @@ namespace MySql.Configurator.Core.Server
     private ConfigurationStep _updateAuthenticationPluginStep;
 
     /// <summary>
-    /// The configuration step used for updating the enterprise firewall plugin.
+    /// The configuration step used for updating the enterprise firewall plugin/component.
     /// </summary>
-    private ConfigurationStep _updateEnterpriseFirewallPluginConfigStep;
+    private ConfigurationStep _updateEnterpriseFirewallConfigStep;
 
     /// <summary>
     /// The configuration step used for resetting the persisted variables.
@@ -615,12 +615,20 @@ namespace MySql.Configurator.Core.Server
                                                                     && IsThereServerDataFiles));
 
     /// <summary>
-    /// Gets or sets a value indicating whether the configuration step that updates the Enterprise Firewall plugin needs to run.
+    /// Gets or sets a value indicating whether the configuration step that updates Enterprise Firewall needs to run.
     /// </summary>
-    public bool IsUpdateEnterpriseFirewallPluginConfigurationStepNeeded => SupportsEnterpriseFirewallConfiguration
-                                                                           && OldSettings != null
-                                                                           && (Settings.Plugins.IsEnabled("mysql_firewall") && !OldSettings.Plugins.IsEnabled("mysql_firewall")
-                                                                               || !Settings.Plugins.IsEnabled("mysql_firewall") && OldSettings.Plugins.IsEnabled("mysql_firewall"));
+    public bool IsUpdateEnterpriseFirewallConfigurationStepNeeded => ServerInstallation.License == LicenseType.Commercial
+                                                                     && ((ConfigurationType == ConfigurationType.Upgrade
+                                                                          && Settings.UpgradeEnterpriseFirewall)
+                                                                         || (ConfigurationType == ConfigurationType.Configure
+                                                                             && Settings.EnableEnterpriseFirewall)
+                                                                         || (ConfigurationType == ConfigurationType.Reconfigure
+                                                                             && OldSettings != null
+                                                                             && (Settings.EnableEnterpriseFirewall != OldSettings.EnableEnterpriseFirewall
+                                                                                 || (Settings.UpgradeEnterpriseFirewall 
+                                                                                     && Settings.EnableEnterpriseFirewall)
+                                                                                 || (Settings.Plugins.IsEnabled("mysql_firewall") 
+                                                                                     != OldSettings.Plugins.IsEnabled("mysql_firewall")))));
 
     /// <summary>
     /// Gets a value indicating whether the configuration step that updates the database security needs to run.
@@ -765,12 +773,6 @@ namespace MySql.Configurator.Core.Server
     /// Gets or sets the statuses lists.
     /// </summary>
     public List<string> StatusesList { get; private set; }
-
-    /// <summary>
-    /// Gets a value indicating whether the Server supports Enterprise Firewall configuration.
-    /// </summary>
-    public bool SupportsEnterpriseFirewallConfiguration => ServerInstallation.License == LicenseType.Commercial
-                                                           && ServerVersion.ServerSupportsEnterpriseFirewall();
 
     /// <summary>
     /// Gets or sets the template that will be used during the server configuration.
@@ -1486,15 +1488,25 @@ namespace MySql.Configurator.Core.Server
       }
 
       // Upgrade pages.
-      Pages.Add(new ServerConfigBackupPage(this) { PageVisible = ConfigurationType == ConfigurationType.Upgrade });
       if (ConfigurationType == ConfigurationType.Upgrade)
       {
+        Pages.Add(new ServerConfigBackupPage(this));
+        if (ServerInstallation.License == LicenseType.Commercial)
+        {
+          Pages.Add(new ServerConfigEnterpriseFirewall(this));
+        }
+
         Pages.Add(new ServerConfigSecurityPage(this) { PageVisible = !ValidateServerFilesHaveRecommendedPermissions() });
         return;
       }
 
       // Configure configuration and reconfiguration pages.
       Pages.Add(new ServerConfigLocalMachinePage(this));
+      if (ServerInstallation.License == LicenseType.Commercial)
+      {
+        Pages.Add(new ServerConfigEnterpriseFirewall(this));
+      }
+
       Pages.Add(new ServerConfigNamedPipesPage(this) { PageVisible = Settings != null
                                                        && Settings.EnableNamedPipe});
       Pages.Add(new ServerConfigUserAccountsPage(this));
@@ -1523,7 +1535,7 @@ namespace MySql.Configurator.Core.Server
         //else if (step == _prepareAuthenticationPluginChangeStep) _prepareAuthenticationPluginChangeStep.Execute = DefaultAuthenticationPluginChanged;
         else if (step == _updateSecurityStep) _updateSecurityStep.Execute = IsUpdateSecurityConfigurationStepNeeded;
         else if (step == _updateUsersStep) _updateUsersStep.Execute = IsUpdateUsersConfigurationStepNeeded;
-        else if (step == _updateEnterpriseFirewallPluginConfigStep) _updateEnterpriseFirewallPluginConfigStep.Execute = IsUpdateEnterpriseFirewallPluginConfigurationStepNeeded;
+        else if (step == _updateEnterpriseFirewallConfigStep) _updateEnterpriseFirewallConfigStep.Execute = IsUpdateEnterpriseFirewallConfigurationStepNeeded;
         else if (step == _updateWindowsServiceStep) _updateWindowsServiceStep.Execute = IsUpdateWindowsServiceConfigurationStepNeeded;
         else if (step == _updateProcessStep) _updateProcessStep.Execute = IsUpdateProcessConfigurationStepNeeded;
         else if (step == _updateAccessPermissions) _updateAccessPermissions.Execute = IsUpdateServerFilesPermissionsStepNeeded;
@@ -1566,6 +1578,7 @@ namespace MySql.Configurator.Core.Server
       _stopExistingServerInstanceStep.Execute = !IsSameDirectoryUpgrade;
       _updateAccessPermissions.Execute = IsUpdateServerFilesPermissionsStepNeeded;
       _updateAuthenticationPluginStep.Execute = IsUpdateAuthenticationPluginStepNeeded;
+      _updateEnterpriseFirewallConfigStep.Execute = IsUpdateEnterpriseFirewallConfigurationStepNeeded;
       ConfigurationSteps = StandAloneServerSteps;
     }
 
@@ -2504,89 +2517,80 @@ namespace MySql.Configurator.Core.Server
     }
 
     /// <summary>
-    /// Installs the enterprise firewall plugin by running the installation script against the server.
+    /// Install the Enterprise Firewall component.
     /// </summary>
-    private void InstallEnterpriseFirewallPlugin()
+    /// <param name="serverInstance">The server instance used to connect to the server.</param>
+    private void InstallEnterpriseFirewallComponent(MySqlServerInstance serverInstance)
     {
-      CancellationToken.ThrowIfCancellationRequested();
-      ReportStatus(Resources.ServerConfigEventConfigureEnterpriseFirewallInfo);
-      string connectionString = GetConnectionString(MySqlServerUser.ROOT_USERNAME, Settings.RootPassword, false, "mysql");
       try
       {
-        // Read the install script from the share folder.
-        string firewallScript;
-        using (var reader = new StreamReader($"{InstallDirectory}\\share\\win_install_firewall.sql"))
+        ReportStatus(Resources.ServerConfigEnterpriseFirewallInstallingComponent);
+        var installScriptFileName = $"{InstallDirectory}\\share\\install_component_firewall.sql";
+        if (!File.Exists(installScriptFileName))
         {
-          firewallScript = reader.ReadToEnd();
-        }
-
-        if (string.IsNullOrEmpty(firewallScript))
-        {
-          ReportError(string.Format(Resources.ServerConfigEventConfigureEnterpriseFirewallError, Resources.InstallEnterpriseFirewallScriptNotFound));
+          ReportError(string.Format(Resources.ServerConfigEnterpriseFirewallScriptNotFound, installScriptFileName));
           CurrentStep.Status = ConfigurationStepStatus.Error;
           return;
         }
 
-        // Generate the uninstall script and execute it.
-        using (var connection = new MySqlConnection(connectionString))
+        string installScript;
+        using (var reader = new StreamReader(installScriptFileName))
         {
-          var uninstallScript = ConvertToUninstallScript("mysql", firewallScript);
-          var script = new MySqlScript
-          {
-            Connection = connection,
-            Query = uninstallScript
-          };
-          connection.Open();
-          script.Execute();
-          script.Query = Resources.UninstallEnterpriseFirewall;
-          script.Execute();
+          installScript = reader.ReadToEnd();
         }
 
-        // Execute the install scripts.
-        CancellationToken.ThrowIfCancellationRequested();
-        if (Settings.Plugins.IsEnabled("mysql_firewall"))
+        if (string.IsNullOrEmpty(installScript))
         {
-          using (var connection = new MySqlConnection(connectionString))
-          {
-            var script = new MySqlScript
-            {
-              Connection = connection,
-              Query = firewallScript
-            };
-            connection.Open();
-            script.Execute();
-            var command = new MySqlCommand
-            {
-              Connection = connection,
-              CommandText = "sp_set_firewall_mode",
-              CommandType = CommandType.StoredProcedure
-            };
-            command.Parameters.AddWithValue("@arg_userhost", "root@localhost");
-            command.Parameters.AddWithValue("@arg_mode", "RECORDING");
-            command.ExecuteNonQuery();
+          ReportError(string.Format(Resources.ServerConfigEnterpriseFirewallFailedToReadScript, installScriptFileName));
+          CurrentStep.Status = ConfigurationStepStatus.Error;
+          return;
+        }
 
-            foreach (var serverUser in Settings.NewServerUsers)
-            {
-              var cmdUser = new MySqlCommand
-              {
-                Connection = connection,
-                CommandText = "sp_set_firewall_mode",
-                CommandType = CommandType.StoredProcedure
-              };
-              cmdUser.Parameters.AddWithValue("@arg_userhost", $"{serverUser.Username}@{serverUser.Host}");
-              cmdUser.Parameters.AddWithValue("@arg_mode", "RECORDING");
-              cmdUser.ExecuteNonQuery();
-            }
-          }
+        serverInstance.ExecuteScripts("mysql", false, new[] { installScript });
+        Settings.EnterpriseFirewallComponentEnabled = true;
+        Settings.SaveGeneralSettings();
+        ReportStatus(Resources.ServerConfigEnterpriseFirewallInstallSuccess);
+        ReportStatus(Resources.ServerConfigEnterpriseFirewallConfigurationSuccess);
+        CurrentStep.Status = ConfigurationStepStatus.Finished;
+      }
+      catch (Exception exception)
+      {
+        ReportStatus(Resources.ServerConfigEnterpriseFirewallRevertingFailedInstall);
+        UninstallEnterpriseFirewall(serverInstance);
+        ReportError(string.Format(Resources.ServerConfigEnterpriseFirewallConfigurationError, exception.Message));
+        CurrentStep.Status = ConfigurationStepStatus.Error;
+      }
+    }
 
-          ReportStatus(Resources.ServerConfigEventConfigureEnterpriseFirewallSuccess);
-          CurrentStep.Status = ConfigurationStepStatus.Finished;
+    /// <summary>
+    /// Configures the enterprise firewall plugin/component by running the installation script against the server.
+    /// </summary>
+    private void ConfigureEnterpriseFirewall()
+    {
+      CancellationToken.ThrowIfCancellationRequested();
+      ReportStatus(Resources.ServerConfigEnterpriseFirewallConfigurationStart);
+      var serverInstance = new MySqlServerInstance(this, ReportStatus);
+      if (Settings.UpgradeEnterpriseFirewall
+          && (ConfigurationType == ConfigurationType.Upgrade
+              || ConfigurationType == ConfigurationType.Reconfigure))
+      {
+        UpgradeEnterpriseFirewallPlugin(serverInstance);
+      }
+      else if (ConfigurationType == ConfigurationType.Reconfigure)
+      {
+        if (Settings.EnableEnterpriseFirewall)
+        {
+          InstallEnterpriseFirewallComponent(serverInstance);
+        }
+        else
+        {
+          UninstallEnterpriseFirewall(serverInstance);
         }
       }
-      catch (Exception e)
+      else if (ConfigurationType == ConfigurationType.Configure
+               && Settings.EnableEnterpriseFirewall)
       {
-        ReportError(string.Format(Resources.ServerConfigEventConfigureEnterpriseFirewallError, e));
-        CurrentStep.Status = ConfigurationStepStatus.Error;
+        InstallEnterpriseFirewallComponent(serverInstance);
       }
     }
 
@@ -2609,7 +2613,7 @@ namespace MySql.Configurator.Core.Server
       _stopServerConfigurationStep = new ConfigurationStep(Resources.ServerStopProcessStep, 40, StopServerSafe);
       _updateAccessPermissions = new ConfigurationStep(Resources.ServerUpdateServerFilePermissions, 10, UpdateServerFilesPermissions, false, ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade);
       _updateAuthenticationPluginStep = new ConfigurationStep(Resources.ServerUpdateAuthenticationPluginStep, 10, UpdateAuthenticationPlugin, true, ConfigurationType.Upgrade);
-      _updateEnterpriseFirewallPluginConfigStep = new ConfigurationStep(Resources.ServerEnableEnterpriseFirewallStep, 45, InstallEnterpriseFirewallPlugin, true, ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade);
+      _updateEnterpriseFirewallConfigStep = new ConfigurationStep(Resources.ServerEnableEnterpriseFirewallStep, 45, ConfigureEnterpriseFirewall, false, ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade);
       _updateProcessStep = new ConfigurationStep(Resources.ServerAdjustProcessStep, 10, UpdateProcessSettings, true, ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade);
       _updateStartMenuLinksStep = new ConfigurationStep(Resources.ServerUpdateStartMenuLinkStep, 20, UpdateStartMenuLink, false, ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade);
       _updateSecurityStep = new ConfigurationStep(Resources.ServerApplySecurityStep, 20, UpdateSecurity, true, ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade);
@@ -2645,7 +2649,7 @@ namespace MySql.Configurator.Core.Server
         _startServerConfigurationStep,
         _updateSecurityStep,
         _updateUsersStep,
-        _updateEnterpriseFirewallPluginConfigStep,
+        _updateEnterpriseFirewallConfigStep,
         _updateStartMenuLinksStep,
         _createRemoveExampleDatabasesStep
       };
@@ -2669,6 +2673,7 @@ namespace MySql.Configurator.Core.Server
         _updateWindowsServiceStep,
         _startAndUpgradeServerConfigStep,
         _updateSecurityStep,
+        _updateEnterpriseFirewallConfigStep,
         _updateStartMenuLinksStep,
         _removeExistingServerInstallationStep
       };
@@ -3312,6 +3317,61 @@ namespace MySql.Configurator.Core.Server
     }
 
     /// <summary>
+    /// Uninstalls the Enterprise Firewall plugin/component.
+    /// </summary>
+    /// <param name="serverInstance">The server instance used to connect to the server.</param>
+    private void UninstallEnterpriseFirewall(MySqlServerInstance serverInstance)
+    {
+      var uninstallComponent = Settings.EnterpriseFirewallComponentEnabled;
+      var unistallScriptFileName = $"{InstallDirectory}\\share\\uninstall_{(uninstallComponent ? "component_" : string.Empty)}firewall.sql";
+      try
+      {
+        ReportStatus(string.Format(Resources.ServerConfigEnterpriseFirewallUninstalling, uninstallComponent ? "component" : "plugin"));
+        if (!File.Exists(unistallScriptFileName))
+        {
+          ReportError(string.Format(Resources.ServerConfigEnterpriseFirewallScriptNotFound, unistallScriptFileName));
+          CurrentStep.Status = ConfigurationStepStatus.Error;
+          return;
+        }
+
+        string uninstallScript;
+        using (var reader = new StreamReader(unistallScriptFileName))
+        {
+          uninstallScript = reader.ReadToEnd();
+        }
+
+        if (string.IsNullOrEmpty(uninstallScript))
+        {
+          ReportError(string.Format(Resources.ServerConfigEnterpriseFirewallFailedToReadScript, unistallScriptFileName));
+          CurrentStep.Status = ConfigurationStepStatus.Error;
+          return;
+        }
+
+        serverInstance.ExecuteScripts("mysql", false, new[] { uninstallScript });
+        if (uninstallComponent)
+        {
+          Settings.EnterpriseFirewallComponentEnabled = false;
+        }
+        else
+        {
+          Settings.EnterpriseFirewallEnabled = false;
+        }
+
+        Settings.SaveGeneralSettings();
+        ReportStatus(Resources.ServerConfigEnterpriseFirewallUninstallSuccess);
+        ReportStatus(Resources.ServerConfigEnterpriseFirewallConfigurationSuccess);
+        CurrentStep.Status = ConfigurationStepStatus.Finished;
+      }
+      catch (Exception exception)
+      {
+        ReportStatus(Resources.ServerConfigEnterpriseFirewallRevertingFailedUninstall);
+        InstallEnterpriseFirewallComponent(serverInstance);
+        ReportError(string.Format(Resources.ServerConfigEnterpriseFirewallConfigurationError, exception.Message));
+        CurrentStep.Status = ConfigurationStepStatus.Error;
+      }
+    }
+
+    /// <summary>
     /// Updates the authentication plugin of the root user to the default authentication plugin.
     /// </summary>
     private void UpdateAuthenticationPlugin()
@@ -3908,6 +3968,123 @@ namespace MySql.Configurator.Core.Server
           && Settings.MySqlXPort != 0)
       {
         CreateFirewallRule(Settings.MySqlXPort);
+      }
+    }
+
+    /// <summary>
+    /// Upgrades the Enterprise Firewall plugin to a component.
+    /// </summary>
+    /// <param name="serverInstance">The server instance used to connect to the server.</param>
+    private void UpgradeEnterpriseFirewallPlugin(MySqlServerInstance serverInstance)
+    {
+      try
+      {
+        ReportStatus(Resources.ServerConfigEnterpriseFirewallUpgradingPlugin);
+
+        // Disable plugins.
+        _settings.Plugins.Enable("mysql_firewall", false);
+        _settings.Plugins.Enable("mysql_firewall_users", false);
+        _settings.Plugins.Enable("mysql_firewall_whitelist", false);
+
+        // Perform upgrade.
+        var upgradeScriptFileName = $"{InstallDirectory}\\share\\firewall_plugin_to_component.sql";
+        if (!File.Exists(upgradeScriptFileName))
+        {
+          ReportError(string.Format(Resources.ServerConfigEnterpriseFirewallScriptNotFound, upgradeScriptFileName));
+          CurrentStep.Status = ConfigurationStepStatus.Error;
+          return;
+        }
+
+        string upgradeScript;
+        using (var reader = new StreamReader(upgradeScriptFileName))
+        {
+          upgradeScript = reader.ReadToEnd();
+        }
+
+        if (string.IsNullOrEmpty(upgradeScript))
+        {
+          ReportError(string.Format(Resources.ServerConfigEnterpriseFirewallConfigurationError, Resources.InstallEnterpriseFirewallScriptNotFound));
+          CurrentStep.Status = ConfigurationStepStatus.Error;
+          return;
+        }
+
+        using (var connection = new MySqlConnection(serverInstance.GetConnectionStringBuilder("mysql").ToString()))
+        {
+          connection.Open();
+
+          // Grant required permissions.
+          ReportStatus(Resources.ServerConfigEnterpriseFirewallSettingPermissions);
+          var command = new MySqlCommand();
+          command.Connection = connection;
+          command.CommandText = "GRANT FIREWALL_ADMIN ON *.* TO 'root'@'localhost';";
+          command.ExecuteNonQuery();
+          _revertController.EnterpriseFirewallPermissionsGranted = true;
+
+          // Update mode for users in RECORDING mode.
+          command.CommandText = "SELECT USERHOST FROM information_schema.mysql_firewall_users WHERE MODE='RECORDING';";
+          MySqlDataReader reader = command.ExecuteReader();
+          var users = new List<string>();
+          using(reader)
+          {
+            while (reader.Read())
+            {
+              users.Add(reader[0].ToString());
+            }
+          }
+
+          if (users.Count > 0)
+          {
+            ReportStatus(Resources.ServerConfigEnterpriseFirewallUpdatingUsersMode);
+            command.CommandType = CommandType.StoredProcedure;
+            command.CommandText = "sp_set_firewall_mode";
+            foreach (var user in users)
+            {
+              command.Parameters.Clear();
+              command.Parameters.AddWithValue("@arg_userhost", user);
+              command.Parameters.AddWithValue("@arg_mode", "DETECTING");
+              command.ExecuteNonQuery();
+            }
+
+            _revertController.EnterpriseFirewallUsersModeUpdated = true;
+          }
+
+          // Execute script.
+          ReportStatus(Resources.ServerConfigEnterpriseFirewallExecutingUpgradeScript);
+          serverInstance.ExecuteScripts("mysql", false, new[] { upgradeScript });
+          _revertController.EnterpriseFirewallUpgradeScriptExecuted = true;
+
+          // Reset mode for the new groups.
+          if (users.Count > 0)
+          {
+            ReportStatus(Resources.ServerConfigEnterpriseFirewallRevertingMode);
+            command.CommandType = CommandType.StoredProcedure;
+            command.CommandText = "sp_set_firewall_group_mode";
+            foreach (var user in users)
+            {
+              command.Parameters.Clear();
+              command.Parameters.AddWithValue("@arg_group_name", user);
+              command.Parameters.AddWithValue("@arg_mode", "RECORDING");
+              command.ExecuteNonQuery();
+            }
+
+            _revertController.EnterpriseFirewallGroupsModeReverted = true;
+          }
+        }
+
+        // Restart server for the component to be enabled.
+        RestartServer(false);
+
+        Settings.EnterpriseFirewallComponentEnabled = true;
+        Settings.SaveGeneralSettings();
+        ReportStatus(Resources.ServerConfigEnterpriseFirewallUpgradeSuccess);
+        ReportStatus(Resources.ServerConfigEnterpriseFirewallConfigurationSuccess);
+        CurrentStep.Status = ConfigurationStepStatus.Finished;
+      }
+      catch (Exception exception)
+      {
+        RevertedSteps = _revertController.RollbackEnterpriseFirewallUpgrade(Settings, serverInstance);
+        ReportError(string.Format(Resources.ServerConfigEnterpriseFirewallConfigurationError, exception.Message));
+        CurrentStep.Status = ConfigurationStepStatus.Error;
       }
     }
 

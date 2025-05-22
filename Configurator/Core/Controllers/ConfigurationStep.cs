@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -50,7 +50,7 @@ namespace MySql.Configurator.Core.Controllers
     /// <param name="required">Flag indicating whether the whole configuration fails if this <see cref="ConfigurationStep"/> fails.</param>
     /// <param name="configurationType">The <see cref="ConfigurationType"/> this step applies to.</param>
     public ConfigurationStep(string description, int time, StepDelegate method, bool required, ConfigurationType configurationType) :
-      base(description, time, method, true)
+      base(description, time, method, required)
     {
       ConfigurationType = configurationType;
     }

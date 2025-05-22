@@ -126,4 +126,12 @@
   <metadata name="ValidationsErrorProvider.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>338, 17</value>
   </metadata>
+  <data name="UpgradeEnterpriseFirewallDescriptionLabel.Text" xml:space="preserve">
+    <value>The MySQL Enterprise Firewall plugin has been deprecated and will continue to exist as a
+component going forward. MySQL Configurator can perform this upgrade for you if required.
+Select the check box below to upgrade MySQL Enterprise Firewall to a component.</value>
+  </data>
+  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>63</value>
+  </metadata>
 </root>

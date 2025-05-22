@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -81,17 +81,6 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       ShowAdvancedLoggingOptionsCheckBox.Checked = _controller.ShowAdvancedOptions;
       HandleAdvancedOptions(_controller.ShowAdvancedOptions);
 
-      if (_controller.ConfigurationType == ConfigurationType.Configure || _controller.ConfigurationType == ConfigurationType.Reconfigure)
-      {
-        var supportsEnterpriseFirewallConfiguration = _controller.SupportsEnterpriseFirewallConfiguration;
-        EnterpriseFirewallCheckBox.Visible = supportsEnterpriseFirewallConfiguration;
-        EnterpriseFirewallCheckBox.Checked = EnterpriseFirewallCheckBox.Enabled
-                                             && _settings.Plugins.IsEnabled("mysql_firewall");
-        ToolTip.SetToolTip(EnterpriseFirewallCheckBox, EnterpriseFirewallCheckBox.Enabled ? string.Empty : Resources.ServerConfigEnterpriseFirewallNotSupportedWithInnoDbCluster);
-        EnterpriseFirewallDescription.Visible = supportsEnterpriseFirewallConfiguration;
-        EnterpriseFirewallTitleLabel.Visible = supportsEnterpriseFirewallConfiguration;
-        EnterpriseFirewallLinkLabel.Visible = supportsEnterpriseFirewallConfiguration;
-      }
       XProtocolPortPanel.Visible = _controller.ServerVersion.ServerSupportsXProtocol();
       OpenWindowsFirewallCheckBox.Text = XProtocolPortPanel.Visible ? Resources.OpenFirewallPorts : Resources.OpenFirewallPort;
       SetDefaultOptions();
@@ -138,12 +127,6 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       _settings.SharedMemoryName = SharedMemoryNameTextBox.Text.Trim();
 
       Logger.LogInformation($"Advancing to next step using:\n\tService Name: {_settings.ServiceName}\n\tEnable TCP/IP: {TcpIpCheckBox.Checked}\n\tPort: {_settings.Port}\n\tEnable pipe: {NamedPipeCheckBox.Checked}\n\tPipe name: {PipeNameTextBox.Text.Trim()}\n\tEnable shared memory: {SharedMemoryCheckBox.Checked}\n\tMemory name {SharedMemoryNameTextBox.Text.Trim()}");
-
-      var enable = EnterpriseFirewallCheckBox.Checked;
-      _settings.Plugins.Enable("mysql_firewall", enable);
-      _settings.Plugins.Enable("mysql_firewall_users", enable);
-      _settings.Plugins.Enable("mysql_firewall_whitelist", enable);
-      _settings.EnterpriseFirewallEnabled = enable;
 
       // Enable de Named Pipe configuration page if required.
       var namedPipesPage = _controller.Pages.FirstOrDefault(page => page is ServerConfigNamedPipesPage);

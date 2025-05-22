@@ -151,9 +151,10 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
           _controller.ConfigurationType = ConfigurationType.Upgrade;
           var dataDirectory = new DirectoryInfo(ExistingDataDirectoryTextBox.Text);
           _controller.Settings.DataDirectory = dataDirectory.Parent.FullName;
-          _controller.Settings.ExistingRootPassword = RootPasswordTextBox.Text;
+          _controller.Settings.RootPassword = RootPasswordTextBox.Text;
           _controller.Settings.IniDirectory = new FileInfo(ExistingConfigFilePathTextBox.Text).DirectoryName;
           _controller.Settings.ErrorLogFileName = oldController.Settings.ErrorLogFileName;
+          _controller.Settings.LoadGeneralSettings(_existingServerInstallationInstance.Controller.Settings.GeneralSettingsFilePath);
 
           // Check if the error log file is in the default path, and if so update the path to the new version.
           var pathToErrorFile = Path.GetDirectoryName(_controller.Settings.ErrorLogFileName);
@@ -338,6 +339,14 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
           continue;
         }
 
+        if (configPage is ServerConfigEnterpriseFirewall)
+        {
+          configPage.PageVisible = _existingServerInstallationInstance.Controller.Settings.EnterpriseFirewallEnabled;
+          var enterpriseFirewallPage = configPage as ServerConfigEnterpriseFirewall;
+          enterpriseFirewallPage.UpdateControls();
+          continue;
+        }
+
         if (!_originalPagesVisibility.ContainsKey(configPage))
         {
           _originalPagesVisibility.Add(configPage, configPage.PageVisible);
@@ -501,6 +510,8 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       {
         _existingServerInstallationInstance.Controller.ServerVersion = _existingServerInstallationInstance.ServerVersion;
         _existingServerInstallationInstance.Controller.ServerInstallation.VersionString = _existingServerInstallationInstance.Controller.ServerVersion.ToString();
+        _existingServerInstallationInstance.Controller.Settings.InstallDirectory = _existingServerInstallationInstance.BaseDir;
+        _existingServerInstallationInstance.Controller.Settings.LoadGeneralSettings();
       }
 
       if (!string.IsNullOrEmpty(_existingServerInstallationInstance.BaseDir))

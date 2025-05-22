@@ -284,6 +284,12 @@
     <Compile Include="UI\Wizards\ConfigWizardPage.Designer.cs">
       <DependentUpon>ConfigWizardPage.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigEnterpriseFirewall.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UI\Wizards\ServerConfigPages\ServerConfigEnterpriseFirewall.Designer.cs">
+      <DependentUpon>ServerConfigEnterpriseFirewall.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\Wizards\WizardPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -520,6 +526,10 @@
     <EmbeddedResource Include="UI\Wizards\ConfigWizardPage.resx">
       <DependentUpon>ConfigWizardPage.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\Wizards\ServerConfigPages\ServerConfigEnterpriseFirewall.resx">
+      <DependentUpon>ServerConfigEnterpriseFirewall.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\Wizards\WizardPage.resx">
       <DependentUpon>WizardPage.cs</DependentUpon>
     </EmbeddedResource>
@@ -691,7 +701,6 @@
     <None Include="Resources\logo.png" />
     <None Include="Resources\Server_Reflection.png" />
     <None Include="Resources\ServerCategoryIcon.png" />
-    <EmbeddedResource Include="Resources\UninstallEnterpriseFirewall.sql" />
     <EmbeddedResource Include="Resources\user-roles.xml" />
     <None Include="Resources\ok_sign.png" />
     <EmbeddedResource Include="Resources\MySql.Data.dll" />

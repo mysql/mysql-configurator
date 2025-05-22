@@ -3177,6 +3177,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to revert the changes made when upgrading the Enterprise Firewall plugin. Manual internvention is required..
+        /// </summary>
+        public static string ServerConfigEFUpgradeRevertFailed {
+            get {
+                return ResourceManager.GetString("ServerConfigEFUpgradeRevertFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Empty or blank passwords are considered insecure.
         ///Provide a more complex password for stronger security..
         /// </summary>
@@ -3196,11 +3205,191 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MySQL Enterprise Firewall is not currently supported when setting up InnoDB Cluster..
+        ///   Looks up a localized string similar to Failed to configure MySQL Enterprise Firewall. Manual interventon may be required. The error is: {0}.
         /// </summary>
-        public static string ServerConfigEnterpriseFirewallNotSupportedWithInnoDbCluster {
+        public static string ServerConfigEnterpriseFirewallConfigurationError {
             get {
-                return ResourceManager.GetString("ServerConfigEnterpriseFirewallNotSupportedWithInnoDbCluster", resourceCulture);
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallConfigurationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attempting to configure MySQL Enterprise Firewall.
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallConfigurationStart {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallConfigurationStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configured MySQL Enterprise Firewall.
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallConfigurationSuccess {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallConfigurationSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Executing revert upgrade script....
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallExecutingRevertScript {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallExecutingRevertScript", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Executing upgrade script....
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallExecutingUpgradeScript {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallExecutingUpgradeScript", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to read the &apos;{0}&apos; script..
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallFailedToReadScript {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallFailedToReadScript", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installing the Enterprise Firewall component....
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallInstallingComponent {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallInstallingComponent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully installed the Enterprise Firewall..
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallInstallSuccess {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallInstallSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to install EF component. Attempting to revert the change....
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallRevertingFailedInstall {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallRevertingFailedInstall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to uninstall EF component. Attempting to revert the change....
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallRevertingFailedUninstall {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallRevertingFailedUninstall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reverting groups to &apos;RECORDING&apos; mode....
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallRevertingMode {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallRevertingMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating users in &apos;DETECTING&apos; mode....
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallRevertingUsersMode {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallRevertingUsersMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Revoking Enterprise Firewall permissions from root account....
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallRevokingPermissions {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallRevokingPermissions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The script &apos;{0}&apos; was not found. Repair your server installation and retry..
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallScriptNotFound {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallScriptNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Granting required permissions to root account....
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallSettingPermissions {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallSettingPermissions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uninstalling the Enterprise Firewall {0}....
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallUninstalling {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallUninstalling", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully uninstalled the Enterprise Firewall..
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallUninstallSuccess {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallUninstallSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating groups in &apos;RECORDING&apos; mode....
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallUpdatingGroupsMode {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallUpdatingGroupsMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating users in &apos;RECORDING&apos; mode....
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallUpdatingUsersMode {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallUpdatingUsersMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully upgraded the Enterprise Firewall..
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallUpgradeSuccess {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallUpgradeSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upgrading the Enterprise Firewall plugin to a component....
+        /// </summary>
+        public static string ServerConfigEnterpriseFirewallUpgradingPlugin {
+            get {
+                return ResourceManager.GetString("ServerConfigEnterpriseFirewallUpgradingPlugin", resourceCulture);
             }
         }
         
@@ -3228,33 +3417,6 @@ namespace MySql.Configurator.Properties {
         public static string ServerConfigEventAddNewUsersSuccess {
             get {
                 return ResourceManager.GetString("ServerConfigEventAddNewUsersSuccess", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to configure MySQL Enterprise Firewall.  The error is:.
-        /// </summary>
-        public static string ServerConfigEventConfigureEnterpriseFirewallError {
-            get {
-                return ResourceManager.GetString("ServerConfigEventConfigureEnterpriseFirewallError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Attempting to configure MySQL Enterprise Firewall.
-        /// </summary>
-        public static string ServerConfigEventConfigureEnterpriseFirewallInfo {
-            get {
-                return ResourceManager.GetString("ServerConfigEventConfigureEnterpriseFirewallInfo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Configured MySQL Enterprise Firewall.
-        /// </summary>
-        public static string ServerConfigEventConfigureEnterpriseFirewallSuccess {
-            get {
-                return ResourceManager.GetString("ServerConfigEventConfigureEnterpriseFirewallSuccess", resourceCulture);
             }
         }
         
@@ -4322,7 +4484,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Updating MySQL Enterprise Firewall plugin.
+        ///   Looks up a localized string similar to Updating MySQL Enterprise Firewall.
         /// </summary>
         public static string ServerEnableEnterpriseFirewallStep {
             get {
@@ -5063,24 +5225,6 @@ namespace MySql.Configurator.Properties {
         public static string UnhandledExceptionText {
             get {
                 return ResourceManager.GetString("UnhandledExceptionText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to # Copyright (c) 2016, 2020, Oracle and/or its affiliates.
-        ///# Uninstall firewall tables, functions and procedures.
-        ///USE mysql;
-        ///DELIMITER //
-        ///CREATE PROCEDURE uninstall_enterprise_firewall()
-        ///BEGIN
-        ///set @m1 = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_NAME = &apos;MYSQL_FIREWALL_USERS&apos;);
-        ///set @m2 = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_NAME = &apos;MYSQL_FIREWALL_WHITELIST&apos;);
-        ///set @m3 = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_NAME = &apos;MYSQL_FIREWALL&apos;);
-        ///I [rest of string was truncated]&quot;;.
-        /// </summary>
-        public static string UninstallEnterpriseFirewall {
-            get {
-                return ResourceManager.GetString("UninstallEnterpriseFirewall", resourceCulture);
             }
         }
         

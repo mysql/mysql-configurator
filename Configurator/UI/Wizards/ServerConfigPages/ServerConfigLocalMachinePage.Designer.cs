@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -73,10 +73,6 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.PipeNameTextBox = new System.Windows.Forms.TextBox();
       this.SharedMemoryNameLabel = new System.Windows.Forms.Label();
       this.SharedMemoryNameTextBox = new System.Windows.Forms.TextBox();
-      this.EnterpriseFirewallCheckBox = new System.Windows.Forms.CheckBox();
-      this.EnterpriseFirewallDescription = new System.Windows.Forms.Label();
-      this.EnterpriseFirewallTitleLabel = new System.Windows.Forms.Label();
-      this.EnterpriseFirewallLinkLabel = new System.Windows.Forms.LinkLabel();
       this.PortPanel = new System.Windows.Forms.FlowLayoutPanel();
       this.PipeNamePanel = new System.Windows.Forms.FlowLayoutPanel();
       this.MemoryNamePanel = new System.Windows.Forms.FlowLayoutPanel();
@@ -107,9 +103,9 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.ServerConfigurationTypeLabel.AccessibleName = "Server Type Text";
       this.ServerConfigurationTypeLabel.AutoSize = true;
       this.ServerConfigurationTypeLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-      this.ServerConfigurationTypeLabel.Location = new System.Drawing.Point(27, 66);
+      this.ServerConfigurationTypeLabel.Location = new System.Drawing.Point(27, 79);
       this.ServerConfigurationTypeLabel.Name = "ServerConfigurationTypeLabel";
-      this.ServerConfigurationTypeLabel.Size = new System.Drawing.Size(153, 15);
+      this.ServerConfigurationTypeLabel.Size = new System.Drawing.Size(236, 25);
       this.ServerConfigurationTypeLabel.TabIndex = 2;
       this.ServerConfigurationTypeLabel.Text = "Server Configuration Type";
       // 
@@ -119,7 +115,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.ServerConfigurationTypeDescriptionLabel.AccessibleName = "Server Type Description";
       this.ServerConfigurationTypeDescriptionLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.ServerConfigurationTypeDescriptionLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(102)))), ((int)(((byte)(102)))), ((int)(((byte)(102)))));
-      this.ServerConfigurationTypeDescriptionLabel.Location = new System.Drawing.Point(27, 88);
+      this.ServerConfigurationTypeDescriptionLabel.Location = new System.Drawing.Point(27, 101);
       this.ServerConfigurationTypeDescriptionLabel.Name = "ServerConfigurationTypeDescriptionLabel";
       this.ServerConfigurationTypeDescriptionLabel.Size = new System.Drawing.Size(520, 35);
       this.ServerConfigurationTypeDescriptionLabel.TabIndex = 3;
@@ -133,9 +129,9 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.ConfigTypeLabel.AccessibleName = "Configuration Type Text";
       this.ConfigTypeLabel.AutoSize = true;
       this.ConfigTypeLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.ConfigTypeLabel.Location = new System.Drawing.Point(27, 129);
+      this.ConfigTypeLabel.Location = new System.Drawing.Point(27, 142);
       this.ConfigTypeLabel.Name = "ConfigTypeLabel";
-      this.ConfigTypeLabel.Size = new System.Drawing.Size(74, 15);
+      this.ConfigTypeLabel.Size = new System.Drawing.Size(111, 25);
       this.ConfigTypeLabel.TabIndex = 4;
       this.ConfigTypeLabel.Text = "Config Type:";
       // 
@@ -148,7 +144,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.PortLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.PortLabel.Location = new System.Drawing.Point(3, 0);
       this.PortLabel.Name = "PortLabel";
-      this.PortLabel.Size = new System.Drawing.Size(32, 29);
+      this.PortLabel.Size = new System.Drawing.Size(48, 37);
       this.PortLabel.TabIndex = 0;
       this.PortLabel.Text = "Port:";
       this.PortLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -160,7 +156,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.ConnectivityDescriptionLabel.AccessibleName = "Connectivity Description";
       this.ConnectivityDescriptionLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.ConnectivityDescriptionLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(102)))), ((int)(((byte)(102)))), ((int)(((byte)(102)))));
-      this.ConnectivityDescriptionLabel.Location = new System.Drawing.Point(27, 185);
+      this.ConnectivityDescriptionLabel.Location = new System.Drawing.Point(27, 212);
       this.ConnectivityDescriptionLabel.Name = "ConnectivityDescriptionLabel";
       this.ConnectivityDescriptionLabel.Size = new System.Drawing.Size(512, 21);
       this.ConnectivityDescriptionLabel.TabIndex = 7;
@@ -172,9 +168,9 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.PortTextBox.AccessibleDescription = "A text box to input the TCP IP port number";
       this.PortTextBox.AccessibleName = "Port Number";
       this.PortTextBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.PortTextBox.Location = new System.Drawing.Point(41, 3);
+      this.PortTextBox.Location = new System.Drawing.Point(57, 3);
       this.PortTextBox.Name = "PortTextBox";
-      this.PortTextBox.Size = new System.Drawing.Size(44, 23);
+      this.PortTextBox.Size = new System.Drawing.Size(44, 31);
       this.PortTextBox.TabIndex = 1;
       this.PortTextBox.Text = "3306";
       this.ToolTip.SetToolTip(this.PortTextBox, "MySQL Client/Server Protocol Port");
@@ -199,10 +195,10 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.ConfigTypeComboBox.FormattingEnabled = true;
       this.ConfigTypeComboBox.ImageMargin = new System.Windows.Forms.Padding(3);
       this.ConfigTypeComboBox.IntegralHeight = false;
-      this.ConfigTypeComboBox.Location = new System.Drawing.Point(106, 124);
+      this.ConfigTypeComboBox.Location = new System.Drawing.Point(106, 137);
       this.ConfigTypeComboBox.MaxDropDownItems = 3;
       this.ConfigTypeComboBox.Name = "ConfigTypeComboBox";
-      this.ConfigTypeComboBox.Size = new System.Drawing.Size(418, 24);
+      this.ConfigTypeComboBox.Size = new System.Drawing.Size(418, 32);
       this.ConfigTypeComboBox.TabIndex = 5;
       this.ConfigTypeComboBox.TitleFont = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
       this.ConfigTypeComboBox.TitleForeColor = System.Drawing.SystemColors.WindowText;
@@ -215,9 +211,9 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.ShowAdvancedLoggingOptionsCheckBox.AccessibleName = "Show Advanced And Logging Options";
       this.ShowAdvancedLoggingOptionsCheckBox.AutoSize = true;
       this.ShowAdvancedLoggingOptionsCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.ShowAdvancedLoggingOptionsCheckBox.Location = new System.Drawing.Point(56, 379);
+      this.ShowAdvancedLoggingOptionsCheckBox.Location = new System.Drawing.Point(56, 421);
       this.ShowAdvancedLoggingOptionsCheckBox.Name = "ShowAdvancedLoggingOptionsCheckBox";
-      this.ShowAdvancedLoggingOptionsCheckBox.Size = new System.Drawing.Size(226, 19);
+      this.ShowAdvancedLoggingOptionsCheckBox.Size = new System.Drawing.Size(341, 29);
       this.ShowAdvancedLoggingOptionsCheckBox.TabIndex = 18;
       this.ShowAdvancedLoggingOptionsCheckBox.Text = "Show Advanced and Logging Options";
       this.ShowAdvancedLoggingOptionsCheckBox.UseVisualStyleBackColor = true;
@@ -230,12 +226,12 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.AdvancedConfigurationDescriptionLabel.AccessibleName = "Show Advanced And Logging Options Description";
       this.AdvancedConfigurationDescriptionLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.AdvancedConfigurationDescriptionLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(102)))), ((int)(((byte)(102)))), ((int)(((byte)(102)))));
-      this.AdvancedConfigurationDescriptionLabel.Location = new System.Drawing.Point(27, 342);
+      this.AdvancedConfigurationDescriptionLabel.Location = new System.Drawing.Point(27, 384);
       this.AdvancedConfigurationDescriptionLabel.Name = "AdvancedConfigurationDescriptionLabel";
       this.AdvancedConfigurationDescriptionLabel.Size = new System.Drawing.Size(506, 34);
       this.AdvancedConfigurationDescriptionLabel.TabIndex = 17;
-      this.AdvancedConfigurationDescriptionLabel.Text = "Select the check box below to get additional configuration pages where you can se" +
-    "t advanced and logging options for this server instance.";
+      this.AdvancedConfigurationDescriptionLabel.Text = "Select the checkbox below to get additional configuration pages where you can set" +
+    " advanced and logging options for this server instance.";
       // 
       // AdvancedConfigurationLabel
       // 
@@ -243,9 +239,9 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.AdvancedConfigurationLabel.AccessibleName = "Advanced Configuration Text";
       this.AdvancedConfigurationLabel.AutoSize = true;
       this.AdvancedConfigurationLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-      this.AdvancedConfigurationLabel.Location = new System.Drawing.Point(27, 319);
+      this.AdvancedConfigurationLabel.Location = new System.Drawing.Point(27, 361);
       this.AdvancedConfigurationLabel.Name = "AdvancedConfigurationLabel";
-      this.AdvancedConfigurationLabel.Size = new System.Drawing.Size(141, 15);
+      this.AdvancedConfigurationLabel.Size = new System.Drawing.Size(220, 25);
       this.AdvancedConfigurationLabel.TabIndex = 16;
       this.AdvancedConfigurationLabel.Text = "Advanced Configuration";
       // 
@@ -257,9 +253,9 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.OpenWindowsFirewallCheckBox.Checked = true;
       this.OpenWindowsFirewallCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
       this.OpenWindowsFirewallCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.OpenWindowsFirewallCheckBox.Location = new System.Drawing.Point(76, 234);
+      this.OpenWindowsFirewallCheckBox.Location = new System.Drawing.Point(76, 261);
       this.OpenWindowsFirewallCheckBox.Name = "OpenWindowsFirewallCheckBox";
-      this.OpenWindowsFirewallCheckBox.Size = new System.Drawing.Size(281, 19);
+      this.OpenWindowsFirewallCheckBox.Size = new System.Drawing.Size(423, 29);
       this.OpenWindowsFirewallCheckBox.TabIndex = 11;
       this.OpenWindowsFirewallCheckBox.Text = "Open Windows Firewall ports for network access";
       this.OpenWindowsFirewallCheckBox.UseVisualStyleBackColor = true;
@@ -270,9 +266,9 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.ConnectivityLabel.AccessibleName = "Connectivity Text";
       this.ConnectivityLabel.AutoSize = true;
       this.ConnectivityLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-      this.ConnectivityLabel.Location = new System.Drawing.Point(27, 162);
+      this.ConnectivityLabel.Location = new System.Drawing.Point(27, 189);
       this.ConnectivityLabel.Name = "ConnectivityLabel";
-      this.ConnectivityLabel.Size = new System.Drawing.Size(77, 15);
+      this.ConnectivityLabel.Size = new System.Drawing.Size(119, 25);
       this.ConnectivityLabel.TabIndex = 6;
       this.ConnectivityLabel.Text = "Connectivity";
       // 
@@ -284,9 +280,9 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.TcpIpCheckBox.Checked = true;
       this.TcpIpCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
       this.TcpIpCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.TcpIpCheckBox.Location = new System.Drawing.Point(56, 209);
+      this.TcpIpCheckBox.Location = new System.Drawing.Point(56, 236);
       this.TcpIpCheckBox.Name = "TcpIpCheckBox";
-      this.TcpIpCheckBox.Size = new System.Drawing.Size(62, 19);
+      this.TcpIpCheckBox.Size = new System.Drawing.Size(89, 29);
       this.TcpIpCheckBox.TabIndex = 8;
       this.TcpIpCheckBox.Text = "TCP/IP";
       this.TcpIpCheckBox.UseVisualStyleBackColor = true;
@@ -300,9 +296,9 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.NamedPipeCheckBox.Checked = true;
       this.NamedPipeCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
       this.NamedPipeCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.NamedPipeCheckBox.Location = new System.Drawing.Point(56, 259);
+      this.NamedPipeCheckBox.Location = new System.Drawing.Point(56, 286);
       this.NamedPipeCheckBox.Name = "NamedPipeCheckBox";
-      this.NamedPipeCheckBox.Size = new System.Drawing.Size(91, 19);
+      this.NamedPipeCheckBox.Size = new System.Drawing.Size(135, 29);
       this.NamedPipeCheckBox.TabIndex = 12;
       this.NamedPipeCheckBox.Text = "Named Pipe";
       this.NamedPipeCheckBox.UseVisualStyleBackColor = true;
@@ -316,9 +312,9 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.SharedMemoryCheckBox.Checked = true;
       this.SharedMemoryCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
       this.SharedMemoryCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.SharedMemoryCheckBox.Location = new System.Drawing.Point(56, 288);
+      this.SharedMemoryCheckBox.Location = new System.Drawing.Point(56, 315);
       this.SharedMemoryCheckBox.Name = "SharedMemoryCheckBox";
-      this.SharedMemoryCheckBox.Size = new System.Drawing.Size(110, 19);
+      this.SharedMemoryCheckBox.Size = new System.Drawing.Size(165, 29);
       this.SharedMemoryCheckBox.TabIndex = 14;
       this.SharedMemoryCheckBox.Text = "Shared Memory";
       this.SharedMemoryCheckBox.UseVisualStyleBackColor = true;
@@ -333,7 +329,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.PipeNameLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.PipeNameLabel.Location = new System.Drawing.Point(3, 0);
       this.PipeNameLabel.Name = "PipeNameLabel";
-      this.PipeNameLabel.Size = new System.Drawing.Size(68, 29);
+      this.PipeNameLabel.Size = new System.Drawing.Size(102, 37);
       this.PipeNameLabel.TabIndex = 0;
       this.PipeNameLabel.Text = "Pipe Name:";
       this.PipeNameLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -345,9 +341,9 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.PipeNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.PipeNameTextBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.PipeNameTextBox.Location = new System.Drawing.Point(77, 3);
+      this.PipeNameTextBox.Location = new System.Drawing.Point(111, 3);
       this.PipeNameTextBox.Name = "PipeNameTextBox";
-      this.PipeNameTextBox.Size = new System.Drawing.Size(241, 23);
+      this.PipeNameTextBox.Size = new System.Drawing.Size(241, 31);
       this.PipeNameTextBox.TabIndex = 1;
       this.PipeNameTextBox.WordWrap = false;
       this.PipeNameTextBox.TextChanged += new System.EventHandler(this.TextChangedHandler);
@@ -362,7 +358,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.SharedMemoryNameLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.SharedMemoryNameLabel.Location = new System.Drawing.Point(3, 0);
       this.SharedMemoryNameLabel.Name = "SharedMemoryNameLabel";
-      this.SharedMemoryNameLabel.Size = new System.Drawing.Size(90, 29);
+      this.SharedMemoryNameLabel.Size = new System.Drawing.Size(135, 37);
       this.SharedMemoryNameLabel.TabIndex = 0;
       this.SharedMemoryNameLabel.Text = "Memory Name:";
       this.SharedMemoryNameLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -374,71 +370,13 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.SharedMemoryNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.SharedMemoryNameTextBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.SharedMemoryNameTextBox.Location = new System.Drawing.Point(99, 3);
+      this.SharedMemoryNameTextBox.Location = new System.Drawing.Point(144, 3);
       this.SharedMemoryNameTextBox.Name = "SharedMemoryNameTextBox";
-      this.SharedMemoryNameTextBox.Size = new System.Drawing.Size(241, 23);
+      this.SharedMemoryNameTextBox.Size = new System.Drawing.Size(241, 31);
       this.SharedMemoryNameTextBox.TabIndex = 1;
       this.SharedMemoryNameTextBox.WordWrap = false;
       this.SharedMemoryNameTextBox.TextChanged += new System.EventHandler(this.TextChangedHandler);
       this.SharedMemoryNameTextBox.Validated += new System.EventHandler(this.ValidatedHandler);
-      // 
-      // EnterpriseFirewallCheckBox
-      // 
-      this.EnterpriseFirewallCheckBox.AccessibleDescription = "A check box to enable MySQL Enterprise Firewall";
-      this.EnterpriseFirewallCheckBox.AccessibleName = "Enable Enterprise Firewall";
-      this.EnterpriseFirewallCheckBox.AutoSize = true;
-      this.EnterpriseFirewallCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.EnterpriseFirewallCheckBox.Location = new System.Drawing.Point(56, 470);
-      this.EnterpriseFirewallCheckBox.Name = "EnterpriseFirewallCheckBox";
-      this.EnterpriseFirewallCheckBox.Size = new System.Drawing.Size(200, 19);
-      this.EnterpriseFirewallCheckBox.TabIndex = 21;
-      this.EnterpriseFirewallCheckBox.Text = "Enable MySQL Enterprise Firewall";
-      this.EnterpriseFirewallCheckBox.UseVisualStyleBackColor = true;
-      this.EnterpriseFirewallCheckBox.Visible = false;
-      // 
-      // EnterpriseFirewallDescription
-      // 
-      this.EnterpriseFirewallDescription.AccessibleDescription = "A label displaying an explanatory text about the MySQL Enterprise Firewall";
-      this.EnterpriseFirewallDescription.AccessibleName = "Enterprise Firewall Description";
-      this.EnterpriseFirewallDescription.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.EnterpriseFirewallDescription.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(102)))), ((int)(((byte)(102)))), ((int)(((byte)(102)))));
-      this.EnterpriseFirewallDescription.Location = new System.Drawing.Point(27, 432);
-      this.EnterpriseFirewallDescription.Name = "EnterpriseFirewallDescription";
-      this.EnterpriseFirewallDescription.Size = new System.Drawing.Size(506, 34);
-      this.EnterpriseFirewallDescription.TabIndex = 20;
-      this.EnterpriseFirewallDescription.Text = "Select the check box below to enable MySQL Enterprise Firewall, a security whitel" +
-    "ist that offers protection from cyber attacks. Additional post installation conf" +
-    "iguration is necessary.";
-      this.EnterpriseFirewallDescription.Visible = false;
-      // 
-      // EnterpriseFirewallTitleLabel
-      // 
-      this.EnterpriseFirewallTitleLabel.AccessibleDescription = "A label displaying the text MySQL Enterprise Firewall";
-      this.EnterpriseFirewallTitleLabel.AccessibleName = "Enterprise Firewall Text";
-      this.EnterpriseFirewallTitleLabel.AutoSize = true;
-      this.EnterpriseFirewallTitleLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-      this.EnterpriseFirewallTitleLabel.Location = new System.Drawing.Point(27, 409);
-      this.EnterpriseFirewallTitleLabel.Name = "EnterpriseFirewallTitleLabel";
-      this.EnterpriseFirewallTitleLabel.Size = new System.Drawing.Size(152, 15);
-      this.EnterpriseFirewallTitleLabel.TabIndex = 19;
-      this.EnterpriseFirewallTitleLabel.Text = "MySQL Enterprise Firewall";
-      this.EnterpriseFirewallTitleLabel.Visible = false;
-      // 
-      // EnterpriseFirewallLinkLabel
-      // 
-      this.EnterpriseFirewallLinkLabel.AccessibleDescription = "A link label to open a web page with documentation about MySQL Enterprise Firewal" +
-    "l";
-      this.EnterpriseFirewallLinkLabel.AccessibleName = "Enterprise Firewall Documentation";
-      this.EnterpriseFirewallLinkLabel.AutoSize = true;
-      this.EnterpriseFirewallLinkLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.EnterpriseFirewallLinkLabel.Location = new System.Drawing.Point(262, 471);
-      this.EnterpriseFirewallLinkLabel.Name = "EnterpriseFirewallLinkLabel";
-      this.EnterpriseFirewallLinkLabel.Size = new System.Drawing.Size(244, 15);
-      this.EnterpriseFirewallLinkLabel.TabIndex = 22;
-      this.EnterpriseFirewallLinkLabel.TabStop = true;
-      this.EnterpriseFirewallLinkLabel.Text = "Click here to view the online documentation.";
-      this.EnterpriseFirewallLinkLabel.Visible = false;
-      this.EnterpriseFirewallLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.EnterpriseFirewallLinkLabel_LinkClicked);
       // 
       // PortPanel
       // 
@@ -447,9 +385,9 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.PortPanel.AutoSize = true;
       this.PortPanel.Controls.Add(this.PortLabel);
       this.PortPanel.Controls.Add(this.PortTextBox);
-      this.PortPanel.Location = new System.Drawing.Point(242, 203);
+      this.PortPanel.Location = new System.Drawing.Point(242, 230);
       this.PortPanel.Name = "PortPanel";
-      this.PortPanel.Size = new System.Drawing.Size(110, 35);
+      this.PortPanel.Size = new System.Drawing.Size(110, 37);
       this.PortPanel.TabIndex = 9;
       // 
       // PipeNamePanel
@@ -459,9 +397,9 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.PipeNamePanel.AutoSize = true;
       this.PipeNamePanel.Controls.Add(this.PipeNameLabel);
       this.PipeNamePanel.Controls.Add(this.PipeNameTextBox);
-      this.PipeNamePanel.Location = new System.Drawing.Point(206, 253);
+      this.PipeNamePanel.Location = new System.Drawing.Point(206, 280);
       this.PipeNamePanel.Name = "PipeNamePanel";
-      this.PipeNamePanel.Size = new System.Drawing.Size(343, 29);
+      this.PipeNamePanel.Size = new System.Drawing.Size(355, 37);
       this.PipeNamePanel.TabIndex = 13;
       // 
       // MemoryNamePanel
@@ -472,9 +410,9 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.MemoryNamePanel.BackColor = System.Drawing.Color.Transparent;
       this.MemoryNamePanel.Controls.Add(this.SharedMemoryNameLabel);
       this.MemoryNamePanel.Controls.Add(this.SharedMemoryNameTextBox);
-      this.MemoryNamePanel.Location = new System.Drawing.Point(184, 282);
+      this.MemoryNamePanel.Location = new System.Drawing.Point(184, 309);
       this.MemoryNamePanel.Name = "MemoryNamePanel";
-      this.MemoryNamePanel.Size = new System.Drawing.Size(365, 29);
+      this.MemoryNamePanel.Size = new System.Drawing.Size(388, 37);
       this.MemoryNamePanel.TabIndex = 15;
       // 
       // XProtocolPortPanel
@@ -484,9 +422,9 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.XProtocolPortPanel.AutoSize = true;
       this.XProtocolPortPanel.Controls.Add(this.XProtocolPortLabel);
       this.XProtocolPortPanel.Controls.Add(this.XProtocolPortTextBox);
-      this.XProtocolPortPanel.Location = new System.Drawing.Point(381, 203);
+      this.XProtocolPortPanel.Location = new System.Drawing.Point(381, 230);
       this.XProtocolPortPanel.Name = "XProtocolPortPanel";
-      this.XProtocolPortPanel.Size = new System.Drawing.Size(168, 35);
+      this.XProtocolPortPanel.Size = new System.Drawing.Size(192, 37);
       this.XProtocolPortPanel.TabIndex = 10;
       // 
       // XProtocolPortLabel
@@ -498,7 +436,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.XProtocolPortLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.XProtocolPortLabel.Location = new System.Drawing.Point(3, 0);
       this.XProtocolPortLabel.Name = "XProtocolPortLabel";
-      this.XProtocolPortLabel.Size = new System.Drawing.Size(90, 29);
+      this.XProtocolPortLabel.Size = new System.Drawing.Size(136, 37);
       this.XProtocolPortLabel.TabIndex = 0;
       this.XProtocolPortLabel.Text = "X Protocol Port:";
       this.XProtocolPortLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -509,9 +447,9 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.XProtocolPortTextBox.AccessibleDescription = "A text box to input the X Protocol port number";
       this.XProtocolPortTextBox.AccessibleName = "X Protocol Port Number";
       this.XProtocolPortTextBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.XProtocolPortTextBox.Location = new System.Drawing.Point(99, 3);
+      this.XProtocolPortTextBox.Location = new System.Drawing.Point(145, 3);
       this.XProtocolPortTextBox.Name = "XProtocolPortTextBox";
-      this.XProtocolPortTextBox.Size = new System.Drawing.Size(44, 23);
+      this.XProtocolPortTextBox.Size = new System.Drawing.Size(44, 31);
       this.XProtocolPortTextBox.TabIndex = 1;
       this.XProtocolPortTextBox.Text = "33060";
       this.ToolTip.SetToolTip(this.XProtocolPortTextBox, "X Protocol Port");
@@ -528,10 +466,6 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.Controls.Add(this.PipeNamePanel);
       this.Controls.Add(this.PortPanel);
       this.Controls.Add(this.XProtocolPortPanel);
-      this.Controls.Add(this.EnterpriseFirewallLinkLabel);
-      this.Controls.Add(this.EnterpriseFirewallCheckBox);
-      this.Controls.Add(this.EnterpriseFirewallDescription);
-      this.Controls.Add(this.EnterpriseFirewallTitleLabel);
       this.Controls.Add(this.MemoryNamePanel);
       this.Controls.Add(this.SharedMemoryCheckBox);
       this.Controls.Add(this.NamedPipeCheckBox);
@@ -562,10 +496,6 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.Controls.SetChildIndex(this.NamedPipeCheckBox, 0);
       this.Controls.SetChildIndex(this.SharedMemoryCheckBox, 0);
       this.Controls.SetChildIndex(this.MemoryNamePanel, 0);
-      this.Controls.SetChildIndex(this.EnterpriseFirewallTitleLabel, 0);
-      this.Controls.SetChildIndex(this.EnterpriseFirewallDescription, 0);
-      this.Controls.SetChildIndex(this.EnterpriseFirewallCheckBox, 0);
-      this.Controls.SetChildIndex(this.EnterpriseFirewallLinkLabel, 0);
       this.Controls.SetChildIndex(this.subCaptionLabel, 0);
       this.Controls.SetChildIndex(this.captionLabel, 0);
       this.Controls.SetChildIndex(this.XProtocolPortPanel, 0);
@@ -606,10 +536,6 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
     private System.Windows.Forms.TextBox PipeNameTextBox;
     private System.Windows.Forms.Label SharedMemoryNameLabel;
     private System.Windows.Forms.TextBox SharedMemoryNameTextBox;
-    private System.Windows.Forms.CheckBox EnterpriseFirewallCheckBox;
-    private System.Windows.Forms.Label EnterpriseFirewallDescription;
-    private System.Windows.Forms.Label EnterpriseFirewallTitleLabel;
-    private System.Windows.Forms.LinkLabel EnterpriseFirewallLinkLabel;
     private System.Windows.Forms.FlowLayoutPanel PortPanel;
     private System.Windows.Forms.FlowLayoutPanel PipeNamePanel;
     private System.Windows.Forms.FlowLayoutPanel MemoryNamePanel;
