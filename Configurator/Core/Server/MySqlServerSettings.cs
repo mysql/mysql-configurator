@@ -248,7 +248,17 @@ namespace MySql.Configurator.Core.Server
       "enterprise-firewall",
        new string[] { "ent-fw" })]
     [DefaultValue(false)]
+    public bool EnableEnterpriseFirewall { get; set; }
+
+    /// <summary>
+    /// Gets or sets a flag indicating if the Enterprise Firewall plugin is enabled.
+    /// </summary>
     public bool EnterpriseFirewallEnabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets a flag indicating if the Enterprise Firewall component is enabled.
+    /// </summary>
+    public bool EnterpriseFirewallComponentEnabled { get; set; }
 
     /// <summary>
     /// Gets the default file name for the Error Log.
@@ -277,6 +287,12 @@ namespace MySql.Configurator.Core.Server
       "general-log-file",
       new string[] { "generallogname" })]
     public string GeneralQueryLogFileName { get; set; }
+
+    /// <summary>
+    /// Gets the general settings associated to this server installation.
+    /// </summary>
+    [XmlIgnore]
+    public GeneralSettings GeneralSettings => _generalSettings;
 
     [XmlIgnore]
     public string GeneralSettingsFilePath => Path.Combine(InstallDirectory, GeneralSettingsManager.CONFIGURATOR_SETTINGS_FILE_NAME);
@@ -578,6 +594,15 @@ namespace MySql.Configurator.Core.Server
     [DefaultValue(ExampleDatabase.None)]
     public ExampleDatabase UninstallExampleDatabase { get; set; }
 
+    [ServerSetting("Upgrades the MySQL Enterprise Firewall plugin to a component (Commercial-only).",
+      "upgrade-enterprise-firewall",
+       new string[] { "upgrade-ent-fw", "upgrade-ef" },
+      false,
+      null,
+      ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade)]
+    [DefaultValue(false)]
+    public bool UpgradeEnterpriseFirewall { get; set; }
+
     [ServerSetting("The path and file name of the file containing the password=... entry that specifies the password of the Windows service " +
       "account user associated to the Windows Service that will run the server.",
       "windows-service-account-password-file",
@@ -586,12 +611,6 @@ namespace MySql.Configurator.Core.Server
       null,
       ConfigurationType.Reconfigure | ConfigurationType.Upgrade)]
     public ExampleDatabase WindowsServiceAccountPasswordFile { get; set; }
-
-    /// <summary>
-    /// Gets the general settings associated to this server installation.
-    /// </summary>
-    [XmlIgnore]
-    protected GeneralSettings GeneralSettings => _generalSettings;
 
     #endregion
 
@@ -822,15 +841,21 @@ namespace MySql.Configurator.Core.Server
 
     /// <summary>
     /// Loads the general server settings.
+    /// <param name="filePath">The path to the settings file. If ommited, the default path is used.</param>
     /// </summary>
-    public void LoadGeneralSettings()
+    public void LoadGeneralSettings(string filePath = null)
     {
-      if (!File.Exists(GeneralSettingsFilePath))
+      if (string.IsNullOrEmpty(filePath))
+      {
+        filePath = GeneralSettingsFilePath;
+      }
+
+      if (!File.Exists(filePath))
       {
         return;
       }
 
-      _generalSettings = GeneralSettingsManager.ReadSettings(InstallDirectory);
+      _generalSettings = GeneralSettingsManager.ReadSettings(filePath);
       _generalSettingsFileLoaded = _generalSettings != null;
       if (!_generalSettingsFileLoaded)
       {
@@ -845,6 +870,8 @@ namespace MySql.Configurator.Core.Server
         return;
       }
 
+      EnableEnterpriseFirewall = _generalSettings.EnterpriseFirewallEnabled
+        || _generalSettings.EnterpriseFirewallComponentEnabled;
       if (!string.IsNullOrEmpty(_generalSettings.IniDirectory))
       {
         var iniFilePath = Path.Combine(_generalSettings.IniDirectory, MySqlServerSettings.DEFAULT_CONFIG_FILE_NAME);

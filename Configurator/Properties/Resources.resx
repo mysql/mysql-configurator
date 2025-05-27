@@ -532,9 +532,6 @@ Provide a more complex password for stronger security.</value>
   <data name="ServerConfigEmptySecurityTokens" xml:space="preserve">
     <value>No security tokens were provided.</value>
   </data>
-  <data name="ServerConfigEnterpriseFirewallNotSupportedWithInnoDbCluster" xml:space="preserve">
-    <value>MySQL Enterprise Firewall is not currently supported when setting up InnoDB Cluster.</value>
-  </data>
   <data name="ServerConfigEventAddNewUsersError" xml:space="preserve">
     <value>An error occurred trying to add new users to the MySQL database (see log).</value>
   </data>
@@ -544,13 +541,13 @@ Provide a more complex password for stronger security.</value>
   <data name="ServerConfigEventAddNewUsersSuccess" xml:space="preserve">
     <value>Added new users to the MySQL database successfully.</value>
   </data>
-  <data name="ServerConfigEventConfigureEnterpriseFirewallError" xml:space="preserve">
-    <value>Failed to configure MySQL Enterprise Firewall.  The error is:</value>
+  <data name="ServerConfigEnterpriseFirewallConfigurationError" xml:space="preserve">
+    <value>Failed to configure MySQL Enterprise Firewall. Manual interventon may be required. The error is: {0}</value>
   </data>
-  <data name="ServerConfigEventConfigureEnterpriseFirewallInfo" xml:space="preserve">
+  <data name="ServerConfigEnterpriseFirewallConfigurationStart" xml:space="preserve">
     <value>Attempting to configure MySQL Enterprise Firewall</value>
   </data>
-  <data name="ServerConfigEventConfigureEnterpriseFirewallSuccess" xml:space="preserve">
+  <data name="ServerConfigEnterpriseFirewallConfigurationSuccess" xml:space="preserve">
     <value>Configured MySQL Enterprise Firewall</value>
   </data>
   <data name="ServerConfigEventFirewallSettingFailed" xml:space="preserve">
@@ -803,7 +800,7 @@ Provide a more complex password for stronger security.</value>
     <value>Removing the MySQL Windows service</value>
   </data>
   <data name="ServerEnableEnterpriseFirewallStep" xml:space="preserve">
-    <value>Updating MySQL Enterprise Firewall plugin</value>
+    <value>Updating MySQL Enterprise Firewall</value>
   </data>
   <data name="ServerInitializeDatabaseStep" xml:space="preserve">
     <value>Initializing database (may take a long time)</value>
@@ -942,9 +939,6 @@ Provide a more complex password for stronger security.</value>
   </data>
   <data name="StoppingServerInstanceText" xml:space="preserve">
     <value>Stopping MySQL Server instance...</value>
-  </data>
-  <data name="UninstallEnterpriseFirewall" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\UninstallEnterpriseFirewall.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;iso-8859-1</value>
   </data>
   <data name="WindowsServiceAlreadyRunning" xml:space="preserve">
     <value>Service {0} is running already.</value>
@@ -1996,5 +1990,62 @@ Usage examples
   </data>
   <data name="CLIDuplicateUserWarning" xml:space="preserve">
     <value>Multiple entries for user '{0}@{1}' have been found. Ignoring all duplicate entries except for the first one.</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallScriptNotFound" xml:space="preserve">
+    <value>The script '{0}' was not found. Repair your server installation and retry.</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallFailedToReadScript" xml:space="preserve">
+    <value>Failed to read the '{0}' script.</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallInstallingComponent" xml:space="preserve">
+    <value>Installing the Enterprise Firewall component...</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallUninstalling" xml:space="preserve">
+    <value>Uninstalling the Enterprise Firewall {0}...</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallUpgradingPlugin" xml:space="preserve">
+    <value>Upgrading the Enterprise Firewall plugin to a component...</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallSettingPermissions" xml:space="preserve">
+    <value>Granting required permissions to root account...</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallUpdatingUsersMode" xml:space="preserve">
+    <value>Updating users in 'RECORDING' mode...</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallRevertingMode" xml:space="preserve">
+    <value>Reverting groups to 'RECORDING' mode...</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallExecutingUpgradeScript" xml:space="preserve">
+    <value>Executing upgrade script...</value>
+  </data>
+  <data name="ServerConfigEFUpgradeRevertFailed" xml:space="preserve">
+    <value>Failed to revert the changes made when upgrading the Enterprise Firewall plugin. Manual internvention is required.</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallRevokingPermissions" xml:space="preserve">
+    <value>Revoking Enterprise Firewall permissions from root account...</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallUpdatingGroupsMode" xml:space="preserve">
+    <value>Updating groups in 'RECORDING' mode...</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallExecutingRevertScript" xml:space="preserve">
+    <value>Executing revert upgrade script...</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallRevertingUsersMode" xml:space="preserve">
+    <value>Updating users in 'DETECTING' mode...</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallRevertingFailedInstall" xml:space="preserve">
+    <value>Failed to install EF component. Attempting to revert the change...</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallRevertingFailedUninstall" xml:space="preserve">
+    <value>Failed to uninstall EF component. Attempting to revert the change...</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallUpgradeSuccess" xml:space="preserve">
+    <value>Successfully upgraded the Enterprise Firewall.</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallInstallSuccess" xml:space="preserve">
+    <value>Successfully installed the Enterprise Firewall.</value>
+  </data>
+  <data name="ServerConfigEnterpriseFirewallUninstallSuccess" xml:space="preserve">
+    <value>Successfully uninstalled the Enterprise Firewall.</value>
   </data>
 </root>

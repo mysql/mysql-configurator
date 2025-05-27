@@ -452,6 +452,8 @@ namespace MySql.Configurator.Core.CLI
       serverInstallation.Controller.Settings.DataDirectory = dataDirectory;
       serverInstallation.Controller.Settings.IniDirectory = new FileInfo(configFile).DirectoryName;
       serverInstallation.Controller.Settings.ErrorLogFileName = oldController.Settings.ErrorLogFileName;
+      _existingServerInstallationInstance.Controller.Settings.InstallDirectory = _existingServerInstallationInstance.BaseDir;
+      serverInstallation.Controller.Settings.LoadGeneralSettings(_existingServerInstallationInstance.Controller.Settings.GeneralSettingsFilePath);
 
       // Check if the error log file is in the default path, and if so update the path to the new version.
       var pathToErrorFile = Path.GetDirectoryName(serverInstallation.Controller.Settings.ErrorLogFileName);
@@ -746,7 +748,8 @@ namespace MySql.Configurator.Core.CLI
         {
           serverInstallation.Controller.Settings.ExistingRootPassword = passwordOption.Value;
         }
-
+        
+        serverInstallation.Controller.Settings.RootPassword = passwordOption.Value;
         CommandLineParser.ProvidedOptions.Remove(passwordOption);
       }
       else if (passwordFileOption != null)
