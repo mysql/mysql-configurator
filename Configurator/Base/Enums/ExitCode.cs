@@ -196,6 +196,12 @@ namespace MySql.Configurator.Base.Enums
     InvalidCustomUserPassword = 81,
 
     [Description("The user or group name '{0}' could not be found for option '{1}'. Error message is '{2}'.")]
-    CustomUserSecurityTokenNotFound = 82
+    CustomUserSecurityTokenNotFound = 82,
+
+    /// Validation related exit codes.
+    /// Reserved codes from 90 through 109.
+
+    [Description("The provided root password is invalid. {0}.")]
+    RootPasswordInvalidFormat = 90
   }
 }

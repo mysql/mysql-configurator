@@ -739,6 +739,15 @@ namespace MySql.Configurator.Core.CLI
       var passwordFileOption = CommandLineParser.GetMatchingProvidedOption(passwordFileOptionName);
       if (passwordOption != null)
       {
+        if (serverInstallation.Controller.ConfigurationType == ConfigurationType.Configure)
+        {
+          var errorMessage = MySqlServerInstance.ValidatePassword(passwordOption.Value, true);
+          if (!string.IsNullOrEmpty(errorMessage))
+          {
+            return new CLIExitCode(ExitCode.RootPasswordInvalidFormat, errorMessage);
+          }
+        }
+
         if (!TryToSetValue(serverInstallation.Controller, passwordOption.Name, passwordOption.Value))
         {
           return new CLIExitCode(ExitCode.InvalidOptionValue, passwordOption.Value, passwordOption.Name);
@@ -805,8 +814,9 @@ namespace MySql.Configurator.Core.CLI
           return new CLIExitCode(ExitCode.InvalidOptionValue, passwordOptionName, password);
         }
 
-        // If password could not be obtained raise error.
-        if (string.IsNullOrEmpty(password))
+        // If password could not be obtained raise error if it is a new configuration.
+        if (string.IsNullOrEmpty(password)
+            && serverInstallation.Controller.ConfigurationType == ConfigurationType.Configure)
         {
           return new CLIExitCode(ExitCode.OptionValueNotFound, passwordOptionName);
         }
