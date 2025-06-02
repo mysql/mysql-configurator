@@ -739,13 +739,10 @@ namespace MySql.Configurator.Core.CLI
       var passwordFileOption = CommandLineParser.GetMatchingProvidedOption(passwordFileOptionName);
       if (passwordOption != null)
       {
-        if (serverInstallation.Controller.ConfigurationType == ConfigurationType.Configure)
+        var passwordValidationResult = ValidatePassword(serverInstallation, passwordOption.Value);
+        if (passwordValidationResult.ExitCode != ExitCode.Success)
         {
-          var errorMessage = MySqlServerInstance.ValidatePassword(passwordOption.Value, true);
-          if (!string.IsNullOrEmpty(errorMessage))
-          {
-            return new CLIExitCode(ExitCode.RootPasswordInvalidFormat, errorMessage);
-          }
+          return passwordValidationResult;
         }
 
         if (!TryToSetValue(serverInstallation.Controller, passwordOption.Name, passwordOption.Value))
@@ -806,7 +803,38 @@ namespace MySql.Configurator.Core.CLI
       else
       {
         // Read from environment variable.
-        string password = Environment.GetEnvironmentVariable(environmentVariable);
+        string variableValue = Environment.GetEnvironmentVariable(environmentVariable);
+        string password = null;
+
+        // Check if value is a file.
+        try
+        {
+          var fileInfo = new FileInfo(variableValue);
+          if (!fileInfo.Exists)
+          {
+            return new CLIExitCode(ExitCode.ErrorPasswordFileDoesNotExist, variableValue);
+          }
+
+          try
+          {
+            password = File.ReadAllText(variableValue);
+          }
+          catch (Exception ex)
+          {
+            return new CLIExitCode(ExitCode.ErrorReadingPasswordFile, variableValue, ex.Message);
+          }
+        }
+        catch (Exception)
+        {
+          Logger.LogInformation(Resources.MySqlPwdValueIsNotAFile);
+          password = variableValue;
+        }
+
+        var passwordValidationResult = ValidatePassword(serverInstallation, password);
+        if (passwordValidationResult.ExitCode != ExitCode.Success)
+        {
+          return passwordValidationResult;
+        }
 
         if (!string.IsNullOrEmpty(password)
             && !TryToSetValue(serverInstallation.Controller, passwordOptionName, password))
@@ -1036,7 +1064,29 @@ namespace MySql.Configurator.Core.CLI
 
       Logger.LogError($@"{message}");
       return false;
-    } 
+    }
+
+    /// <summary>
+    /// Validates the provided password.
+    /// </summary>
+    /// <param name="serverInstallation">The server installation.</param>
+    /// <param name="password">The password to validate.</param>
+    /// <returns>A <see cref="CLIExitCode"/> instance representing the result of the password validation.</returns>
+    private static CLIExitCode ValidatePassword(ServerInstallation serverInstallation, string password)
+    {
+      if (serverInstallation.Controller.ConfigurationType != ConfigurationType.Configure)
+      {
+        new CLIExitCode(ExitCode.Success);
+      }
+
+      var errorMessage = MySqlServerInstance.ValidatePassword(password, true);
+      if (!string.IsNullOrEmpty(errorMessage))
+      {
+        return new CLIExitCode(ExitCode.RootPasswordInvalidFormat, errorMessage);
+      }
+
+      return new CLIExitCode(ExitCode.Success);
+    }
 
     #region Event Delegates
 

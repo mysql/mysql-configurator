@@ -1796,6 +1796,15 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The value provided in the MYSQL_PWD environment variable is not a file, value will be used as the password for the root user..
+        /// </summary>
+        public static string MySqlPwdValueIsNotAFile {
+            get {
+                return ResourceManager.GetString("MySqlPwdValueIsNotAFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The name cannot consist of only digits..
         /// </summary>
         public static string MySqlSchemaTableNameAllDigitsError {

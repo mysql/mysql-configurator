@@ -202,6 +202,9 @@ namespace MySql.Configurator.Base.Enums
     /// Reserved codes from 90 through 109.
 
     [Description("The provided root password is invalid. {0}.")]
-    RootPasswordInvalidFormat = 90
+    RootPasswordInvalidFormat = 90,
+
+    [Description("The password file path '{0}' does not exist.")]
+    ErrorPasswordFileDoesNotExist = 91,
   }
 }

@@ -2048,4 +2048,7 @@ Usage examples
   <data name="ServerConfigEnterpriseFirewallUninstallSuccess" xml:space="preserve">
     <value>Successfully uninstalled the Enterprise Firewall.</value>
   </data>
+  <data name="MySqlPwdValueIsNotAFile" xml:space="preserve">
+    <value>The value provided in the MYSQL_PWD environment variable is not a file, value will be used as the password for the root user.</value>
+  </data>
 </root>
