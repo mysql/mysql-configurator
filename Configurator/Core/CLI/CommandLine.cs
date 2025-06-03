@@ -807,14 +807,17 @@ namespace MySql.Configurator.Core.CLI
         string password = null;
 
         // Check if value is a file.
-        try
+        if (!Path.IsPathRooted(variableValue))
         {
-          var fileInfo = new FileInfo(variableValue);
-          if (!fileInfo.Exists)
-          {
-            return new CLIExitCode(ExitCode.ErrorPasswordFileDoesNotExist, variableValue);
-          }
-
+          Logger.LogInformation(Resources.MySqlPwdValueIsNotAFile);
+          password = variableValue;
+        }
+        else if (!File.Exists(variableValue))
+        {
+          return new CLIExitCode(ExitCode.ErrorPasswordFileDoesNotExist, variableValue);
+        }
+        else
+        {
           try
           {
             password = File.ReadAllText(variableValue);
@@ -823,11 +826,6 @@ namespace MySql.Configurator.Core.CLI
           {
             return new CLIExitCode(ExitCode.ErrorReadingPasswordFile, variableValue, ex.Message);
           }
-        }
-        catch (Exception)
-        {
-          Logger.LogInformation(Resources.MySqlPwdValueIsNotAFile);
-          password = variableValue;
         }
 
         var passwordValidationResult = ValidatePassword(serverInstallation, password);
