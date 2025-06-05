@@ -1074,7 +1074,7 @@ namespace MySql.Configurator.Core.CLI
     {
       if (serverInstallation.Controller.ConfigurationType != ConfigurationType.Configure)
       {
-        new CLIExitCode(ExitCode.Success);
+        return new CLIExitCode(ExitCode.Success);
       }
 
       var errorMessage = MySqlServerInstance.ValidatePassword(password, true);

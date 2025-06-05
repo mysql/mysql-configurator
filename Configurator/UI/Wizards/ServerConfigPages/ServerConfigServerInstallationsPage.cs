@@ -339,7 +339,8 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
           continue;
         }
 
-        if (configPage is ServerConfigEnterpriseFirewall)
+        if (configPage is ServerConfigEnterpriseFirewall
+            && _controller.ConfigurationType == ConfigurationType.Upgrade)
         {
           configPage.PageVisible = _existingServerInstallationInstance.Controller.Settings.EnterpriseFirewallEnabled;
           var enterpriseFirewallPage = configPage as ServerConfigEnterpriseFirewall;
