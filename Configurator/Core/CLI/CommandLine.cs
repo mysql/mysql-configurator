@@ -30,12 +30,12 @@ using System.Text.RegularExpressions;
 using System.Timers;
 using MySql.Configurator.Base.Classes;
 using MySql.Configurator.Base.Enums;
+using MySql.Configurator.Core.Controllers;
 using MySql.Configurator.Core.Ini;
 using MySql.Configurator.Core.Logging;
 using MySql.Configurator.Core.Server;
 using MySql.Configurator.Core.Settings;
 using MySql.Configurator.Properties;
-using MySql.Configurator.UI.Wizards.ServerConfigPages;
 using MySql.Data.MySqlClient;
 
 namespace MySql.Configurator.Core.CLI
@@ -468,15 +468,32 @@ namespace MySql.Configurator.Core.CLI
 
       // Find if existing instance is configured as service.
       var serviceNames = MySqlServiceControlManager.FindServiceNamesWithBaseDirectory(_existingServerInstallationInstance.BaseDir);
+      var serviceAdjustmentNeeded = false;
       if (serviceNames != null
           && serviceNames.Length > 0)
       {
         _existingServerInstallationInstance.ServiceName = serviceNames[0];
+        serverInstallation.Controller.Settings.ServiceName = serviceNames[0];
+        try
+        {
+          using (var ssc = new ExpandedServiceController(serviceNames[0]))
+          {
+            serviceAdjustmentNeeded = ssc.BinaryPath.Contains(_existingServerInstallationInstance.ServerVersion.ToString(2));
+            ssc.Close();
+          }
+        }
+        catch (Exception e)
+        {
+          Logger.LogException(e);
+          serviceAdjustmentNeeded = false;
+        }
       }
 
       serverInstallation.Controller.IsServiceRenameNeeded = _existingServerInstallationInstance.IsServiceNameDefault(
         _existingServerInstallationInstance.ServiceName,
         _existingServerInstallationInstance.ServerVersion);
+      serverInstallation.Controller.IsServiceAdjustmentNeeded = serverInstallation.Controller.IsServiceRenameNeeded
+            || serviceAdjustmentNeeded;
       DetermineExistingServerPersistedVariablesToReset(serverInstallation);
 
       // Set existing instance relevant properties for rollback.

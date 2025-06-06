@@ -551,6 +551,11 @@ namespace MySql.Configurator.Core.Server
     public bool IsSameDirectoryUpgrade { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the service needs to be adjusted. 
+    /// </summary>
+    public bool IsServiceAdjustmentNeeded { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether the service name needs to be renamed to reflect the server series.
     /// </summary>
     public bool IsServiceRenameNeeded { get; set; }
@@ -662,7 +667,10 @@ namespace MySql.Configurator.Core.Server
                                                                   && (!Settings.ConfigureAsService
                                                                       || OldSettings.ServiceName != Settings.ServiceName))
                                                                  || Settings.ConfigureAsService
-                                                                    && ConfigurationType != ConfigurationType.Upgrade;
+                                                                    && ConfigurationType != ConfigurationType.Upgrade
+                                                                 || (ConfigurationType == ConfigurationType.Upgrade
+                                                                     && (IsServiceRenameNeeded
+                                                                         || IsServiceAdjustmentNeeded));
 
     /// <summary>
     /// Gets a value indicating wheter the configuration step to update settings for the MySQL process needs to run.
@@ -3767,7 +3775,8 @@ namespace MySql.Configurator.Core.Server
               ? Settings.GetDefaultServiceName()
               : Settings.ServiceName;
           ReportStatus(Resources.ServerConfigUpdatingExistingService);
-          if (!newServiceName.Equals(Settings.ServiceName))
+          if (!newServiceName.Equals(Settings.ServiceName)
+              || IsServiceAdjustmentNeeded)
           {
             _revertController.OldServiceName = ExistingServerInstallationInstance.ServiceName;
             _revertController.NewServiceName = newServiceName;
