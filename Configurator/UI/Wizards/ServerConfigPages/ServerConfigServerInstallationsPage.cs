@@ -151,6 +151,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
           _controller.ConfigurationType = ConfigurationType.Upgrade;
           var dataDirectory = new DirectoryInfo(ExistingDataDirectoryTextBox.Text);
           _controller.Settings.DataDirectory = dataDirectory.Parent.FullName;
+          _controller.Settings.ExistingRootPassword = RootPasswordTextBox.Text;
           _controller.Settings.RootPassword = RootPasswordTextBox.Text;
           _controller.Settings.IniDirectory = new FileInfo(ExistingConfigFilePathTextBox.Text).DirectoryName;
           _controller.Settings.ErrorLogFileName = oldController.Settings.ErrorLogFileName;

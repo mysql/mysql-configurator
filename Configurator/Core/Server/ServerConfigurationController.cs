@@ -1488,6 +1488,7 @@ namespace MySql.Configurator.Core.Server
       }
 
       // Upgrade pages.
+      Pages.Add(new ServerConfigBackupPage(this) { PageVisible = ConfigurationType == ConfigurationType.Upgrade });
       if (ConfigurationType == ConfigurationType.Upgrade)
       {
         Pages.Add(new ServerConfigBackupPage(this));

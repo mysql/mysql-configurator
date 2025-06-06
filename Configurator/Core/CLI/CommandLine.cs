@@ -750,11 +750,7 @@ namespace MySql.Configurator.Core.CLI
           return new CLIExitCode(ExitCode.InvalidOptionValue, passwordOption.Value, passwordOption.Name);
         }
 
-        if (serverInstallation.Controller.ConfigurationType == ConfigurationType.Reconfigure)
-        {
-          serverInstallation.Controller.Settings.ExistingRootPassword = passwordOption.Value;
-        }
-        
+        serverInstallation.Controller.Settings.ExistingRootPassword = passwordOption.Value;
         serverInstallation.Controller.Settings.RootPassword = passwordOption.Value;
         CommandLineParser.ProvidedOptions.Remove(passwordOption);
       }
