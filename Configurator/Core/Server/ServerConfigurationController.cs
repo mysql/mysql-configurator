@@ -745,7 +745,9 @@ namespace MySql.Configurator.Core.Server
     /// <summary>
     /// Gets a value indicating if the credentials of the root user have been provided and validated.
     /// </summary>
-    public bool RootUserCredentialsSet => !string.IsNullOrEmpty(Settings.ExistingRootPassword);
+    public bool RootUserCredentialsSet => !string.IsNullOrEmpty(Settings.ExistingRootPassword)
+                                          || (ConfigurationType == ConfigurationType.Upgrade
+                                              && !string.IsNullOrEmpty(Settings.RootPassword));
 
     /// <summary>
     /// Gets or sets the authentication plugin assigned to the root user.
