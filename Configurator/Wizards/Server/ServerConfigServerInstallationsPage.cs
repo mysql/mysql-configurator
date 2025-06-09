@@ -172,14 +172,31 @@ namespace MySql.Configurator.Wizards.Server
 
           // Find if existing instance is configured as service.
           var serviceNames = MySqlServiceControlManager.FindServiceNamesWithBaseDirectory(_existingServerInstallationInstance.BaseDir);
+          var serviceAdjustmentNeeded = false;
           if (serviceNames.Length > 0)
           {
             _existingServerInstallationInstance.ServiceName = serviceNames[0];
+            _controller.Settings.ServiceName = serviceNames[0];
+            try
+            {
+              using (var ssc = new ExpandedServiceController(serviceNames[0]))
+              {
+                serviceAdjustmentNeeded = ssc.BinaryPath.Contains(_existingServerInstallationInstance.ServerVersion.ToString(2));
+                ssc.Close();
+              }
+            }
+            catch (Exception e)
+            {
+              Logger.LogException(e);
+              serviceAdjustmentNeeded = false;
+            }
           }
 
           _controller.IsServiceRenameNeeded = _existingServerInstallationInstance.IsServiceNameDefault(
             _existingServerInstallationInstance.ServiceName,
             _existingServerInstallationInstance.ServerVersion);
+          _controller.IsServiceAdjustmentNeeded = _controller.IsServiceRenameNeeded
+            || serviceAdjustmentNeeded;
           DetermineExistingServerPersistedVariablesToReset();
         }
         else

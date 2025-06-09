@@ -306,7 +306,12 @@ namespace MySql.Configurator.Wizards.Server
     /// Gets or sets a value indicating if the upgrade is reusing the existing installation and data directories.
     /// </summary>
     public bool IsSameDirectoryUpgrade { get; set; }
-    
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the service needs to be adjusted. 
+    /// </summary>
+    public bool IsServiceAdjustmentNeeded { get; set; }
+
     /// <summary>
     /// Gets a value indicating if there are steps that require to be executed for a server removal.
     /// </summary>
@@ -420,7 +425,10 @@ namespace MySql.Configurator.Wizards.Server
                                                                   && (!Settings.ConfigureAsService
                                                                       || OldSettings.ServiceName != Settings.ServiceName))
                                                                  || Settings.ConfigureAsService
-                                                                    && ConfigurationType != ConfigurationType.Upgrade;
+                                                                    && ConfigurationType != ConfigurationType.Upgrade
+                                                                 || (ConfigurationType == ConfigurationType.Upgrade
+                                                                     && (IsServiceRenameNeeded
+                                                                         || IsServiceAdjustmentNeeded));
 
     /// <summary>
     /// Gets a value indicating wheter the configuration step to update settings for the MySQL process needs to run.
@@ -2923,7 +2931,8 @@ namespace MySql.Configurator.Wizards.Server
               ? Settings.GetDefaultServiceName()
               : Settings.ServiceName;
           ReportStatus(Resources.ServerConfigUpdatingExistingService);
-          if (!newServiceName.Equals(Settings.ServiceName))
+          if (!newServiceName.Equals(Settings.ServiceName)
+              || IsServiceAdjustmentNeeded)
           {
             _revertController.OldServiceName = ExistingServerInstallationInstance.ServiceName;
             _revertController.NewServiceName = newServiceName;
