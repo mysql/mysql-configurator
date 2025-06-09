@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -473,7 +473,10 @@ namespace MySql.Configurator.Wizards.Server
         }
 
         OpenFirewall = EnableTcpIp && IsRuleEnabled(Port.ToString());
-        ErrorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
+        var errorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
+        ErrorLogFileName = string.IsNullOrEmpty(errorLogFileName)
+          ? MySqlServerSettings.ErrorLogDefaultFileName
+          : errorLogFileName;
         EnableGeneralLog = iniFile.FindValue<bool>("mysqld", "general-log", false);
         GeneralQueryLogFileName = iniFile.FindValue("mysqld", "general_log_file", false);
         EnableSlowQueryLog = iniFile.FindValue<bool>("mysqld", "slow-query-log", false);
