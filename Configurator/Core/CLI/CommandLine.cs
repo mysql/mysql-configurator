@@ -26,15 +26,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Timers;
 using MySql.Configurator.Base.Classes;
 using MySql.Configurator.Base.Enums;
+using MySql.Configurator.Core.Controllers;
 using MySql.Configurator.Core.Ini;
 using MySql.Configurator.Core.Logging;
 using MySql.Configurator.Core.Server;
 using MySql.Configurator.Core.Settings;
 using MySql.Configurator.Properties;
-using MySql.Configurator.UI.Wizards.ServerConfigPages;
 using MySql.Data.MySqlClient;
 
 namespace MySql.Configurator.Core.CLI
@@ -450,21 +451,49 @@ namespace MySql.Configurator.Core.CLI
       serverInstallation.Controller.ConfigurationType = ConfigurationType.Upgrade;
       serverInstallation.Controller.Settings.DataDirectory = dataDirectory;
       serverInstallation.Controller.Settings.IniDirectory = new FileInfo(configFile).DirectoryName;
+      serverInstallation.Controller.Settings.ErrorLogFileName = oldController.Settings.ErrorLogFileName;
+      _existingServerInstallationInstance.Controller.Settings.InstallDirectory = _existingServerInstallationInstance.BaseDir;
+      serverInstallation.Controller.Settings.LoadGeneralSettings(_existingServerInstallationInstance.Controller.Settings.GeneralSettingsFilePath);
+
+      // Check if the error log file is in the default path, and if so update the path to the new version.
+      var pathToErrorFile = Path.GetDirectoryName(serverInstallation.Controller.Settings.ErrorLogFileName);
+      if (_existingServerInstallationInstance.IsDataDirNameDefault())
+      {
+        serverInstallation.Controller.Settings.ErrorLogFileName = Regex.Replace(serverInstallation.Controller.Settings.ErrorLogFileName, MySqlServerInstance.DEFAULT_DATADIR_NAME_REGEX, $"MySQL Server {serverInstallation.Controller.ServerVersion.ToString(2)}", RegexOptions.IgnoreCase);
+      }
+
       serverInstallation.Controller.IsRemoveExistingServerInstallationStepNeeded = true;
       serverInstallation.Controller.IsDataDirectoryRenameNeeded = _existingServerInstallationInstance.IsDataDirNameDefault(serverInstallation.Controller.ServerVersion);
       serverInstallation.Controller.ExistingServerInstallationInstance = _existingServerInstallationInstance;
 
       // Find if existing instance is configured as service.
       var serviceNames = MySqlServiceControlManager.FindServiceNamesWithBaseDirectory(_existingServerInstallationInstance.BaseDir);
+      var serviceAdjustmentNeeded = false;
       if (serviceNames != null
           && serviceNames.Length > 0)
       {
         _existingServerInstallationInstance.ServiceName = serviceNames[0];
+        serverInstallation.Controller.Settings.ServiceName = serviceNames[0];
+        try
+        {
+          using (var ssc = new ExpandedServiceController(serviceNames[0]))
+          {
+            serviceAdjustmentNeeded = ssc.BinaryPath.Contains(_existingServerInstallationInstance.ServerVersion.ToString(2));
+            ssc.Close();
+          }
+        }
+        catch (Exception e)
+        {
+          Logger.LogException(e);
+          serviceAdjustmentNeeded = false;
+        }
       }
 
       serverInstallation.Controller.IsServiceRenameNeeded = _existingServerInstallationInstance.IsServiceNameDefault(
         _existingServerInstallationInstance.ServiceName,
         _existingServerInstallationInstance.ServerVersion);
+      serverInstallation.Controller.IsServiceAdjustmentNeeded = serverInstallation.Controller.IsServiceRenameNeeded
+            || serviceAdjustmentNeeded;
       DetermineExistingServerPersistedVariablesToReset(serverInstallation);
 
       // Set existing instance relevant properties for rollback.
@@ -480,7 +509,10 @@ namespace MySql.Configurator.Core.CLI
 
         var iniFile = new IniFileEngine(configFile).Load();
         _existingServerInstallationInstance.Controller.Settings.DataDirectory = new DirectoryInfo(iniFile.FindValue("mysqld", "datadir", false)).Parent.FullName;
-        _existingServerInstallationInstance.Controller.Settings.ErrorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
+        var errorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
+        _existingServerInstallationInstance.Controller.Settings.ErrorLogFileName = string.IsNullOrEmpty(errorLogFileName)
+          ? MySqlServerSettings.ErrorLogDefaultFileName
+          : errorLogFileName;
       }
 
       return new CLIExitCode(ExitCode.Success);
@@ -695,13 +727,18 @@ namespace MySql.Configurator.Core.CLI
       }
 
       // Validate not repeated user.
-      if (serverInstallation.Controller.Settings.NewServerUsers.Any(existingUser => existingUser.Username.Equals(user.Username, StringComparison.InvariantCultureIgnoreCase)
+      if (!serverInstallation.Controller.Settings.NewServerUsers.Any(existingUser => existingUser.Username.Equals(user.Username, StringComparison.InvariantCultureIgnoreCase)
                                                                                     && existingUser.Host.Equals(user.Host, StringComparison.InvariantCultureIgnoreCase)))
       {
-        return new CLIExitCode(ExitCode.RepeatedCustomUser, user.Username, user.Host);
+        serverInstallation.Controller.Settings.NewServerUsers.Add(user);
       }
-
-      serverInstallation.Controller.Settings.NewServerUsers.Add(user);
+      else
+      {
+        var warningMessage = string.Format(Resources.CLIDuplicateUserWarning, user.Username, user.Host);
+        Logger.LogWarning(warningMessage);
+        Console.WriteLine(warningMessage);
+      }
+      
       return new CLIExitCode(ExitCode.Success);
     }
 
@@ -719,6 +756,12 @@ namespace MySql.Configurator.Core.CLI
       var passwordFileOption = CommandLineParser.GetMatchingProvidedOption(passwordFileOptionName);
       if (passwordOption != null)
       {
+        var passwordValidationResult = ValidatePassword(serverInstallation, passwordOption.Value);
+        if (passwordValidationResult.ExitCode != ExitCode.Success)
+        {
+          return passwordValidationResult;
+        }
+
         if (!TryToSetValue(serverInstallation.Controller, passwordOption.Name, passwordOption.Value))
         {
           return new CLIExitCode(ExitCode.InvalidOptionValue, passwordOption.Value, passwordOption.Name);
@@ -729,6 +772,7 @@ namespace MySql.Configurator.Core.CLI
           serverInstallation.Controller.Settings.ExistingRootPassword = passwordOption.Value;
         }
 
+        serverInstallation.Controller.Settings.RootPassword = passwordOption.Value;
         CommandLineParser.ProvidedOptions.Remove(passwordOption);
       }
       else if (passwordFileOption != null)
@@ -776,7 +820,36 @@ namespace MySql.Configurator.Core.CLI
       else
       {
         // Read from environment variable.
-        string password = Environment.GetEnvironmentVariable(environmentVariable);
+        string variableValue = Environment.GetEnvironmentVariable(environmentVariable);
+        string password = null;
+
+        // Check if value is a file.
+        if (!Path.IsPathRooted(variableValue))
+        {
+          Logger.LogInformation(Resources.MySqlPwdValueIsNotAFile);
+          password = variableValue;
+        }
+        else if (!File.Exists(variableValue))
+        {
+          return new CLIExitCode(ExitCode.ErrorPasswordFileDoesNotExist, variableValue);
+        }
+        else
+        {
+          try
+          {
+            password = File.ReadAllText(variableValue);
+          }
+          catch (Exception ex)
+          {
+            return new CLIExitCode(ExitCode.ErrorReadingPasswordFile, variableValue, ex.Message);
+          }
+        }
+
+        var passwordValidationResult = ValidatePassword(serverInstallation, password);
+        if (passwordValidationResult.ExitCode != ExitCode.Success)
+        {
+          return passwordValidationResult;
+        }
 
         if (!string.IsNullOrEmpty(password)
             && !TryToSetValue(serverInstallation.Controller, passwordOptionName, password))
@@ -784,8 +857,9 @@ namespace MySql.Configurator.Core.CLI
           return new CLIExitCode(ExitCode.InvalidOptionValue, passwordOptionName, password);
         }
 
-        // If password could not be obtained raise error.
-        if (string.IsNullOrEmpty(password))
+        // If password could not be obtained raise error if it is a new configuration.
+        if (string.IsNullOrEmpty(password)
+            && serverInstallation.Controller.ConfigurationType == ConfigurationType.Configure)
         {
           return new CLIExitCode(ExitCode.OptionValueNotFound, passwordOptionName);
         }
@@ -860,7 +934,11 @@ namespace MySql.Configurator.Core.CLI
             return new CLIExitCode(ExitCode.MissingRequiredOption, requiredProtocolOption.Name);
           }
 
-          TryToSetValue(serverInstallation.Controller, requiredProtocolOption.Name, requiredProtocolOption.Value);
+          if (!TryToSetValue(serverInstallation.Controller, requiredProtocolOption.Name, requiredProtocolOption.Value))
+          {
+            return new CLIExitCode(ExitCode.InvalidOptionValue, requiredProtocolOption.Value, requiredProtocolOption.Name);
+          }
+
           CommandLineParser.ProvidedOptions.Remove(requiredProtocolOption);
         }
         else
@@ -907,6 +985,7 @@ namespace MySql.Configurator.Core.CLI
             return new CLIExitCode(ExitCode.InvalidOptionValue, installSampleDbOption.Value, installSampleDbOption.Name);
           }
 
+          serverInstallation.Controller.IsCreateRemoveExamplesDatabasesStepNeeded = true;
           switch (installStatus)
           {
             case ExampleDatabase.All:
@@ -1000,7 +1079,29 @@ namespace MySql.Configurator.Core.CLI
 
       Logger.LogError($@"{message}");
       return false;
-    } 
+    }
+
+    /// <summary>
+    /// Validates the provided password.
+    /// </summary>
+    /// <param name="serverInstallation">The server installation.</param>
+    /// <param name="password">The password to validate.</param>
+    /// <returns>A <see cref="CLIExitCode"/> instance representing the result of the password validation.</returns>
+    private static CLIExitCode ValidatePassword(ServerInstallation serverInstallation, string password)
+    {
+      if (serverInstallation.Controller.ConfigurationType != ConfigurationType.Configure)
+      {
+        return new CLIExitCode(ExitCode.Success);
+      }
+
+      var errorMessage = MySqlServerInstance.ValidatePassword(password, true);
+      if (!string.IsNullOrEmpty(errorMessage))
+      {
+        return new CLIExitCode(ExitCode.RootPasswordInvalidFormat, errorMessage);
+      }
+
+      return new CLIExitCode(ExitCode.Success);
+    }
 
     #region Event Delegates
 

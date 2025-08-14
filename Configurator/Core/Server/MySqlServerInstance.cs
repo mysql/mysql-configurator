@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -1094,9 +1094,10 @@ namespace MySql.Configurator.Core.Server
     /// Executes the given SQL scripts connecting to this instance.
     /// </summary>
     /// <param name="outputScriptToStatus">Flag indicating whether feedback about the scripts being executed is sent to the output.</param>
+    /// <param name="schemaName">The schema name that must be selected when executing the scripts.</param>
     /// <param name="sqlScripts">An array of SQL scripts to execute.</param>
     /// <returns>The number of scripts that executed successfully.</returns>
-    public int ExecuteScripts(bool outputScriptToStatus, params string[] sqlScripts)
+    public int ExecuteScripts(string schemaName, bool outputScriptToStatus, params string[] sqlScripts)
     {
       if (sqlScripts.Length == 0
           || !IsUsernameValid)
@@ -1105,7 +1106,7 @@ namespace MySql.Configurator.Core.Server
       }
 
       int successfulScriptsCount = 0;
-      using (var connection = new MySqlConnection(GetConnectionStringBuilder().ConnectionString))
+      using (var connection = new MySqlConnection(GetConnectionStringBuilder(schemaName).ConnectionString))
       {
         try
         {
@@ -1143,6 +1144,17 @@ namespace MySql.Configurator.Core.Server
       }
 
       return successfulScriptsCount;
+    }
+
+    /// <summary>
+    /// Executes the given SQL scripts connecting to this instance.
+    /// </summary>
+    /// <param name="outputScriptToStatus">Flag indicating whether feedback about the scripts being executed is sent to the output.</param>
+    /// <param name="sqlScripts">An array of SQL scripts to execute.</param>
+    /// <returns>The number of scripts that executed successfully.</returns>
+    public int ExecuteScripts(bool outputScriptToStatus, params string[] sqlScripts)
+    {
+      return ExecuteScripts(null, outputScriptToStatus, sqlScripts);
     }
 
     /// <summary>
@@ -1388,8 +1400,7 @@ namespace MySql.Configurator.Core.Server
     {
       if (_controller.ServerInstallation.License == LicenseType.Commercial
           && _controller.ConfigurationType == ConfigurationType.Configure
-          && !_controller.IsThereServerDataFiles
-          && _controller.ServerVersion.ServerSupportsEnterpriseFirewall())
+          && !_controller.IsThereServerDataFiles)
       {
         // If the user is retrying configuration the data will be recreated so the root user will have a blank password
         // Changes done for Bug #21085453 - FAILED CONFIGURATION STEPS FOR EFW ARE NOT PROPERLY INDICATED AFTER EXECUTION

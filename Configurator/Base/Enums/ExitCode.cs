@@ -198,7 +198,13 @@ namespace MySql.Configurator.Base.Enums
     [Description("The user or group name '{0}' could not be found for option '{1}'. Error message is '{2}'.")]
     CustomUserSecurityTokenNotFound = 82,
 
-    [Description("Two or more custom users have the same user name '{0}' and host '{1}'. Review your '--add-user' entries.")]
-    RepeatedCustomUser = 83
+    /// Validation related exit codes.
+    /// Reserved codes from 90 through 109.
+
+    [Description("The provided root password is invalid. {0}.")]
+    RootPasswordInvalidFormat = 90,
+
+    [Description("The password file path '{0}' does not exist.")]
+    ErrorPasswordFileDoesNotExist = 91,
   }
 }

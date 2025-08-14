@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -44,9 +44,14 @@ namespace MySql.Configurator.Core.Settings
     public bool ConfigureAsService { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating if the Enterprise Firewall is enabled.
+    /// Gets or sets a value indicating if the Enterprise Firewall plugin is enabled.
     /// </summary>
     public bool EnterpriseFirewallEnabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating if the Enterprise Firewall component is enabled.
+    /// </summary>
+    public bool EnterpriseFirewallComponentEnabled { get; set; }
 
     /// <summary>
     /// Gets or sets the path to the server configuration file.
@@ -141,8 +146,7 @@ namespace MySql.Configurator.Core.Settings
 
       try
       {
-        var settingsFileName = Path.Combine(path, CONFIGURATOR_SETTINGS_FILE_NAME);
-        if (!File.Exists(settingsFileName))
+        if (!File.Exists(path))
         {
           Logger.LogInformation(Resources.ServerConfigGeneralSettingsFileNotFound);
           return null;
@@ -151,7 +155,7 @@ namespace MySql.Configurator.Core.Settings
         Logger.LogInformation(string.Format(Resources.ServerConfigReadingGeneralSettingsFile, path));
         GeneralSettings settings;
         var serializer = new XmlSerializer(typeof(GeneralSettings));
-        using (var stream = new FileStream(settingsFileName, FileMode.Open))
+        using (var stream = new FileStream(path, FileMode.Open))
         {
           settings = (GeneralSettings)serializer.Deserialize(stream);
         }

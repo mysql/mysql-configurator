@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -21,11 +21,14 @@
   along with this program; if not, write to the Free Software Foundation, Inc., 
   51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
+using Microsoft.VisualBasic.ApplicationServices;
 using MySql.Configurator.Base.Enums;
 using MySql.Configurator.Core.Settings;
 using MySql.Configurator.Properties;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 
 namespace MySql.Configurator.Core.Server
@@ -55,6 +58,26 @@ namespace MySql.Configurator.Core.Server
     /// Flag indicating if the data dir was renamed.
     /// </summary>
     public bool DataDirRenamed { get; set; }
+
+    /// <summary>
+    /// Gets or sets a flag indicating if the EF permissions were granted to the root user.
+    /// </summary>
+    public bool EnterpriseFirewallPermissionsGranted { get; set; }
+
+    /// <summary>
+    /// Gets or sets a flag indicating if the mode of EF groups was updated.
+    /// </summary>
+    public bool EnterpriseFirewallGroupsModeReverted { get; set; }
+
+    /// <summary>
+    /// Gets or sets a flag indicating if the upgrade EF script was executed.
+    /// </summary>
+    public bool EnterpriseFirewallUpgradeScriptExecuted { get; set; }
+
+    /// <summary>
+    /// Gets or sets a flag indicating if the mode of EF users was updated.
+    /// </summary>
+    public bool EnterpriseFirewallUsersModeUpdated { get; set; }
 
     /// <summary>
     /// Gets or sets the existing server installation instance.
@@ -159,6 +182,10 @@ namespace MySql.Configurator.Core.Server
       _revertedSteps = new List<string>();
       AuthenticationPluginUpdated = false;
       DataDirRenamed = false;
+      EnterpriseFirewallGroupsModeReverted = false;
+      EnterpriseFirewallPermissionsGranted = false;
+      EnterpriseFirewallUpgradeScriptExecuted = false;
+      EnterpriseFirewallUsersModeUpdated = false;
       ExistingServerInstallationInstance = null;
       IniFileUpdated = false;
       InstanceStopped = false;
@@ -311,6 +338,110 @@ namespace MySql.Configurator.Core.Server
       Reset();
       ReportStatus(Resources.ServerConfigRollbackFinished);
       return revertedSteps;
+    }
+
+    /// <summary>
+    /// Reverts the changes performed during an Enterprise Firewall plugin to component upgrade.
+    /// </summary>
+    /// <param name="settings">The settings to revert.</param>
+    /// <param name="serverInstance">The server instance used to connect to the server.</param>
+    /// <returns>The corresponding reverted step.</returns>
+    public List<string> RollbackEnterpriseFirewallUpgrade(MySqlServerSettings settings, MySqlServerInstance serverInstance)
+    {
+      ReportStatus(Resources.ServerConfigRollbackStarted);
+      try
+      {
+        using (var connection = new MySqlConnection(serverInstance.GetConnectionStringBuilder("mysql").ToString()))
+        {
+          var users = new List<string>();
+          var command = new MySqlCommand();
+          command.Connection = connection;
+          connection.Open();
+          if (EnterpriseFirewallGroupsModeReverted)
+          {
+            command.CommandText = "SELECT USERHOST FROM mysql.firewall_groups WHERE MODE='RECORDING';";
+            MySqlDataReader reader = command.ExecuteReader();
+            users = new List<string>();
+            using (reader)
+            {
+              while (reader.Read())
+              {
+                users.Add(reader[0].ToString());
+              }
+            }
+
+            if (users.Count > 0)
+            {
+              ReportStatus(Resources.ServerConfigEnterpriseFirewallUpdatingGroupsMode);
+              command.CommandType = CommandType.StoredProcedure;
+              command.CommandText = "sp_set_firewall_group_mode";
+              foreach (var user in users)
+              {
+                command.Parameters.Clear();
+                command.Parameters.AddWithValue("@arg_group_name", user);
+                command.Parameters.AddWithValue("@arg_mode", "DETECTING");
+                command.ExecuteNonQuery();
+              }
+            }
+          }
+
+          if (EnterpriseFirewallUpgradeScriptExecuted)
+          {
+            string revertUpgradeScript;
+            using (var reader = new StreamReader($"{ExistingServerInstallationInstance.BaseDir}\\share\\firewall_component_to_plugin.sql"))
+            {
+              revertUpgradeScript = reader.ReadToEnd();
+            }
+
+            ReportStatus(Resources.ServerConfigEnterpriseFirewallExecutingRevertScript);
+            serverInstance.ExecuteScripts("mysql", false, new[] { revertUpgradeScript });
+          }
+
+          if (EnterpriseFirewallUsersModeUpdated
+              && users.Count > 0)
+          {
+            ReportStatus(Resources.ServerConfigEnterpriseFirewallRevertingUsersMode);
+            command.CommandType = CommandType.StoredProcedure;
+            command.CommandText = "sp_set_firewall_mode";
+            foreach (var user in users)
+            {
+              command.Parameters.Clear();
+              command.Parameters.AddWithValue("@arg_userhost", user);
+              command.Parameters.AddWithValue("@arg_mode", "RECORDING");
+              command.ExecuteNonQuery();
+            }
+          }
+
+          if (EnterpriseFirewallPermissionsGranted)
+          {
+            ReportStatus(Resources.ServerConfigEnterpriseFirewallRevokingPermissions);
+            command.CommandType = CommandType.Text;
+            command.CommandText = "REVOKE FIREWALL_ADMIN ON * FROM 'root'@'localhost';";
+            command.ExecuteNonQuery();
+          }
+        }
+
+        _revertedSteps.Clear();
+        _revertedSteps.Add(Resources.ServerEnableEnterpriseFirewallStep);
+        var revertedSteps = _revertedSteps;
+        Reset();
+        ReportStatus(Resources.ServerConfigRollbackFinished);
+        return revertedSteps;
+      }
+      catch (Exception ex)
+      {
+        _revertedSteps.Clear();
+        _revertedSteps.Add(Resources.ServerEnableEnterpriseFirewallStep);
+        var revertedSteps = _revertedSteps;
+        Reset();
+        ReportError(string.Format(Resources.ServerConfigEFUpgradeRevertFailed, ex.Message));
+        return revertedSteps;
+      }
+      finally
+      {
+        settings.EnterpriseFirewallComponentEnabled = false;
+        settings.SaveGeneralSettings();
+      }
     }
 
     /// <summary>

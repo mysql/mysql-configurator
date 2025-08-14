@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -24,13 +24,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using MySql.Configurator.Base.Classes;
 using MySql.Configurator.Base.Enums;
+using MySql.Configurator.Core.Controllers;
 using MySql.Configurator.Core.Ini;
 using MySql.Configurator.Core.Logging;
 using MySql.Configurator.Core.Server;
-using MySql.Configurator.Core.Settings;
 using MySql.Configurator.Properties;
 using MySql.Configurator.UI.Forms;
 using MySql.Data.MySqlClient;
@@ -151,21 +152,49 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
           var dataDirectory = new DirectoryInfo(ExistingDataDirectoryTextBox.Text);
           _controller.Settings.DataDirectory = dataDirectory.Parent.FullName;
           _controller.Settings.ExistingRootPassword = RootPasswordTextBox.Text;
+          _controller.Settings.RootPassword = RootPasswordTextBox.Text;
           _controller.Settings.IniDirectory = new FileInfo(ExistingConfigFilePathTextBox.Text).DirectoryName;
+          _controller.Settings.ErrorLogFileName = oldController.Settings.ErrorLogFileName;
+          _controller.Settings.LoadGeneralSettings(_existingServerInstallationInstance.Controller.Settings.GeneralSettingsFilePath);
+
+          // Check if the error log file is in the default path, and if so update the path to the new version.
+          var pathToErrorFile = Path.GetDirectoryName(_controller.Settings.ErrorLogFileName);
+          if (_existingServerInstallationInstance.IsDataDirNameDefault())
+          {
+            _controller.Settings.ErrorLogFileName = Regex.Replace(_controller.Settings.ErrorLogFileName, MySqlServerInstance.DEFAULT_DATADIR_NAME_REGEX, $"MySQL Server {_controller.ServerVersion.ToString(2)}", RegexOptions.IgnoreCase);
+          }
+
           _controller.IsRemoveExistingServerInstallationStepNeeded = true;
           _controller.IsDataDirectoryRenameNeeded = DataDirectoryRenameWarningProvider.HasErrors();
           _controller.ExistingServerInstallationInstance = _existingServerInstallationInstance;
 
           // Find if existing instance is configured as service.
           var serviceNames = MySqlServiceControlManager.FindServiceNamesWithBaseDirectory(_existingServerInstallationInstance.BaseDir);
+          var serviceAdjustmentNeeded = false;
           if (serviceNames.Length > 0)
           {
             _existingServerInstallationInstance.ServiceName = serviceNames[0];
+            _controller.Settings.ServiceName = serviceNames[0];
+            try
+            {
+              using (var ssc = new ExpandedServiceController(serviceNames[0]))
+              {
+                serviceAdjustmentNeeded = ssc.BinaryPath.Contains(_existingServerInstallationInstance.ServerVersion.ToString(2));
+                ssc.Close();
+              }
+            }
+            catch (Exception e)
+            {
+              Logger.LogException(e);
+              serviceAdjustmentNeeded=false;
+            }
           }
 
           _controller.IsServiceRenameNeeded = _existingServerInstallationInstance.IsServiceNameDefault(
             _existingServerInstallationInstance.ServiceName,
             _existingServerInstallationInstance.ServerVersion);
+          _controller.IsServiceAdjustmentNeeded = _controller.IsServiceRenameNeeded
+            || serviceAdjustmentNeeded;
           DetermineExistingServerPersistedVariablesToReset();
         }
         else
@@ -325,6 +354,15 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
         if (configPage is ServerConfigBackupPage)
         {
           configPage.PageVisible = ReplaceServerInstallationRadioButton.Checked;
+          continue;
+        }
+
+        if (configPage is ServerConfigEnterpriseFirewall
+            && _controller.ConfigurationType == ConfigurationType.Upgrade)
+        {
+          configPage.PageVisible = _existingServerInstallationInstance.Controller.Settings.EnterpriseFirewallEnabled;
+          var enterpriseFirewallPage = configPage as ServerConfigEnterpriseFirewall;
+          enterpriseFirewallPage.UpdateControls();
           continue;
         }
 
@@ -491,6 +529,8 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       {
         _existingServerInstallationInstance.Controller.ServerVersion = _existingServerInstallationInstance.ServerVersion;
         _existingServerInstallationInstance.Controller.ServerInstallation.VersionString = _existingServerInstallationInstance.Controller.ServerVersion.ToString();
+        _existingServerInstallationInstance.Controller.Settings.InstallDirectory = _existingServerInstallationInstance.BaseDir;
+        _existingServerInstallationInstance.Controller.Settings.LoadGeneralSettings();
       }
 
       if (!string.IsNullOrEmpty(_existingServerInstallationInstance.BaseDir))
@@ -507,7 +547,10 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
         {
           var iniFile = new IniFileEngine(ExistingConfigFilePathTextBox.Text).Load();
           _existingServerInstallationInstance.Controller.Settings.DataDirectory = new DirectoryInfo(iniFile.FindValue("mysqld", "datadir", false)).Parent.FullName;
-          _existingServerInstallationInstance.Controller.Settings.ErrorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
+          var errorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
+          _existingServerInstallationInstance.Controller.Settings.ErrorLogFileName = string.IsNullOrEmpty(errorLogFileName)
+            ? MySqlServerSettings.ErrorLogDefaultFileName
+            : errorLogFileName;
         }
         else
         {

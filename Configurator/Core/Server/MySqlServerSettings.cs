@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -248,7 +248,17 @@ namespace MySql.Configurator.Core.Server
       "enterprise-firewall",
        new string[] { "ent-fw" })]
     [DefaultValue(false)]
+    public bool EnableEnterpriseFirewall { get; set; }
+
+    /// <summary>
+    /// Gets or sets a flag indicating if the Enterprise Firewall plugin is enabled.
+    /// </summary>
     public bool EnterpriseFirewallEnabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets a flag indicating if the Enterprise Firewall component is enabled.
+    /// </summary>
+    public bool EnterpriseFirewallComponentEnabled { get; set; }
 
     /// <summary>
     /// Gets the default file name for the Error Log.
@@ -277,6 +287,12 @@ namespace MySql.Configurator.Core.Server
       "general-log-file",
       new string[] { "generallogname" })]
     public string GeneralQueryLogFileName { get; set; }
+
+    /// <summary>
+    /// Gets the general settings associated to this server installation.
+    /// </summary>
+    [XmlIgnore]
+    public GeneralSettings GeneralSettings => _generalSettings;
 
     [XmlIgnore]
     public string GeneralSettingsFilePath => Path.Combine(InstallDirectory, GeneralSettingsManager.CONFIGURATOR_SETTINGS_FILE_NAME);
@@ -423,9 +439,7 @@ namespace MySql.Configurator.Core.Server
       new string[] { "existing-instance-port" },
       false,
       null,
-      ConfigurationType.Upgrade,
-      null,
-      "CheckPort")]
+      ConfigurationType.Upgrade)]
     [DefaultValue(DEFAULT_PORT)]
     public uint OldInstancePort { get; set; }
 
@@ -580,6 +594,15 @@ namespace MySql.Configurator.Core.Server
     [DefaultValue(ExampleDatabase.None)]
     public ExampleDatabase UninstallExampleDatabase { get; set; }
 
+    [ServerSetting("Upgrades the MySQL Enterprise Firewall plugin to a component (Commercial-only).",
+      "upgrade-enterprise-firewall",
+       new string[] { "upgrade-ent-fw", "upgrade-ef" },
+      false,
+      null,
+      ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade)]
+    [DefaultValue(false)]
+    public bool UpgradeEnterpriseFirewall { get; set; }
+
     [ServerSetting("The path and file name of the file containing the password=... entry that specifies the password of the Windows service " +
       "account user associated to the Windows Service that will run the server.",
       "windows-service-account-password-file",
@@ -588,12 +611,6 @@ namespace MySql.Configurator.Core.Server
       null,
       ConfigurationType.Reconfigure | ConfigurationType.Upgrade)]
     public ExampleDatabase WindowsServiceAccountPasswordFile { get; set; }
-
-    /// <summary>
-    /// Gets the general settings associated to this server installation.
-    /// </summary>
-    [XmlIgnore]
-    protected GeneralSettings GeneralSettings => _generalSettings;
 
     #endregion
 
@@ -824,15 +841,21 @@ namespace MySql.Configurator.Core.Server
 
     /// <summary>
     /// Loads the general server settings.
+    /// <param name="filePath">The path to the settings file. If ommited, the default path is used.</param>
     /// </summary>
-    public void LoadGeneralSettings()
+    public void LoadGeneralSettings(string filePath = null)
     {
-      if (!File.Exists(GeneralSettingsFilePath))
+      if (string.IsNullOrEmpty(filePath))
+      {
+        filePath = GeneralSettingsFilePath;
+      }
+
+      if (!File.Exists(filePath))
       {
         return;
       }
 
-      _generalSettings = GeneralSettingsManager.ReadSettings(InstallDirectory);
+      _generalSettings = GeneralSettingsManager.ReadSettings(filePath);
       _generalSettingsFileLoaded = _generalSettings != null;
       if (!_generalSettingsFileLoaded)
       {
@@ -847,6 +870,8 @@ namespace MySql.Configurator.Core.Server
         return;
       }
 
+      EnableEnterpriseFirewall = _generalSettings.EnterpriseFirewallEnabled
+        || _generalSettings.EnterpriseFirewallComponentEnabled;
       if (!string.IsNullOrEmpty(_generalSettings.IniDirectory))
       {
         var iniFilePath = Path.Combine(_generalSettings.IniDirectory, MySqlServerSettings.DEFAULT_CONFIG_FILE_NAME);
@@ -942,8 +967,9 @@ namespace MySql.Configurator.Core.Server
     /// </summary>
     /// <param name="template">The template containing the values to be saved into the configuration file.</param>
     /// <param name="skipExistingValues">If a configuration file already exists, indicates if the existing values
+    /// <param name="updateDefaultPaths">Indicates if the default data directory and related paths should be updated.</param>
     /// should be replaced with the re-calculated ones.</param>
-    public void Save(IniTemplate template, bool skipExistingValues = false)
+    public void Save(IniTemplate template, bool skipExistingValues = false, bool updateDefaultPaths = false)
     {
       if (!template.IsValid)
       {
@@ -977,7 +1003,7 @@ namespace MySql.Configurator.Core.Server
       template.PluginLoad = string.IsNullOrEmpty(Plugins.ToString()) ? string.Empty : $"\"{Plugins}\"";
       template.MySqlXPort = MySqlXPort == 0 ? X_PROTOCOL_DEFAULT_PORT : MySqlXPort;
       template.NamedPipeFullAccessGroup = NamedPipeFullAccessGroup;
-      template.ProcessTemplate(false, true, skipExistingValues);
+      template.ProcessTemplate(false, true, skipExistingValues, updateDefaultPaths);
       SaveGeneralSettings();
     }
 
@@ -1216,7 +1242,10 @@ namespace MySql.Configurator.Core.Server
         }
 
         OpenFirewall = EnableTcpIp && IsRuleEnabled(Port.ToString());
-        ErrorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
+        var errorLogFileName = iniFile.FindValue("mysqld", "log-error", false);
+        ErrorLogFileName = string.IsNullOrEmpty(errorLogFileName)
+          ? MySqlServerSettings.ErrorLogDefaultFileName
+          : errorLogFileName;
         EnableGeneralLog = iniFile.FindValue<bool>("mysqld", "general-log", false);
         GeneralQueryLogFileName = iniFile.FindValue("mysqld", "general_log_file", false);
         EnableSlowQueryLog = iniFile.FindValue<bool>("mysqld", "slow-query-log", false);
