@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2024, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2024, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -30,13 +30,16 @@ namespace MySql.Configurator.Core.CLI
     /// </summary>
     /// <param name="name">The name of the option.</param>
     /// <param name="description">The description of the option.</param>
+    /// <param name="providedName">The name of the option provided by the user.</param>
     /// <param name="aliases">The supported aliases.</param>
     /// <param name="supportsValue">Flag indicating if the option supports a value.</param>
     /// <param name="supportsRepeat">Flag indicating if the option supports being repeated.</param>
     /// <param name="required">Flag indicating if the option is required.</param>
     /// <param name="shortcut">A string representing the shortcut name.</param>
     /// <param name="supportedValues">A list of supported values (if applicable).</param>
-    public CommandLineOption(string name, string description, string[] aliases = null, bool supportsValue = true, bool supportsRepeat = false, bool required = false, string shortcut = null, string[] supportedValues = null, string checkAction = null)
+    /// <param name="checkAction">Indicates the name of the validation that should be made for this option.</param>
+    /// <param name="deprecatedAliases">The permitted aliases that have been deprectaded.</param>
+    public CommandLineOption(string name, string description, string providedName, string[] aliases = null, bool supportsValue = true, bool supportsRepeat = false, bool required = false, string shortcut = null, string[] supportedValues = null, string checkAction = null, string[] deprecatedAliases = null)
     {
       Aliases = aliases;
       CheckAction = checkAction;
@@ -44,11 +47,13 @@ namespace MySql.Configurator.Core.CLI
       HasFixedValues = supportedValues != null
         && supportedValues.Length > 0;
       Name = name;
+      ProvidedName = providedName;
       Required = required;
       Shortcut = shortcut;
       SupportsRepeat = supportsRepeat;
       SupportsValue = supportsValue;
       SupportedValues = supportedValues;
+      DeprecatedAliases = deprecatedAliases;
     }
 
     #region Properties
@@ -64,9 +69,19 @@ namespace MySql.Configurator.Core.CLI
     public string CheckAction { get; private set; }
 
     /// <summary>
+    /// Gets or sets the list of aliases that are deprecated.
+    /// </summary>
+    public string[] DeprecatedAliases { get; private set; }
+
+    /// <summary>
     /// Gets or sets the description of this option.
     /// </summary>
     public string Description { get; private set; }
+
+    /// <summary>
+    /// Gets or sets a flag indicating wether this option only supports certain values.
+    /// </summary>
+    public bool HasFixedValues { get; private set; }
 
     /// <summary>
     /// Gets or sets the name of this option.
@@ -74,9 +89,9 @@ namespace MySql.Configurator.Core.CLI
     public string Name { get; private set; }
 
     /// <summary>
-    /// Gets or sets a flag indicating wether this option only supports certain values.
+    /// Gets or sets the name of the option provided by the user.
     /// </summary>
-    public bool HasFixedValues { get; private set; }
+    public string ProvidedName { get; private set; }
 
     /// <summary>
     /// Gets or sets a flag indicating wether this option is required.

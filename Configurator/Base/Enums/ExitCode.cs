@@ -105,6 +105,9 @@ namespace MySql.Configurator.Base.Enums
     [Description("Invalid syntax. Execute '--console --help' for details on the general syntax.")]
     InvalidGenericSyntax = 23,
 
+    [Description("Option '{0}' can not be set to '{1}' because option '{2}' is already set to that value.")]
+    ConflictingValues = 24,
+
     /// Configure related exit codes.
     /// Reserved codes from 30 through 39.
 

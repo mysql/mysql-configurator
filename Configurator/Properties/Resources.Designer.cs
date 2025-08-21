@@ -359,8 +359,10 @@ namespace MySql.Configurator.Properties {
         ///
         ///Options
         ///---------------------------------------------------------------------------------------------------
-        ///Name:Shortcut:Aliases:Supported Values:Description
-        ///----- [rest of string was truncated]&quot;;.
+        ///[options]
+        ///
+        ///Usage examples
+        ///---------------------------- [rest of string was truncated]&quot;;.
         /// </summary>
         public static string CLIConfigureActionHelp {
             get {
@@ -374,6 +376,15 @@ namespace MySql.Configurator.Properties {
         public static string CLICopyrightNotice {
             get {
                 return ResourceManager.GetString("CLICopyrightNotice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The provided alias &apos;{0}&apos; is deprecated for option &apos;{1}&apos;. Usage of a valid alias is recommended as deprecated elements may be removed in the future..
+        /// </summary>
+        public static string CLIDeprecatedAliasWarning {
+            get {
+                return ResourceManager.GetString("CLIDeprecatedAliasWarning", resourceCulture);
             }
         }
         
@@ -474,8 +485,10 @@ namespace MySql.Configurator.Properties {
         ///
         ///Options
         ///---------------------------------------------------------------------------------------------------
-        ///Name:Shortcut:Aliases:Supported Values:Description
-        ///------ [rest of string was truncated]&quot;;.
+        ///[options]
+        ///
+        ///Usage examples
+        ///----------------------------- [rest of string was truncated]&quot;;.
         /// </summary>
         public static string CLIReconfigureActionHelp {
             get {
@@ -496,7 +509,7 @@ namespace MySql.Configurator.Properties {
         ///
         ///Options
         ///---------------------------------------------------------------------------------------------------
-        ///Name: [rest of string was truncated]&quot;;.
+        ///[opti [rest of string was truncated]&quot;;.
         /// </summary>
         public static string CLIRemoveActionHelp {
             get {
@@ -544,8 +557,11 @@ namespace MySql.Configurator.Properties {
         ///
         ///Options
         ///---------------------------------------------------------------------------------------------------
-        ///Name:Shortcut:Aliases:Supported Values:Description
-        ///------------------------------------------------------------------------------------------------ [rest of string was truncated]&quot;;.
+        ///[options]
+        ///
+        ///Usage examples
+        ///---------------------------------------------------------------------------------------------------
+        ///--action=upgrade - [rest of string was truncated]&quot;;.
         /// </summary>
         public static string CLIUpgradeActionHelp {
             get {

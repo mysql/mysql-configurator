@@ -27,16 +27,13 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using MySql.Configurator.Base.Classes;
 using MySql.Configurator.Base.Enums;
-using MySql.Configurator.Core.Controllers;
 using MySql.Configurator.Core.Firewall;
 using MySql.Configurator.Core.Ini;
 using MySql.Configurator.Core.Logging;
-using MySql.Configurator.Core.MSI;
 using MySql.Configurator.Core.Settings;
 using MySql.Configurator.Properties;
 using MySql.Configurator.UI.Dialogs;
@@ -120,10 +117,13 @@ namespace MySql.Configurator.Core.Server
 
     [ServerSetting("Creates a backup of the databases to ensure data can be restored in case of any failure.",
       "backup-data",
-      new string[] { "backup-data-directory" },
+      new string[] { "backup-databases", "dump-databases" },
       false,
       null,
-      ConfigurationType.Upgrade)]
+      ConfigurationType.Upgrade,
+      null,
+      null,
+      new string[] { "backup-data-directory" })]
     [DefaultValue(true)]
     public bool BackupData { get; set; }
 
@@ -135,8 +135,8 @@ namespace MySql.Configurator.Core.Server
     [ServerSetting("Specifies the base name to use for binary log files. With binary logging enabled, the server logs " +
       "all statements that change data to the binary log, which is used for backup and replication. The binary log is a " +
       "sequence of files with a base name and numeric extension.",
-      "log-bin",
-      new string[] { "binary-log" })]
+      "binary-log-file-name",
+      new string[] { "log-bin", "binary-log-file", "binary-log", "binary-log-path", "log-bin-file", "log-bin-file-name", "log-bin-path" })]
     public string BinLogFileNameBase { get; set; }
 
     public string ConfigFile { get; set; }
@@ -155,16 +155,24 @@ namespace MySql.Configurator.Core.Server
       }
     }
 
-    [ServerSetting("Configures MySQL Server to run as a Windows service. By default the Windows service runs using the " +
-      "Standard System Account (Network Service).",
-      "configure-as-service",
+    [ServerSetting("Configures MySQL Server to run as a Windows process.",
+      "configure-as-process",
+      new string[] { "run-as-proccess"}
+      , null)]
+    [DefaultValue(false)]
+    public bool ConfigureAsProcess { get; set; }
+
+    [ServerSetting("Configures MySQL Server to run as a Windows service. By default the Windows service runs using " +
+      "the Standard System Account (Network Service).",
+      "configure-as-windows-service",
+      new string[] { "configure-as-win-service", "configure-as-service", "run-as-service", "run-as-windows-service", "run-as-win-service" },
       new string[] { "as-windows-service", "as-win-service" })]
     [DefaultValue(true)]
     public bool ConfigureAsService { get; set; }
 
     [ServerSetting("The path to the MySQL server data directory. This option sets the datadir system variable.",
-      "datadir",
-      new string[] { "data-dir", "data-directory" },
+      "data-directory",
+      new string[] { "data-dir", "datadir" },
       false,
       "d",
       ConfigurationType.Configure,
@@ -186,18 +194,20 @@ namespace MySql.Configurator.Core.Server
     /// </summary>
     public static MySqlAuthenticationPluginType DefaultServerAuthenticationPlugin => MySqlAuthenticationPluginType.CachingSha2Password;
 
-    [ServerSetting("The path and file name of the file containing the password=... entry that specifies the password " +
-      "of the root user.",
-      "defaults-extra-file",
-      new string[] { "password-file", "pass-file", "pwd-file" },
+    [ServerSetting("Defines the name and path of the file containing the password of the root user.",
+      "root-password-file-name",
+      new string[] { "root-password-file", "root-pass-file", "root-pwd-file", "defaults-extra-file", "root-pass-file-name", "root-pwd-file-name", "defaults-extra-file-name" },
       false,
       null,
-      ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade)]
+      ConfigurationType.Configure | ConfigurationType.Reconfigure | ConfigurationType.Upgrade,
+      null,
+      null,
+      new string[] { "password-file", "pass-file", "pwd-file" })]
     public string DefaultsExtraFile { get; set; }
 
-    [ServerSetting("Enables binary logging.",
-      "enable-log-bin",
-      new string[] { "enable-binary-log" })]
+    [ServerSetting("Indicates whether the binary log is enabled.",
+      "enable-binary-log",
+      new string[] { "enable-log-bin" })]
     [DefaultValue(false)]
     public bool EnableBinLog { get; set; }
 
@@ -211,14 +221,16 @@ namespace MySql.Configurator.Core.Server
     [DefaultValue(true)]
     public bool EnableErrorLog { get; set; }
 
-    [ServerSetting("Whether the general query log is enabled.",
-      "general-log",
-      new string[] { "enable-general-log", "generallog" })]
+    [ServerSetting("Indicates whether the general query log is enabled.",
+      "enable-general-log",
+      null,
+      new string[] { "general-log", "generallog" })]
     [DefaultValue(false)]
     public bool EnableGeneralLog { get; set; }
 
     [ServerSetting("Indicates whether the server permits connections over a named pipe.",
       "enable-named-pipes",
+      new string[] { "enable-pipes" },
       new string[] { "named-pipes" })]
     [DefaultValue(true)]
     public bool EnableNamedPipe { get; set; }
@@ -228,13 +240,14 @@ namespace MySql.Configurator.Core.Server
     public bool EnableQueryCacheType { get; set; }
 
     [ServerSetting("Indicates whether the server permits shared-memory connections.",
-      "shared-memory",
-      new string[] { "enable-shared-memory" })]
+      "enable-shared-memory",
+      new string[] { "shared-memory" })]
     public bool EnableSharedMemory { get; set; }
 
-    [ServerSetting("Whether the slow query log is enabled.",
-      "slow-query-log",
-      new string[] { "enable-slow-log" })]
+    [ServerSetting("Indicates whether the slow query log is enabled.",
+      "enable-slow-query-log",
+      null,
+      new string[] { "slow-query-log", "enable-slow-log" })]
     [DefaultValue(true)]
     public bool EnableSlowQueryLog { get; set; }
 
@@ -244,9 +257,10 @@ namespace MySql.Configurator.Core.Server
     [DefaultValue(true)]
     public bool EnableTcpIp { get; set; }
 
-    [ServerSetting("Enable the MySQL Enterprise Firewall plugin.",
-      "enterprise-firewall",
-       new string[] { "ent-fw" })]
+    [ServerSetting("Enables the MySQL Enterprise Firewall plugin.",
+      "enable-enterprise-firewall",
+      new string[] { "enable-ent-fw" },
+      new string[] { "enterprise-firewall", "ent-fw" })]
     [DefaultValue(false)]
     public bool EnableEnterpriseFirewall { get; set; }
 
@@ -265,10 +279,11 @@ namespace MySql.Configurator.Core.Server
     /// </summary>
     public static string ErrorLogDefaultFileName => $"{Environment.MachineName}.err";
 
-    [ServerSetting("Defines the name and location of the error log. If no path is given, the location of the file is the " +
+    [ServerSetting("Defines the name and path of the error log. If no path is given, the path of the file is the " +
       "data directory.",
-      "log-error",
-      new string[] { "error-log", "error-log-file", "errorlogname" })]
+      "error-log-file-name",
+      new string[] { "log-error", "error-log", "error-log-file", "error-log-path" },
+      new string[] { "errorlogname" })]
     public string ErrorLogFileName { get; set; }
 
     public string ExistingRootPassword { get; set; }
@@ -283,8 +298,10 @@ namespace MySql.Configurator.Core.Server
     /// </summary>
     public static string GeneralQueryLogDefaultFileName => $"{Environment.MachineName}.log";
 
-    [ServerSetting("The name of the general query log file.",
-      "general-log-file",
+    [ServerSetting("Defines the name and path of the general query log. If no path is given, the path of the file is the " +
+      "data directory.",
+      "general-log-file-name",
+      new string[] { "general-log-file", "general-log-path" },
       new string[] { "generallogname" })]
     public string GeneralQueryLogFileName { get; set; }
 
@@ -338,9 +355,10 @@ namespace MySql.Configurator.Core.Server
       new string[] { "installdir" })]
     public string InstallDirectory { get; set; }
 
-    [ServerSetting("Installs the specified sample databases.",
-      "install-sample-database",
-      new string[] { "install-example-database" })]
+    [ServerSetting("Installs the specified sample databases (Sakila/World).",
+      "install-sample-databases",
+      new string[] { "install-sample-databases", "install-example-databases", "create-sample-databases", "create-example-databases" },
+      new string[] { "install-sample-database", "install-example-database" })]
     [DefaultValue(ExampleDatabase.None)]
     public ExampleDatabase InstallExampleDatabase { get; set; }
 
@@ -351,12 +369,14 @@ namespace MySql.Configurator.Core.Server
                                                       && !EnableTcpIp
                                                       && !EnableSharedMemory;
 
-    [ServerSetting("Prevents the data directory from being deleted when other configurations are removed.",
+    [ServerSetting("Prevents the data directory from being deleted when MySQL Server configurations are removed.",
       "keep-data-directory",
-      new string[] { "keep-data" },
+      new string[] { "keep-data", "keep-data-dir", "keep-datadir" },
       false,
       null,
-      ConfigurationType.Remove)]
+      ConfigurationType.Remove,
+      null,
+      null)]
     [DefaultValue(false)]
     public bool KeepDataDirectory { get; set; }
 
@@ -375,19 +395,22 @@ namespace MySql.Configurator.Core.Server
       false,
       null,
       ConfigurationType.Configure,
-      new string[] { "1", "2" })]
+      new string[] { "1", "2" },
+      null,
+      new string[] { "table-names" })]
     [DefaultValue(LowerCaseTableNamesTypes.LowerCaseStoredInsensitiveComparison)]
     public LowerCaseTableNamesTypes LowerCaseTableNames { get; set; }
 
     [ServerSetting("The network port on which X Plugin listens for TCP/IP connections. This is the X Plugin equivalent " +
       "of port; see that variable description for more information.",
       "mysqlx-port",
-      new string[] { "x-port", "xport" },
+      new string[] { "x-port" },
       false,
       null,
       ConfigurationType.Configure | ConfigurationType.Reconfigure,
       null,
-      "CheckXPort")]
+      "CheckXPort",
+      new string[] { "xport" })]
     [DefaultValue(33060)]
     public uint MySqlXPort { get; set; }
 
@@ -400,14 +423,14 @@ namespace MySql.Configurator.Core.Server
       "to use named-pipe clients. The default value is an empty string, which means that no Windows user is granted full " +
       "access to the named pipe.",
       "named-pipe-full-access-group",
-      new string[] { "full-access-group" })]
+      new string[] { "pipe-full-access-group", "full-access-group" })]
     [DefaultValue("")]
     public string NamedPipeFullAccessGroup { get; set; }
 
     [ServerSetting("The name of the shared-memory connection used by the server instance that will be upgraded to communicate with the " +
       "server.",
-      "old-instance-memory-name",
-      new string[] { "old-instance-shared-memory-name", "existing-instance-memory-name", "existing-instance-shared-memory-name" },
+      "old-instance-shared-memory-name",
+      new string[] { "existing-instance-memory-name", "old-instance-memory-name", "existing-instance-shared-memory-name" },
       false,
       null,
       ConfigurationType.Upgrade)]
@@ -427,7 +450,7 @@ namespace MySql.Configurator.Core.Server
     [ServerSetting("Specifies the pipe name to use by the server instance that will be upgraded when listening for local connections " +
       "that use a named pipe.",
       "old-instance-pipe-name",
-      new string[] { "existing-instance-pipe-name" },
+      new string[] { "old-instance-named-pipe", "existing-instance-pipe-name", "existing-instance-named-pipe" },
       false,
       null,
       ConfigurationType.Upgrade)]
@@ -436,16 +459,19 @@ namespace MySql.Configurator.Core.Server
 
     [ServerSetting("The port number to use by the server instance that will be upgraded when listening for TCP/IP connections.",
       "old-instance-port",
-      new string[] { "existing-instance-port" },
+      new string[] { "old-instance-tcp-ip-port", "existing-instance-tcp-ip-port" },
       false,
       null,
-      ConfigurationType.Upgrade)]
+      ConfigurationType.Upgrade,
+      null,
+      null,
+      new string[] { "existing-instance-port" })]
     [DefaultValue(DEFAULT_PORT)]
     public uint OldInstancePort { get; set; }
 
     [ServerSetting("The connection protocol used by the server instance that will be upgraded.",
-      "old-instance-protocol",
-      new string[] { "existing-instance-protocol" },
+      "old-instance-connection-protocol",
+      new string[] { "old-instance-protocol", "existing-instance-protocol", "existing-instance-connection-protocol" },
       false,
       null,
       ConfigurationType.Upgrade)]
@@ -455,9 +481,10 @@ namespace MySql.Configurator.Core.Server
     [NonSerialized]
     public MySqlServerSettings OldSettings;
 
-    [ServerSetting("Creates Windows Firewall rules for TCP/IP connection for both port and mysqlx-port.",
-      "open-win-firewall",
-      new string[] { "open-windows-firewall", "openfirewall" })]
+    [ServerSetting("Creates Windows Firewall rules to allow traffic through both the classic and x protocol TCP/IP ports.",
+      "create-windows-firewall-rules",
+      new string[] { "create-firewall-rules", "create-win-fw-rules", "create-fw-rules" },
+      new string[] { "open-win-firewall", "open-windows-firewall", "openfirewall" })]
     [DefaultValue(true)]
     public bool OpenFirewall { get; set; }
 
@@ -473,10 +500,11 @@ namespace MySql.Configurator.Core.Server
     [XmlIgnore]
     public bool PendingSystemTablesUpgrade { get; set; }
 
-    [ServerSetting("Specifies the pipe name to use when listening for local connections that use a named pipe. " +
+    [ServerSetting("Specifies the pipe name to use when listening for local connections that use a named pipe." +
       "The default value is MySQL (not case-sensitive).",
-      "socket",
-      new string[] { "pipe-name", "named-pipe-name", "named-pipe", "pipename" })]
+      "named-pipe-name",
+      new string[] { "socket", "pipe-name", "named-pipe" },
+      new string[] { "pipename" })]
     [DefaultValue("MYSQL")]
     public string PipeName { get; set; }
 
@@ -497,9 +525,13 @@ namespace MySql.Configurator.Core.Server
     [ServerSetting("The password that will be assigned to the root user during a new installation or reconfiguration. Password can't be " +
       "changed during a reconfiguration, though it is required to validate that it is possible to connect to the server.",
       "password",
-      new string[] { "pwd", "root-password", "passwd", "rootpasswd" },
+      new string[] { "pwd", "root-password", "root-pwd", "passwd" },
       true,
-      "p")]
+      "p",
+      ConfigurationType.Configure | ConfigurationType.Reconfigure,
+      null,
+      null,
+      new string[] { "rootpasswd" })]
     public string RootPassword { get; set; }
 
     [ServerSetting("Sets the value of the secure_file_priv server variable that is used to limit the effect of " +
@@ -510,18 +542,21 @@ namespace MySql.Configurator.Core.Server
     public string SecureFilePrivFolder { get; set; }
 
     [ServerSetting("Configures the user level of access for the server files (data directory and any files inside that location).",
-      "server-file-permissions-access",
-      new string[] { "server-file-access" })]
+      "server-file-permissions",
+      new string[] { "server-file-access" },
+      new string[] { "server-file-permissions-access" })]
     [DefaultValue(ServerFilePermissionsAccess.FullAccess)]
     public ServerFilePermissionsAccess ServerFilePermissionsAccess { get; set; }
 
-    [ServerSetting("Defines a comma separated list of users or groups that will have full access to the server files.",
-      "server-file-full-control-list",
-      new string[] { "full-control-list" })]
+    [ServerSetting("Defines a comma separated list of Windows users or groups that will have full access to the server files.",
+      "server-file-full-permissions-list",
+      new string[] { "server-file-full-access-list", "server-file-full-control-list" },
+      new string[] { "full-access-list", "full-control-list" })]
     public string ServerFileFullControlList { get; set; }
 
-    [ServerSetting("Defines a comma separated list of users or groups that will not have access to the server files.",
-      "server-file-no-access-list",
+    [ServerSetting("Defines a comma separated list of users or groups that will not have any type of access to the server files.",
+      "server-file-no-permissions-list",
+      new string[] { "server-file-no-access-list" },
       new string[] { "no-access-list" })]
     public string ServerFileNoAccessList { get; set; }
 
@@ -529,27 +564,30 @@ namespace MySql.Configurator.Core.Server
       "in the range from 1 to 232 -1. Unique means that each ID must be different from every other ID in use by any other source or replica " +
       "in the replication topology.",
       "server-id",
-      new string[] { "serverid" },
+      null,
       false,
       null,
-      ConfigurationType.Configure)]
+      ConfigurationType.Configure,
+      null,
+      null,
+      new string[] { "serverid" })]
     [DefaultValue(1)]
     public uint? ServerId { get; set; }
 
     [ServerSetting("Optimizes system resources depending on the intended use of the server instance.",
-      "config-type",
-      new string[] { "configuration-type", "server-type" },
+      "server-type",
+      new string[] { "server-configuration-type", "server-config-type", "configuration-type", "config-type" },
       false,
       null,
       ConfigurationType.Configure | ConfigurationType.Reconfigure,
-      new string[] { "development", "server", "dedicated", "manual" },
-      "CheckInteger")]
+      new string[] { "Dedicated", "Server", "Developer", "Manual" })]
     [DefaultValue(ServerInstallationType.Developer)]
     public ServerInstallationType ServerInstallationType { get; set; }
 
     [ServerSetting("The password of the Windows User Account used to run the Windows Service.",
       "windows-service-password",
-      new string[] { "win-service-password", "win-service-pwd", "service-password", "service-pwd", "sapass" })]
+      new string[] { "win-service-password", "win-service-pwd", "service-password", "service-pwd" },
+      new string[] { "sapass" })]
     public string ServiceAccountPassword { get; set; }
 
     [ServerSetting("The name of a Windows User Account used to run the Windows service.",
@@ -560,37 +598,42 @@ namespace MySql.Configurator.Core.Server
 
     [ServerSetting("The name given to the Windows service used to run MySQL Server.",
       "windows-service-name",
-      new string[] { "service-name", "win-service-name", "servicename" },
+      new string[] { "win-service-name", "service-name" },
       false,
       null,
       ConfigurationType.Configure | ConfigurationType.Reconfigure,
       null,
-      "CheckServiceName")]
+      "CheckServiceName",
+      new string[] { "servicename" })]
     public string ServiceName { get; set; }
 
     [ServerSetting("If configured as a Windows Service, this value sets the service to start " +
       "automatically at system startup.",
       "windows-service-auto-start",
-      new string[] { "win-service-auto-start", "service-auto-start", "auto-start", "autostart" })]
+      new string[] { "win-service-auto-start", "service-auto-start" },
+      new string[] { "auto-start", "autostart" })]
     [DefaultValue(true)]
     public bool ServiceStartAtStartup { get; set; }
 
     [ServerSetting("The name of the shared-memory connection used to communicate with the server.",
-      "shared-memory-base-name",
-      new string[] { "shared-memory-name", "shared-mem-name" })]
+      "shared-memory-name",
+      new string[] { "shared-memory-base-name", "shared-mem-name", "memory-name" })]
     [DefaultValue("MYSQL")]
     public string SharedMemoryName { get; set; }
 
     public static string SlowQueryLogDefaultFileName => $"{Environment.MachineName}-slow.log";
 
-    [ServerSetting("The name of the slow query log file.",
+    [ServerSetting("Defines the name and path of the slow query log file. If no path is given, the path " +
+      "of the file is the data directory.",
       "slow-query-log-file",
-      new string[] { "slow-log-file", "slowlogname" })]
+      new string[] { "slow-log-file", "slow-log-file-name", "slow-query-log-file", "slow-query-log-file-name", "slow-log-path", "slow-query-log-path" },
+      new string[] { "slowlogname" })]
     public string SlowQueryLogFileName { get; set; }
 
-    [ServerSetting("Uninstalls the specified sample databases.",
-      "uninstall-sample-database",
-      new string[] { "uninstall-example-database" })]
+    [ServerSetting("Uninstalls the specified sample databases (Sakila/World).",
+      "uninstall-sample-databases",
+      new string[] { "uninstall-sample-databases", "uninstall-example-databases", "remove-sample-databases", "remove-example-databases" },
+      new string[] { "uninstall-sample-database", "uninstall-example-database" })]
     [DefaultValue(ExampleDatabase.None)]
     public ExampleDatabase UninstallExampleDatabase { get; set; }
 
@@ -603,14 +646,14 @@ namespace MySql.Configurator.Core.Server
     [DefaultValue(false)]
     public bool UpgradeEnterpriseFirewall { get; set; }
 
-    [ServerSetting("The path and file name of the file containing the password=... entry that specifies the password of the Windows service " +
-      "account user associated to the Windows Service that will run the server.",
+    [ServerSetting("Defines the name and path of the file containing the password of the Windows service account user associated to the " +
+      "Windows Service that will run the server.",
       "windows-service-account-password-file",
       new string[] { "windows-service-account-password-file", "win-service-account-pass-file", "service-account-pwd-file", "win-service-account-pwd-file", "service-account-password-file" },
       false,
       null,
       ConfigurationType.Reconfigure | ConfigurationType.Upgrade)]
-    public ExampleDatabase WindowsServiceAccountPasswordFile { get; set; }
+    public string WindowsServiceAccountPasswordFile { get; set; }
 
     #endregion
 
@@ -803,6 +846,7 @@ namespace MySql.Configurator.Core.Server
     public void LoadDefaultsForInstall()
     {
       ConfigureAsService = true;
+      ConfigureAsProcess = false;
       string name = ServerInstallation.DISPLAY_NAME.Replace('/', '.');
       PendingSystemTablesUpgrade = false;
       DataDirectory = $"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\\MySQL\\{name}";
@@ -939,6 +983,7 @@ namespace MySql.Configurator.Core.Server
       PipeName = DEFAULT_PIPE_OR_SHARED_MEMORY_NAME;
       SharedMemoryName = DEFAULT_PIPE_OR_SHARED_MEMORY_NAME;
       ConfigureAsService = true;
+      ConfigureAsProcess = false;
       ServiceStartAtStartup = true;
       ServiceAccountUsername = MySqlServiceControlManager.STANDARD_SERVICE_ACCOUNT;
       EnableQueryCacheSize = true;
@@ -1325,6 +1370,7 @@ namespace MySql.Configurator.Core.Server
       }
 
       ConfigureAsService = true;
+      ConfigureAsProcess = false;
       var configFileDirectory = !string.IsNullOrEmpty(IniDirectory) ? IniDirectory : DataDirectory;
       ServiceName = sm.GetBestServiceNameMatchingConfigFileDirectory(configFileDirectory);
       Service s = MySqlServiceControlManager.GetServiceDetails(ServiceName);

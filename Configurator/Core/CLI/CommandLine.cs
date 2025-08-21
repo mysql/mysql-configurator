@@ -136,13 +136,22 @@ namespace MySql.Configurator.Core.CLI
         return new CLIExitCode(ExitCode.ServerNotConfigured);
       }
 
-      // Validate that all provided options are applicable to the specified action.
       var optionsForConfigurationType = GetOptionsForAction(serverInstallation.Controller.ConfigurationType);
       foreach (var option in CommandLineParser.ProvidedOptions)
       {
+        // Validate that all provided options are applicable to the specified action.
         if (!optionsForConfigurationType.Any(configTypeOption => configTypeOption.Name.Equals(option.Name, StringComparison.InvariantCultureIgnoreCase)))
         {
           return new CLIExitCode(ExitCode.InvalidOptionForAction, serverInstallation.Controller.ConfigurationType.ToString(), option.Name);
+        }
+
+        // Check for deprecated aliases.
+        if (option.DeprecatedAliases != null
+            && option.DeprecatedAliases.Contains(option.ProvidedName))
+        {
+          var message = string.Format(Resources.CLIDeprecatedAliasWarning, option.ProvidedName, option.Name);
+          Logger.LogWarning(message);
+          Console.WriteLine(message);
         }
       }
 
@@ -170,7 +179,7 @@ namespace MySql.Configurator.Core.CLI
         }
       }
 
-      // Process special cases
+      // Process special cases.
       if (serverInstallation.Controller.ConfigurationType == ConfigurationType.Reconfigure)
       {
         if (CommandLineParser.ProvidedOptions.Count == 0)
@@ -505,6 +514,7 @@ namespace MySql.Configurator.Core.CLI
         {
           _existingServerInstallationInstance.Controller.Settings.ServiceName = serviceNames[0];
           _existingServerInstallationInstance.Controller.Settings.ConfigureAsService = true;
+          _existingServerInstallationInstance.Controller.Settings.ConfigureAsProcess = false;
         }
 
         var iniFile = new IniFileEngine(configFile).Load();
@@ -557,29 +567,62 @@ namespace MySql.Configurator.Core.CLI
       // Generate action options section.
       var builder = new StringBuilder();
       var options = GetOptionsForAction(actionType);
+      var properties = typeof(MySqlServerSettings).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(ServerSettingAttribute)));
       foreach (var option in options)
       {
-        string aliases = "N/A";
-        string shortcut = "N/A";
-        string supportedValues = "N/A";
+        builder.AppendLine($"--{option.Name}");
         if (!string.IsNullOrEmpty(option.Shortcut))
         {
-          shortcut = option.Shortcut;
+          builder.AppendLine($"Shortcut:\t-{option.Shortcut}");
         }
 
         if (option.Aliases != null
             && option.Aliases.Length > 0)
         {
-          aliases = string.Join(",", option.Aliases);
+          builder.Append("Aliases:\t");
+          builder.AppendLine(string.Join(", ", option.Aliases));
         }
 
         if (option.SupportedValues != null
             && option.SupportedValues.Length > 0)
         {
-          supportedValues = string.Join(",", option.SupportedValues);
+          builder.Append("Values:\t\t");
+          builder.AppendLine(string.Join(", ", option.SupportedValues));
+        }
+        else
+        {
+          foreach (var propertyInfo in properties)
+          {
+            var controllerSettingAttribute = propertyInfo.GetCustomAttributes(typeof(ServerSettingAttribute), true).First() as ServerSettingAttribute;
+            if (controllerSettingAttribute == null
+                || !controllerSettingAttribute.IsValidKeyword(option.Name)
+                || (propertyInfo.PropertyType != typeof(bool)
+                    && !propertyInfo.PropertyType.IsEnum))
+            {
+              continue;
+            }
+
+            builder.Append("Values:\t\t");
+            if (propertyInfo.PropertyType == typeof(bool))
+            {
+              builder.AppendLine("true, false");
+            }
+            else if (propertyInfo.PropertyType.IsEnum)
+            {
+              var values = Enum.GetValues(propertyInfo.PropertyType);
+              foreach (var value in values)
+              {
+                builder.Append($"{value.ToString()}, ");
+              }
+
+              builder.AppendLine();
+            }
+          }
         }
 
-        builder.AppendLine($"- {option.Name}:{shortcut}:{aliases}:{supportedValues}:{option.Description}");
+        builder.AppendLine($"Description:\t{option.Description}");
+        builder.AppendLine();
+        builder.AppendLine();
       }
 
       actionHelp = actionHelp.Replace("[options]", builder.ToString());
@@ -957,6 +1000,32 @@ namespace MySql.Configurator.Core.CLI
       if (serverInstallation.Controller.ConfigurationType == ConfigurationType.Configure
           || serverInstallation.Controller.ConfigurationType == ConfigurationType.Reconfigure)
       {
+        // Configure as service/process.
+        var configureAsServiceOption = CommandLineParser.GetMatchingProvidedOption("configure-as-service");
+        var configureAsProcessOption = CommandLineParser.GetMatchingProvidedOption("configure-as-process");
+        if (configureAsServiceOption != null
+            && configureAsProcessOption != null)
+        {
+          var configureAsService = bool.Parse(configureAsServiceOption.Value);
+          var configureAsProcess = bool.Parse(configureAsProcessOption.Value);
+          if (configureAsService == configureAsProcess)
+          {
+            return new CLIExitCode(ExitCode.ConflictingValues, configureAsProcessOption.Name, configureAsProcessOption.Value, configureAsServiceOption.Name);
+          }
+        }
+        else if (configureAsServiceOption != null)
+        {
+          serverInstallation.Controller.Settings.ConfigureAsService = bool.Parse(configureAsServiceOption.Value);
+          serverInstallation.Controller.Settings.ConfigureAsProcess = !serverInstallation.Controller.Settings.ConfigureAsService;
+          CommandLineParser.ProvidedOptions.Remove(configureAsServiceOption);
+        }
+        else if (configureAsProcessOption != null)
+        {
+          serverInstallation.Controller.Settings.ConfigureAsProcess = bool.Parse(configureAsProcessOption.Value);
+          serverInstallation.Controller.Settings.ConfigureAsService = !serverInstallation.Controller.Settings.ConfigureAsProcess;
+          CommandLineParser.ProvidedOptions.Remove(configureAsProcessOption);
+        }
+
         // Root password.
         var passwordOptionProcessingResult = ProcessPasswordOption("password", "defaults-extra-file", "MYSQL_PWD", serverInstallation);
         if (passwordOptionProcessingResult.ExitCode != ExitCode.Success)

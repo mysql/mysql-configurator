@@ -644,7 +644,7 @@ namespace MySql.Configurator.Core.Server
     public static ConnectionResultType CanConnect(ServerConfigurationController controller, out string errorMessage, string passwordOverride = null, bool useOldSettings = false, bool checkDataDirectoryInUse = false)
     {
       errorMessage = null;
-      var mySqlErrorLog = new ServerErrorLog(controller.ErrorLogFilePath);
+      var mySqlErrorLog = new ServerErrorLog(controller);
       var connectionResult = CanConnect(controller, passwordOverride, useOldSettings);
       if (!checkDataDirectoryInUse
           || connectionResult != ConnectionResultType.HostNotRunning)
@@ -1865,7 +1865,7 @@ namespace MySql.Configurator.Core.Server
       if (parseErrorLog)
       {
         _controller.UseStatusesList = redirectOutputToConsole;
-        mySqlErrorLog = new ServerErrorLog(_controller.ErrorLogFilePath, redirectOutputToConsole ? _controller.StatusesList : null)
+        mySqlErrorLog = new ServerErrorLog(_controller, redirectOutputToConsole ? _controller.StatusesList : null)
         {
           ReportStatusDelegate = ReportStatus,
           ReportWaitingDelegate = _controller.ReportWaiting
@@ -1950,7 +1950,7 @@ namespace MySql.Configurator.Core.Server
       var startStatus = new ServerStartStatus(true);
       Task<ServerUpgradeStatus> parsingLogForUpgradeTask = null;
       Task<bool> parsingLogTask = null;
-      var mySqlErrorLog = new ServerErrorLog(_controller.ErrorLogFilePath)
+      var mySqlErrorLog = new ServerErrorLog(_controller)
       {
         ReportStatusDelegate = ReportStatus,
         ReportWaitingDelegate = _controller.ReportWaiting

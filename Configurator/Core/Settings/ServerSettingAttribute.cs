@@ -1,4 +1,4 @@
-/* Copyright (c) 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2024, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -37,10 +37,99 @@ namespace MySql.Configurator.Core.Settings
     /// Initializes a configurable server setting.
     /// </summary>
     /// <param name="description">The description of the setting.</param>
+    /// <param name="name">The name of the setting.</param>
+    /// <param name="aliases">The permitted aliases.</param>
+    public ServerSettingAttribute(string description,
+      string name,
+      string[] aliases)
+    {
+      Name = name;
+      Keywords = new List<string>();
+      if (name.Contains('-'))
+      {
+        Keywords.Add(name.Replace('-', '_'));
+      }
+
+      var newAliases = new List<string>();
+      if (aliases != null)
+      {
+        Keywords.AddRange(aliases);
+        newAliases = new List<string>();
+        foreach (var alias in aliases)
+        {
+          if (!alias.Contains('-'))
+          {
+            continue;
+          }
+
+          newAliases.Add(alias.Replace('-', '_'));
+        }
+
+        Keywords.AddRange(newAliases);
+      }
+
+      AllKeywords = new List<string>();
+      AllKeywords.Add(name);
+      if (name.Contains('-'))
+      {
+        AllKeywords.Add(name.Replace('-', '_'));
+      }
+
+      if (aliases != null)
+      {
+        AllKeywords.AddRange(aliases);
+        AllKeywords.AddRange(newAliases);
+      }
+
+      Description = description;
+      SupportedConfigurationTypes = ConfigurationType.Configure | ConfigurationType.Reconfigure;
+    }
+
+    /// <summary>
+    /// Initializes a configurable server setting.
+    /// </summary>
+    /// <param name="description">The description of the setting.</param>
+    /// <param name="name">The name of the setting.</param>
+    /// <param name="aliases">The permitted aliases.</param>
+    /// <param name="deprecatedAliases">The permitted aliases that have been deprecated.</param>
+    public ServerSettingAttribute(string description,
+      string name,
+      string[] aliases,
+      string[] deprecatedAliases = null)
+      : this(description, name, aliases)
+    {
+      DeprecatedAliases = new List<string>();
+      if (deprecatedAliases != null)
+      {
+        DeprecatedAliases.AddRange(deprecatedAliases);
+        var newDeprecatedAliases = new List<string>();
+        foreach (var deprecatedAlias in deprecatedAliases)
+        {
+          if (!deprecatedAlias.Contains('-'))
+          {
+            continue;
+          }
+
+          newDeprecatedAliases.Add(deprecatedAlias.Replace('-', '_'));
+        }
+
+        DeprecatedAliases.AddRange(newDeprecatedAliases);
+        AllKeywords.AddRange(DeprecatedAliases);
+      }
+    }
+
+    // <summary>
+    /// Initializes a configurable server setting.
+    /// </summary>
+    /// <param name="description">The description of the setting.</param>
+    /// <param name="name">The name of the setting.</param>
     /// <param name="aliases">The permitted aliases.</param>
     /// <param name="required">Flag indicating if the setting is required.</param>
-    /// <param name="deprecatedKeywords">The permitted aliases that have been deprectaded.</param>
+    /// <param name="shortcut">A string representing a shortcut for this setting.</param>
+    /// <param name="supportedConfigurationTypes">The configuration types for which this setting is supported.</param>
+    /// <param name="supportedValues">The list of allowed values.</param>
     /// <param name="checkAction">Indicates the name of the validation that should be made for this setting.</param>
+    /// <param name="deprecatedAlias">The permitted aliases that have been deprecated.</param>
     public ServerSettingAttribute(string description,
       string name,
       string[] aliases,
@@ -49,31 +138,10 @@ namespace MySql.Configurator.Core.Settings
       ConfigurationType supportedConfigurationTypes = ConfigurationType.Configure | ConfigurationType.Reconfigure,
       string[] supportedValues = null, 
       string checkAction = null,
-      string[] deprecatedKeywords = null)
+      string[] deprecatedAlias = null)
+      : this(description, name, aliases, deprecatedAlias)
     {
-      Name = name;
-      Keywords = new List<string>();
-      if (aliases != null)
-      {
-        Keywords.AddRange(aliases);
-      }
-
-      AllKeywords = new List<string>();
-      AllKeywords.Add(name);
-      if (aliases != null)
-      {
-        AllKeywords.AddRange(aliases);
-      }
-
-      DeprecatedKeywords = new List<string>();
-      if (deprecatedKeywords != null)
-      {
-        DeprecatedKeywords.AddRange(deprecatedKeywords);
-        AllKeywords.AddRange(DeprecatedKeywords);
-      }
-
       CheckAction = checkAction;
-      Description = description;
       Required = required;
       Shortcut = shortcut;
       if (!string.IsNullOrEmpty(shortcut))
@@ -102,9 +170,9 @@ namespace MySql.Configurator.Core.Settings
     public string CheckAction { get; private set; }
 
     /// <summary>
-    /// Gets or sets the list of valid aliases that are deprecated.
+    /// Gets or sets the list of aliases that are deprecated.
     /// </summary>
-    public List<string> DeprecatedKeywords { get; private set; }
+    public List<string> DeprecatedAliases { get; private set; }
 
     /// <summary>
     /// Gets or sets the description of the server setting.

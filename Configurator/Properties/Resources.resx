@@ -1890,14 +1890,12 @@ Syntax
 
 Options
 ---------------------------------------------------------------------------------------------------
-Name:Shortcut:Aliases:Supported Values:Description
----------------------------------------------------------------------------------------------------
 [options]
 
 Usage examples
 ---------------------------------------------------------------------------------------------------
 --action=configure --password=test
---action=configure --password=test --port=3320 enable-named-pipes --pipe-name=MYSQL_PIPE --server-id=2 --install-sample-database=All
+--action=configure --password=test --port=3320 enable-named-pipes --pipe-name=MYSQL_PIPE --server-id=2 --install-sample-databases=All
 --action=configure --password=other123 --add-user='john':'pa$$':localhost:'DBA':MYSQL --add-user='mary':'p4ssW0rd':%:'DBDesigner':MYSQL
 
 Notes
@@ -1917,8 +1915,6 @@ Syntax
 
 
 Options
----------------------------------------------------------------------------------------------------
-Name:Shortcut:Aliases:Supported Values:Description
 ---------------------------------------------------------------------------------------------------
 [options]
 
@@ -1940,8 +1936,6 @@ Syntax
 
 
 Options
----------------------------------------------------------------------------------------------------
-Name:Shortcut:Aliases:Supported Values:Description
 ---------------------------------------------------------------------------------------------------
 [options]
 
@@ -1966,14 +1960,12 @@ Syntax
 
 Options
 ---------------------------------------------------------------------------------------------------
-Name:Shortcut:Aliases:Supported Values:Description
----------------------------------------------------------------------------------------------------
 [options]
 
 Usage examples
 ---------------------------------------------------------------------------------------------------
 --action=upgrade --old-instance-password=test
---action=upgrade --old-instance-password=test --backup-data=false --server-file-permissions-access=FullAccess
+--action=upgrade --old-instance-password=test --backup-data=false
 </value>
   </data>
   <data name="CLISuccessfulConnection" xml:space="preserve">
@@ -2050,5 +2042,8 @@ Usage examples
   </data>
   <data name="MySqlPwdValueIsNotAFile" xml:space="preserve">
     <value>The value provided in the MYSQL_PWD environment variable is not a file, value will be used as the password for the root user.</value>
+  </data>
+  <data name="CLIDeprecatedAliasWarning" xml:space="preserve">
+    <value>The provided alias '{0}' is deprecated for option '{1}'. Usage of a valid alias is recommended as deprecated elements may be removed in the future.</value>
   </data>
 </root>

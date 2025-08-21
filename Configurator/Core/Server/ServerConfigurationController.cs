@@ -3584,6 +3584,7 @@ namespace MySql.Configurator.Core.Server
               && !IsServiceRenameNeeded)
           {
             Settings.ConfigureAsService = false;
+            Settings.ConfigureAsProcess = true;
           }
         }
 

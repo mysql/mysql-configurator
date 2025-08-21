@@ -21,6 +21,7 @@
   along with this program; if not, write to the Free Software Foundation, Inc., 
   51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
+using MySql.Configurator.Core.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -48,7 +49,7 @@ namespace MySql.Configurator.Core.Server
     /// <summary>
     /// The number of loops to wait before timing out if the accepting connections message is not read.
     /// </summary>
-    public const int DEFAULT_TIMEOUT_LOOPS_IF_NOT_ACCEPTING_CONNECTIONS = 120;
+    public const int DEFAULT_TIMEOUT_LOOPS_IF_NOT_ACCEPTING_CONNECTIONS = 20;
 
     /// <summary>
     /// The regex string to check if a server is accepting connections after being started.
@@ -80,6 +81,11 @@ namespace MySql.Configurator.Core.Server
     #region Fields
 
     /// <summary>
+    /// The server controller.
+    /// </summary>
+    private ServerConfigurationController _controller; 
+
+    /// <summary>
     /// The <see cref="FileInfo"/> related to the error log file.
     /// </summary>
     private readonly FileInfo _fileInfo;
@@ -99,18 +105,18 @@ namespace MySql.Configurator.Core.Server
     /// <summary>
     /// Initializes a new instance of the <see cref="ServerErrorLog"/> class.
     /// </summary>
-    /// <param name="filePath">The file path of the MySQL error log file.</param>
     /// <param name="logLines">A list of error log lines.</param>
-    public ServerErrorLog(string filePath, List<string> logLines = null)
+    public ServerErrorLog(ServerConfigurationController controller, List<string> logLines = null)
     {
-      _fileInfo = string.IsNullOrEmpty(filePath)
+      _controller = controller;
+      _fileInfo = string.IsNullOrEmpty(_controller.ErrorLogFilePath)
         ? null
-        : new FileInfo(filePath);
+        : new FileInfo(_controller.ErrorLogFilePath);
       _lastFilePosition = _fileInfo != null && _fileInfo.Exists
         ? _fileInfo.Length
         : -1;
       _lastFileSize = _lastFilePosition;
-      FilePath = filePath;
+      FilePath = _controller.ErrorLogFilePath;
       LogLines = new List<ServerErrorLogLine>();
       if (logLines != null)
       {
@@ -335,6 +341,11 @@ namespace MySql.Configurator.Core.Server
         if (fromLogFile)
         {
           ReadNewLinesFromFile(reportStatus);
+        }
+        else if (_controller.UseStatusesList)
+        {
+          LogLines.Clear();
+          _controller.StatusesList.ForEach(line => LogLines.Add(ServerErrorLogLine.Parse(line)));
         }
 
         lastErrorLogLinesCount = newErrorLogLinesCount;

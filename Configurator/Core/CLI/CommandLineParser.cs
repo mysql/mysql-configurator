@@ -23,15 +23,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using MySql.Configurator.Base.Classes;
 using MySql.Configurator.Base.Enums;
-using MySql.Configurator.Core.Firewall;
 using MySql.Configurator.Core.Server;
 using MySql.Configurator.Core.Settings;
-using MySql.Configurator.Properties;
 
 namespace MySql.Configurator.Core.CLI
 {
@@ -57,10 +54,10 @@ namespace MySql.Configurator.Core.CLI
       ProvidedOptions = new List<CommandLineOption>();
       SupportedOptions = new List<CommandLineOption>()
       {
-        new CommandLineOption("console", null, null, false, false, false, "c"),
-        new CommandLineOption("action", null, null, true, false, false, "a", new string[]{ "configure", "reconfigure", "upgrade", "remove", "removenoshow" }),
-        new CommandLineOption("help", null, null, false, false, false,"h"),
-        new CommandLineOption("add-user", null, null, true, true)
+        new CommandLineOption("console", null, null, null, false, false, false, "c"),
+        new CommandLineOption("action", null, null, null, true, false, false, "a", new string[]{ "configure", "reconfigure", "upgrade", "remove", "removenoshow" }),
+        new CommandLineOption("help", null, null, null, false, false, false,"h"),
+        new CommandLineOption("add-user", null, null, null, true, true)
       };
       SupportedOptions.AddRange(GetServerConfigurableSettings());
     }
@@ -115,7 +112,7 @@ namespace MySql.Configurator.Core.CLI
         options = options.Where(attribute => attribute != null && attribute.SupportedConfigurationTypes.HasFlag(action));
       }
 
-      return options.Select(attribute => new CommandLineOption(attribute.Name, attribute.Description, attribute.Keywords.ToArray(), true, false, attribute.Required, attribute.Shortcut, attribute.SupportedValues?.ToArray(), attribute.CheckAction)).ToList();
+      return options.Select(attribute => new CommandLineOption(attribute.Name, attribute.Description, null, attribute.Keywords.ToArray(), true, false, attribute.Required, attribute.Shortcut, attribute.SupportedValues?.ToArray(), attribute.CheckAction, attribute.DeprecatedAliases?.ToArray())).ToList();
     }
 
     /// <summary>
@@ -282,6 +279,8 @@ namespace MySql.Configurator.Core.CLI
       return collection.FirstOrDefault(option => (option.Name.Equals(optionName, StringComparison.InvariantCultureIgnoreCase)
                                                   || (option.Aliases != null
                                                       && option.Aliases.Contains(optionName, StringComparer.InvariantCultureIgnoreCase))
+                                                  || (option.DeprecatedAliases != null
+                                                      && option.DeprecatedAliases.Contains(optionName, StringComparer.InvariantCultureIgnoreCase))
                                                   || (!string.IsNullOrEmpty(option.Shortcut)
                                                       && option.Shortcut.Equals(optionName, StringComparison.InvariantCulture))));
 
@@ -306,15 +305,17 @@ namespace MySql.Configurator.Core.CLI
       if (option != null)
       {
         commandLineOption = new CommandLineOption(
-        option.Name,
-        option.Description,
-        option.Aliases,
-        option.SupportsValue,
-        option.SupportsRepeat,
-        option.Required,
-        option.Shortcut,
-        option.SupportedValues,
-        option.CheckAction
+          option.Name,
+          option.Description,
+          optionName,
+          option.Aliases,
+          option.SupportsValue,
+          option.SupportsRepeat,
+          option.Required,
+          option.Shortcut,
+          option.SupportedValues,
+          option.CheckAction,
+          option.DeprecatedAliases
         );
         commandLineOption.Value = optionValue;
       }
