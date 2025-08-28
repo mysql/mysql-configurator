@@ -209,7 +209,6 @@ namespace MySql.Configurator.Core.Server
       MaxConnectionRetries = DEFAULT_MAX_CONNECTION_RETRIES;
       Type = ServerConfigurationType.StandAlone;
       ParseErrorLogForAcceptingConnections = true;
-      Port = _controller.Settings.Port;
       UserAccount = MySqlServerUser.GetLocalRootUser(_controller.Settings.RootPassword, _controller.Settings.DefaultAuthenticationPlugin);
       UseOldSettings = false;
       WaitUntilAcceptingConnections = true;
