@@ -1793,7 +1793,7 @@ namespace MySql.Configurator.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to MZ����@���	�!�L�!This program cannot be run in DOS mode.        ///
-        ///$PEL�@@��&quot; 0�&amp;�  @        ///�`���O� ��T  H.text�� � `.rsrc��@@.reloc �@B [rest of string was truncated]&quot;;.
+        ///$PEL�����&quot; 0��   `3`�:O T@DT  H.text0� � `.rsrcT �@@.reloc@�@B [rest of string was truncated]&quot;;.
         /// </summary>
         public static string MySql_Data {
             get {
