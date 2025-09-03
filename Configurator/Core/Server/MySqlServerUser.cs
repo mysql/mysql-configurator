@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -372,8 +372,8 @@ namespace MySql.Configurator.Core.Server
         return Resources.MySqlServerUserNameInvalidRoot;
       }
 
-      var clusterNameRegex = new Regex(MySqlServerInstance.NAME_REGEX_VALIDATION);
-      return clusterNameRegex.IsMatch(trimmedUserName)
+      var userNameRegex = new Regex(MySqlServerInstance.NAME_REGEX_VALIDATION);
+      return userNameRegex.IsMatch(trimmedUserName)
         ? string.Empty
         : Resources.MySqlServerUsernameInvalid;
     }

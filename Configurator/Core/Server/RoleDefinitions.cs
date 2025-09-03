@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -74,6 +74,21 @@ namespace MySql.Configurator.Core.Server
     /// <returns>A SQL statement for a CREATE USER or ALTER USER operation.</returns>
     public string GetCreateOrAlterUserSql(UserCrudOperationType type, MySqlServerUser serverUser)
     {
+      // Remove double quotes/backticks if needed. Single quotes are already added when building the command. 
+      if (serverUser.Username.StartsWith("\\\"")
+          || serverUser.Username.StartsWith("\\\'"))
+      {
+        serverUser.Username = serverUser.Username.Substring(2, serverUser.Username.Length - 4);
+      }
+      else if (serverUser.Username.StartsWith("`"))
+      {
+        serverUser.Username = serverUser.Username.Substring(1, serverUser.Username.Length - 2);
+      }
+
+      // Trim after removing quotes since server has same behavior with the CREATE USER command.
+      serverUser.Username = serverUser.Username.Trim();
+
+      // Create sql command.
       var builder = new StringBuilder();
       builder.Append(type.GetDescription());
       builder.Append(" '");

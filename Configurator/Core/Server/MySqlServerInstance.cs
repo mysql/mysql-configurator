@@ -114,7 +114,7 @@ namespace MySql.Configurator.Core.Server
     /// <summary>
     /// The regex used to validate MySQL user and cluster names.
     /// </summary>
-    public const string NAME_REGEX_VALIDATION = @"^(\w|\d|_|\s)+$";
+    public const string NAME_REGEX_VALIDATION = @"^(?<username>(?:(?:\w|\d|_)+|('|""|`)[\u0001-\uFFFF]+\1))$";
 
     /// <summary>
     /// The minimum suggested length for a password.
