@@ -490,7 +490,13 @@ namespace MySql.Configurator.Core.Server
     [ServerSetting("Creates Windows Firewall rules to allow traffic through both the classic and x protocol TCP/IP ports.",
       "create-windows-firewall-rules",
       new string[] { "create-firewall-rules", "create-win-fw-rules", "create-fw-rules" },
-      new string[] { "open-win-firewall", "open-windows-firewall", "openfirewall" })]
+      false,
+      null,
+      ConfigurationType.Configure | ConfigurationType.Reconfigure,
+      null,
+      null,
+      new string[] { "open-win-firewall", "open-windows-firewall", "openfirewall" },
+      new string[] { "enable-tcp-ip=true" })]
     [DefaultValue(true)]
     public bool OpenFirewall { get; set; }
 
