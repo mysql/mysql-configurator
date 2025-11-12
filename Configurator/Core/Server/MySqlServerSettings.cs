@@ -302,7 +302,13 @@ namespace MySql.Configurator.Core.Server
       "data directory.",
       "general-log-file-name",
       new string[] { "general-log-file", "general-log-path" },
-      new string[] { "generallogname" })]
+      false,
+      null,
+      ConfigurationType.Configure | ConfigurationType.Reconfigure,
+      null,
+      null,
+      new string[] { "generallogname" },
+      new string[] { "enable-general-log=true" })]
     public string GeneralQueryLogFileName { get; set; }
 
     /// <summary>
@@ -809,6 +815,40 @@ namespace MySql.Configurator.Core.Server
       }
 
       return t;
+    }
+
+    /// <summary>
+    /// Gets the value of the property associated to the provided CLI option.
+    /// </summary>
+    /// <param name="keyword">The name of the CLI option for which to recover the property name.</param>
+    /// <returns>A string representing the value assigned to the specified property.</returns>
+    public string GetValue(string keyword)
+    {
+      var type = GetType();
+      var props = type.GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(ServerSettingAttribute)));
+      foreach (var propertyInfo in props)
+      {
+        var controllerSettingAttribute = propertyInfo.GetCustomAttributes(typeof(ServerSettingAttribute), true).First() as ServerSettingAttribute;
+        if (controllerSettingAttribute == null
+            || !controllerSettingAttribute.IsValidKeyword(keyword))
+        {
+          continue;
+        }
+
+        try
+        {
+          var propertyName = propertyInfo.Name;
+          var value = propertyInfo.GetValue(this);
+          return value.ToString();
+        }
+        catch (Exception ex)
+        {
+          Logger.LogException(ex);
+          return null;
+        }
+      }
+
+      return null;
     }
 
     public bool HasChanges()

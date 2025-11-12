@@ -209,5 +209,8 @@ namespace MySql.Configurator.Base.Enums
 
     [Description("The password file path '{0}' does not exist.")]
     ErrorPasswordFileDoesNotExist = 91,
+
+    [Description("Option '{0}' can only be used when option '{1}' is set to '{2}'.")]
+    ValueNotMatchingCondition = 92,
   }
 }

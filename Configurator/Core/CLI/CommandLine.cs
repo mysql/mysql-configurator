@@ -153,6 +153,46 @@ namespace MySql.Configurator.Core.CLI
           Logger.LogWarning(message);
           Console.WriteLine(message);
         }
+
+        // Check for conditions.
+        if (option.Conditions != null
+            && option.Conditions.Count > 0)
+        {
+          foreach (var condition in option.Conditions)
+          {
+            var conditionOption = CommandLineParser.ProvidedOptions.FirstOrDefault(providedOption => providedOption.Name.Equals(condition.Key, StringComparison.InvariantCultureIgnoreCase));
+
+            /*
+              Check if the default value of the option matches the conditions.
+              Otherwise, check if an option provided by the user matches the conditions.
+            */
+            if (conditionOption == null)
+            {
+              conditionOption = CommandLineParser.SupportedOptions.FirstOrDefault(providedOption => providedOption.Name.Equals(condition.Key, StringComparison.InvariantCultureIgnoreCase));
+              if (conditionOption == null)
+              {
+                throw new ArgumentNullException(nameof(conditionOption));
+              }
+
+              var value = serverInstallation.Controller.Settings.GetValue(condition.Key);
+              if (value == null)
+              {
+                throw new ArgumentNullException(nameof(conditionOption));
+              }
+
+              if (!condition.Value.Equals(value, StringComparison.InvariantCultureIgnoreCase))
+              {
+                return new CLIExitCode(ExitCode.ValueNotMatchingCondition, option.Name, condition.Key, condition.Value);
+              }
+
+              continue;
+            }
+            else if (!condition.Value.Equals(conditionOption.Value))
+            {
+              return new CLIExitCode(ExitCode.ValueNotMatchingCondition, option.Name, condition.Key, condition.Value);
+            }
+          }
+        }
       }
 
       // Process special options

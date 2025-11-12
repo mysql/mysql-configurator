@@ -112,7 +112,7 @@ namespace MySql.Configurator.Core.CLI
         options = options.Where(attribute => attribute != null && attribute.SupportedConfigurationTypes.HasFlag(action));
       }
 
-      return options.Select(attribute => new CommandLineOption(attribute.Name, attribute.Description, null, attribute.Keywords.ToArray(), true, false, attribute.Required, attribute.Shortcut, attribute.SupportedValues?.ToArray(), attribute.CheckAction, attribute.DeprecatedAliases?.ToArray())).ToList();
+      return options.Select(attribute => new CommandLineOption(attribute.Name, attribute.Description, null, attribute.Keywords.ToArray(), true, false, attribute.Required, attribute.Shortcut, attribute.SupportedValues?.ToArray(), attribute.CheckAction, attribute.DeprecatedAliases?.ToArray(), attribute.Conditions)).ToList();
     }
 
     /// <summary>
@@ -315,7 +315,8 @@ namespace MySql.Configurator.Core.CLI
           option.Shortcut,
           option.SupportedValues,
           option.CheckAction,
-          option.DeprecatedAliases
+          option.DeprecatedAliases,
+          option.Conditions
         );
         commandLineOption.Value = optionValue;
       }

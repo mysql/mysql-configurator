@@ -21,6 +21,8 @@
   along with this program; if not, write to the Free Software Foundation, Inc., 
   51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
+using System.Collections.Generic;
+
 namespace MySql.Configurator.Core.CLI
 {
   public class CommandLineOption
@@ -39,7 +41,8 @@ namespace MySql.Configurator.Core.CLI
     /// <param name="supportedValues">A list of supported values (if applicable).</param>
     /// <param name="checkAction">Indicates the name of the validation that should be made for this option.</param>
     /// <param name="deprecatedAliases">The permitted aliases that have been deprectaded.</param>
-    public CommandLineOption(string name, string description, string providedName, string[] aliases = null, bool supportsValue = true, bool supportsRepeat = false, bool required = false, string shortcut = null, string[] supportedValues = null, string checkAction = null, string[] deprecatedAliases = null)
+    /// <param name="conditions">The conditions that must be met before this option can be used.</param>
+    public CommandLineOption(string name, string description, string providedName, string[] aliases = null, bool supportsValue = true, bool supportsRepeat = false, bool required = false, string shortcut = null, string[] supportedValues = null, string checkAction = null, string[] deprecatedAliases = null, List<KeyValuePair<string, string>> conditions = null)
     {
       Aliases = aliases;
       CheckAction = checkAction;
@@ -47,6 +50,7 @@ namespace MySql.Configurator.Core.CLI
       HasFixedValues = supportedValues != null
         && supportedValues.Length > 0;
       Name = name;
+      Conditions = conditions;
       ProvidedName = providedName;
       Required = required;
       Shortcut = shortcut;
@@ -87,6 +91,12 @@ namespace MySql.Configurator.Core.CLI
     /// Gets or sets the name of this option.
     /// </summary>
     public string Name { get; private set; }
+
+    /// <summary>
+    /// Gets or sets a list of key value pairs indicating the conditions that 
+    /// must be met to allow this setting to be used.
+    /// </summary>
+    public List<KeyValuePair<string, string>> Conditions { get; private set; }
 
     /// <summary>
     /// Gets or sets the name of the option provided by the user.

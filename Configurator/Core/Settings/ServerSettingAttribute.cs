@@ -130,6 +130,7 @@ namespace MySql.Configurator.Core.Settings
     /// <param name="supportedValues">The list of allowed values.</param>
     /// <param name="checkAction">Indicates the name of the validation that should be made for this setting.</param>
     /// <param name="deprecatedAlias">The permitted aliases that have been deprecated.</param>
+    /// <param name="conditions">The list of conditions that must be met for this option to be used.</param>
     public ServerSettingAttribute(string description,
       string name,
       string[] aliases,
@@ -138,7 +139,8 @@ namespace MySql.Configurator.Core.Settings
       ConfigurationType supportedConfigurationTypes = ConfigurationType.Configure | ConfigurationType.Reconfigure,
       string[] supportedValues = null, 
       string checkAction = null,
-      string[] deprecatedAlias = null)
+      string[] deprecatedAlias = null,
+      string[] conditions = null)
       : this(description, name, aliases, deprecatedAlias)
     {
       CheckAction = checkAction;
@@ -154,6 +156,22 @@ namespace MySql.Configurator.Core.Settings
       if (supportedValues != null)
       {
         SupportedValues.AddRange(supportedValues);
+      }
+
+      if (conditions != null)
+      {
+        Conditions = new List<KeyValuePair<string, string>>();
+        foreach (var prerequisite in conditions)
+        {
+          var parts = prerequisite.Split(new[] { '=' }, 2, StringSplitOptions.None);
+          if (parts.Length != 2)
+          {
+            throw new FormatException(string.Format("Invalid format of the prequisite condition for option '{0}'.", Name));
+          }
+
+          var pair = new KeyValuePair<string, string>(parts[0].Trim(), parts[1].Trim());
+          Conditions.Add(pair);
+        }
       }
     }
 
@@ -193,6 +211,12 @@ namespace MySql.Configurator.Core.Settings
     /// Gets or sets a flag indicating if the server setting is required.
     /// </summary>
     public bool Required { get; private set; }
+
+    /// <summary>
+    /// Gets or sets a list of key value pairs indicating the conditions that 
+    /// must be met to allow this setting to be used.
+    /// </summary>
+    public List<KeyValuePair<string, string>> Conditions { get; private set; }
 
     /// <summary>
     /// Gets or set the shortcut used to refer to this server setting.
