@@ -633,7 +633,13 @@ namespace MySql.Configurator.Core.Server
       "of the file is the data directory.",
       "slow-query-log-file",
       new string[] { "slow-log-file", "slow-log-file-name", "slow-query-log-file", "slow-query-log-file-name", "slow-log-path", "slow-query-log-path" },
-      new string[] { "slowlogname" })]
+      false,
+      null,
+      ConfigurationType.Configure | ConfigurationType.Reconfigure,
+      null,
+      null,
+      new string[] { "slowlogname" },
+      new string[] { "enable-slow-query-log=true" })]
     public string SlowQueryLogFileName { get; set; }
 
     [ServerSetting("Uninstalls the specified sample databases (Sakila/World).",
