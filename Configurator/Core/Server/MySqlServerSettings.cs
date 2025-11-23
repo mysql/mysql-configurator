@@ -563,13 +563,25 @@ namespace MySql.Configurator.Core.Server
     [ServerSetting("Defines a comma separated list of Windows users or groups that will have full access to the server files.",
       "server-file-full-permissions-list",
       new string[] { "server-file-full-access-list", "server-file-full-control-list" },
-      new string[] { "full-access-list", "full-control-list" })]
+      false,
+      null,
+      ConfigurationType.Configure | ConfigurationType.Reconfigure,
+      null,
+      null,
+      new string[] { "full-access-list", "full-control-list" },
+      new string[] { "server-file-permissions=Configure" })]
     public string ServerFileFullControlList { get; set; }
 
     [ServerSetting("Defines a comma separated list of users or groups that will not have any type of access to the server files.",
       "server-file-no-permissions-list",
       new string[] { "server-file-no-access-list" },
-      new string[] { "no-access-list" })]
+      false,
+      null,
+      ConfigurationType.Configure | ConfigurationType.Reconfigure,
+      null,
+      null,
+      new string[] { "no-access-list" },
+      new string[] { "server-file-permissions=Configure" })]
     public string ServerFileNoAccessList { get; set; }
 
     [ServerSetting("For servers that are used in a replication topology, you must specify a unique server ID for each replication server, " +

@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -1526,6 +1526,23 @@ namespace MySql.Configurator.Base.Classes
         // Free memory obtained by CommandLineToArgW.
         LocalFree(ptrToSplitArgs);
       }
+    }
+
+    /// <summary>
+    /// Splits the given comma separated string into an array of strings.
+    /// </summary>
+    /// <param name="input">The string to split.</param>
+    /// <returns>An array of strings.</returns>
+    public static string[] SplitCommaSeparatedList(string input)
+    {
+      if (string.IsNullOrWhiteSpace(input))
+      {
+        return new string[0];
+      }
+
+      return input.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                  .Select(item => item.Trim())
+                  .ToArray();
     }
 
     private static void FindAllControls(Control container, ICollection<Control> ctrlList)

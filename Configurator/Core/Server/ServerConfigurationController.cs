@@ -617,7 +617,8 @@ namespace MySql.Configurator.Core.Server
                                                             && (ConfigurationType == ConfigurationType.Configure
                                                                 || (ConfigurationType == ConfigurationType.Reconfigure
                                                                     || ConfigurationType == ConfigurationType.Upgrade
-                                                                    && IsThereServerDataFiles));
+                                                                    && IsThereServerDataFiles))
+                                                            && Settings.ServerFilePermissionsAccess != ServerFilePermissionsAccess.Manual;
 
     /// <summary>
     /// Gets or sets a value indicating whether the configuration step that updates Enterprise Firewall needs to run.
@@ -696,6 +697,11 @@ namespace MySql.Configurator.Core.Server
                                                       || (ConfigurationType == ConfigurationType.Upgrade
                                                           && (!IsThereServerDataFiles
                                                               || ExistingServerInstallationInstance != null)));
+
+    /// <summary>
+    /// Gets or sets the list of local users or groups that will not have access to the data directory.
+    /// </summary>
+    public Dictionary<SecurityIdentifier, string> NoAccessDictionary { get; set; }
 
     /// <summary>
     /// Gets the settings of the existing server installation.
@@ -3420,36 +3426,21 @@ namespace MySql.Configurator.Core.Server
     private void UpdateServerFilesPermissions()
     {
       CancellationToken.ThrowIfCancellationRequested();
-      if (FullControlDictionary.Count == 0)
+      if (FullControlDictionary.Count > 0
+          && Settings.ConfigureAsService
+          && !string.IsNullOrEmpty(Settings.ServiceAccountUsername))
       {
-        try
-        {
-          var _administratorsGroup = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
-          var _creatorOwnerUser = new SecurityIdentifier(WellKnownSidType.CreatorOwnerSid, null);
-          var _systemAccountUser = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
-          if (Settings.ConfigureAsService)
-          {
-            var serviceAccountUsername = Settings.ServiceAccountUsername.StartsWith(".")
+        var serviceAccountUsername = Settings.ServiceAccountUsername.StartsWith(".")
                                        ? Settings.ServiceAccountUsername.Replace(".", Environment.MachineName)
                                        : Settings.ServiceAccountUsername;
-            var sid = DirectoryServicesWrapper.GetSecurityIdentifier(serviceAccountUsername);
-            if (sid == null)
-            {
-              Logger.LogError(string.Format(Resources.ServerConfigSidRetrievalFailure, Settings.ServiceAccountUsername));
-            }
-            else
-            {
-              FullControlDictionary.Add(sid, "User");
-            }
-          }
-
-          FullControlDictionary.Add(_administratorsGroup, "Group");
-          FullControlDictionary.Add(_creatorOwnerUser, "User");
-          FullControlDictionary.Add(_systemAccountUser, "User");
-        }
-        catch (Exception ex)
+        var sid = DirectoryServicesWrapper.GetSecurityIdentifier(serviceAccountUsername);
+        if (sid == null)
         {
-          Logger.LogException(ex);
+          Logger.LogError(string.Format(Resources.ServerConfigSidRetrievalFailure, Settings.ServiceAccountUsername));
+        }
+        else
+        {
+          FullControlDictionary.Add(sid, "User");
         }
       }
 
@@ -3493,21 +3484,42 @@ namespace MySql.Configurator.Core.Server
           // Next grant full control to selected users/groups.
           if (success)
           {
-            foreach (var item in FullControlDictionary)
+            if (FullControlDictionary != null
+                && FullControlDictionary.Count > 0)
             {
-              var accountName = DirectoryServicesWrapper.GetAccountName(item.Key);
-              if (!DirectoryServicesWrapper.GrantPermissionsToDirectory(dataDirectory, accountName, FileSystemRights.FullControl, AccessControlType.Allow, true))
+              foreach (var item in FullControlDictionary)
               {
-                ReportStatus(string.Format(Resources.ServerConfigGrantedFullControlFailed, DirectoryServicesWrapper.GetAccountName(item.Key)));
-                break;
-              }
+                var accountName = DirectoryServicesWrapper.GetAccountName(item.Key);
+                if (!DirectoryServicesWrapper.GrantPermissionsToDirectory(dataDirectory, accountName, FileSystemRights.FullControl, AccessControlType.Allow, true))
+                {
+                  ReportStatus(string.Format(Resources.ServerConfigGrantedFullControlFailed, DirectoryServicesWrapper.GetAccountName(item.Key)));
+                  break;
+                }
 
-              ReportStatus(string.Format(Resources.ServerConfigGrantedFullControlSuccess, DirectoryServicesWrapper.GetAccountName(item.Key)));
+                ReportStatus(string.Format(Resources.ServerConfigGrantedFullControlSuccess, DirectoryServicesWrapper.GetAccountName(item.Key)));
+              }
+            }
+
+            if (NoAccessDictionary != null
+                && NoAccessDictionary.Count > 0)
+            {
+              foreach (var item in NoAccessDictionary)
+              {
+                var accountName = DirectoryServicesWrapper.GetAccountName(item.Key);
+                if (!DirectoryServicesWrapper.RemoveGroupPermissions(dataDirectory, DirectoryServicesWrapper.GetSecurityIdentifier(accountName), true))
+                {
+                  ReportStatus(string.Format(Resources.ServerConfigRemovedAccessFailed, DirectoryServicesWrapper.GetAccountName(item.Key)));
+                  break;
+                }
+
+                ReportStatus(string.Format(Resources.ServerConfigRemovedAccessSuccess, DirectoryServicesWrapper.GetAccountName(item.Key)));
+              }
             }
           }
           
           // Then remove access to all other users/groups.
-          if (success)
+          if (Settings.ServerFilePermissionsAccess == ServerFilePermissionsAccess.FullAccess
+              && success)
           {
             // Remove all access to the users group.
             success = DirectoryServicesWrapper.RemoveGroupPermissions(dataDirectory, usersGroupSid, true);

@@ -212,5 +212,11 @@ namespace MySql.Configurator.Base.Enums
 
     [Description("Option '{0}' can only be used when option '{1}' is set to '{2}'.")]
     ValueNotMatchingCondition = 92,
+
+    [Description("Options server-file-full-permissions-list and/or server-file-no-permissions-list were not provided.")]
+    NoAccessListsProvided = 93,
+
+    [Description("The provided user/group name '{0}' is not a valid Windows user/group.")]
+    InvalidUserGroupName = 94,
   }
 }

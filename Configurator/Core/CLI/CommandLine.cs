@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Timers;
@@ -1135,6 +1136,80 @@ namespace MySql.Configurator.Core.CLI
           }
 
           CommandLineParser.ProvidedOptions.Remove(uninstallSampleDbOption);
+        }
+
+        // Server file permissions.
+        var serverFilePermissionsOption = CommandLineParser.GetMatchingProvidedOption("server-file-permissions");
+        if (serverFilePermissionsOption != null)
+        {
+          if (!Enum.TryParse(serverFilePermissionsOption.Value, out ServerFilePermissionsAccess accessType))
+          {
+            return new CLIExitCode(ExitCode.InvalidOptionValue, serverFilePermissionsOption.Value, serverFilePermissionsOption.Name);
+          }
+
+          var fullControlDictionary = new Dictionary<SecurityIdentifier, string>();
+          var noAccessDictionary = new Dictionary<SecurityIdentifier, string>();
+          switch (accessType)
+          {
+            case ServerFilePermissionsAccess.FullAccess:
+              fullControlDictionary.Add(new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null), "Group");
+              fullControlDictionary.Add(new SecurityIdentifier(WellKnownSidType.CreatorOwnerSid, null), "User");
+              fullControlDictionary.Add(new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), "User");
+              serverInstallation.Controller.FullControlDictionary = fullControlDictionary;
+              break;
+
+            case ServerFilePermissionsAccess.Configure:
+              var fullControlListOption = CommandLineParser.GetMatchingProvidedOption("server-file-full-permissions-list");
+              var noAccessListOption = CommandLineParser.GetMatchingProvidedOption("server-file-no-permissions-list");
+              if (fullControlListOption == null
+                  && noAccessListOption == null)
+              {
+                return new CLIExitCode(ExitCode.NoAccessListsProvided);
+              }
+
+              if (fullControlListOption != null)
+              {
+                var fullControlList = Utilities.SplitCommaSeparatedList(fullControlListOption.Value);
+                foreach (var item in fullControlList)
+                {
+                  var sid = DirectoryServicesWrapper.GetSecurityIdentifier(item);
+                  if (sid == null)
+                  {
+                    Logger.LogError(string.Format(Resources.ServerConfigSidRetrievalFailure, serverInstallation.Controller.Settings.ServiceAccountUsername));
+                    return new CLIExitCode(ExitCode.InvalidUserGroupName, item);
+                  }
+                  else
+                  {
+                    fullControlDictionary.Add(sid, DirectoryServicesWrapper.IsGroup(item) == true ? "Group" : "User");
+                  }
+                }
+              }
+
+              if (noAccessListOption != null)
+              {
+                var noAccesslList = Utilities.SplitCommaSeparatedList(noAccessListOption.Value);
+                foreach (var item in noAccesslList)
+                {
+                  var sid = DirectoryServicesWrapper.GetSecurityIdentifier(item);
+                  if (sid == null)
+                  {
+                    Logger.LogError(string.Format(Resources.ServerConfigSidRetrievalFailure, serverInstallation.Controller.Settings.ServiceAccountUsername));
+                    return new CLIExitCode(ExitCode.InvalidUserGroupName, item);
+                  }
+                  else
+                  {
+                    noAccessDictionary.Add(sid, DirectoryServicesWrapper.IsGroup(item) == true ? "Group" : "User");
+                  }
+                }
+              }
+
+              serverInstallation.Controller.FullControlDictionary = fullControlDictionary;
+              serverInstallation.Controller.NoAccessDictionary = noAccessDictionary;
+              break;
+
+            case ServerFilePermissionsAccess.Manual:
+              break;
+          }
         }
 
         // Configure configuration type special options.
