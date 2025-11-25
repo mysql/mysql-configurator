@@ -174,12 +174,11 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
         var noAccessDictionary = new Dictionary<SecurityIdentifier, string>();
         if (YesRadioButton.Checked)
         {
-          fullControlDictionary.Add(_administratorsGroup, "Group");
-          fullControlDictionary.Add(_creatorOwnerUser, "User");
-          fullControlDictionary.Add(_systemAccountUser, "User");
+          _controller.Settings.ServerFilePermissionsAccess = Base.Enums.ServerFilePermissionsAccess.FullAccess;
         }
         else
         {
+          _controller.Settings.ServerFilePermissionsAccess = Base.Enums.ServerFilePermissionsAccess.Configure;
           Cursor = Cursors.WaitCursor;
           foreach (ListViewItem item in FullControlListView.Items)
           {
@@ -212,6 +211,10 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
 
         _controller.FullControlDictionary = fullControlDictionary;
         _controller.NoAccessDictionary = noAccessDictionary;
+      }
+      else
+      {
+        _controller.Settings.ServerFilePermissionsAccess = Base.Enums.ServerFilePermissionsAccess.Manual;
       }
 
       return base.Next();

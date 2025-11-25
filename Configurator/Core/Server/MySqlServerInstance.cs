@@ -580,7 +580,8 @@ namespace MySql.Configurator.Core.Server
 
       var serverInstance = new MySqlServerInstance(controller)
       {
-        UseOldSettings = useOldSettings
+        UseOldSettings = useOldSettings,
+        DataDir = controller.DataDirectory
       };
 
       var settings = useOldSettings

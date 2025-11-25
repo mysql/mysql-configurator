@@ -3426,8 +3426,14 @@ namespace MySql.Configurator.Core.Server
     private void UpdateServerFilesPermissions()
     {
       CancellationToken.ThrowIfCancellationRequested();
-      if (FullControlDictionary.Count > 0
-          && Settings.ConfigureAsService
+      if (Settings.ServerFilePermissionsAccess == ServerFilePermissionsAccess.FullAccess)
+      {
+        FullControlDictionary.Add(new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null), "Group");
+        FullControlDictionary.Add(new SecurityIdentifier(WellKnownSidType.CreatorOwnerSid, null), "User");
+        FullControlDictionary.Add(new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), "User");
+      }
+
+      if (Settings.ConfigureAsService
           && !string.IsNullOrEmpty(Settings.ServiceAccountUsername))
       {
         var serviceAccountUsername = Settings.ServiceAccountUsername.StartsWith(".")

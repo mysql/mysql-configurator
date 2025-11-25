@@ -1152,10 +1152,6 @@ namespace MySql.Configurator.Core.CLI
           switch (accessType)
           {
             case ServerFilePermissionsAccess.FullAccess:
-              fullControlDictionary.Add(new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null), "Group");
-              fullControlDictionary.Add(new SecurityIdentifier(WellKnownSidType.CreatorOwnerSid, null), "User");
-              fullControlDictionary.Add(new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), "User");
-              serverInstallation.Controller.FullControlDictionary = fullControlDictionary;
               break;
 
             case ServerFilePermissionsAccess.Configure:
