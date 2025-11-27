@@ -65,11 +65,6 @@ namespace MySql.Configurator.Core.Server
     #region Fields
 
     /// <summary>
-    /// The user name.
-    /// </summary>
-    private string _username;
-
-    /// <summary>
     /// The tokens used for Windows authentication.
     /// </summary>
     private string _windowsSecurityTokenList;
@@ -80,9 +75,9 @@ namespace MySql.Configurator.Core.Server
     /// </summary>
     public MySqlServerUser()
     {
-      _username = string.Empty;
-      Password = string.Empty;
       AuthenticationPlugin = MySqlAuthenticationPluginType.None;
+      Password = string.Empty;
+      Username = string.Empty;
     }
 
     /// <summary>
@@ -95,11 +90,11 @@ namespace MySql.Configurator.Core.Server
     /// <param name="role">The <see cref="Role"/> for setting permissions on the account.</param>
     public MySqlServerUser(string username, string password, MySqlAuthenticationPluginType authenticationPlugin, string host = null, Role role = null)
     {
-      _username = username;
       _windowsSecurityTokenList = string.Empty;
       AuthenticationPlugin = authenticationPlugin;
       Host = string.IsNullOrEmpty(host) ? LOCALHOST : host;
       Password = password;
+      Username = username;
       UserRole = role;
     }
 
@@ -145,18 +140,7 @@ namespace MySql.Configurator.Core.Server
     [ServerSetting("The name of a user account to be created for the server instance.",
       "user",
       new string[] { "user_name" })]
-    public string Username
-    {
-      get
-      {
-        return _username.Sanitize();
-      }
-
-      set
-      {
-        _username = value;
-      }
-    }
+    public string Username { get; set; }
 
     /// <summary>
     /// Gets or sets a comma separated list of Windows tokens allowed to authenticate to the server.

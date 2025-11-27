@@ -840,23 +840,24 @@ namespace MySql.Configurator.Core.CLI
       var passwordFileOption = CommandLineParser.GetMatchingProvidedOption(passwordFileOptionName);
       if (passwordOption != null)
       {
-        var passwordValidationResult = ValidatePassword(serverInstallation, passwordOption.Value);
+        var value = passwordOption.Value.SanitizeQuotedString();
+        var passwordValidationResult = ValidatePassword(serverInstallation, value);
         if (passwordValidationResult.ExitCode != ExitCode.Success)
         {
           return passwordValidationResult;
         }
 
-        if (!TryToSetValue(serverInstallation.Controller, passwordOption.Name, passwordOption.Value))
+        if (!TryToSetValue(serverInstallation.Controller, passwordOption.Name, value))
         {
-          return new CLIExitCode(ExitCode.InvalidOptionValue, passwordOption.Value, passwordOption.Name);
+          return new CLIExitCode(ExitCode.InvalidOptionValue, value, passwordOption.Name);
         }
 
         if (serverInstallation.Controller.ConfigurationType == ConfigurationType.Reconfigure)
         {
-          serverInstallation.Controller.Settings.ExistingRootPassword = passwordOption.Value;
+          serverInstallation.Controller.Settings.ExistingRootPassword = value;
         }
 
-        serverInstallation.Controller.Settings.RootPassword = passwordOption.Value;
+        serverInstallation.Controller.Settings.RootPassword = value;
         CommandLineParser.ProvidedOptions.Remove(passwordOption);
       }
       else if (passwordFileOption != null)

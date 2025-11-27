@@ -24,15 +24,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using MySql.Configurator;
-using MySql.Configurator.Base.Classes;
 using MySql.Configurator.Core.CLI;
 using MySql.Configurator.Base.Enums;
-using MySql.Configurator.Core.Server;
 using MySql.Configurator.Core.Settings;
 
 namespace MySQLConfigurator.Test
@@ -46,7 +40,7 @@ namespace MySQLConfigurator.Test
       var parser = new CommandLineParser();
       var privateObject = new PrivateObject(parser);
       var methodName = "GetMatchingSupportedOption";
-      var bindingFlags = BindingFlags.NonPublic | BindingFlags.Static;
+      var bindingFlags = BindingFlags.Public | BindingFlags.Static;
       var option = privateObject.Invoke(methodName, bindingFlags, new object[] { "datadir" });
       Assert.AreEqual(true, option != null);
       option = privateObject.Invoke(methodName, bindingFlags, new object[] { "mysqlx-port" });

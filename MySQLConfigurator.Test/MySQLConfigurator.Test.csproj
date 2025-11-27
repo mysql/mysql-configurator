@@ -56,6 +56,7 @@
     <Compile Include="CommandLineTests.cs" />
     <Compile Include="MySqlConfiguratorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StringExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

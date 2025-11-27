@@ -724,6 +724,44 @@ namespace MySql.Configurator.Base.Classes
     }
 
     /// <summary>
+    /// Removes enclosing single quotes, double quotes or backticks from the string (if any).
+    /// </summary>
+    /// <param name="input">The string to sanitize.</param>
+    /// <returns>The sanitized string.</returns>
+    public static string SanitizeQuotedString(this string input)
+    {
+      if (string.IsNullOrEmpty(input) || input.Length < 2)
+      {
+        return input;
+      }
+
+      char first = input[0];
+      char last = input[input.Length - 1];
+      
+      // Set of allowed quote characters
+      char[] allowed = { '"', '\'', '`' };
+
+      bool hasOpening = allowed.Contains(first);
+      bool hasClosing = allowed.Contains(last);
+      if (hasOpening && hasClosing)
+      {
+        // Both ends are some sort of quote/backtick
+        if (first == last)
+        {
+          return input.Substring(1, input.Length - 2);
+        }
+        else
+        {
+          return input;
+        }
+      }
+      else
+      {
+        return input;
+      }
+    }
+
+    /// <summary>
     /// Gets a value indicating whether the MySQL Server skips the plugin-load and plugin-load-add options as stated in bug #29622406.
     /// </summary>
     /// <param name="serverVersion">The MySQL Server version.</param>
