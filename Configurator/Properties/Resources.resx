@@ -1821,7 +1821,7 @@ Proceeding with the upgrade will update the plugin to 'caching_sha2_password'.</
     <value>Step execution failed!</value>
   </data>
   <data name="CLICopyrightNotice" xml:space="preserve">
-    <value>Copyright (c) 2023, 2025, Oracle and/or its affiliates. Oracle(R), Java, MySQL, and NetSuite are registered trademarks of Oracle and/or its affiliates.</value>
+    <value>Copyright (c) 2023, 2026, Oracle and/or its affiliates. Oracle(R), Java, MySQL, and NetSuite are registered trademarks of Oracle and/or its affiliates.</value>
   </data>
   <data name="CLIEndOperation" xml:space="preserve">
     <value>{0} operation has finished.</value>
