@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -87,7 +87,7 @@ namespace MySql.Configurator.Dialogs
       this.CopyrightLabel.Name = "CopyrightLabel";
       this.CopyrightLabel.Size = new System.Drawing.Size(241, 13);
       this.CopyrightLabel.TabIndex = 1;
-      this.CopyrightLabel.Text = "Copyright (c) 2023, 2025, Oracle and/or its affiliates.";
+      this.CopyrightLabel.Text = "Copyright (c) 2023, 2026, Oracle and/or its affiliates.";
       this.CopyrightLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
       // 
       // RegisteredTrademarkLabel

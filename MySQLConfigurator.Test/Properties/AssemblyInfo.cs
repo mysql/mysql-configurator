@@ -1,4 +1,4 @@
-/* Copyright (c) 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2024, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -27,7 +27,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Unit tests for the MySQL Configurator.")]
 [assembly: AssemblyCompany("Oracle Corporation")]
 [assembly: AssemblyProduct("MySQL Configurator")]
-[assembly: AssemblyCopyright("Copyright (c) 2024, Oracle and/or its affiliates.")]
+[assembly: AssemblyCopyright("Copyright (c) 2024, 2026, Oracle and/or its affiliates.")]
 [assembly: AssemblyTrademark("Oracle®, Java, MySQL, and NetSuite are registered trademarks of Oracle and/or its affiliates.")]
 
 [assembly: ComVisible(false)]
