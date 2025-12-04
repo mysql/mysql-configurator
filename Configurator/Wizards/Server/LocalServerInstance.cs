@@ -216,7 +216,8 @@ namespace MySql.Configurator.Wizards.Server
 
       var serverInstance = new LocalServerInstance(controller)
       {
-        UseOldSettings = useOldSettings
+        UseOldSettings = useOldSettings,
+        DataDir = controller.DataDirectory
       };
 
       var settings = useOldSettings
