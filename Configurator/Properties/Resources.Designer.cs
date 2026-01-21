@@ -2028,7 +2028,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} cannot be used as a boolean value..
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not valid. Please enter a boolean value..
         /// </summary>
         public static string NotProperValueForBool {
             get {
@@ -2037,7 +2037,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} cannot be used as an integer value..
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not valid. Please enter an integer value..
         /// </summary>
         public static string NotProperValueForInt {
             get {
@@ -2046,7 +2046,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} is not a proper value for type {1}.
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not valid. Please enter a value of type &apos;{1}&apos;..
         /// </summary>
         public static string NotProperValueForType {
             get {
@@ -2055,7 +2055,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} cannot be used as an unsigned integer value..
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not valid. Please enter an unsigned integer value..
         /// </summary>
         public static string NotProperValueForUInt {
             get {
@@ -2106,6 +2106,15 @@ namespace MySql.Configurator.Properties {
         public static string OpenFirewallPorts {
             get {
                 return ResourceManager.GetString("OpenFirewallPorts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value ‘{0}’ is outside the allowed range for an integer..
+        /// </summary>
+        public static string OutOfRangeValueForInt {
+            get {
+                return ResourceManager.GetString("OutOfRangeValueForInt", resourceCulture);
             }
         }
         

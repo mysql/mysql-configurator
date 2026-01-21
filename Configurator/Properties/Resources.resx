@@ -1305,16 +1305,16 @@ If you choose not to migrate connections now, you will be prompted later to perf
     <value>No connection was detected, local IP addresses could not be loaded.</value>
   </data>
   <data name="NotProperValueForBool" xml:space="preserve">
-    <value>{0} cannot be used as a boolean value.</value>
+    <value>'{0}' is not valid. Please enter a boolean value.</value>
   </data>
   <data name="NotProperValueForInt" xml:space="preserve">
-    <value>{0} cannot be used as an integer value.</value>
+    <value>'{0}' is not valid. Please enter an integer value.</value>
   </data>
   <data name="NotProperValueForType" xml:space="preserve">
-    <value>{0} is not a proper value for type {1}</value>
+    <value>'{0}' is not valid. Please enter a value of type '{1}'.</value>
   </data>
   <data name="NotProperValueForUInt" xml:space="preserve">
-    <value>{0} cannot be used as an unsigned integer value.</value>
+    <value>'{0}' is not valid. Please enter an unsigned integer value.</value>
   </data>
   <data name="OkButtonDefaultText2" xml:space="preserve">
     <value>OK</value>
@@ -2045,5 +2045,8 @@ Usage examples
   </data>
   <data name="CLIDeprecatedAliasWarning" xml:space="preserve">
     <value>The provided alias '{0}' is deprecated for option '{1}'. Usage of a valid alias is recommended as deprecated elements may be removed in the future.</value>
+  </data>
+  <data name="OutOfRangeValueForInt" xml:space="preserve">
+    <value>The value ‘{0}’ is outside the allowed range for an integer.</value>
   </data>
 </root>
