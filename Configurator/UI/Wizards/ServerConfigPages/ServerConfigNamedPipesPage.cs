@@ -176,27 +176,14 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
     private void LoadWindowsGroups()
     {
       Cursor = Cursors.WaitCursor;
+      var localWindowsGroups = Utilities.GetLocalWindowsGroups();
+      if (localWindowsGroups == null)
+      {
+        return;
+      }
+
       LocalGroupNameComboBox.Items.Clear();
-      try
-      {
-        using (DirectoryEntry computerEntry = new DirectoryEntry($"WinNT://{Environment.MachineName},computer"))
-        {
-          foreach (DirectoryEntry childEntry in computerEntry.Children)
-          {
-            if (!childEntry.SchemaClassName.Equals("Group"))
-            {
-              continue;
-            }
-
-            LocalGroupNameComboBox.Items.Add(childEntry.Name);
-          }
-        }
-      }
-      catch (Exception ex)
-      {
-        Logger.LogException(ex);
-      }
-
+      LocalGroupNameComboBox.Items.AddRange(localWindowsGroups);
       LocalGroupNameComboBox.Refresh();
       Cursor = Cursors.Default;
     }

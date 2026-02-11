@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2026, Oracle and/or its affiliates
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -27,6 +27,7 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
+using System.DirectoryServices;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -65,11 +66,6 @@ namespace MySql.Configurator.Base.Classes
     public const string DEFAULT_COLLATION_TEXT = "default collation";
 
     public const int DELETE_DIRECTORY_ERROR_RETRY_WAIT_IN_MILLISECONDS = 200;
-
-    /// <summary>
-    /// The secret key in string format used to generate the hashing.
-    /// </summary>
-    private const string HASHING_KEY = "1e65340434a8e8c77ef56a4bc0955a0c";
 
     /// <summary>
     /// The regex used to validate IPv4 addresses.
@@ -1070,6 +1066,36 @@ namespace MySql.Configurator.Base.Classes
       }
 
       return where.ToString();
+    }
+
+    /// <summary>
+    /// Gets a list of the available local Windows groups on this machine.
+    /// </summary>
+    /// <returns>A string list with the local Windows groups.</returns>
+    public static string[] GetLocalWindowsGroups()
+    {
+      var localWindowsGroups = new List<string>();
+      try
+      {
+        using (DirectoryEntry computerEntry = new DirectoryEntry($"WinNT://{Environment.MachineName},computer"))
+        {
+          foreach (DirectoryEntry childEntry in computerEntry.Children)
+          {
+            if (!childEntry.SchemaClassName.Equals("Group"))
+            {
+              continue;
+            }
+
+            localWindowsGroups.Add(childEntry.Name);
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        Logger.LogException(ex);
+      }
+
+      return localWindowsGroups.Count() > 0 ? localWindowsGroups.ToArray() : null;
     }
 
     /// <summary>

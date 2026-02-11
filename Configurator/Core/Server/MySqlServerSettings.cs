@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2026, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -429,7 +429,14 @@ namespace MySql.Configurator.Core.Server
       "to use named-pipe clients. The default value is an empty string, which means that no Windows user is granted full " +
       "access to the named pipe.",
       "named-pipe-full-access-group",
-      new string[] { "pipe-full-access-group", "full-access-group" })]
+      new string[] { "pipe-full-access-group", "full-access-group" },
+      false,
+      null,
+      ConfigurationType.Configure | ConfigurationType.Reconfigure,
+      null,
+      null,
+      null,
+      new string[] { "enable-named-pipes=true" })]
     [DefaultValue("")]
     public string NamedPipeFullAccessGroup { get; set; }
 

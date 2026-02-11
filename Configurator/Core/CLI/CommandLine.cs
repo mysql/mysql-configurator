@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2024, 2025, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2024, 2026, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -61,6 +61,11 @@ namespace MySql.Configurator.Core.CLI
     private static MySqlServerInstance _existingServerInstallationInstance;
 
     /// <summary>
+    /// Flag to indicate if special commands were processed.
+    /// </summary>
+    private static bool _specialCommandsProcessed;
+    
+    /// <summary>
     /// The timer used to keep track of a running operation.
     /// </summary>
     private static Timer _stepTimer;
@@ -78,6 +83,7 @@ namespace MySql.Configurator.Core.CLI
     static CommandLine()
     {
       _spinner = new ConsoleSpinner();
+      _specialCommandsProcessed = false;
       _stepTimer = new Timer(DEFAULT_SPINNER_TIMER_MILLISECONDS);
       _stepTimer.Elapsed += Timer_Elapsed;
       ResetEvent = new System.Threading.ManualResetEvent(false);
@@ -223,7 +229,8 @@ namespace MySql.Configurator.Core.CLI
       // Process special cases.
       if (serverInstallation.Controller.ConfigurationType == ConfigurationType.Reconfigure)
       {
-        if (CommandLineParser.ProvidedOptions.Count == 0)
+        if (CommandLineParser.ProvidedOptions.Count == 0
+            && !_specialCommandsProcessed)
         {
           return new CLIExitCode(ExitCode.MissingOptionToReconfigure);
         }
@@ -1207,6 +1214,29 @@ namespace MySql.Configurator.Core.CLI
             case ServerFilePermissionsAccess.Manual:
               break;
           }
+        }
+
+        // Named pipe full access group.
+        var namedPipeFullAcessGroupOption = CommandLineParser.GetMatchingProvidedOption("named-pipe-full-access-group");
+        if (namedPipeFullAcessGroupOption != null)
+        {
+          if (!namedPipeFullAcessGroupOption.Value.Equals("*everyone*", StringComparison.InvariantCulture))
+          {
+            var localWindowsGroups = Utilities.GetLocalWindowsGroups();
+            if (localWindowsGroups?.Length == 0)
+            {
+              return new CLIExitCode(ExitCode.FailedToRetrieveAnyLocalWindowsGroups);
+            }
+
+            if (!localWindowsGroups.Any(group => group.Equals(namedPipeFullAcessGroupOption.Value, StringComparison.InvariantCultureIgnoreCase)))
+            {
+              return new CLIExitCode(ExitCode.InvalidLocalWindowsGroupName, namedPipeFullAcessGroupOption.Value, namedPipeFullAcessGroupOption.Name);
+            }
+          }
+
+          serverInstallation.Controller.Settings.NamedPipeFullAccessGroup = namedPipeFullAcessGroupOption.Value;
+          CommandLineParser.ProvidedOptions.Remove(namedPipeFullAcessGroupOption);
+          _specialCommandsProcessed = true;
         }
 
         // Configure configuration type special options.

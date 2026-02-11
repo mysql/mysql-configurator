@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2024, 2025, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2024, 2026, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -200,6 +200,12 @@ namespace MySql.Configurator.Base.Enums
 
     [Description("The user or group name '{0}' could not be found for option '{1}'. Error message is '{2}'.")]
     CustomUserSecurityTokenNotFound = 82,
+
+    [Description("Failed to retrieve the list of local Windows groups.")]
+    FailedToRetrieveAnyLocalWindowsGroups = 83,
+
+    [Description("The local Windows group name '{0}' could not be found for option '{1}'.")]
+    InvalidLocalWindowsGroupName = 84,
 
     /// Validation related exit codes.
     /// Reserved codes from 90 through 109.
