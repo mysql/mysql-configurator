@@ -644,7 +644,7 @@ Provide a more complex password for stronger security.</value>
     <value>Initialize is only compatible for MySQL Server 5.7.7 or higher, no need to initialize the database for this version ({0}).</value>
   </data>
   <data name="ServerConfigInitializeDatabaseRunningInitializeInsecureText" xml:space="preserve">
-    <value>Attempting to run MySQL Server with --initialize-insecure option...</value>
+    <value>Attempting to initialize MySQL Server data directory...</value>
   </data>
   <data name="ServerConfigInitializeDatabaseSuccessText" xml:space="preserve">
     <value>{0} intialized the database successfully.</value>
