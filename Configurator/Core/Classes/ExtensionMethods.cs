@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2026, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -1136,7 +1136,14 @@ namespace MySql.Configurator.Core.Classes
           || (oldVersion.Major == 8
               && oldVersion.Minor == 4
               && newVersion.Major == 9
-              && newVersion.Minor == 7))
+              && newVersion.Minor == 7)
+          || (oldVersion.Major == 9
+              && oldVersion.Minor == 7
+              && newVersion.Major == 28
+              && newVersion.Minor == 4)
+          || (IsCalendarLtsVersion(oldVersion)
+              && IsCalendarLtsVersion(newVersion)
+              && newVersion.Major == oldVersion.Major + 2))
       {
         return true;
       }
@@ -1179,7 +1186,12 @@ namespace MySql.Configurator.Core.Classes
           ||(oldVersion.Major == 8
              && oldVersion.Minor == 4
              && newVersion.Major == 9
-             && newVersion.Minor < 7))
+             && newVersion.Minor < 7)
+          || (oldVersion.Major == 9
+              && oldVersion.Minor == 7
+              && IsInnovationBetweenLtsVersions(newVersion, oldVersion, new Version(28, 4, 0)))
+          || (IsCalendarLtsVersion(oldVersion)
+              && IsInnovationBetweenLtsVersions(newVersion, oldVersion, new Version(oldVersion.Major + 2, 4, 0))))
       {
         return true;
       }
@@ -1222,7 +1234,11 @@ namespace MySql.Configurator.Core.Classes
                || (oldVersion.Major == 9
                    && oldVersion.Minor < 7))
               && newVersion.Major == 9
-              && newVersion.Minor == 7))
+              && newVersion.Minor == 7)
+          || (IsInnovationBetweenLtsVersions(oldVersion, new Version(9, 7, 0), newVersion)
+              && IsCalendarLtsVersion(newVersion))
+          || (IsCalendarLtsVersion(new Version(newVersion.Major - 2, 4, 0))
+              && IsInnovationBetweenLtsVersions(oldVersion, new Version(newVersion.Major - 2, 4, 0), newVersion)))
       {
         return true;
       }
@@ -1258,9 +1274,16 @@ namespace MySql.Configurator.Core.Classes
 
       if (oldVersion.Major == newVersion.Major
           && ((oldVersion.Major == 8
-               && oldVersion.Minor < 4)
+               && oldVersion.Minor < 4
+               && newVersion.Minor < 4)
               || (oldVersion.Major == 9
-                  && oldVersion.Minor < 7)))
+                  && oldVersion.Minor < 7
+                  && newVersion.Minor < 7)))
+      {
+        return true;
+      }
+
+      if (IsWithinSameCalendarInnovationSeries(newVersion, oldVersion))
       {
         return true;
       }
@@ -1301,6 +1324,66 @@ namespace MySql.Configurator.Core.Classes
       }
 
       return false;
+    }
+
+    /// <summary>
+    /// Checks if the version is an LTS release under the date-based release model.
+    /// </summary>
+    /// <param name="version">The version to check.</param>
+    /// <returns><c>true</c> if the version is a date-based LTS; otherwise, <c>false</c>.</returns>
+    private static bool IsCalendarLtsVersion(Version version)
+    {
+      return version != null
+             && version.Major >= 28
+             && version.Major % 2 == 0
+             && version.Minor == 4;
+    }
+
+    /// <summary>
+    /// Checks if the version is an innovation release between two LTS releases.
+    /// </summary>
+    /// <param name="version">The innovation version to check.</param>
+    /// <param name="previousLtsVersion">The LTS version that starts the release window.</param>
+    /// <param name="nextLtsVersion">The LTS version that ends the release window.</param>
+    /// <returns><c>true</c> if the version is between the LTS releases; otherwise, <c>false</c>.</returns>
+    private static bool IsInnovationBetweenLtsVersions(Version version, Version previousLtsVersion, Version nextLtsVersion)
+    {
+      return version != null
+             && previousLtsVersion != null
+             && nextLtsVersion != null
+             && version > previousLtsVersion
+             && version < nextLtsVersion
+             && Utilities.GetServerMaturity(version) == ServerMaturity.Innovation;
+    }
+
+    /// <summary>
+    /// Checks if both versions are innovation releases within the same date-based release window.
+    /// </summary>
+    /// <param name="newVersion">The version to which the upgrade will be made to.</param>
+    /// <param name="oldVersion">The version of the existing server instance.</param>
+    /// <returns><c>true</c> if the validation has been met; otherwise, <c>false</c>.</returns>
+    private static bool IsWithinSameCalendarInnovationSeries(Version newVersion, Version oldVersion)
+    {
+      if (newVersion == null
+          || oldVersion == null
+          || oldVersion.Major < 26
+          || newVersion.Major < 26)
+      {
+        return false;
+      }
+
+      var nextLtsMajor = oldVersion.Major < 28
+        ? 28
+        : oldVersion.Major % 2 == 0 && oldVersion.Minor < 4
+          ? oldVersion.Major
+          : oldVersion.Major + (oldVersion.Major % 2 == 0 ? 2 : 1);
+      var previousLtsVersion = nextLtsMajor == 28
+        ? new Version(9, 7, 0)
+        : new Version(nextLtsMajor - 2, 4, 0);
+      var nextLtsVersion = new Version(nextLtsMajor, 4, 0);
+
+      return IsInnovationBetweenLtsVersions(oldVersion, previousLtsVersion, nextLtsVersion)
+             && IsInnovationBetweenLtsVersions(newVersion, previousLtsVersion, nextLtsVersion);
     }
 
     /// <summary>

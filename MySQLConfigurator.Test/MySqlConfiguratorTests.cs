@@ -1,4 +1,4 @@
-/* Copyright (c) 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2024, 2026, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -53,26 +53,50 @@ namespace MySQLConfigurator.Test
       Assert.AreEqual(UpgradeViability.Unsupported, currentVersion.ServerSupportsInPlaceUpgrades(new Version(5, 7, 0)));
       Assert.AreEqual(UpgradeViability.Unsupported, currentVersion.ServerSupportsInPlaceUpgrades(currentVersion));
       Assert.AreEqual(UpgradeViability.Unsupported, currentVersion.ServerSupportsInPlaceUpgrades(currentVersion));
-      
+
       // Unsupported with warning scenarios.
       Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, currentVersion.ServerSupportsInPlaceUpgrades(new Version(8, 0, 0)));
       Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, currentVersion.ServerSupportsInPlaceUpgrades(new Version(8, 0, 34)));
-      Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(8, 4, 0).ServerSupportsInPlaceUpgrades(new Version(8, 2, 0)));
       Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(8, 5, 0).ServerSupportsInPlaceUpgrades(new Version(8, 3, 0)));
       Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(9, 0, 0).ServerSupportsInPlaceUpgrades(new Version(8, 3, 0)));
-      Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(8, 3, 1).ServerSupportsInPlaceUpgrades(new Version(8, 3, 0)));
-      Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(9, 1, 0).ServerSupportsInPlaceUpgrades(new Version(8, 4, 1)));
-      Assert.AreEqual(UpgradeViability.UnsupportedWithWarning, new Version(8, 2, 0).ServerSupportsInPlaceUpgrades(new Version(8, 0, 35)));
 
       // Supported scenarios.
+      Assert.AreEqual(UpgradeViability.Supported, new Version(8, 2, 0).ServerSupportsInPlaceUpgrades(new Version(8, 0, 35)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(8, 3, 1).ServerSupportsInPlaceUpgrades(new Version(8, 3, 0)));
       Assert.AreEqual(UpgradeViability.Supported, new Version(8, 4, 0).ServerSupportsInPlaceUpgrades(new Version(8, 0, 35)));
       Assert.AreEqual(UpgradeViability.Supported, new Version(8, 1, 0).ServerSupportsInPlaceUpgrades(new Version(8, 0, 35)));
       Assert.AreEqual(UpgradeViability.Supported, new Version(8, 1, 0).ServerSupportsInPlaceUpgrades(new Version(8, 0, 35)));
       Assert.AreEqual(UpgradeViability.Supported, new Version(8, 3, 0).ServerSupportsInPlaceUpgrades(new Version(8, 2, 0)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(8, 4, 0).ServerSupportsInPlaceUpgrades(new Version(8, 2, 0)));
       Assert.AreEqual(UpgradeViability.Supported, new Version(8, 4, 0).ServerSupportsInPlaceUpgrades(new Version(8, 3, 0)));
       Assert.AreEqual(UpgradeViability.Supported, new Version(8, 4, 1).ServerSupportsInPlaceUpgrades(new Version(8, 4, 0)));
       Assert.AreEqual(UpgradeViability.Supported, new Version(8, 4, 3).ServerSupportsInPlaceUpgrades(new Version(8, 4, 1)));
       Assert.AreEqual(UpgradeViability.Supported, new Version(9, 0, 0).ServerSupportsInPlaceUpgrades(new Version(8, 4, 1)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(9, 1, 0).ServerSupportsInPlaceUpgrades(new Version(8, 4, 1)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(26, 7, 0).ServerSupportsInPlaceUpgrades(new Version(9, 7, 5)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(26, 10, 0).ServerSupportsInPlaceUpgrades(new Version(9, 7, 5)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(27, 1, 0).ServerSupportsInPlaceUpgrades(new Version(26, 10, 0)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(28, 1, 2).ServerSupportsInPlaceUpgrades(new Version(26, 7, 0)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(28, 4, 0).ServerSupportsInPlaceUpgrades(new Version(26, 7, 0)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(28, 4, 0).ServerSupportsInPlaceUpgrades(new Version(9, 7, 5)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(28, 7, 0).ServerSupportsInPlaceUpgrades(new Version(28, 4, 0)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(30, 4, 0).ServerSupportsInPlaceUpgrades(new Version(28, 7, 0)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(30, 2, 0).ServerSupportsInPlaceUpgrades(new Version(30, 1, 0)));
+      Assert.AreEqual(UpgradeViability.Supported, new Version(30, 4, 0).ServerSupportsInPlaceUpgrades(new Version(30, 1, 0)));
+    }
+
+    [TestMethod]
+    public void ValidateServerMaturity()
+    {
+      Assert.AreEqual(ServerMaturity.Older, Utilities.GetServerMaturity(new Version(5, 7, 0)));
+      Assert.AreEqual(ServerMaturity.LTS, Utilities.GetServerMaturity(new Version(8, 4, 15)));
+      Assert.AreEqual(ServerMaturity.LTS, Utilities.GetServerMaturity(new Version(9, 7, 5)));
+      Assert.AreEqual(ServerMaturity.Innovation, Utilities.GetServerMaturity(new Version(10, 7, 0)));
+      Assert.AreEqual(ServerMaturity.Innovation, Utilities.GetServerMaturity(new Version(11, 7, 0)));
+      Assert.AreEqual(ServerMaturity.Innovation, Utilities.GetServerMaturity(new Version(26, 7, 0)));
+      Assert.AreEqual(ServerMaturity.LTS, Utilities.GetServerMaturity(new Version(28, 4, 0)));
+      Assert.AreEqual(ServerMaturity.Innovation, Utilities.GetServerMaturity(new Version(28, 7, 0)));
+      Assert.AreEqual(ServerMaturity.LTS, Utilities.GetServerMaturity(new Version(30, 4, 0)));
     }
 
     [TestMethod]
