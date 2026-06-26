@@ -7,6 +7,11 @@ It performs the initial configuration, a reconfiguration, and also functions as 
 
 Please refer to the license files, available in this repository, and [Legal Notices in documentation](https://dev.mysql.com/doc/refman/8.4/en/preface.html) for further details.
 
+
+## Contributing
+
+We greatly appreciate feedback from our users, including bug reports and code contributions. Your input helps us improve, and we thank you for any issues you report or code you contribute. Please refer to the [contributing](CONTRIBUTING.md) document for additional information.
+
 ## Download and build
 
 MySQL Configurator is distributed as part of the MySQL Server and can be found in the bin folder located in the folder where MySQL Server was extracted to or installed.
