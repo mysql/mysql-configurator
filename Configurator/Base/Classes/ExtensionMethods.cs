@@ -362,7 +362,11 @@ namespace MySql.Configurator.Base.Classes
     /// <returns>The corresponding <see cref="ServerSeriesType"/> of a given MySQL Server version.</returns>
     public static ServerSeriesType GetServerSeries(this Version serverVersion)
     {
-      if (serverVersion.Major == 9)
+      if (serverVersion.Major == 26)
+      {
+        return ServerSeriesType.S26x;
+      }
+      else if (serverVersion.Major == 9)
       {
         return ServerSeriesType.S9x;
       }

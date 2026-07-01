@@ -2832,7 +2832,8 @@ namespace MySql.Configurator.Core.Server
       string templateFile = null;
       if ((version.Major >= 8
           && version.Minor > 0)
-          || version.Major == 9)
+          || version.Major == 9
+          || version.Major == 26)
       {
         templateFile = string.Format(templateBase, $"-{version.Major}.x");
       }

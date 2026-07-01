@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2026, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -67,8 +67,13 @@ namespace MySql.Configurator.Base.Enums
     S9x = S8x << 1,
 
     /// <summary>
+    /// Server 26.x
+    /// </summary>
+    S26x = S9x << 1,
+
+    /// <summary>
     /// All supported series
     /// </summary>
-    All = S51 | S55 | S56 | S57 | S80 | S8x | S9x
+    All = S51 | S55 | S56 | S57 | S80 | S8x | S9x | S26x
   }
 }
