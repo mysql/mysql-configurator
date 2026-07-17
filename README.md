@@ -5,7 +5,7 @@ It performs the initial configuration, a reconfiguration, and also functions as 
 
 ## Licensing
 
-Please refer to the license files, available in this repository, and [Legal Notices in documentation](https://dev.mysql.com/doc/refman/9.5/en/preface.html) for further details.
+Please refer to the license files, available in this repository, and [Legal Notices in documentation](https://dev.mysql.com/doc/refman/26.7/en/preface.html) for further details.
 
 ## Contributing
 
@@ -51,7 +51,7 @@ Before debugging, update the path to the server installation directory in the **
 The path set as the installation directory must be the root directory of the server installation. 
 This directory is expected to contain the bin, share, etc and other server directories.
            
-For MSI installations this path is usually "C:\Program Files\MySQL\MySQL Server 9.x" or the custom path set during installation.
+For MSI installations this path is usually "C:\Program Files\MySQL\MySQL Server 26.7.x" or the custom path set during installation.
 For ZIP installations this path is whichever location where the server files were extracted to.
 
 ### Report a bug
