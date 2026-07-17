@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2026, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -231,9 +231,13 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
     private string ValidateSecondsNumber(string seconds)
     {
       var messageResult = string.Empty;
-      if (!int.TryParse(seconds, out var slowQueryTime))
+      if (!long.TryParse(seconds, out var slowQueryTime))
       {
         messageResult = string.Format(Resources.NotProperValueForInt, seconds);
+      }
+      else if (slowQueryTime < int.MinValue || slowQueryTime > int.MaxValue)
+      {
+        messageResult = string.Format(Resources.OutOfRangeValueForInt, seconds);
       }
       else if (slowQueryTime < 0)
       {

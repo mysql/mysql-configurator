@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -30,7 +30,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("The MySQL Configurator is designed to allow the configuration and/or upgrade of the MySQL Server product.")]
 [assembly: AssemblyCompany("Oracle Corporation")]
 [assembly: AssemblyProduct("MySQL Configurator")]
-[assembly: AssemblyCopyright("Copyright (c) 2023, 2025, Oracle and/or its affiliates.")]
+[assembly: AssemblyCopyright("Copyright (c) 2023, 2026, Oracle and/or its affiliates.")]
 [assembly: AssemblyTrademark("Oracle®, Java, MySQL, and NetSuite are registered trademarks of Oracle and/or its affiliates.")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

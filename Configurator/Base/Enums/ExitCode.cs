@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2024, 2025, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2024, 2026, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -105,6 +105,9 @@ namespace MySql.Configurator.Base.Enums
     [Description("Invalid syntax. Execute '--console --help' for details on the general syntax.")]
     InvalidGenericSyntax = 23,
 
+    [Description("Option '{0}' can not be set to '{1}' because option '{2}' is already set to that value.")]
+    ConflictingValues = 24,
+
     /// Configure related exit codes.
     /// Reserved codes from 30 through 39.
 
@@ -198,6 +201,12 @@ namespace MySql.Configurator.Base.Enums
     [Description("The user or group name '{0}' could not be found for option '{1}'. Error message is '{2}'.")]
     CustomUserSecurityTokenNotFound = 82,
 
+    [Description("Failed to retrieve the list of local Windows groups.")]
+    FailedToRetrieveAnyLocalWindowsGroups = 83,
+
+    [Description("The local Windows group name '{0}' could not be found for option '{1}'.")]
+    InvalidLocalWindowsGroupName = 84,
+
     /// Validation related exit codes.
     /// Reserved codes from 90 through 109.
 
@@ -206,5 +215,14 @@ namespace MySql.Configurator.Base.Enums
 
     [Description("The password file path '{0}' does not exist.")]
     ErrorPasswordFileDoesNotExist = 91,
+
+    [Description("Option '{0}' can only be used when option '{1}' is set to '{2}'.")]
+    ValueNotMatchingCondition = 92,
+
+    [Description("Options server-file-full-permissions-list and/or server-file-no-permissions-list were not provided.")]
+    NoAccessListsProvided = 93,
+
+    [Description("The provided user/group name '{0}' is not a valid Windows user/group.")]
+    InvalidUserGroupName = 94,
   }
 }

@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2025, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -74,6 +74,10 @@ namespace MySql.Configurator.Core.Server
     /// <returns>A SQL statement for a CREATE USER or ALTER USER operation.</returns>
     public string GetCreateOrAlterUserSql(UserCrudOperationType type, MySqlServerUser serverUser)
     {
+      serverUser.Username = serverUser.Username.SanitizeQuotedString();
+      serverUser.Username = serverUser.Username.Trim();
+
+      // Create sql command.
       var builder = new StringBuilder();
       builder.Append(type.GetDescription());
       builder.Append(" '");
@@ -84,7 +88,7 @@ namespace MySql.Configurator.Core.Server
       if (serverUser.AuthenticationPlugin == MySqlAuthenticationPluginType.Windows)
       {
         builder.Append("WITH authentication_windows AS '");
-        builder.Append(Base.Classes.Utilities.StandardizeToMySqlUserDomainSyntax(serverUser.WindowsSecurityTokenList));
+        builder.Append(Utilities.StandardizeToMySqlUserDomainSyntax(serverUser.WindowsSecurityTokenList));
         builder.Append("'");
       }
       else

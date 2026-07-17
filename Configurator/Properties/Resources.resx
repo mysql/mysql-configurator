@@ -644,7 +644,7 @@ Provide a more complex password for stronger security.</value>
     <value>Initialize is only compatible for MySQL Server 5.7.7 or higher, no need to initialize the database for this version ({0}).</value>
   </data>
   <data name="ServerConfigInitializeDatabaseRunningInitializeInsecureText" xml:space="preserve">
-    <value>Attempting to run MySQL Server with --initialize-insecure option...</value>
+    <value>Attempting to initialize MySQL Server data directory...</value>
   </data>
   <data name="ServerConfigInitializeDatabaseSuccessText" xml:space="preserve">
     <value>{0} intialized the database successfully.</value>
@@ -1305,16 +1305,16 @@ If you choose not to migrate connections now, you will be prompted later to perf
     <value>No connection was detected, local IP addresses could not be loaded.</value>
   </data>
   <data name="NotProperValueForBool" xml:space="preserve">
-    <value>{0} cannot be used as a boolean value.</value>
+    <value>'{0}' is not valid. Please enter a boolean value.</value>
   </data>
   <data name="NotProperValueForInt" xml:space="preserve">
-    <value>{0} cannot be used as an integer value.</value>
+    <value>'{0}' is not valid. Please enter an integer value.</value>
   </data>
   <data name="NotProperValueForType" xml:space="preserve">
-    <value>{0} is not a proper value for type {1}</value>
+    <value>'{0}' is not valid. Please enter a value of type '{1}'.</value>
   </data>
   <data name="NotProperValueForUInt" xml:space="preserve">
-    <value>{0} cannot be used as an unsigned integer value.</value>
+    <value>'{0}' is not valid. Please enter an unsigned integer value.</value>
   </data>
   <data name="OkButtonDefaultText2" xml:space="preserve">
     <value>OK</value>
@@ -1821,7 +1821,7 @@ Proceeding with the upgrade will update the plugin to 'caching_sha2_password'.</
     <value>Step execution failed!</value>
   </data>
   <data name="CLICopyrightNotice" xml:space="preserve">
-    <value>Copyright (c) 2023, 2025, Oracle and/or its affiliates. Oracle(R), Java, MySQL, and NetSuite are registered trademarks of Oracle and/or its affiliates.</value>
+    <value>Copyright (c) 2023, 2026, Oracle and/or its affiliates. Oracle(R), Java, MySQL, and NetSuite are registered trademarks of Oracle and/or its affiliates.</value>
   </data>
   <data name="CLIEndOperation" xml:space="preserve">
     <value>{0} operation has finished.</value>
@@ -1890,14 +1890,12 @@ Syntax
 
 Options
 ---------------------------------------------------------------------------------------------------
-Name:Shortcut:Aliases:Supported Values:Description
----------------------------------------------------------------------------------------------------
 [options]
 
 Usage examples
 ---------------------------------------------------------------------------------------------------
 --action=configure --password=test
---action=configure --password=test --port=3320 enable-named-pipes --pipe-name=MYSQL_PIPE --server-id=2 --install-sample-database=All
+--action=configure --password=test --port=3320 enable-named-pipes --pipe-name=MYSQL_PIPE --server-id=2 --install-sample-databases=All
 --action=configure --password=other123 --add-user='john':'pa$$':localhost:'DBA':MYSQL --add-user='mary':'p4ssW0rd':%:'DBDesigner':MYSQL
 
 Notes
@@ -1917,8 +1915,6 @@ Syntax
 
 
 Options
----------------------------------------------------------------------------------------------------
-Name:Shortcut:Aliases:Supported Values:Description
 ---------------------------------------------------------------------------------------------------
 [options]
 
@@ -1940,8 +1936,6 @@ Syntax
 
 
 Options
----------------------------------------------------------------------------------------------------
-Name:Shortcut:Aliases:Supported Values:Description
 ---------------------------------------------------------------------------------------------------
 [options]
 
@@ -1966,14 +1960,12 @@ Syntax
 
 Options
 ---------------------------------------------------------------------------------------------------
-Name:Shortcut:Aliases:Supported Values:Description
----------------------------------------------------------------------------------------------------
 [options]
 
 Usage examples
 ---------------------------------------------------------------------------------------------------
 --action=upgrade --old-instance-password=test
---action=upgrade --old-instance-password=test --backup-data=false --server-file-permissions-access=FullAccess
+--action=upgrade --old-instance-password=test --backup-data=false
 </value>
   </data>
   <data name="CLISuccessfulConnection" xml:space="preserve">
@@ -2050,5 +2042,11 @@ Usage examples
   </data>
   <data name="MySqlPwdValueIsNotAFile" xml:space="preserve">
     <value>The value provided in the MYSQL_PWD environment variable is not a file, value will be used as the password for the root user.</value>
+  </data>
+  <data name="CLIDeprecatedAliasWarning" xml:space="preserve">
+    <value>The provided alias '{0}' is deprecated for option '{1}'. Usage of a valid alias is recommended as deprecated elements may be removed in the future.</value>
+  </data>
+  <data name="OutOfRangeValueForInt" xml:space="preserve">
+    <value>The value ‘{0}’ is outside the allowed range for an integer.</value>
   </data>
 </root>

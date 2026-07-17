@@ -167,35 +167,18 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       {
         _controller.UpdateConfigurationSteps();
       }
-      
+
       if (_updateServerFilesPermissions)
       {
         var fullControlDictionary = new Dictionary<SecurityIdentifier, string>();
+        var noAccessDictionary = new Dictionary<SecurityIdentifier, string>();
         if (YesRadioButton.Checked)
         {
-          if (_controller.Settings.ConfigureAsService
-              && !string.IsNullOrEmpty(_controller.Settings.ServiceAccountUsername))
-          {
-            var serviceAccountUsername = _controller.Settings.ServiceAccountUsername.StartsWith(".")
-                                       ? _controller.Settings.ServiceAccountUsername.Replace(".", Environment.MachineName)
-                                       : _controller.Settings.ServiceAccountUsername;
-            var sid = DirectoryServicesWrapper.GetSecurityIdentifier(serviceAccountUsername);
-            if (sid == null)
-            {
-              Logger.LogError(string.Format(Properties.Resources.ServerConfigSidRetrievalFailure, _controller.Settings.ServiceAccountUsername));
-            }
-            else
-            {
-              fullControlDictionary.Add(sid, "User");
-            }
-          }
-
-          fullControlDictionary.Add(_administratorsGroup, "Group");
-          fullControlDictionary.Add(_creatorOwnerUser, "User");
-          fullControlDictionary.Add(_systemAccountUser, "User");
+          _controller.Settings.ServerFilePermissionsAccess = Base.Enums.ServerFilePermissionsAccess.FullAccess;
         }
         else
         {
+          _controller.Settings.ServerFilePermissionsAccess = Base.Enums.ServerFilePermissionsAccess.Configure;
           Cursor = Cursors.WaitCursor;
           foreach (ListViewItem item in FullControlListView.Items)
           {
@@ -210,10 +193,28 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
             }
           }
 
+          foreach (ListViewItem item in NoAccessListView.Items)
+          {
+            var sid = DirectoryServicesWrapper.GetSecurityIdentifier(item.Name);
+            if (sid == null)
+            {
+              Logger.LogError(string.Format(Properties.Resources.ServerConfigSidRetrievalFailure, _controller.Settings.ServiceAccountUsername));
+            }
+            else
+            {
+              noAccessDictionary.Add(sid, DirectoryServicesWrapper.IsGroup(item.Name) == true ? "Group" : "User");
+            }
+          }
+
           Cursor = Cursors.Default;
         }
 
         _controller.FullControlDictionary = fullControlDictionary;
+        _controller.NoAccessDictionary = noAccessDictionary;
+      }
+      else
+      {
+        _controller.Settings.ServerFilePermissionsAccess = Base.Enums.ServerFilePermissionsAccess.Manual;
       }
 
       return base.Next();

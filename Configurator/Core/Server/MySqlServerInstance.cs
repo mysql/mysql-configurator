@@ -114,7 +114,7 @@ namespace MySql.Configurator.Core.Server
     /// <summary>
     /// The regex used to validate MySQL user and cluster names.
     /// </summary>
-    public const string NAME_REGEX_VALIDATION = @"^(\w|\d|_|\s)+$";
+    public const string NAME_REGEX_VALIDATION = @"^(?<username>(?:(?:\w|\d|_)+|('|""|`)[\u0001-\uFFFF]+\1))$";
 
     /// <summary>
     /// The minimum suggested length for a password.
@@ -209,7 +209,6 @@ namespace MySql.Configurator.Core.Server
       MaxConnectionRetries = DEFAULT_MAX_CONNECTION_RETRIES;
       Type = ServerConfigurationType.StandAlone;
       ParseErrorLogForAcceptingConnections = true;
-      Port = _controller.Settings.Port;
       UserAccount = MySqlServerUser.GetLocalRootUser(_controller.Settings.RootPassword, _controller.Settings.DefaultAuthenticationPlugin);
       UseOldSettings = false;
       WaitUntilAcceptingConnections = true;
@@ -581,7 +580,8 @@ namespace MySql.Configurator.Core.Server
 
       var serverInstance = new MySqlServerInstance(controller)
       {
-        UseOldSettings = useOldSettings
+        UseOldSettings = useOldSettings,
+        DataDir = controller.DataDirectory
       };
 
       var settings = useOldSettings
@@ -644,7 +644,7 @@ namespace MySql.Configurator.Core.Server
     public static ConnectionResultType CanConnect(ServerConfigurationController controller, out string errorMessage, string passwordOverride = null, bool useOldSettings = false, bool checkDataDirectoryInUse = false)
     {
       errorMessage = null;
-      var mySqlErrorLog = new ServerErrorLog(controller.ErrorLogFilePath);
+      var mySqlErrorLog = new ServerErrorLog(controller);
       var connectionResult = CanConnect(controller, passwordOverride, useOldSettings);
       if (!checkDataDirectoryInUse
           || connectionResult != ConnectionResultType.HostNotRunning)
@@ -1865,7 +1865,7 @@ namespace MySql.Configurator.Core.Server
       if (parseErrorLog)
       {
         _controller.UseStatusesList = redirectOutputToConsole;
-        mySqlErrorLog = new ServerErrorLog(_controller.ErrorLogFilePath, redirectOutputToConsole ? _controller.StatusesList : null)
+        mySqlErrorLog = new ServerErrorLog(_controller, redirectOutputToConsole ? _controller.StatusesList : null)
         {
           ReportStatusDelegate = ReportStatus,
           ReportWaitingDelegate = _controller.ReportWaiting
@@ -1950,7 +1950,7 @@ namespace MySql.Configurator.Core.Server
       var startStatus = new ServerStartStatus(true);
       Task<ServerUpgradeStatus> parsingLogForUpgradeTask = null;
       Task<bool> parsingLogTask = null;
-      var mySqlErrorLog = new ServerErrorLog(_controller.ErrorLogFilePath)
+      var mySqlErrorLog = new ServerErrorLog(_controller)
       {
         ReportStatusDelegate = ReportStatus,
         ReportWaitingDelegate = _controller.ReportWaiting

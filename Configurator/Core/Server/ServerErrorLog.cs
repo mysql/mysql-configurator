@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2026, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -21,6 +21,7 @@
   along with this program; if not, write to the Free Software Foundation, Inc., 
   51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
+using MySql.Configurator.Core.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -48,12 +49,17 @@ namespace MySql.Configurator.Core.Server
     /// <summary>
     /// The number of loops to wait before timing out if the accepting connections message is not read.
     /// </summary>
-    public const int DEFAULT_TIMEOUT_LOOPS_IF_NOT_ACCEPTING_CONNECTIONS = 120;
+    public const int DEFAULT_TIMEOUT_LOOPS_IF_NOT_ACCEPTING_CONNECTIONS = 20;
 
     /// <summary>
     /// The regex string to check if a server is accepting connections after being started.
     /// </summary>
     public const string SERVER_READY_FOR_CONNECTIONS_REGEX = @"mysqld\.exe: ready for connections\.";
+
+    /// <summary>
+    /// The regex string to get the temporary root password generated during database initialization.
+    /// </summary>
+    public const string TEMPORARY_ROOT_PASSWORD_REGEX = @"(?<Prefix>.*A temporary password is generated for root@localhost:\s*)(?<Password>.+?)\s*$";
 
     /// <summary>
     /// The regex string to check information about a started server, like its version, socket name, port, product name and license.
@@ -80,6 +86,11 @@ namespace MySql.Configurator.Core.Server
     #region Fields
 
     /// <summary>
+    /// The server controller.
+    /// </summary>
+    private ServerConfigurationController _controller; 
+
+    /// <summary>
     /// The <see cref="FileInfo"/> related to the error log file.
     /// </summary>
     private readonly FileInfo _fileInfo;
@@ -99,18 +110,18 @@ namespace MySql.Configurator.Core.Server
     /// <summary>
     /// Initializes a new instance of the <see cref="ServerErrorLog"/> class.
     /// </summary>
-    /// <param name="filePath">The file path of the MySQL error log file.</param>
     /// <param name="logLines">A list of error log lines.</param>
-    public ServerErrorLog(string filePath, List<string> logLines = null)
+    public ServerErrorLog(ServerConfigurationController controller, List<string> logLines = null)
     {
-      _fileInfo = string.IsNullOrEmpty(filePath)
+      _controller = controller;
+      _fileInfo = string.IsNullOrEmpty(_controller.ErrorLogFilePath)
         ? null
-        : new FileInfo(filePath);
+        : new FileInfo(_controller.ErrorLogFilePath);
       _lastFilePosition = _fileInfo != null && _fileInfo.Exists
         ? _fileInfo.Length
         : -1;
       _lastFileSize = _lastFilePosition;
-      FilePath = filePath;
+      FilePath = _controller.ErrorLogFilePath;
       LogLines = new List<ServerErrorLogLine>();
       if (logLines != null)
       {
@@ -191,6 +202,45 @@ namespace MySql.Configurator.Core.Server
     }
 
     /// <summary>
+    /// Redacts any temporary root password generated during database initialization from a log line.
+    /// </summary>
+    /// <param name="line">The log line to redact.</param>
+    /// <returns>The redacted log line.</returns>
+    public static string RedactTemporaryRootPassword(string line)
+    {
+      if (string.IsNullOrEmpty(line))
+      {
+        return line;
+      }
+
+      return Regex.Replace(line, TEMPORARY_ROOT_PASSWORD_REGEX, "${Prefix}****", RegexOptions.IgnoreCase);
+    }
+
+    /// <summary>
+    /// Tries to get a temporary root password generated during database initialization from a raw log line.
+    /// </summary>
+    /// <param name="line">The raw log line to inspect.</param>
+    /// <param name="password">The temporary root password, if found.</param>
+    /// <returns><c>true</c> if the temporary root password was found; otherwise, <c>false</c>.</returns>
+    public static bool TryGetTemporaryRootPassword(string line, out string password)
+    {
+      password = null;
+      if (string.IsNullOrEmpty(line))
+      {
+        return false;
+      }
+
+      var match = Regex.Match(line, TEMPORARY_ROOT_PASSWORD_REGEX, RegexOptions.IgnoreCase);
+      if (!match.Success)
+      {
+        return false;
+      }
+
+      password = match.Groups["Password"].Value;
+      return !string.IsNullOrEmpty(password);
+    }
+
+    /// <summary>
     /// Reads new lines added to the error log file and adds them into the <see cref="LogLines"/>.
     /// </summary>
     /// <param name="reportStatus">Flag indicating whether added lines are output using the <see cref="ReportStatusDelegate"/>.</param>
@@ -233,7 +283,8 @@ namespace MySql.Configurator.Core.Server
               continue;
             }
 
-            ReportStatusDelegate?.Invoke(logLine.Parsed ? logLine.Message : logLine.UnparsedLine);
+            var statusLine = logLine.Parsed ? logLine.Message : logLine.UnparsedLine;
+            ReportStatusDelegate?.Invoke(RedactTemporaryRootPassword(statusLine));
           }
 
           _lastFilePosition = stream.Position;
@@ -241,6 +292,42 @@ namespace MySql.Configurator.Core.Server
       }
 
       _lastFileSize = currentFileSize;
+    }
+
+    /// <summary>
+    /// Tries to get the last temporary root password generated during database initialization from the parsed log lines.
+    /// </summary>
+    /// <param name="password">The temporary root password, if found.</param>
+    /// <returns><c>true</c> if the temporary root password was found; otherwise, <c>false</c>.</returns>
+    public bool TryGetTemporaryRootPassword(out string password)
+    {
+      return TryGetTemporaryRootPassword(LogLines, out password);
+    }
+
+    /// <summary>
+    /// Tries to get the last temporary root password generated during database initialization from log lines.
+    /// </summary>
+    /// <param name="logLines">The error log lines to inspect.</param>
+    /// <param name="password">The temporary root password, if found.</param>
+    /// <returns><c>true</c> if the temporary root password was found; otherwise, <c>false</c>.</returns>
+    public static bool TryGetTemporaryRootPassword(IEnumerable<ServerErrorLogLine> logLines, out string password)
+    {
+      password = null;
+      if (logLines == null)
+      {
+        return false;
+      }
+
+      foreach (var logLine in logLines)
+      {
+        var line = logLine?.Message ?? logLine?.UnparsedLine;
+        if (TryGetTemporaryRootPassword(line, out var temporaryRootPassword))
+        {
+          password = temporaryRootPassword;
+        }
+      }
+
+      return !string.IsNullOrEmpty(password);
     }
 
     /// <summary>
@@ -335,6 +422,11 @@ namespace MySql.Configurator.Core.Server
         if (fromLogFile)
         {
           ReadNewLinesFromFile(reportStatus);
+        }
+        else if (_controller.UseStatusesList)
+        {
+          LogLines.Clear();
+          _controller.StatusesList.ForEach(line => LogLines.Add(ServerErrorLogLine.Parse(line)));
         }
 
         lastErrorLogLinesCount = newErrorLogLinesCount;

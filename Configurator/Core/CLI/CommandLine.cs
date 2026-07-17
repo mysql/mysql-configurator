@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2024, 2025, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2024, 2026, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Timers;
@@ -60,6 +61,11 @@ namespace MySql.Configurator.Core.CLI
     private static MySqlServerInstance _existingServerInstallationInstance;
 
     /// <summary>
+    /// Flag to indicate if special commands were processed.
+    /// </summary>
+    private static bool _specialCommandsProcessed;
+    
+    /// <summary>
     /// The timer used to keep track of a running operation.
     /// </summary>
     private static Timer _stepTimer;
@@ -77,6 +83,7 @@ namespace MySql.Configurator.Core.CLI
     static CommandLine()
     {
       _spinner = new ConsoleSpinner();
+      _specialCommandsProcessed = false;
       _stepTimer = new Timer(DEFAULT_SPINNER_TIMER_MILLISECONDS);
       _stepTimer.Elapsed += Timer_Elapsed;
       ResetEvent = new System.Threading.ManualResetEvent(false);
@@ -136,13 +143,62 @@ namespace MySql.Configurator.Core.CLI
         return new CLIExitCode(ExitCode.ServerNotConfigured);
       }
 
-      // Validate that all provided options are applicable to the specified action.
       var optionsForConfigurationType = GetOptionsForAction(serverInstallation.Controller.ConfigurationType);
       foreach (var option in CommandLineParser.ProvidedOptions)
       {
+        // Validate that all provided options are applicable to the specified action.
         if (!optionsForConfigurationType.Any(configTypeOption => configTypeOption.Name.Equals(option.Name, StringComparison.InvariantCultureIgnoreCase)))
         {
           return new CLIExitCode(ExitCode.InvalidOptionForAction, serverInstallation.Controller.ConfigurationType.ToString(), option.Name);
+        }
+
+        // Check for deprecated aliases.
+        if (option.DeprecatedAliases != null
+            && option.DeprecatedAliases.Contains(option.ProvidedName))
+        {
+          var message = string.Format(Resources.CLIDeprecatedAliasWarning, option.ProvidedName, option.Name);
+          Logger.LogWarning(message);
+          Console.WriteLine(message);
+        }
+
+        // Check for conditions.
+        if (option.Conditions != null
+            && option.Conditions.Count > 0)
+        {
+          foreach (var condition in option.Conditions)
+          {
+            var conditionOption = CommandLineParser.ProvidedOptions.FirstOrDefault(providedOption => providedOption.Name.Equals(condition.Key, StringComparison.InvariantCultureIgnoreCase));
+
+            /*
+              Check if the default value of the option matches the conditions.
+              Otherwise, check if an option provided by the user matches the conditions.
+            */
+            if (conditionOption == null)
+            {
+              conditionOption = CommandLineParser.SupportedOptions.FirstOrDefault(providedOption => providedOption.Name.Equals(condition.Key, StringComparison.InvariantCultureIgnoreCase));
+              if (conditionOption == null)
+              {
+                throw new ArgumentNullException(nameof(conditionOption));
+              }
+
+              var value = serverInstallation.Controller.Settings.GetValue(condition.Key);
+              if (value == null)
+              {
+                throw new ArgumentNullException(nameof(conditionOption));
+              }
+
+              if (!condition.Value.Equals(value, StringComparison.InvariantCultureIgnoreCase))
+              {
+                return new CLIExitCode(ExitCode.ValueNotMatchingCondition, option.Name, condition.Key, condition.Value);
+              }
+
+              continue;
+            }
+            else if (!condition.Value.Equals(conditionOption.Value))
+            {
+              return new CLIExitCode(ExitCode.ValueNotMatchingCondition, option.Name, condition.Key, condition.Value);
+            }
+          }
         }
       }
 
@@ -170,10 +226,11 @@ namespace MySql.Configurator.Core.CLI
         }
       }
 
-      // Process special cases
+      // Process special cases.
       if (serverInstallation.Controller.ConfigurationType == ConfigurationType.Reconfigure)
       {
-        if (CommandLineParser.ProvidedOptions.Count == 0)
+        if (CommandLineParser.ProvidedOptions.Count == 0
+            && !_specialCommandsProcessed)
         {
           return new CLIExitCode(ExitCode.MissingOptionToReconfigure);
         }
@@ -505,6 +562,7 @@ namespace MySql.Configurator.Core.CLI
         {
           _existingServerInstallationInstance.Controller.Settings.ServiceName = serviceNames[0];
           _existingServerInstallationInstance.Controller.Settings.ConfigureAsService = true;
+          _existingServerInstallationInstance.Controller.Settings.ConfigureAsProcess = false;
         }
 
         var iniFile = new IniFileEngine(configFile).Load();
@@ -557,29 +615,62 @@ namespace MySql.Configurator.Core.CLI
       // Generate action options section.
       var builder = new StringBuilder();
       var options = GetOptionsForAction(actionType);
+      var properties = typeof(MySqlServerSettings).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(ServerSettingAttribute)));
       foreach (var option in options)
       {
-        string aliases = "N/A";
-        string shortcut = "N/A";
-        string supportedValues = "N/A";
+        builder.AppendLine($"--{option.Name}");
         if (!string.IsNullOrEmpty(option.Shortcut))
         {
-          shortcut = option.Shortcut;
+          builder.AppendLine($"Shortcut:\t-{option.Shortcut}");
         }
 
         if (option.Aliases != null
             && option.Aliases.Length > 0)
         {
-          aliases = string.Join(",", option.Aliases);
+          builder.Append("Aliases:\t");
+          builder.AppendLine(string.Join(", ", option.Aliases));
         }
 
         if (option.SupportedValues != null
             && option.SupportedValues.Length > 0)
         {
-          supportedValues = string.Join(",", option.SupportedValues);
+          builder.Append("Values:\t\t");
+          builder.AppendLine(string.Join(", ", option.SupportedValues));
+        }
+        else
+        {
+          foreach (var propertyInfo in properties)
+          {
+            var controllerSettingAttribute = propertyInfo.GetCustomAttributes(typeof(ServerSettingAttribute), true).First() as ServerSettingAttribute;
+            if (controllerSettingAttribute == null
+                || !controllerSettingAttribute.IsValidKeyword(option.Name)
+                || (propertyInfo.PropertyType != typeof(bool)
+                    && !propertyInfo.PropertyType.IsEnum))
+            {
+              continue;
+            }
+
+            builder.Append("Values:\t\t");
+            if (propertyInfo.PropertyType == typeof(bool))
+            {
+              builder.AppendLine("true, false");
+            }
+            else if (propertyInfo.PropertyType.IsEnum)
+            {
+              var values = Enum.GetValues(propertyInfo.PropertyType);
+              foreach (var value in values)
+              {
+                builder.Append($"{value.ToString()}, ");
+              }
+
+              builder.AppendLine();
+            }
+          }
         }
 
-        builder.AppendLine($"- {option.Name}:{shortcut}:{aliases}:{supportedValues}:{option.Description}");
+        builder.AppendLine($"Description:\t{option.Description}");
+        builder.AppendLine();
+        builder.AppendLine();
       }
 
       actionHelp = actionHelp.Replace("[options]", builder.ToString());
@@ -756,23 +847,24 @@ namespace MySql.Configurator.Core.CLI
       var passwordFileOption = CommandLineParser.GetMatchingProvidedOption(passwordFileOptionName);
       if (passwordOption != null)
       {
-        var passwordValidationResult = ValidatePassword(serverInstallation, passwordOption.Value);
+        var value = passwordOption.Value.SanitizeQuotedString();
+        var passwordValidationResult = ValidatePassword(serverInstallation, value);
         if (passwordValidationResult.ExitCode != ExitCode.Success)
         {
           return passwordValidationResult;
         }
 
-        if (!TryToSetValue(serverInstallation.Controller, passwordOption.Name, passwordOption.Value))
+        if (!TryToSetValue(serverInstallation.Controller, passwordOption.Name, value))
         {
-          return new CLIExitCode(ExitCode.InvalidOptionValue, passwordOption.Value, passwordOption.Name);
+          return new CLIExitCode(ExitCode.InvalidOptionValue, value, passwordOption.Name);
         }
 
         if (serverInstallation.Controller.ConfigurationType == ConfigurationType.Reconfigure)
         {
-          serverInstallation.Controller.Settings.ExistingRootPassword = passwordOption.Value;
+          serverInstallation.Controller.Settings.ExistingRootPassword = value;
         }
 
-        serverInstallation.Controller.Settings.RootPassword = passwordOption.Value;
+        serverInstallation.Controller.Settings.RootPassword = value;
         CommandLineParser.ProvidedOptions.Remove(passwordOption);
       }
       else if (passwordFileOption != null)
@@ -957,6 +1049,32 @@ namespace MySql.Configurator.Core.CLI
       if (serverInstallation.Controller.ConfigurationType == ConfigurationType.Configure
           || serverInstallation.Controller.ConfigurationType == ConfigurationType.Reconfigure)
       {
+        // Configure as service/process.
+        var configureAsServiceOption = CommandLineParser.GetMatchingProvidedOption("configure-as-service");
+        var configureAsProcessOption = CommandLineParser.GetMatchingProvidedOption("configure-as-process");
+        if (configureAsServiceOption != null
+            && configureAsProcessOption != null)
+        {
+          var configureAsService = bool.Parse(configureAsServiceOption.Value);
+          var configureAsProcess = bool.Parse(configureAsProcessOption.Value);
+          if (configureAsService == configureAsProcess)
+          {
+            return new CLIExitCode(ExitCode.ConflictingValues, configureAsProcessOption.Name, configureAsProcessOption.Value, configureAsServiceOption.Name);
+          }
+        }
+        else if (configureAsServiceOption != null)
+        {
+          serverInstallation.Controller.Settings.ConfigureAsService = bool.Parse(configureAsServiceOption.Value);
+          serverInstallation.Controller.Settings.ConfigureAsProcess = !serverInstallation.Controller.Settings.ConfigureAsService;
+          CommandLineParser.ProvidedOptions.Remove(configureAsServiceOption);
+        }
+        else if (configureAsProcessOption != null)
+        {
+          serverInstallation.Controller.Settings.ConfigureAsProcess = bool.Parse(configureAsProcessOption.Value);
+          serverInstallation.Controller.Settings.ConfigureAsService = !serverInstallation.Controller.Settings.ConfigureAsProcess;
+          CommandLineParser.ProvidedOptions.Remove(configureAsProcessOption);
+        }
+
         // Root password.
         var passwordOptionProcessingResult = ProcessPasswordOption("password", "defaults-extra-file", "MYSQL_PWD", serverInstallation);
         if (passwordOptionProcessingResult.ExitCode != ExitCode.Success)
@@ -1026,6 +1144,99 @@ namespace MySql.Configurator.Core.CLI
           }
 
           CommandLineParser.ProvidedOptions.Remove(uninstallSampleDbOption);
+        }
+
+        // Server file permissions.
+        var serverFilePermissionsOption = CommandLineParser.GetMatchingProvidedOption("server-file-permissions");
+        if (serverFilePermissionsOption != null)
+        {
+          if (!Enum.TryParse(serverFilePermissionsOption.Value, out ServerFilePermissionsAccess accessType))
+          {
+            return new CLIExitCode(ExitCode.InvalidOptionValue, serverFilePermissionsOption.Value, serverFilePermissionsOption.Name);
+          }
+
+          var fullControlDictionary = new Dictionary<SecurityIdentifier, string>();
+          var noAccessDictionary = new Dictionary<SecurityIdentifier, string>();
+          switch (accessType)
+          {
+            case ServerFilePermissionsAccess.FullAccess:
+              break;
+
+            case ServerFilePermissionsAccess.Configure:
+              var fullControlListOption = CommandLineParser.GetMatchingProvidedOption("server-file-full-permissions-list");
+              var noAccessListOption = CommandLineParser.GetMatchingProvidedOption("server-file-no-permissions-list");
+              if (fullControlListOption == null
+                  && noAccessListOption == null)
+              {
+                return new CLIExitCode(ExitCode.NoAccessListsProvided);
+              }
+
+              if (fullControlListOption != null)
+              {
+                var fullControlList = Utilities.SplitCommaSeparatedList(fullControlListOption.Value);
+                foreach (var item in fullControlList)
+                {
+                  var sid = DirectoryServicesWrapper.GetSecurityIdentifier(item);
+                  if (sid == null)
+                  {
+                    Logger.LogError(string.Format(Resources.ServerConfigSidRetrievalFailure, serverInstallation.Controller.Settings.ServiceAccountUsername));
+                    return new CLIExitCode(ExitCode.InvalidUserGroupName, item);
+                  }
+                  else
+                  {
+                    fullControlDictionary.Add(sid, DirectoryServicesWrapper.IsGroup(item) == true ? "Group" : "User");
+                  }
+                }
+              }
+
+              if (noAccessListOption != null)
+              {
+                var noAccesslList = Utilities.SplitCommaSeparatedList(noAccessListOption.Value);
+                foreach (var item in noAccesslList)
+                {
+                  var sid = DirectoryServicesWrapper.GetSecurityIdentifier(item);
+                  if (sid == null)
+                  {
+                    Logger.LogError(string.Format(Resources.ServerConfigSidRetrievalFailure, serverInstallation.Controller.Settings.ServiceAccountUsername));
+                    return new CLIExitCode(ExitCode.InvalidUserGroupName, item);
+                  }
+                  else
+                  {
+                    noAccessDictionary.Add(sid, DirectoryServicesWrapper.IsGroup(item) == true ? "Group" : "User");
+                  }
+                }
+              }
+
+              serverInstallation.Controller.FullControlDictionary = fullControlDictionary;
+              serverInstallation.Controller.NoAccessDictionary = noAccessDictionary;
+              break;
+
+            case ServerFilePermissionsAccess.Manual:
+              break;
+          }
+        }
+
+        // Named pipe full access group.
+        var namedPipeFullAcessGroupOption = CommandLineParser.GetMatchingProvidedOption("named-pipe-full-access-group");
+        if (namedPipeFullAcessGroupOption != null)
+        {
+          if (!namedPipeFullAcessGroupOption.Value.Equals("*everyone*", StringComparison.InvariantCulture))
+          {
+            var localWindowsGroups = Utilities.GetLocalWindowsGroups();
+            if (localWindowsGroups?.Length == 0)
+            {
+              return new CLIExitCode(ExitCode.FailedToRetrieveAnyLocalWindowsGroups);
+            }
+
+            if (!localWindowsGroups.Any(group => group.Equals(namedPipeFullAcessGroupOption.Value, StringComparison.InvariantCultureIgnoreCase)))
+            {
+              return new CLIExitCode(ExitCode.InvalidLocalWindowsGroupName, namedPipeFullAcessGroupOption.Value, namedPipeFullAcessGroupOption.Name);
+            }
+          }
+
+          serverInstallation.Controller.Settings.NamedPipeFullAccessGroup = namedPipeFullAcessGroupOption.Value;
+          CommandLineParser.ProvidedOptions.Remove(namedPipeFullAcessGroupOption);
+          _specialCommandsProcessed = true;
         }
 
         // Configure configuration type special options.

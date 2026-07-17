@@ -359,8 +359,10 @@ namespace MySql.Configurator.Properties {
         ///
         ///Options
         ///---------------------------------------------------------------------------------------------------
-        ///Name:Shortcut:Aliases:Supported Values:Description
-        ///----- [rest of string was truncated]&quot;;.
+        ///[options]
+        ///
+        ///Usage examples
+        ///---------------------------- [rest of string was truncated]&quot;;.
         /// </summary>
         public static string CLIConfigureActionHelp {
             get {
@@ -369,11 +371,20 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copyright (c) 2023, 2025, Oracle and/or its affiliates. Oracle(R), Java, MySQL, and NetSuite are registered trademarks of Oracle and/or its affiliates..
+        ///   Looks up a localized string similar to Copyright (c) 2023, 2026, Oracle and/or its affiliates. Oracle(R), Java, MySQL, and NetSuite are registered trademarks of Oracle and/or its affiliates..
         /// </summary>
         public static string CLICopyrightNotice {
             get {
                 return ResourceManager.GetString("CLICopyrightNotice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The provided alias &apos;{0}&apos; is deprecated for option &apos;{1}&apos;. Usage of a valid alias is recommended as deprecated elements may be removed in the future..
+        /// </summary>
+        public static string CLIDeprecatedAliasWarning {
+            get {
+                return ResourceManager.GetString("CLIDeprecatedAliasWarning", resourceCulture);
             }
         }
         
@@ -474,8 +485,10 @@ namespace MySql.Configurator.Properties {
         ///
         ///Options
         ///---------------------------------------------------------------------------------------------------
-        ///Name:Shortcut:Aliases:Supported Values:Description
-        ///------ [rest of string was truncated]&quot;;.
+        ///[options]
+        ///
+        ///Usage examples
+        ///----------------------------- [rest of string was truncated]&quot;;.
         /// </summary>
         public static string CLIReconfigureActionHelp {
             get {
@@ -496,7 +509,7 @@ namespace MySql.Configurator.Properties {
         ///
         ///Options
         ///---------------------------------------------------------------------------------------------------
-        ///Name: [rest of string was truncated]&quot;;.
+        ///[opti [rest of string was truncated]&quot;;.
         /// </summary>
         public static string CLIRemoveActionHelp {
             get {
@@ -544,8 +557,11 @@ namespace MySql.Configurator.Properties {
         ///
         ///Options
         ///---------------------------------------------------------------------------------------------------
-        ///Name:Shortcut:Aliases:Supported Values:Description
-        ///------------------------------------------------------------------------------------------------ [rest of string was truncated]&quot;;.
+        ///[options]
+        ///
+        ///Usage examples
+        ///---------------------------------------------------------------------------------------------------
+        ///--action=upgrade - [rest of string was truncated]&quot;;.
         /// </summary>
         public static string CLIUpgradeActionHelp {
             get {
@@ -1777,7 +1793,7 @@ namespace MySql.Configurator.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to MZ����@���	�!�L�!This program cannot be run in DOS mode.        ///
-        ///$PEL�@@��&quot; 0�&amp;�  @        ///�`���O� ��T  H.text�� � `.rsrc��@@.reloc �@B [rest of string was truncated]&quot;;.
+        ///$PEL�����&quot; 0��   `3`�:O T@DT  H.text0� � `.rsrcT �@@.reloc@�@B [rest of string was truncated]&quot;;.
         /// </summary>
         public static string MySql_Data {
             get {
@@ -2012,7 +2028,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} cannot be used as a boolean value..
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not valid. Please enter a boolean value..
         /// </summary>
         public static string NotProperValueForBool {
             get {
@@ -2021,7 +2037,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} cannot be used as an integer value..
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not valid. Please enter an integer value..
         /// </summary>
         public static string NotProperValueForInt {
             get {
@@ -2030,7 +2046,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} is not a proper value for type {1}.
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not valid. Please enter a value of type &apos;{1}&apos;..
         /// </summary>
         public static string NotProperValueForType {
             get {
@@ -2039,7 +2055,7 @@ namespace MySql.Configurator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} cannot be used as an unsigned integer value..
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not valid. Please enter an unsigned integer value..
         /// </summary>
         public static string NotProperValueForUInt {
             get {
@@ -2090,6 +2106,15 @@ namespace MySql.Configurator.Properties {
         public static string OpenFirewallPorts {
             get {
                 return ResourceManager.GetString("OpenFirewallPorts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value ‘{0}’ is outside the allowed range for an integer..
+        /// </summary>
+        public static string OutOfRangeValueForInt {
+            get {
+                return ResourceManager.GetString("OutOfRangeValueForInt", resourceCulture);
             }
         }
         
