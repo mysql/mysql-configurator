@@ -435,35 +435,12 @@ namespace MySql.Configurator.Core.CLI
       Console.WriteLine(Resources.CLISuccessfulConnection);
 
       // Determine if the upgrade is supported.
-      string versionErrorMessage = null;
       var newVersion = serverInstallation.Controller.ServerInstallation.Version;
       var oldVersion = _existingServerInstallationInstance.ServerVersion;
-      var upgradeViability = newVersion.ServerSupportsInPlaceUpgrades(oldVersion);
-      switch (upgradeViability)
+      var versionValidationResult = ValidateUpgradeVersion(newVersion, oldVersion);
+      if (versionValidationResult.ExitCode != ExitCode.Success)
       {
-        case UpgradeViability.UnsupportedWithWarning:
-          versionErrorMessage = string.Format(Resources.UpgradeNotSupportedWithWarningError, oldVersion, newVersion);
-          break;
-        case UpgradeViability.Unsupported:
-          if (oldVersion.Major < 8)
-          {
-            versionErrorMessage = Resources.UpgradeOldServerNotSupportedError;
-          }
-          else if (oldVersion == newVersion)
-          {
-            versionErrorMessage = Resources.SameVersionError;
-          }
-          else
-          {
-            versionErrorMessage = string.Format(Resources.UpgradeNotSupportedError, oldVersion, newVersion);
-          }
-
-          break;
-      }
-
-      if (!string.IsNullOrEmpty(versionErrorMessage))
-      {
-        return new CLIExitCode(ExitCode.UnsupportedUpgrade, versionErrorMessage);
+        return versionValidationResult;
       }
 
       // Validations.
@@ -571,6 +548,43 @@ namespace MySql.Configurator.Core.CLI
         _existingServerInstallationInstance.Controller.Settings.ErrorLogFileName = string.IsNullOrEmpty(errorLogFileName)
           ? MySqlServerSettings.ErrorLogDefaultFileName
           : errorLogFileName;
+      }
+
+      return new CLIExitCode(ExitCode.Success);
+    }
+
+    /// <summary>
+    /// Validates whether an upgrade between the specified server versions is allowed.
+    /// </summary>
+    /// <param name="newVersion">The version to which the upgrade will be made.</param>
+    /// <param name="oldVersion">The version of the existing server instance.</param>
+    /// <returns>A <see cref="CLIExitCode"/> representing the result of the validation.</returns>
+    private static CLIExitCode ValidateUpgradeVersion(Version newVersion, Version oldVersion)
+    {
+      var upgradeViability = newVersion.ServerSupportsInPlaceUpgrades(oldVersion);
+      switch (upgradeViability)
+      {
+        case UpgradeViability.UnsupportedWithWarning:
+          var warningMessage = string.Format(Resources.UpgradeNotSupportedWithWarningError, oldVersion, newVersion);
+          Logger.LogWarning(warningMessage);
+          Console.WriteLine(warningMessage);
+          break;
+        case UpgradeViability.Unsupported:
+          string versionErrorMessage;
+          if (oldVersion.Major < 8)
+          {
+            versionErrorMessage = Resources.UpgradeOldServerNotSupportedError;
+          }
+          else if (oldVersion == newVersion)
+          {
+            versionErrorMessage = Resources.SameVersionError;
+          }
+          else
+          {
+            versionErrorMessage = string.Format(Resources.UpgradeNotSupportedError, oldVersion, newVersion);
+          }
+
+          return new CLIExitCode(ExitCode.UnsupportedUpgrade, versionErrorMessage);
       }
 
       return new CLIExitCode(ExitCode.Success);

@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2024, Oracle and/or its affiliates.
+﻿/* Copyright (c) 2024, 2026, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -24,6 +24,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using MySql.Configurator.Core.CLI;
 using MySql.Configurator.Base.Enums;
@@ -34,6 +35,42 @@ namespace MySQLConfigurator.Test
   [TestClass]
   public class CommandLineTests
   {
+    [TestMethod]
+    public void ValidateUpgradeVersionWritesWarningAndAllowsUnsupportedUpgrade()
+    {
+      var privateType = new PrivateType(typeof(CommandLine));
+      var originalOutput = Console.Out;
+      using (var output = new StringWriter())
+      {
+        try
+        {
+          Console.SetOut(output);
+          var result = privateType.InvokeStatic("ValidateUpgradeVersion", BindingFlags.NonPublic | BindingFlags.Static,
+            new object[] { new Version(8, 5, 0), new Version(8, 3, 0) }) as CLIExitCode;
+
+          Assert.IsNotNull(result);
+          Assert.AreEqual(ExitCode.Success, result.ExitCode);
+          StringAssert.Contains(output.ToString(), "not officially supported");
+        }
+        finally
+        {
+          Console.SetOut(originalOutput);
+        }
+      }
+    }
+
+    [TestMethod]
+    public void ValidateUpgradeVersionBlocksUnsupportedUpgrade()
+    {
+      var privateType = new PrivateType(typeof(CommandLine));
+
+      var result = privateType.InvokeStatic("ValidateUpgradeVersion", BindingFlags.NonPublic | BindingFlags.Static,
+        new object[] { new Version(26, 7, 0), new Version(5, 7, 0) }) as CLIExitCode;
+
+      Assert.IsNotNull(result);
+      Assert.AreEqual(ExitCode.UnsupportedUpgrade, result.ExitCode);
+    }
+
     [TestMethod]
     public void ValidateGetMatchingSupportedOption()
     {
