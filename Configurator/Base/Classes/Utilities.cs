@@ -180,6 +180,20 @@ namespace MySql.Configurator.Base.Classes
         return false;
       }
 
+      try
+      {
+        if ((File.GetAttributes(target) & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint)
+        {
+          // Delete the reparse point itself; enumerating it can operate on its target.
+          Directory.Delete(target, false);
+          return true;
+        }
+      }
+      catch
+      {
+        return false;
+      }
+
       bool success = true;
       string[] files = Directory.GetFiles(target);
       string[] dirs = Directory.GetDirectories(target);
@@ -199,7 +213,25 @@ namespace MySql.Configurator.Base.Classes
         }
       }
 
-      success = dirs.Aggregate(success, (current, dir) => current && DeleteDirectory(dir));
+      foreach (var dir in dirs)
+      {
+        if ((File.GetAttributes(dir) & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint)
+        {
+          try
+          {
+            // Delete the reparse point itself; recursing into it can operate on its target.
+            Directory.Delete(dir, false);
+          }
+          catch
+          {
+            success = false;
+          }
+        }
+        else if (!DeleteDirectory(dir))
+        {
+          success = false;
+        }
+      }
       File.SetAttributes(target, FileAttributes.Normal);
       try
       {

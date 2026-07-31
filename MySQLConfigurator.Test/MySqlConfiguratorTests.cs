@@ -26,6 +26,8 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using MySql.Configurator.Base.Classes;
 using MySql.Configurator.Base.Enums;
 using MySql.Configurator.Core.Server;
@@ -36,6 +38,123 @@ namespace MySQLConfigurator.Test
   [TestClass]
   public class MySQLConfiguratorTests
   {
+    /// <summary>
+    /// Bug#39248552 - Improper handling of directory links during MySQL data directory removal.
+    /// Verifies that directory junctions are deleted without traversing their targets.
+    /// </summary>
+    [TestMethod]
+    public void DeleteDirectoryDeletesJunctionWithoutDeletingTarget()
+    {
+      var testRoot = Path.Combine(Path.GetTempPath(), $"MySQLConfigurator-{Guid.NewGuid():N}");
+      var deletionRoot = Path.Combine(testRoot, "delete-root");
+      var junctionPath = Path.Combine(deletionRoot, "junction");
+      var targetDirectory = Path.Combine(testRoot, "target");
+      var targetFile = Path.Combine(targetDirectory, "must-remain.txt");
+
+      try
+      {
+        Directory.CreateDirectory(deletionRoot);
+        Directory.CreateDirectory(targetDirectory);
+        File.WriteAllText(targetFile, "This file must not be deleted through the junction.");
+
+        using (var process = Process.Start(new ProcessStartInfo
+               {
+                 FileName = Path.Combine(Environment.SystemDirectory, "cmd.exe"),
+                 Arguments = $"/c mklink /J \"{junctionPath}\" \"{targetDirectory}\"",
+                 CreateNoWindow = true,
+                 UseShellExecute = false
+               }))
+        {
+          process.WaitForExit();
+          Assert.AreEqual(0, process.ExitCode, "Failed to create the test junction.");
+        }
+
+        Assert.IsTrue(Utilities.DeleteDirectory(deletionRoot));
+        Assert.IsFalse(Directory.Exists(junctionPath));
+        Assert.IsTrue(File.Exists(targetFile));
+      }
+      finally
+      {
+        if (Directory.Exists(testRoot))
+        {
+          Directory.Delete(testRoot, true);
+        }
+      }
+    }
+
+    /// <summary>
+    /// Bug#39248552 - Improper handling of directory links during MySQL data directory removal.
+    /// Verifies that a directory junction used as the deletion root is removed without traversing its target.
+    /// </summary>
+    [TestMethod]
+    public void DeleteDirectoryDeletesJunctionRootWithoutDeletingTarget()
+    {
+      var testRoot = Path.Combine(Path.GetTempPath(), $"MySQLConfigurator-{Guid.NewGuid():N}");
+      var junctionPath = Path.Combine(testRoot, "delete-root");
+      var targetDirectory = Path.Combine(testRoot, "target");
+      var targetFile = Path.Combine(targetDirectory, "must-remain.txt");
+
+      try
+      {
+        Directory.CreateDirectory(testRoot);
+        Directory.CreateDirectory(targetDirectory);
+        File.WriteAllText(targetFile, "This file must not be deleted through the root junction.");
+
+        using (var process = Process.Start(new ProcessStartInfo
+               {
+                 FileName = Path.Combine(Environment.SystemDirectory, "cmd.exe"),
+                 Arguments = $"/c mklink /J \"{junctionPath}\" \"{targetDirectory}\"",
+                 CreateNoWindow = true,
+                 UseShellExecute = false
+               }))
+        {
+          process.WaitForExit();
+          Assert.AreEqual(0, process.ExitCode, "Failed to create the test junction.");
+        }
+
+        var targetPermissionsInherited = DirectoryServicesWrapper.DirectoryPermissionsAreInherited(targetDirectory);
+        var usersGroupSid = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
+        Assert.IsFalse(DirectoryServicesWrapper.ConvertInheritedPermissionsToExplicitPermissions(junctionPath, false));
+        Assert.IsFalse(DirectoryServicesWrapper.GrantPermissionsToDirectory(junctionPath, Environment.UserName, FileSystemRights.FullControl, AccessControlType.Allow, false));
+        Assert.IsFalse(DirectoryServicesWrapper.RemoveGroupPermissions(junctionPath, usersGroupSid, false));
+        Assert.AreEqual(targetPermissionsInherited, DirectoryServicesWrapper.DirectoryPermissionsAreInherited(targetDirectory));
+
+        var serverInstallation = new ServerInstallation(LicenseType.Community);
+        serverInstallation.Initialize("8.0.40", null);
+        var controller = new PrivateObject(serverInstallation.Controller);
+        Assert.IsFalse((bool)controller.Invoke("ConfigurationDirectoryHasRecommendedPermissions", junctionPath, null));
+        Assert.IsFalse((bool)controller.Invoke("SecureConfigurationDirectory", junctionPath, null));
+
+        Assert.IsTrue(Utilities.DeleteDirectory(junctionPath));
+        Assert.IsFalse(Directory.Exists(junctionPath));
+        Assert.IsTrue(File.Exists(targetFile));
+      }
+      finally
+      {
+        if (Directory.Exists(testRoot))
+        {
+          Directory.Delete(testRoot, true);
+        }
+      }
+    }
+
+    /// <summary>
+    /// Bug#39248552 - Improper handling of directory links during MySQL data directory removal.
+    /// Verifies that manual server-file permission management does not schedule an ACL update.
+    /// </summary>
+    [TestMethod]
+    public void ManualServerFilePermissionsDoesNotScheduleUpdate()
+    {
+      var serverInstallation = new ServerInstallation(LicenseType.Community);
+      serverInstallation.Initialize("8.0.40", null);
+      var controller = serverInstallation.Controller;
+      controller.ConfigurationType = ConfigurationType.Configure;
+      controller.UpdateDataDirectoryPermissions = true;
+      controller.Settings.ServerFilePermissionsAccess = ServerFilePermissionsAccess.Manual;
+
+      Assert.IsFalse(controller.IsUpdateServerFilesPermissionsStepNeeded);
+    }
+
     [TestMethod]
     public void ValidateSupportedUpgradeScenarios()
     {

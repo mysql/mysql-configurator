@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2026, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -144,7 +144,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.PermissionsQuestionLabel.Name = "PermissionsQuestionLabel";
       this.PermissionsQuestionLabel.Size = new System.Drawing.Size(504, 28);
       this.PermissionsQuestionLabel.TabIndex = 47;
-      this.PermissionsQuestionLabel.Text = "Do you want MySQL Configurator to update the server file permissions for you?";
+      this.PermissionsQuestionLabel.Text = "Do you want MySQL Configurator to update data and configuration file permissions?";
       // 
       // YesRadioButton
       // 
@@ -159,8 +159,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.YesRadioButton.Size = new System.Drawing.Size(504, 35);
       this.YesRadioButton.TabIndex = 49;
       this.YesRadioButton.TabStop = true;
-      this.YesRadioButton.Text = "Yes, grant full access to the user running the Windows Service (if applicable) an" +
-    "d the administrators group only. Other users and groups will not have access.";
+      this.YesRadioButton.Text = "Yes, grant full access to server data for the service account (if applicable) and the administrators group only. Other users and groups will not have access.";
       this.YesRadioButton.UseVisualStyleBackColor = true;
       this.YesRadioButton.CheckedChanged += new System.EventHandler(this.YesRadioButton_CheckedChanged);
       // 
@@ -176,7 +175,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.YesReviewRadioButton.Name = "YesReviewRadioButton";
       this.YesReviewRadioButton.Size = new System.Drawing.Size(504, 35);
       this.YesReviewRadioButton.TabIndex = 52;
-      this.YesReviewRadioButton.Text = "Yes, but let me review and configure the level of access.";
+      this.YesReviewRadioButton.Text = "Yes, but let me review and configure the level of access to the server data.";
       this.YesReviewRadioButton.UseVisualStyleBackColor = true;
       this.YesReviewRadioButton.CheckedChanged += new System.EventHandler(this.YesReviewRadioButton_CheckedChanged);
       // 
@@ -359,7 +358,7 @@ namespace MySql.Configurator.UI.Wizards.ServerConfigPages
       this.NoRadioButton.Name = "NoRadioButton";
       this.NoRadioButton.Size = new System.Drawing.Size(581, 29);
       this.NoRadioButton.TabIndex = 54;
-      this.NoRadioButton.Text = "No, I will manage the permissions after the server configuration.";
+      this.NoRadioButton.Text = "No, I will manage the server file permissions after the server configuration.";
       this.NoRadioButton.UseVisualStyleBackColor = true;
       this.NoRadioButton.CheckedChanged += new System.EventHandler(this.NoRadioButton_CheckedChanged);
       // 

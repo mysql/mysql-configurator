@@ -1,4 +1,4 @@
-/* Copyright (c) 2023, 2024, Oracle and/or its affiliates.
+/* Copyright (c) 2023, 2026, Oracle and/or its affiliates.
 
   This program is free software; you can redistribute it and/or modify 
   it under the terms of the GNU General Public License, version 2.0, as 
@@ -64,10 +64,15 @@ namespace MySql.Configurator.Base.Classes
           return false;
         }
 
+        if ((directoryInfo.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint)
+        {
+          return false;
+        }
+
         var directorySecurity = directoryInfo.GetAccessControl();
         directorySecurity.SetAccessRuleProtection(true, true);
         directoryInfo.SetAccessControl(directorySecurity);
-        foreach (FileInfo fileInfo in directoryInfo.GetFiles())
+        foreach (FileInfo fileInfo in directoryInfo.GetFiles().Where(file => (file.Attributes & FileAttributes.ReparsePoint) == 0))
         {
           var accessControl = fileInfo.GetAccessControl();
           accessControl.SetAccessRuleProtection(true, true);
@@ -79,7 +84,7 @@ namespace MySql.Configurator.Base.Classes
           return true;
         }
 
-        directoryInfo.GetDirectories().ToList()
+        directoryInfo.GetDirectories().Where(directory => (directory.Attributes & FileAttributes.ReparsePoint) == 0).ToList()
           .ForEach(directory => ConvertInheritedPermissionsToExplicitPermissions(directory.FullName, true));
 
         return true;
@@ -302,16 +307,30 @@ namespace MySql.Configurator.Base.Classes
       }
     }
 
+    /// <summary>
+    /// Grants the specified permissions to a directory and, optionally, its content.
+    /// </summary>
+    /// <param name="directoryName">The path to the directory.</param>
+    /// <param name="userName">The user or group that receives the permission.</param>
+    /// <param name="permission">The file-system rights to grant.</param>
+    /// <param name="access">The access-control type to apply.</param>
+    /// <param name="recursive">Whether to apply the permission to child directories and files.</param>
+    /// <returns><c>true</c> if the permission was applied; otherwise, <c>false</c>.</returns>
     public static bool GrantPermissionsToDirectory(string directoryName, string userName, FileSystemRights permission, AccessControlType access, bool recursive)
     {
       try
       {
         var directoryInfo = new DirectoryInfo(directoryName);
+        if ((directoryInfo.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint)
+        {
+          return false;
+        }
+
         DirectorySecurity directorySecurity = directoryInfo.GetAccessControl();
         directorySecurity.AddAccessRule(new FileSystemAccessRule(userName, permission, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.None, access));
         directoryInfo.SetAccessControl(directorySecurity);
 
-        foreach (FileInfo fileInfo in directoryInfo.GetFiles())
+        foreach (FileInfo fileInfo in directoryInfo.GetFiles().Where(file => (file.Attributes & FileAttributes.ReparsePoint) == 0))
         {
           FileSecurity fileSecurity = fileInfo.GetAccessControl();
           fileSecurity.AddAccessRule(new FileSystemAccessRule(userName, permission, InheritanceFlags.None, PropagationFlags.None, access));
@@ -323,7 +342,7 @@ namespace MySql.Configurator.Base.Classes
           return true;
         }
 
-        directoryInfo.GetDirectories().ToList()
+        directoryInfo.GetDirectories().Where(directory => (directory.Attributes & FileAttributes.ReparsePoint) == 0).ToList()
           .ForEach(directory => GrantPermissionsToDirectory(directory.FullName, userName, FileSystemRights.FullControl, AccessControlType.Allow, true));
 
         return true;
@@ -590,10 +609,15 @@ namespace MySql.Configurator.Base.Classes
           return false;
         }
 
+        if ((directoryInfo.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint)
+        {
+          return false;
+        }
+
         var directorySecurity = directoryInfo.GetAccessControl();
         directorySecurity.PurgeAccessRules(principalSid);
         directoryInfo.SetAccessControl(directorySecurity);
-        foreach (FileInfo fileInfo in directoryInfo.GetFiles())
+        foreach (FileInfo fileInfo in directoryInfo.GetFiles().Where(file => (file.Attributes & FileAttributes.ReparsePoint) == 0))
         {
           var accessControl = fileInfo.GetAccessControl();
           accessControl.PurgeAccessRules(principalSid);
@@ -605,7 +629,7 @@ namespace MySql.Configurator.Base.Classes
           return true;
         }
 
-        directoryInfo.GetDirectories().ToList()
+        directoryInfo.GetDirectories().Where(directory => (directory.Attributes & FileAttributes.ReparsePoint) == 0).ToList()
           .ForEach(directory => RemoveGroupPermissions(directory.FullName, principalSid, true));
 
         return true;

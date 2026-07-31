@@ -1692,6 +1692,8 @@ namespace MySql.Configurator.Core.Server
                                                          && OldSettings.ConfigureAsService
                                                            ? !DirectoryServicesWrapper.HasAccessToDirectory(DirectoryServicesWrapper.GetSecurityIdentifier(OldSettings.ServiceAccountUsername), dataDirectory, FileSystemRights.FullControl)
                                                            : true;
+      serverFilesHaveRecommendedPermissions = serverFilesHaveRecommendedPermissions
+                                              && GetConfigurationDirectories().All(directory => ConfigurationDirectoryHasRecommendedPermissions(directory, serviceAccountSid));
       UpdateDataDirectoryPermissions = !serverFilesHaveRecommendedPermissions;
       if (ConfigurationType == ConfigurationType.Upgrade)
       {
@@ -1877,9 +1879,12 @@ namespace MySql.Configurator.Core.Server
       ReportStatus(string.Format(Resources.ServerConfigGrantingPermissionsToAccount, Settings.ServiceAccountUsername));
       try
       {
-        // Validate access to data directory.
-        DirectoryServicesWrapper.GrantUserPermissionToDirectory(Settings.DataDirectory, Settings.ServiceAccountUsername, FileSystemRights.FullControl, AccessControlType.Allow);
+        // Validate access to the server data directory.
+        DirectoryServicesWrapper.GrantUserPermissionToDirectory(Path.Combine(Settings.DataDirectory, "Data"), Settings.ServiceAccountUsername, FileSystemRights.FullControl, AccessControlType.Allow);
         ReportStatus(Resources.ServerConfigGrantedPermissionsToDataDirectory);
+
+        // Validate access to the configuration file.
+        DirectoryServicesWrapper.GrantUserPermissionToFile(Settings.FullConfigFilePath, Settings.ServiceAccountUsername, FileSystemRights.FullControl, AccessControlType.Allow);
 
         // Validate the service account has access to log files.
         ConfigureFilePermissionsForServerLogs(Settings.ServiceAccountUsername);
@@ -3496,11 +3501,158 @@ namespace MySql.Configurator.Core.Server
     }
 
     /// <summary>
-    /// Sets the correct access permissions to the data directory and related files.
+    /// Determines whether a configuration directory has the restricted access rules required by the Configurator.
+    /// </summary>
+    /// <param name="directory">The configuration directory to validate.</param>
+    /// <param name="serviceAccountSid">The optional service-account security identifier.</param>
+    /// <returns><c>true</c> if the directory has only the expected access rules; otherwise, <c>false</c>.</returns>
+    private bool ConfigurationDirectoryHasRecommendedPermissions(string directory, SecurityIdentifier serviceAccountSid)
+    {
+      if (IsDirectoryReparsePoint(directory)
+          || DirectoryServicesWrapper.DirectoryPermissionsAreInherited(directory) != false)
+      {
+        return false;
+      }
+
+      var allowedSids = new HashSet<string>
+      {
+        new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null).Value,
+        new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null).Value
+      };
+      if (serviceAccountSid != null)
+      {
+        allowedSids.Add(serviceAccountSid.Value);
+      }
+
+      var rules = DirectoryServicesWrapper.GetAuthorizationRules(new DirectoryInfo(directory));
+      if (rules == null)
+      {
+        return false;
+      }
+
+      foreach (FileSystemAccessRule rule in rules)
+      {
+        var ruleSid = rule.IdentityReference as SecurityIdentifier
+                      ?? DirectoryServicesWrapper.GetSecurityIdentifier(rule.IdentityReference.Value);
+        if (ruleSid == null
+            || !allowedSids.Contains(ruleSid.Value))
+        {
+          return false;
+        }
+      }
+
+      var administratorsGroupSid = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
+      var systemAccountSid = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
+      return DirectoryServicesWrapper.HasAccessToDirectory(administratorsGroupSid, directory, FileSystemRights.FullControl)
+             && DirectoryServicesWrapper.HasAccessToDirectory(systemAccountSid, directory, FileSystemRights.FullControl)
+             && (serviceAccountSid == null
+                 || DirectoryServicesWrapper.HasAccessToDirectory(serviceAccountSid, directory, FileSystemRights.ReadAndExecute));
+    }
+
+    /// <summary>
+    /// Gets the distinct directories that contain server configuration files.
+    /// </summary>
+    /// <returns>The data directory and, when different, the INI directory.</returns>
+    private IEnumerable<string> GetConfigurationDirectories()
+    {
+      return new[] { DataDirectory, Settings.IniDirectory }
+        .Where(directory => !string.IsNullOrEmpty(directory))
+        .Distinct(StringComparer.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
+    /// Replaces a configuration directory's access rules with the restricted server configuration policy.
+    /// </summary>
+    /// <param name="directory">The configuration directory to secure.</param>
+    /// <param name="serviceAccountSid">The optional service-account security identifier.</param>
+    /// <returns><c>true</c> if the directory was secured; otherwise, <c>false</c>.</returns>
+    private bool SecureConfigurationDirectory(string directory, SecurityIdentifier serviceAccountSid)
+    {
+      if (IsDirectoryReparsePoint(directory))
+      {
+        return false;
+      }
+
+      var success = true;
+      if (DirectoryServicesWrapper.DirectoryPermissionsAreInherited(directory) == true)
+      {
+        success = DirectoryServicesWrapper.ConvertInheritedPermissionsToExplicitPermissions(directory, false);
+        ReportStatus(success
+                       ? Resources.ServerConfigConvertToExplicitPermissionsSuccess
+                       : Resources.ServerConfigConvertToExplicitPermissionsFailed);
+      }
+
+      if (!success)
+      {
+        return false;
+      }
+
+      var rules = DirectoryServicesWrapper.GetAuthorizationRules(new DirectoryInfo(directory));
+      if (rules == null)
+      {
+        return false;
+      }
+
+      foreach (FileSystemAccessRule rule in rules)
+      {
+        var ruleSid = rule.IdentityReference as SecurityIdentifier
+                      ?? DirectoryServicesWrapper.GetSecurityIdentifier(rule.IdentityReference.Value);
+        if (ruleSid == null)
+        {
+          return false;
+        }
+
+        if (!DirectoryServicesWrapper.RemoveGroupPermissions(directory, ruleSid, false))
+        {
+          return false;
+        }
+      }
+
+      var administratorsGroupSid = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
+      var systemAccountSid = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
+      foreach (var sid in new[] { administratorsGroupSid, systemAccountSid })
+      {
+        var accountName = DirectoryServicesWrapper.GetAccountName(sid);
+        if (!DirectoryServicesWrapper.GrantPermissionsToDirectory(directory, accountName, FileSystemRights.FullControl, AccessControlType.Allow, false))
+        {
+          return false;
+        }
+      }
+
+      if (serviceAccountSid == null)
+      {
+        return true;
+      }
+
+      var serviceAccountName = DirectoryServicesWrapper.GetAccountName(serviceAccountSid);
+      return DirectoryServicesWrapper.GrantPermissionsToDirectory(directory, serviceAccountName, FileSystemRights.ReadAndExecute, AccessControlType.Allow, false);
+    }
+
+    /// <summary>
+    /// Determines whether a directory path is a reparse point without following its target.
+    /// </summary>
+    /// <param name="directory">The directory path to inspect.</param>
+    /// <returns><c>true</c> when the path is a reparse point or cannot be inspected; otherwise, <c>false</c>.</returns>
+    private static bool IsDirectoryReparsePoint(string directory)
+    {
+      try
+      {
+        return (File.GetAttributes(directory) & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint;
+      }
+      catch (Exception ex)
+      {
+        Logger.LogException(ex);
+        return true;
+      }
+    }
+
+    /// <summary>
+    /// Sets the correct access permissions to the data directory, configuration directory and related files.
     /// </summary>
     private void UpdateServerFilesPermissions()
     {
       CancellationToken.ThrowIfCancellationRequested();
+      SecurityIdentifier serviceAccountSid = null;
       if (Settings.ServerFilePermissionsAccess == ServerFilePermissionsAccess.FullAccess)
       {
         FullControlDictionary.Add(new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null), "Group");
@@ -3514,14 +3666,14 @@ namespace MySql.Configurator.Core.Server
         var serviceAccountUsername = Settings.ServiceAccountUsername.StartsWith(".")
                                        ? Settings.ServiceAccountUsername.Replace(".", Environment.MachineName)
                                        : Settings.ServiceAccountUsername;
-        var sid = DirectoryServicesWrapper.GetSecurityIdentifier(serviceAccountUsername);
-        if (sid == null)
+        serviceAccountSid = DirectoryServicesWrapper.GetSecurityIdentifier(serviceAccountUsername);
+        if (serviceAccountSid == null)
         {
           Logger.LogError(string.Format(Resources.ServerConfigSidRetrievalFailure, Settings.ServiceAccountUsername));
         }
         else
         {
-          FullControlDictionary.Add(sid, "User");
+          FullControlDictionary.Add(serviceAccountSid, "User");
         }
       }
 
@@ -3550,89 +3702,108 @@ namespace MySql.Configurator.Core.Server
         }
         else
         {
-          var dataDirectory = Path.Combine(DataDirectory, "Data");
-          var usersGroupSid = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
-
-          // First convert inherited permissions to explicit permissions.
-          if (DirectoryServicesWrapper.DirectoryPermissionsAreInherited(dataDirectory) == true)
+          foreach (var configurationDirectory in GetConfigurationDirectories())
           {
-            success = DirectoryServicesWrapper.ConvertInheritedPermissionsToExplicitPermissions(dataDirectory, true);
-            ReportStatus(success
-                           ? Resources.ServerConfigConvertToExplicitPermissionsSuccess
-                           : Resources.ServerConfigConvertToExplicitPermissionsFailed);
+            if (!SecureConfigurationDirectory(configurationDirectory, serviceAccountSid))
+            {
+              success = false;
+              break;
+            }
           }
 
-          // Next grant full control to selected users/groups.
           if (success)
           {
-            if (FullControlDictionary != null
-                && FullControlDictionary.Count > 0)
+            var dataDirectory = Path.Combine(DataDirectory, "Data");
+            var usersGroupSid = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
+
+            if (IsDirectoryReparsePoint(dataDirectory))
             {
-              foreach (var item in FullControlDictionary)
+              success = false;
+            }
+            else
+            {
+              // First convert inherited permissions to explicit permissions.
+              if (DirectoryServicesWrapper.DirectoryPermissionsAreInherited(dataDirectory) == true)
               {
-                var accountName = DirectoryServicesWrapper.GetAccountName(item.Key);
-                if (!DirectoryServicesWrapper.GrantPermissionsToDirectory(dataDirectory, accountName, FileSystemRights.FullControl, AccessControlType.Allow, true))
+                success = DirectoryServicesWrapper.ConvertInheritedPermissionsToExplicitPermissions(dataDirectory, true);
+                ReportStatus(success
+                               ? Resources.ServerConfigConvertToExplicitPermissionsSuccess
+                               : Resources.ServerConfigConvertToExplicitPermissionsFailed);
+              }
+
+              // Next grant full control to selected users/groups.
+              if (success)
+              {
+                if (FullControlDictionary != null
+                    && FullControlDictionary.Count > 0)
                 {
-                  ReportStatus(string.Format(Resources.ServerConfigGrantedFullControlFailed, DirectoryServicesWrapper.GetAccountName(item.Key)));
-                  break;
+                  foreach (var item in FullControlDictionary)
+                  {
+                    var accountName = DirectoryServicesWrapper.GetAccountName(item.Key);
+                    if (!DirectoryServicesWrapper.GrantPermissionsToDirectory(dataDirectory, accountName, FileSystemRights.FullControl, AccessControlType.Allow, true))
+                    {
+                      ReportStatus(string.Format(Resources.ServerConfigGrantedFullControlFailed, DirectoryServicesWrapper.GetAccountName(item.Key)));
+                      break;
+                    }
+
+                    ReportStatus(string.Format(Resources.ServerConfigGrantedFullControlSuccess, DirectoryServicesWrapper.GetAccountName(item.Key)));
+                  }
                 }
 
-                ReportStatus(string.Format(Resources.ServerConfigGrantedFullControlSuccess, DirectoryServicesWrapper.GetAccountName(item.Key)));
-              }
-            }
-
-            if (NoAccessDictionary != null
-                && NoAccessDictionary.Count > 0)
-            {
-              foreach (var item in NoAccessDictionary)
-              {
-                var accountName = DirectoryServicesWrapper.GetAccountName(item.Key);
-                if (!DirectoryServicesWrapper.RemoveGroupPermissions(dataDirectory, DirectoryServicesWrapper.GetSecurityIdentifier(accountName), true))
+                if (NoAccessDictionary != null
+                    && NoAccessDictionary.Count > 0)
                 {
-                  ReportStatus(string.Format(Resources.ServerConfigRemovedAccessFailed, DirectoryServicesWrapper.GetAccountName(item.Key)));
-                  break;
-                }
+                  foreach (var item in NoAccessDictionary)
+                  {
+                    var accountName = DirectoryServicesWrapper.GetAccountName(item.Key);
+                    if (!DirectoryServicesWrapper.RemoveGroupPermissions(dataDirectory, DirectoryServicesWrapper.GetSecurityIdentifier(accountName), true))
+                    {
+                      ReportStatus(string.Format(Resources.ServerConfigRemovedAccessFailed, DirectoryServicesWrapper.GetAccountName(item.Key)));
+                      break;
+                    }
 
-                ReportStatus(string.Format(Resources.ServerConfigRemovedAccessSuccess, DirectoryServicesWrapper.GetAccountName(item.Key)));
+                    ReportStatus(string.Format(Resources.ServerConfigRemovedAccessSuccess, DirectoryServicesWrapper.GetAccountName(item.Key)));
+                  }
+                }
               }
-            }
-          }
           
-          // Then remove access to all other users/groups.
-          if (Settings.ServerFilePermissionsAccess == ServerFilePermissionsAccess.FullAccess
-              && success)
-          {
-            // Remove all access to the users group.
-            success = DirectoryServicesWrapper.RemoveGroupPermissions(dataDirectory, usersGroupSid, true);
-            ReportStatus(success
-                           ? string.Format(Resources.ServerConfigRemovedAccessSuccess, "users", "group")
-                           : string.Format(Resources.ServerConfigRemovedAccessFailed, "users", "group"));
-
-            // Get account names for logging purposes.
-            var accountNames = new List<string>();
-            foreach (var item in FullControlDictionary)
-            {
-              var accountName = DirectoryServicesWrapper.GetAccountName(item.Key);
-              if (string.IsNullOrEmpty(accountName))
+              // Then remove access to all other users/groups.
+              if (Settings.ServerFilePermissionsAccess == ServerFilePermissionsAccess.FullAccess
+                  && success)
               {
-                continue;
+                // Remove all access to the users group.
+                success = DirectoryServicesWrapper.RemoveGroupPermissions(dataDirectory, usersGroupSid, true);
+                ReportStatus(success
+                               ? string.Format(Resources.ServerConfigRemovedAccessSuccess, "users", "group")
+                               : string.Format(Resources.ServerConfigRemovedAccessFailed, "users", "group"));
+
+                // Get account names for logging purposes.
+                var accountNames = new List<string>();
+                foreach (var item in FullControlDictionary)
+                {
+                  var accountName = DirectoryServicesWrapper.GetAccountName(item.Key);
+                  if (string.IsNullOrEmpty(accountName))
+                  {
+                    continue;
+                  }
+
+                  accountNames.Add(accountName);
+                }
+
+                // Remove all access to any other user/group not in the Full Control list.
+                var rules = DirectoryServicesWrapper.GetAuthorizationRules(new DirectoryInfo(dataDirectory));
+                foreach (FileSystemAccessRule rule in rules)
+                {
+                  var ruleValue = rule.IdentityReference.Value;
+                  var account = new NTAccount(ruleValue.Contains("\\") ? ruleValue.Split('\\')[1] : ruleValue);
+                  if (accountNames.Contains(account.Value))
+                  {
+                    continue;
+                  }
+
+                  DirectoryServicesWrapper.RemoveGroupPermissions(dataDirectory, DirectoryServicesWrapper.GetSecurityIdentifier(account.Value), true);
+                }
               }
-
-              accountNames.Add(accountName);
-            }
-
-            // Remove all access to any other user/group not in the Full Control list.
-            var rules = DirectoryServicesWrapper.GetAuthorizationRules(new DirectoryInfo(dataDirectory));
-            foreach (FileSystemAccessRule rule in rules)
-            {
-              var ruleValue = rule.IdentityReference.Value;
-              var account = new NTAccount(ruleValue.Contains("\\") ? ruleValue.Split('\\')[1] : ruleValue);
-              if (accountNames.Contains(account.Value))
-              {
-                continue;
-              }
-
-              DirectoryServicesWrapper.RemoveGroupPermissions(dataDirectory, DirectoryServicesWrapper.GetSecurityIdentifier(account.Value), true);
             }
           }
         }

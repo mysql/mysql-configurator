@@ -581,13 +581,13 @@ Provide a more complex password for stronger security.</value>
     <value>Updated security settings.</value>
   </data>
   <data name="ServerConfigEventServerSecurityFailed" xml:space="preserve">
-    <value>Failed to update permissions for the data folder and related server files.</value>
+    <value>Failed to update permissions for the server data and configuration directories.</value>
   </data>
   <data name="ServerConfigEventServerSecurityInfo" xml:space="preserve">
-    <value>Attempting to update the permissions for the data folder and related server files...</value>
+    <value>Attempting to update permissions for the server data and configuration directories...</value>
   </data>
   <data name="ServerConfigEventServerSecuritySuccess" xml:space="preserve">
-    <value>Permissions for the data folder and related server files are updated correctly.</value>
+    <value>Permissions for the server data and configuration directories are updated correctly.</value>
   </data>
   <data name="ServerConfigEventShortcutError" xml:space="preserve">
     <value>Failed to verify command-line client shortcut.</value>
