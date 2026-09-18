@@ -3593,6 +3593,17 @@ namespace MySql.Configurator.Core.Server
         return false;
       }
 
+      var administratorsGroupSid = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
+      var administratorsGroupName = DirectoryServicesWrapper.GetAccountName(administratorsGroupSid);
+
+      // Preserve an administrative ACE while removing existing entries. Besides retaining access
+      // for the elevated Configurator process, this allows RemoveGroupPermissions to enumerate
+      // direct files after the BUILTIN\Users ACE has been removed.
+      if (!DirectoryServicesWrapper.GrantPermissionsToDirectory(directory, administratorsGroupName, FileSystemRights.FullControl, AccessControlType.Allow, false))
+      {
+        return false;
+      }
+
       foreach (FileSystemAccessRule rule in rules)
       {
         var ruleSid = rule.IdentityReference as SecurityIdentifier
@@ -3602,21 +3613,24 @@ namespace MySql.Configurator.Core.Server
           return false;
         }
 
+        // PurgeAccessRules removes every ACE for a principal, including the administrative
+        // ACE added above. Keep it until all unwanted entries have been removed.
+        if (ruleSid.Value == administratorsGroupSid.Value)
+        {
+          continue;
+        }
+
         if (!DirectoryServicesWrapper.RemoveGroupPermissions(directory, ruleSid, false))
         {
           return false;
         }
       }
 
-      var administratorsGroupSid = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
       var systemAccountSid = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
-      foreach (var sid in new[] { administratorsGroupSid, systemAccountSid })
+      var systemAccountName = DirectoryServicesWrapper.GetAccountName(systemAccountSid);
+      if (!DirectoryServicesWrapper.GrantPermissionsToDirectory(directory, systemAccountName, FileSystemRights.FullControl, AccessControlType.Allow, false))
       {
-        var accountName = DirectoryServicesWrapper.GetAccountName(sid);
-        if (!DirectoryServicesWrapper.GrantPermissionsToDirectory(directory, accountName, FileSystemRights.FullControl, AccessControlType.Allow, false))
-        {
-          return false;
-        }
+        return false;
       }
 
       if (serviceAccountSid == null)
