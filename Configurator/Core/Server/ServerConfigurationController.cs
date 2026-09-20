@@ -1879,8 +1879,9 @@ namespace MySql.Configurator.Core.Server
       ReportStatus(string.Format(Resources.ServerConfigGrantingPermissionsToAccount, Settings.ServiceAccountUsername));
       try
       {
-        // Validate access to the server data directory.
-        DirectoryServicesWrapper.GrantUserPermissionToDirectory(Path.Combine(Settings.DataDirectory, "Data"), Settings.ServiceAccountUsername, FileSystemRights.FullControl, AccessControlType.Allow);
+        // Grant access to the existing data-directory parent so its inheritable ACEs
+        // apply to the Data directory created later during server initialization.
+        DirectoryServicesWrapper.GrantUserPermissionToDirectory(Settings.DataDirectory, Settings.ServiceAccountUsername, FileSystemRights.FullControl, AccessControlType.Allow);
         ReportStatus(Resources.ServerConfigGrantedPermissionsToDataDirectory);
 
         // Validate access to the configuration file.
